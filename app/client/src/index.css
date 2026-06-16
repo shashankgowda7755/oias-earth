@@ -1,0 +1,27 @@
+/* Noto Sans — original site uses NotoSans-Regular. Pulled from Google Fonts
+   so the rebuild matches without bundling the font file. */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    @apply bg-appbg font-sans text-textPrimary antialiased;
+    margin: 0;
+    font-size: 16px;
+  }
+
+  /* Sensible default focus ring for keyboard users (accessibility). */
+  :focus-visible {
+    outline: 2px solid #17970e;
+    outline-offset: 2px;
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "name": "communitree-rebuild",
+  "private": true,
+  "version": "1.0.0",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "build": "npm install --prefix app/client && npm run --prefix app/client build && npm install --prefix app/server && npm run --prefix app/server build",
+    "start": "cd app/server && npm start"
+  }
+}

@@ -1,0 +1,170 @@
+{
+  "_meta": {
+    "title": "Be The Tree Hugger / CommuniTREE Admin — Reverse-Engineered Spec",
+    "sourceUrl": "https://admin.bethetreehugger.co/",
+    "capturedOn": "2026-06-16",
+    "method": "Authenticated headless-browser inspection (DOM + network) + GraphQL introspection. SuperAdmin account.",
+    "stackObserved": {
+      "frontend": "React SPA bundled with Vite (asset hashes like bth-33a1bc68.png), Material-UI (MUI) component library, NotoSans font, Google Maps JS API (forest geo picker), client-side routing (react-router; routes /, /dashboard).",
+      "dataLayer": "Axios over XHR. Two API surfaces on the same host dev-api.bethetreehugger.co: (1) custom REST under /api/v1/* for list/search reads, (2) PostGraphile GraphQL at /graphql for entity CRUD + relation reads. Auth service separate host dev-auth.bethetreehugger.co.",
+      "backendInferred": "Node.js. PostGraphile auto-generates the GraphQL API directly from a PostgreSQL schema (evidence: *Connection/nodes/byXId naming, nodeId, __typename). DB migrations managed by Sequelize (SequelizeMeta table present). REST layer is a separate Express service wrapping the same DB for paginated list/search.",
+      "database": "PostgreSQL. 52 tables recovered from introspection. snake_case columns; PostGraphile exposes them camelCase, REST returns raw snake_case."
+    },
+    "authObserved": {
+      "login": "POST https://dev-auth.bethetreehugger.co/api/v1/auth/login {username,password} -> 200 returns JWT (~210 char token).",
+      "tokenStorage": "localStorage: token, role, profileId, userDetailsData (JSON), forestUniqueId, ForestID.",
+      "graphqlAuth": "Authorization: Bearer <token>",
+      "restAuth": "Authorization: <token>   (RAW token, NO 'Bearer ' prefix — Bearer prefix yields 500 'jwt malformed'; wrong/absent header yields 403 'Missing Authorisation Token!')"
+    }
+  },
+
+  "designTokens": {
+    "colors": {
+      "primary": "#17970E",
+      "primaryRgb": "rgb(23,151,14)",
+      "primaryUseage": "Add buttons, Next/Save buttons, active tab underline, stepper progress, logo wordmark/leaf",
+      "navBarBg": "#4d4d4d",
+      "navBarText": "#ffffff",
+      "navBarTextInactive": "rgba(255,255,255,0.7)",
+      "appBg": "#f5f5f5",
+      "surface": "#ffffff",
+      "tableHeaderBg": "#eef1f3",
+      "textPrimary": "rgba(0,0,0,0.87)",
+      "textSecondary": "rgba(0,0,0,0.54)",
+      "border": "rgba(0,0,0,0.12)",
+      "danger": "#d32f2f",
+      "darkInk": "rgb(2,17,26)"
+    },
+    "typography": {
+      "fontFamily": "NotoSans-Regular, 'Noto Sans', Arial, sans-serif",
+      "baseFontSize": "16px",
+      "headingWeight": 600,
+      "bodyWeight": 400,
+      "fieldLabel": "12px floating label (MUI outlined)",
+      "tableHeader": "14px 600"
+    },
+    "spacing": { "scale": "MUI 8px base (theme.spacing). Card padding ~24px, field gap ~16-24px, page gutter ~24px" },
+    "radii": { "button": "4px", "card": "8px", "input": "4px", "iconButton": "50%", "pill": "9999px" },
+    "shadows": { "card": "MUI elevation 1 (0 1px 3px rgba(0,0,0,0.12))", "dialog": "MUI elevation 24", "appBar": "0 1px 4px rgba(0,0,0,0.1)" }
+  },
+
+  "components": [
+    { "name": "AppHeader", "type": "layout", "states": ["default"], "variants": [], "behavior": "White top bar. Left: leaf logo + 'Be The Tree Hugger' wordmark (green). Right: user avatar with dropdown caret -> menu with 'Log out' (clears localStorage, returns to /)." },
+    { "name": "TabNav", "type": "navigation", "states": ["default","active","hover"], "variants": ["Users","Sponsors","Employees","Forests","Reports","Jobs"], "behavior": "Dark gray secondary bar of MUI Tabs. Active tab = white text + green underline. Switching tab swaps the section's DataTable in place (URL stays /dashboard). Each tab triggers that entity's REST list call on first activation; results are cached client-side (React Query) so re-selecting does not refetch." },
+    { "name": "DataTable", "type": "data-display", "states": ["default","loading (centered spinner)","empty","error"], "variants": ["users","sponsors","employees","forests","reports","jobs"], "behavior": "Card containing: SearchBar (left), AddButton + FilterButton (right), MUI table with per-entity columns, footer with RowsPerPage select (default 10) + numbered pagination. Each row has action control(s) (edit/view/delete). Server-side pagination via {page,limit} in the list POST body." },
+    { "name": "SearchBar", "type": "input", "states": ["default","focused","filled"], "variants": [], "behavior": "Debounced text input ('Search users...', 'Search forests...', etc). Sends search term to the list endpoint (server-side filter, inferred)." },
+    { "name": "FilterButton", "type": "button", "states": ["default","active"], "variants": [], "behavior": "Funnel icon button; opens a filter popover (per-column filters; e.g. reports/list returns filter_limit). Exact filter fields not fully enumerated — OPEN QUESTION." },
+    { "name": "AddButton", "type": "button", "states": ["default","hover","disabled"], "variants": ["+ Add User","+ Add Sponsor","+ Add Employee","+ Add Forest","+ Add Report"], "behavior": "Green primary button. Opens the entity create dialog/wizard." },
+    { "name": "Pagination", "type": "navigation", "states": ["default","disabled (prev on page 1)"], "variants": [], "behavior": "Prev / numbered pages / Next. Page count derived from pagination.total in response." },
+    { "name": "EntityFormDialog", "type": "modal", "states": ["open","submitting","validation-error","success"], "variants": ["AddUser","AddSponsor","AddEmployee","AddReport","Edit*"], "behavior": "MUI Dialog with outlined fields. Footer: Cancel (close, no save), Reset (clear fields), Save (validate -> POST create or PATCH update via GraphQL mutation -> toast -> refetch list -> close)." },
+    { "name": "FormField", "type": "input", "states": ["default","focused","filled","error","disabled"], "variants": ["text","email","number/mobile","password","textarea","select"], "behavior": "MUI outlined TextField with floating label. Required fields marked with '*'. Inline helper/error text below on validation failure." },
+    { "name": "RoleSelect", "type": "select", "states": ["default","open","selected"], "variants": [], "behavior": "Combobox populated from /api/v1/roles/list (SuperAdmin, Admin, ...). Used in Add/Edit User." },
+    { "name": "Stepper", "type": "navigation", "states": ["step-active","step-complete","step-upcoming"], "variants": ["2-step Add Forest wizard"], "behavior": "CORRECTED (live walk-through): the wizard is TWO steps only — '1 Basic Info' and '2 Grid Config' (the '1-6' seen earlier were the forest LIST pagination behind the modal). Numbered horizontal stepper with green progress bar; completed step shows a check. Footer step1: Cancel / Reset / Next->. Footer step2: <- Previous / Cancel / Reset / Save Forest." },
+    { "name": "EditBoxDialog", "type": "modal", "states": ["open"], "variants": [], "behavior": "Sub-modal opened by clicking a box card in Grid Config step. Header 'Row R • Column C' + Capacity/Planted/Remaining counters (capacity = treeRows*treeColumns, e.g. 25 for 5x5). Fields: Prefix (text), Start Digits (number, default 1), Start (number, auto-calculated). 'Enter prefix to add species details.' -> species rows appear. Cancel / Done. Generates ForestBox + tree unique IDs (prefix+running number) for that box." },
+    { "name": "MapLocationPicker", "type": "input", "states": ["default","located"], "variants": [], "behavior": "Google Maps embed with 'Search location' autocomplete; 'Click to update coordinates' sets forest_geo_lat/long. Recenter control. Part of Add Forest step 1." },
+    { "name": "SpeciesSearchSelect", "type": "select", "states": ["default","searching","selected"], "variants": [], "behavior": "Async search backed by POST /api/v1/master-plantspecies/search (large catalog ~67KB). Used in forest wizard for species selection." },
+    { "name": "AvatarCell", "type": "data-display", "states": ["with-image","initials-fallback"], "variants": [], "behavior": "Round avatar or 2-letter initials in user/sponsor/employee tables." },
+    { "name": "ConfirmDialog", "type": "modal", "states": ["open"], "variants": ["delete"], "behavior": "Inferred for destructive row actions (delete -> GraphQL delete mutation). Not visually confirmed — OPEN QUESTION." },
+    { "name": "Toast", "type": "feedback", "states": ["success","error"], "variants": [], "behavior": "Snackbar feedback after mutations (inferred standard MUI snackbar)." }
+  ],
+
+  "screens": [
+    { "name": "Login", "route": "/", "reachedBy": "Unauthenticated root, or after logout / token expiry redirect.",
+      "components": ["Centered card","FormField(username)","FormField(password + show/hide toggle)","Sign in button"],
+      "dataDisplayed": ["'Sign in to your account' heading"],
+      "dataCollected": ["User name","Password"],
+      "submit": "POST dev-auth /api/v1/auth/login. Success -> store token+role+profileId+userDetailsData -> redirect /dashboard. Failure -> inline error (inferred)." },
+    { "name": "Users", "route": "/dashboard (Users tab, default)",
+      "components": ["TabNav","DataTable(users)","SearchBar","AddButton(+ Add User)","FilterButton","EntityFormDialog(AddUser)"],
+      "dataDisplayed": ["User (avatar+name)","Username","Role","Email","Mobile"],
+      "dataCollected": ["AddUser: First Name, Last Name, Username, Role(select), Email, Mobile, Password"],
+      "apisOnLoad": ["POST /api/v1/roles/list","POST /api/v1/users/list","3x POST /graphql (bootstrap: current-user profile/roles)"] },
+    { "name": "Sponsors", "route": "/dashboard (Sponsors tab)",
+      "components": ["DataTable(sponsors)","AddButton(+ Add Sponsor)","EntityFormDialog(AddSponsor)"],
+      "dataDisplayed": ["sponsor_name","logo","industry","headquarters","website_url","established_year","is_active"],
+      "dataCollected": ["sponsor name, logos (sponsor/forest/tree/og image), established year, website, industry, headquarters"],
+      "apisOnLoad": ["POST /api/v1/sponsors/list"] },
+    { "name": "Employees", "route": "/dashboard (Employees tab)",
+      "components": ["DataTable(employees)","AddButton(+ Add Employee)","EntityFormDialog(AddEmployee)"],
+      "dataDisplayed": ["name","profile_image","designation","contact_no","email_id","is_active"],
+      "dataCollected": ["name, profile image, designation, contact no, email"],
+      "apisOnLoad": ["POST /api/v1/employee/list"],
+      "note": "employee/list pagination shape differs: {data,total,page,limit} instead of {data,pagination}." },
+    { "name": "Forests", "route": "/dashboard (Forests tab)",
+      "components": ["DataTable(forests)","AddButton(+ Add Forest)","Stepper wizard(6 steps)","MapLocationPicker","SpeciesSearchSelect"],
+      "dataDisplayed": ["Forest Name","Internal ID","Unique ID","Sponsor","Geo (Lat,Long)","Oxygen (KT)","Carbon Offset (KT)","Address","Box Grid (rows x cols)","Tree Grid","Total Trees","Avg Age (Yrs)","Species Planted","Plantation Date","Project Period (Yrs)"],
+      "dataCollected": ["CORRECTED via live walk-through. TWO-step wizard. Step1 'Basic Info': Forest Name*, Forest Internal ID*, City*, State*, Country*, Address, Description, map coordinates (Google Places search 'Pick Location on Map*'), Site Manager*(employee autocomplete), Sponsor*(autocomplete), User*(autocomplete). Step2 'Grid Config': Box Rows*, Box Column*, Box to Box Distance(ft)*, Tree Rows*, Tree Column*, Tree to Tree Distance(ft)*, Direction Angle*, Boundary Gap(ft)*, Pathway Spacing(ft)*, Project Site*, Project Period(years)*, Plantation Date* -> renders a grid of Box cards (rows x cols); each card opens EditBoxDialog (prefix/startDigits/start -> tree IDs + species). Final action 'Save Forest'. Submit goes through forest/upsert which runs the async forest_upsert_v1 job that materializes boxes/trees/clusters."],
+      "apisOnLoad": ["POST /api/v1/forest/list","POST /api/v1/master-plantspecies/search (on wizard open)"] },
+    { "name": "Reports", "route": "/dashboard (Reports tab)",
+      "components": ["DataTable(reports)","AddButton","FilterButton"],
+      "dataDisplayed": ["year","quarter","report_date","plantation_date","start/end_date","mode","type","version","project_period","Forest (joined name)","CreatedBy/UpdatedBy (joined user)","is_active"],
+      "dataCollected": ["report metadata + reportData JSON; tied to a forest (forest_id)"],
+      "apisOnLoad": ["POST /api/v1/reports/list (response adds filter_limit)"] },
+    { "name": "Jobs", "route": "/dashboard (Jobs tab)",
+      "components": ["DataTable(jobs)","SearchBar"],
+      "dataDisplayed": ["job_id","job_type","status","job_description","created_at","updated_at"],
+      "dataCollected": ["read-only async job monitor (payload/result JSON). Likely background jobs e.g. report generation."],
+      "apisOnLoad": ["POST /api/v1/jobs/list"] }
+  ],
+
+  "apis": [
+    { "endpoint": "https://dev-auth.bethetreehugger.co/api/v1/auth/login", "method": "POST", "calledWhen": "Login submit", "requestShape": {"username":"string","password":"string"}, "responseShape": {"token":"jwt string","user":"{...} (inferred)"} },
+    { "endpoint": "/api/v1/users/list", "method": "POST", "auth": "Authorization: <rawToken>", "calledWhen": "Users tab", "requestShape": {"page":"int","limit":"int","search":"string?","filters":"obj?"}, "responseShape": {"data":[{"id":"uuid","firstName":"","lastName":"","imageUrl":"","username":"","role":"","roleId":0,"user_role_id":"","email":"","mobile":""}],"pagination":{"total":0,"page":1,"limit":10}} },
+    { "endpoint": "/api/v1/roles/list", "method": "POST", "calledWhen": "Users tab / Add User role select", "requestShape": {"page":1,"limit":10}, "responseShape": {"data":[{"id":0,"name":""}],"pagination":{}} },
+    { "endpoint": "/api/v1/sponsors/list", "method": "POST", "calledWhen": "Sponsors tab", "requestShape": {"page":"int","limit":"int","search":"string?"}, "responseShape": {"data":[{"id":"uuid","sponsor_name":"","sponsor_logo":"","is_active":true,"sponsor_forest_logo":"","sponsor_tree_logo":"","sponsor_og_image_url":"","established_year":"","website_url":"","industry":"","headquarters":"","created_by":"","updated_by":"","createdAt":"","updatedAt":""}],"pagination":{}} },
+    { "endpoint": "/api/v1/employee/list", "method": "POST", "calledWhen": "Employees tab", "requestShape": {"page":"int","limit":"int","search":"string?"}, "responseShape": {"data":[{"id":"uuid","name":"","profile_image":"","designation":"","contact_no":"","email_id":"","created_by":"","updated_by":"","is_active":true,"created_at":"","updated_at":""}],"total":0,"page":1,"limit":10} },
+    { "endpoint": "/api/v1/forest/list", "method": "POST", "calledWhen": "Forests tab", "requestShape": {"page":"int","limit":"int","search":"string?"}, "responseShape": {"data":[{"id":"uuid","forest_name":"","forest_geo_lat":"","forest_geo_long":"","forest_oxygen":"","forest_carbonoffset":"","forest_address":"","forest_city":"","forest_state":"","forest_country":"","is_active":true,"forest_unique_id":"","forest_internal_id":"","total_trees":0,"average_age":0,"total_species_planted":0,"box_rows":0,"box_column":0,"tree_row":0,"tree_column":0,"project_period":0,"plantation_date":"","is_updated":false,"sponsors":[]}],"pagination":{}} },
+    { "endpoint": "/api/v1/reports/list", "method": "POST", "calledWhen": "Reports tab", "requestShape": {"page":"int","limit":"int","filters":"obj?"}, "responseShape": {"data":[{"id":"uuid","year":0,"quarter":0,"report_date":"","plantation_date":"","start_date":"","end_date":"","mode":"","type":"","version":0,"project_period":0,"forest_id":"uuid","skip":{},"is_active":true,"Forest":{},"CreatedBy":{},"UpdatedBy":{}}],"pagination":{},"filter_limit":{}} },
+    { "endpoint": "/api/v1/jobs/list", "method": "POST", "calledWhen": "Jobs tab", "requestShape": {"page":"int","limit":"int","search":"string?"}, "responseShape": {"data":[{"id":"uuid","job_id":"","job_type":"","job_description":{},"status":"","payload":{},"result":{},"created_at":"","updated_at":""}],"pagination":{}} },
+    { "endpoint": "/api/v1/master-plantspecies/search", "method": "POST", "calledWhen": "Forest wizard species step", "requestShape": {"search":"string?"}, "responseShape": {"data":["~large species catalog"]} },
+    { "endpoint": "/graphql", "method": "POST", "auth": "Authorization: Bearer <token>", "calledWhen": "Entity create/update/delete + relational reads + app bootstrap", "requestShape": {"query":"string","variables":{},"operationName":"string?"}, "responseShape": {"data":{},"errors":[]},
+      "notes": "PostGraphile. Per-table mutations create<T>/update<T>(/ById)/delete<T>(/ById) and node/connection queries all<T>s with filter/orderBy/first/offset. Introspection enabled (full schema captured in graphql_introspection.json)." }
+  ],
+
+  "dataModel": [
+    { "entity": "UserProfile", "table": "user_profiles", "fields": ["id:uuid","firstName","lastName","address","emailId","mobileNo:bigint","mobileCountryCode","userId:int","isActive","isVerified","otp","imageUrl","createdBy","updatedBy","createdAt","updatedAt"], "relationships": ["1-N UserRole (profileId)","N-1 created/updated by UserProfile"], "inferred": false },
+    { "entity": "UserRole", "table": "user_roles", "fields": ["id:uuid","profileId:uuid->UserProfile","roleId:int->MasterRole","isActive","timestamps","createdBy","updatedBy"], "relationships": ["N-1 UserProfile","N-1 MasterRole","1-N UserRoleForestAccess"], "inferred": false },
+    { "entity": "MasterRole", "table": "master_roles", "fields": ["id:int","name","isActive","timestamps"], "relationships": ["1-N UserRole"], "inferred": false },
+    { "entity": "UserRoleForestAccess", "table": "user_role_forest_accesses", "fields": ["id:uuid","userRoleId:uuid->UserRole","forestId:uuid->Forest","isActive","timestamps"], "relationships": ["join UserRole<->Forest (scoped forest access for non-super admins)"], "inferred": false },
+    { "entity": "Forest", "table": "forests", "fields": ["id:uuid","forestName","forestDesc","forestUniqueId","forestInternalId","forestUrl","forestGeoLat","forestGeoLong","forestGeoRadius","forestGeoShape","forestBoundary:json","forestOxygen","forestCarbonoffset","forestAddress","forestCity","forestState","forestCountry","isActive","totalTrees","averageAge","totalSpeciesPlanted","totalDrying","totalDamaged","totalEmptyPits","totalDead","boxRows","boxColumn","boxToBoxDistance","treeRow","treeColumn","treeToTreeDistance","directionAngle","boundaryGap","projectSite","projectDetails:json","projectPeriod","plantationDate","plantationStrategy(+Other)","irrigationMethod(+Other)","climate(+Other)","soilType(+Other)","soilPhLevel:json","temperatureHumidity:json","landOwnership:json","landArea:json","authorizationDetails:json","permissionLetter","areaPopulationStatisticsDetails:json","directAndIndirectBeneficiaries:json","forestValueFlowImpactReport:json","speciesDetails:json","maintenanceWorkforce:json","plantGrowthData:json","environmentalNeedIndicators:json","securityAndInfrastructure:json","plantationProgress:json","additionalSponsorLogo:json","dashboardImages:json","reportImages:json","siteLayout","pathwaySpacing","digipin","lastInspectionDate","isUpdated","createdBy","updatedBy","timestamps"], "relationships": ["N-N Sponsor via ForestSponsor","N-N Employee via ForestsEmployee","N-N Report via ForestsReport (+ direct Report.forestId)","1-N ForestTree","1-N ForestCluster","1-N ForestBox","1-N ForestAssert"], "inferred": false },
+    { "entity": "Sponsor", "table": "sponsors", "fields": ["id:uuid","sponsorName","sponsorLogo","sponsorForestLogo","sponsorTreeLogo","sponsorOgImageUrl","establishedYear","websiteUrl","industry","headquarters","isActive","createdBy","updatedBy","timestamps"], "relationships": ["N-N Forest via ForestSponsor","N-N Donor via DonorSponsor","1-N ForestTreeSponsor"], "inferred": false },
+    { "entity": "Employee", "table": "employees", "fields": ["id:uuid","name","profileImage","designation","contactNo","emailId","isActive","createdBy","updatedBy","timestamps"], "relationships": ["N-N Forest via ForestsEmployee (site managers)"], "inferred": false },
+    { "entity": "Report", "table": "reports", "fields": ["id:uuid","year","quarter","reportDate","plantationDate","startDate","endDate","mode","type","version","reportData:json","projectPeriod","skip:json","forestId:uuid->Forest","isActive","createdBy","updatedBy","timestamps"], "relationships": ["N-1 Forest","N-N Forest via ForestsReport"], "inferred": false },
+    { "entity": "Job", "table": "jobs", "fields": ["id:uuid","jobId","jobType","jobDescription:json","status","payload:json","result:json","createdBy","updatedBy","timestamps"], "relationships": ["async job queue records (e.g. report generation)"], "inferred": false },
+    { "entity": "ForestTree", "table": "forest_trees", "fields": ["id:uuid","forestId->Forest","masterPlantSpeciesId->MasterPlantspecy","forestTreeName","forestTreePetname","forestTreeHeight","forestTreeDia","forestTreeAge","forestTreeOxygen","forestTreeCarbonoffset","forestTreeGeoLat","forestTreeGeoLong","treeUniqueId","treeStatusId->TreeStatusMaster","planterId->Planter","planterReasonId->MasterPlantingReason","plantedOn","plantedBy","plantingMessage","boxId->ForestBox","clusterIds:[uuid]","sponsoredBy->Sponsor","assignedTo","isDisplay","isActive","landmark","timestamps"], "relationships": ["N-1 Forest, Species, Status, Planter, Box","1-N ForestTreeActivity","1-N ForestTreeSponsor","1-N DonorTree","1-N TreeAssert"], "inferred": false },
+    { "entity": "ForestCluster", "table": "forest_clusters", "fields": ["id:uuid","forestId->Forest","lat","lng","zoom","treeCount","tree:json","timestamps"], "relationships": ["N-1 Forest (map clustering)"], "inferred": false },
+    { "entity": "ForestSponsor", "table": "forest_sponsors", "fields": ["id:uuid","forestId->Forest","sponsorId->Sponsor","isActive","timestamps"], "relationships": ["join Forest<->Sponsor"], "inferred": false },
+    { "entity": "ForestsEmployee", "table": "forests_employees", "fields": ["id:uuid","forestId->Forest","employeeId->Employee","isActive","timestamps"], "relationships": ["join Forest<->Employee"], "inferred": false },
+    { "entity": "ForestsReport", "table": "forests_reports", "fields": ["id:uuid","forestId->Forest","reportId->Report","isActive","timestamps"], "relationships": ["join Forest<->Report"], "inferred": false },
+    { "entity": "Donor", "table": "donors", "fields": ["id:uuid","fullName","donorLogo","email","mobileCountryCode","mobileNo:bigint","isActive","timestamps"], "relationships": ["N-N Sponsor via DonorSponsor","1-N DonorTree"], "inferred": false },
+    { "entity": "GiftForestPlant", "table": "gift_forest_plants", "fields": ["id:uuid","giftTreeId->ForestTree","salutation","name","designation","organizationName","orgLogoUrl","emailId","mobileNo","message","allocatingOn","isEmailSent","giftCertificateUrl","userAssetUrl","isActive","timestamps"], "relationships": ["N-1 ForestTree (gifted tree certificate flow)"], "inferred": false },
+    { "entity": "MasterPlantspecy", "table": "master_plantspecies", "fields": ["id:int","species name + botanical/eco attributes (large catalog)"], "relationships": ["1-N ForestTree"], "inferred": true },
+    { "entity": "Planter / MasterPlantingReason / TreeStatusMaster", "table": "lookup tables", "fields": ["id, name, ..."], "relationships": ["lookups referenced by ForestTree"], "inferred": false },
+    { "entity": "SaplingOrder / SaplingOrderItem / SaplingOrderAddress / SaplingStore / OrderPayment / OrderStatusMaster / OrderTypeMaster / OrderActivityLog / OrderActivityTypeMaster / OrderPaymentModesMaster", "table": "e-commerce order domain", "fields": ["order#, type, status, amount, dates, address, items(species), payments"], "relationships": ["sapling e-commerce — NOT exposed in this admin UI; belongs to broader CommuniTREE platform"], "inferred": true },
+    { "entity": "ContactFromWhatsappOrder / WhatsappUserStep / BroadcastList / NudgeConfiguration / NudgeSequenceConfiguration", "table": "whatsapp/notification domain", "fields": ["whatsapp conversation state, broadcast lists, nudge sequences"], "relationships": ["WhatsApp bot + nudges — NOT in this admin UI"], "inferred": true },
+    { "entity": "ForestBox / ForestAssert / TreeAssert / ForestPlantTimeline(+Asset) / ForestTreeActivity / ForestTreeSponsor / ForestTreesOur(+1) / ForestClustersCopy / ForestPrefix / SponserPrefix / TreeIdCount / Testtree / Testuser / SequelizeMeta", "table": "supporting/internal", "fields": ["see graphql_introspection.json"], "relationships": ["forest sub-objects, asset media, ID counters, sequelize migration table, test scaffolding"], "inferred": true }
+  ],
+
+  "flows": [
+    { "name": "Login", "steps": ["GET / -> login card","enter username+password","Sign in -> POST auth/login","store token/role/profileId/userDetails","redirect /dashboard -> Users tab loads"], "conditions": ["invalid creds -> error (inferred)","existing valid token in localStorage -> auto land on /dashboard"], "outcome": "Authenticated SuperAdmin session" },
+    { "name": "Browse entity list", "steps": ["select tab","REST <entity>/list {page,limit} (first time)","render table","search -> server filter (inferred)","change rows-per-page / page -> refetch"], "conditions": ["data cached on revisit (no refetch)","empty -> empty state","error -> error state"], "outcome": "Paginated entity records displayed" },
+    { "name": "Create simple entity (User/Sponsor/Employee)", "steps": ["click + Add","fill dialog fields","Save -> validate required","GraphQL create<Entity> mutation","success toast -> close -> refetch list"], "conditions": ["missing required -> inline errors, no submit","Reset clears fields","Cancel discards"], "outcome": "New record persisted" },
+    { "name": "Create Forest (2-step wizard) [CORRECTED via live walk-through]", "steps": ["+ Add Forest","Step1 Basic Info: name, internal id, city/state/country, address, description, map pick coords, assign Site Manager + Sponsor + User (all required except address/description)","Next -> Step2 Grid Config: box/tree grid dims + spacing + project site/period + plantation date (all required) -> generates Box cards grid","optionally click each Box card -> EditBoxDialog (prefix/startDigits -> tree unique IDs + species)","Save Forest -> POST /api/v1/forest/upsert (multipart) which enqueues forest_upsert_v1 async job that creates the forest + ForestBox + ForestTree + ForestCluster rows (+ join rows ForestSponsor/ForestsEmployee)"], "conditions": ["per-step required validation gates Next/Save","coordinates required (Google Places)","Previous returns to step1"], "outcome": "Forest + boxes/trees/relations created via async job (status visible in Jobs tab)" },
+    { "name": "Edit / Delete record", "steps": ["row action (edit -> prefilled dialog -> update<Entity>ById; delete -> confirm -> delete<Entity>ById)","refetch list"], "conditions": ["delete needs confirm (inferred)"], "outcome": "Record updated/removed" },
+    { "name": "Role-scoped forest access", "steps": ["SuperAdmin sees all forests","non-super Admin scoped via UserRoleForestAccess rows"], "conditions": ["role from localStorage.role gates UI + API filtering (inferred)"], "outcome": "Access-controlled data visibility" },
+    { "name": "Logout", "steps": ["avatar menu -> Log out","clear localStorage","redirect /"], "conditions": [], "outcome": "Session ended" }
+  ],
+
+  "openQuestions": [
+    "RESOLVED: list body = {page,limit,search}. Confirmed live (search is server-side ILIKE). Per-table filter params (FilterButton popover) still partly unknown; reports returns filter_limit metadata.",
+    "Login success response body shape (token confirmed; user object fields not captured).",
+    "RESOLVED: Forest wizard is 2 steps (Basic Info, Grid Config). The '3-6' were list pagination, not steps. Step2 ends with Save Forest + per-box EditBoxDialog. See screens/flows (corrected).",
+    "RESOLVED: writes go through REST, not GraphQL. Create/Update = POST /api/v1/<entity>/upsert (multipart/form-data; no id=insert, id=update). See write_contracts.md.",
+    "RESOLVED: delete = POST /api/v1/<entity>/delete {id,<entity>_id}; HARD delete (confirm dialog 'cannot be undone', cascade-detaches forests/trees). is_active exists but delete is hard.",
+    "Filter popover contents per table (reports returns filter_limit hinting at filter metadata).",
+    "Reports 'reportData' JSON schema and whether report generation is the Job queue's purpose.",
+    "Pagination response inconsistency: employee/list uses {total,page,limit}; others use {pagination:{...}} — backend likely two code paths.",
+    "Whether non-SuperAdmin roles change which tabs/columns are visible.",
+    "Sapling e-commerce, WhatsApp bot, donor, gift-plant, and nudge domains exist in DB/GraphQL but are not surfaced in this admin — confirm they are out of scope for the rebuild."
+  ]
+}

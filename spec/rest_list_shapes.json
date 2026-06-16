@@ -1,0 +1,1088 @@
+{
+  "users/list": {
+    "status": 200,
+    "topKeys": [
+      "data",
+      "pagination"
+    ],
+    "count": 2,
+    "rec0Keys": [
+      "id",
+      "firstName",
+      "lastName",
+      "imageUrl",
+      "username",
+      "role",
+      "roleId",
+      "user_role_id",
+      "email",
+      "mobile"
+    ],
+    "sample": {
+      "id": 271,
+      "firstName": "Anvar",
+      "lastName": "Raja",
+      "imageUrl": null,
+      "username": "anvar_communitree_admin",
+      "role": "SuperAdmin",
+      "roleId": 3,
+      "user_role_id": "9e60326c-a111-4d87-afda-ef84c106786a",
+      "email": "anvar@communitree.co.in",
+      "mobile": "8925834149"
+    }
+  },
+  "sponsors/list": {
+    "status": 200,
+    "topKeys": [
+      "data",
+      "pagination"
+    ],
+    "count": 2,
+    "rec0Keys": [
+      "id",
+      "sponsor_name",
+      "sponsor_logo",
+      "is_active",
+      "sponsor_forest_logo",
+      "sponsor_tree_logo",
+      "sponsor_og_image_url",
+      "established_year",
+      "website_url",
+      "industry",
+      "headquarters",
+      "created_by",
+      "updated_by",
+      "createdAt",
+      "updatedAt"
+    ],
+    "sample": {
+      "id": "64904581-84c8-440c-a313-b14b167f480b",
+      "sponsor_name": "Acuity",
+      "sponsor_logo": "https://bethetreehugger-staging.objectstore.e2enetworks.net/sponsors/sponsor_logo-1781520987271-download_(1).jpeg",
+      "is_active": true,
+      "sponsor_forest_logo": "https://bethetreehugger-staging.objectstore.e2enetworks.net/sponsors/sponsor_forest_logo-1781520987360-download_(1).jpeg",
+      "sponsor_tree_logo": "https://bethetreehugger-staging.objectstore.e2enetworks.net/sponsors/sponsor_tree_logo-1781520987389-download_(1).jpeg",
+      "sponsor_og_image_url": "https://bethetreehugger-staging.objectstore.e2enetworks.net/sponsors/sponsor_og_image_url-1781520987539-download_(1).jpeg",
+      "established_year": "2026",
+      "website_url": "https://www.acuityanalytics.com/",
+      "industry": "NA",
+      "headquarters": "Bengaluru",
+      "created_by": "d21cabf2-c06c-4c1e-a9ea-d1ea928727d0",
+      "updated_by": "d21cabf2-c06c-4c1e-a9ea-d1ea928727d0",
+      "createdAt": "2026-06-15T10:56:27.653Z",
+      "updatedAt": "2026-06-15T10:56:27.653Z"
+    }
+  },
+  "employee/list": {
+    "status": 200,
+    "topKeys": [
+      "data",
+      "total",
+      "page",
+      "limit"
+    ],
+    "count": 2,
+    "rec0Keys": [
+      "id",
+      "name",
+      "profile_image",
+      "designation",
+      "contact_no",
+      "email_id",
+      "created_by",
+      "updated_by",
+      "is_active",
+      "created_at",
+      "updated_at"
+    ],
+    "sample": {
+      "id": "0ed53c6f-24d1-4235-b761-ff47e298cb60",
+      "name": "Anvar Raja M",
+      "profile_image": "https://bethetreehugger-staging.objectstore.e2enetworks.net/bth_files/employee/1779774962847_0_IMG_6170.jpg",
+      "designation": "Operations Executive - Forest",
+      "contact_no": "8925834149",
+      "email_id": "anvar@communitree.co.in",
+      "created_by": "8b7fbce3-bac7-47cf-9767-296e0f3604dc",
+      "updated_by": "8b7fbce3-bac7-47cf-9767-296e0f3604dc",
+      "is_active": true,
+      "created_at": "2026-05-26T05:56:11.276Z",
+      "updated_at": "2026-05-26T05:56:11.276Z"
+    }
+  },
+  "forest/list": {
+    "status": 200,
+    "topKeys": [
+      "data",
+      "pagination"
+    ],
+    "count": 2,
+    "rec0Keys": [
+      "id",
+      "forest_name",
+      "forest_geo_lat",
+      "forest_geo_long",
+      "forest_oxygen",
+      "forest_carbonoffset",
+      "forest_address",
+      "forest_city",
+      "forest_state",
+      "forest_country",
+      "is_active",
+      "created_at",
+      "updated_at",
+      "created_by",
+      "updated_by",
+      "forest_unique_id",
+      "forest_internal_id",
+      "total_trees",
+      "average_age",
+      "total_species_planted",
+      "box_rows",
+      "box_column",
+      "tree_row",
+      "tree_column",
+      "project_period",
+      "plantation_date",
+      "is_updated",
+      "sponsors"
+    ],
+    "sample": {
+      "id": "55ec5786-c1d1-4f72-a403-5b1a9d8e4d34",
+      "forest_name": "IDFC First Bank",
+      "forest_geo_lat": "9.934781",
+      "forest_geo_long": "78.000977",
+      "forest_oxygen": "2069100.00",
+      "forest_carbonoffset": "1149500.00",
+      "forest_address": "Vadapalanji IT Park\nVadapalanji\nNH 49\nNagamalaipudukottai, Tamil Nadu 625021\nIndia",
+      "forest_city": "Madurai",
+      "forest_state": "Tamil Nadu",
+      "forest_country": "India",
+      "is_active": true,
+      "created_at": "2026-06-10T09:42:18.529Z",
+      "updated_at": "2026-06-10T10:58:55.401Z",
+      "created_by": {
+        "id": "d21cabf2-c06c-4c1e-a9ea-d1ea928727d0",
+        "first_name": "CommuniTREE"
+      },
+      "updated_by": {
+        "id": "d21cabf2-c06c-4c1e-a9ea-d1ea928727d0",
+        "first_name": "CommuniTREE"
+      },
+      "forest_unique_id": "IDFIDF62",
+      "forest_internal_id": "101",
+      "total_trees": 11000,
+      "average_age": 837,
+      "total_species_planted": 1,
+      "box_rows": 1,
+      "box_column": 1,
+      "tree_row": 100,
+      "tree_column": 300,
+      "project_period": 3,
+      "plantation_date": "2024-03-01",
+      "is_updated": true,
+      "sponsors": [
+        {
+          "id": "eaadc2ee-f4d3-49be-8892-e52bdfdaa64b",
+          "sponsor_name": "IDFC First Bank",
+          "sponsor_logo": "https://www.idfcfirstbank.com/content/dam/idfcfirstbank/images/n1/IDFC-logo-website.svg",
+          "sponsor_forest_logo": "https://i.ibb.co/Mkx6vbZ/Idfc-logo.png",
+          "sponsor_tree_logo": "https://i.ibb.co/Mkx6vbZ/Idfc-logo.png",
+          "sponsor_og_image_url": "https://i.ibb.co/VYPctq0/Bethetreehugger-IDFC.png"
+        }
+      ]
+    }
+  },
+  "reports/list": {
+    "status": 200,
+    "topKeys": [
+      "data",
+      "pagination",
+      "filter_limit"
+    ],
+    "count": 2,
+    "rec0Keys": [
+      "id",
+      "year",
+      "quarter",
+      "report_date",
+      "plantation_date",
+      "start_date",
+      "end_date",
+      "mode",
+      "type",
+      "version",
+      "project_period",
+      "forest_id",
+      "skip",
+      "created_by",
+      "updated_by",
+      "is_active",
+      "created_at",
+      "updated_at",
+      "Forest",
+      "CreatedBy",
+      "UpdatedBy"
+    ],
+    "sample": {
+      "id": "0f602c89-bbd0-4d5d-a039-bf4d5068070e",
+      "year": 2026,
+      "quarter": 2,
+      "report_date": "2026-06-09T00:00:00.000Z",
+      "plantation_date": "2026-01-31T00:00:00.000Z",
+      "start_date": "2026-04-01T00:00:00.000Z",
+      "end_date": "2026-06-30T00:00:00.000Z",
+      "mode": "automatic",
+      "type": "quarterly",
+      "version": 1,
+      "project_period": 3,
+      "forest_id": "25b16c3c-595e-4c53-83e9-e5b3b3b9d869",
+      "skip": [],
+      "created_by": "d21cabf2-c06c-4c1e-a9ea-d1ea928727d0",
+      "updated_by": "d21cabf2-c06c-4c1e-a9ea-d1ea928727d0",
+      "is_active": true,
+      "created_at": "2026-06-10T05:15:33.296Z",
+      "updated_at": "2026-06-10T05:15:33.296Z",
+      "Forest": {
+        "id": "25b16c3c-595e-4c53-83e9-e5b3b3b9d869",
+        "forest_name": "Temenos",
+        "forest_unique_id": "TEMTEM58"
+      },
+      "CreatedBy": {
+        "id": "d21cabf2-c06c-4c1e-a9ea-d1ea928727d0",
+        "first_name": "CommuniTREE"
+      },
+      "UpdatedBy": {
+        "id": "d21cabf2-c06c-4c1e-a9ea-d1ea928727d0",
+        "first_name": "CommuniTREE"
+      }
+    }
+  },
+  "jobs/list": {
+    "status": 200,
+    "topKeys": [
+      "data",
+      "pagination"
+    ],
+    "count": 2,
+    "rec0Keys": [
+      "id",
+      "job_id",
+      "job_type",
+      "job_description",
+      "status",
+      "payload",
+      "result",
+      "created_by",
+      "updated_by",
+      "created_at",
+      "updated_at"
+    ],
+    "sample": {
+      "id": "5a20e581-7da3-4c0e-a143-f3ba1192d68c",
+      "job_id": "JOB_20260612202031770_6NMSZSC6",
+      "job_type": "forest_upsert_v1",
+      "job_description": {
+        "forest_id": "KISVAN63 - Vandalur Forest",
+        "total_number_of_boxes": 1,
+        "total_number_of_trees": 1
+      },
+      "status": "completed",
+      "payload": {
+        "url": "http://localhost:4000/api/v1/forest/create",
+        "body": {
+          "climate": "summer",
+          "digipin": "DIGIPIN12345",
+          "box_data": [
+            {
+              "id": "",
+              "row": 1,
+              "start": "1",
+              "column": 1,
+              "prefix": "AA",
+              "row_position": 1,
+              "species_data": [
+                {
+                  "count": 1,
+                  "height": 4,
+                  "diameter": 1,
+                  "planted_on": "2023-06-30",
+                  "species_id": 31,
+                  "species_name": "Mangifera Indica",
+                  "species_common_name": "Mango"
+                }
+              ],
+              "column_position": 1,
+              "tree_to_tree_distance": 1
+            }
+          ],
+          "box_rows": 1,
+          "land_area": {
+            "total_area": 2000,
+            "planted_area": 1000
+          },
+          "soil_type": "red_soil",
+          "tree_rows": 1,
+          "sponsor_id": "f5786b29-cd96-40aa-abc4-3628cfd99f5e",
+          "box_columns": 1,
+          "employee_id": "db746f3b-646d-4929-a4ec-5561f389e83d",
+          "forest_city": "Chennai",
+          "forest_desc": "This is Vandalur Forest",
+          "forest_name": "Vandalur Forest",
+          "site_layout": "https://bethetreehugger-staging.objectstore.e2enetworks.net/bth_files/forest/1781294125465_0_ChatGPT_Image_May_29,_2026,_04_10_37_PM.png",
+          "boundary_gap": 1,
+          "forest_state": "Tamil Nadu",
+          "project_site": "Vandalur Forest Site",
+          "tree_columns": 1,
+          "user_role_id": "4c2d39cd-bdfe-4f9e-b475-a750b1d00b39",
+          "climate_other": "",
+          "report_images": [
+            {
+              "image": "https://bethetreehugger-staging.objectstore.e2enetworks.net/bth_files/forest/1781294282059_0_ChatGPT_Image_May_29,_2026,_04_10_37_PM.png",
+              "slide_type": "first_slide"
+            },
+            {
+              "image": "https://bethetreehugger-staging.objectstore.e2enetworks.net/bth_files/forest/1781294290630_0_ChatGPT_Image_May_29,_2026,_04_10_37_PM.png",
+              "slide_type": "content_slide"
+            },
+            {
+              "image": "https://bethetreehugger-staging.objectstore.e2enetworks.net/bth_files/forest/1781294298743_0_ChatGPT_Image_May_29,_2026,_04_10_37_PM.png",
+              "slide_type": "project_impact_slide"
+            }
+          ],
+          "soil_ph_level": [
+            {
+              "year": 2023,
+              "quarter": 2,
+              "meter_image": "https://bethetreehugger-staging.objectstore.e2enetworks.net/bth_files/forest/1781294642269_0_ChatGPT_Image_May_29,_2026,_04_10_37_PM.png",
+              "reading_date": "2023-06-01",
+              "meter_reading": 0.1
+            },
+            {
+              "year": 2023,
+              "quarter": 3,
+              "meter_image": "https://bethetreehugger-staging.objectstore.e2enetworks.net/bth_files/forest/1781294654778_0_ChatGPT_Image_May_29,_2026,_04_10_37_PM.png",
+              "reading_date": "2023-09-01",
+              "meter_reading": 0.1
+            },
+            {
+              "year": 2023,
+              "quarter": 4,
+              "meter_image": "https://bethetreehugger-staging.objectstore.e2enetworks.net/bth_files/forest/1781294672961_0_ChatGPT_Image_May_29,_2026,_04_10_37_PM.png",
+              "reading_date": "2023-12-01",
+              "meter_reading": 0.1
+            },
+            {
+              "year": 2024,
+              "quarter": 1,
+              "meter_image": "https://bethetreehugger-staging.objectstore.e2enetworks.net/bth_files/forest/1781294719320_0_ChatGPT_Image_May_29,_2026,_04_10_37_PM.png",
+              "reading_date": "2024-03-01",
+              "meter_reading": 0.1
+            },
+            {
+              "year": 2024,
+              "quarter": 2,
+              "meter_image": "https://bethetreehugger-staging.objectstore.e2enetworks.net/bth_files/forest/1781294975788_0_ChatGPT_Image_May_29,_2026,_04_10_37_PM.png",
+              "reading_date": "2024-06-01",
+              "meter_reading": 0.1
+            },
+            {
+              "year": 2024,
+              "quarter": 3,
+              "meter_image": "https://bethetreehugger-staging.objectstore.e2enetworks.net/bth_files/forest/1781294982940_0_ChatGPT_Image_May_29,_2026,_04_10_37_PM.png",
+              "reading_date": "2024-09-01",
+              "meter_reading": 0.1
+            },
+            {
+              "year": 2024,
+              "quarter": 4,
+              "meter_image": "https://bethetreehugger-staging.objectstore.e2enetworks.net/bth_files/forest/1781294996851_0_ChatGPT_Image_May_29,_2026,_04_10_37_PM.png",
+              "reading_date": "2024-12-01",
+              "meter_reading": 0.1
+            },
+            {
+              "year": 2025,
+              "quarter": 1,
+              "meter_image": "https://bethetreehugger-staging.objectstore.e2enetworks.net/bth_files/forest/1781295010765_0_ChatGPT_Image_May_29,_2026,_04_10_37_PM.png",
+              "reading_date": "2025-03-01",
+              "meter_reading": 0.1
+            },
+            {
+              "year": 2025,
+              "quarter": 2,
+              "meter_image": "https://bethetreehugger-staging.objectstore.e2enetworks.net/bth_files/forest/1781295024513_0_ChatGPT_Image_May_29,_2026,_04_10_37_PM.png",
+              "reading_date": "2025-06-01",
+              "meter_reading": 0.1
+            },
+            {
+              "year": 2025,
+              "quarter": 3,
+              "meter_image": "https://bethetreehugger-staging.objectstore.e2enetworks.net/bth_files/forest/1781295036795_0_ChatGPT_Image_May_29,_2026,_04_10_37_PM.png",
+              "reading_date": "2025-09-01",
+              "meter_reading": 0.1
+            },
+            {
+              "year": 2025,
+              "quarter": 4,
+              "meter_image": "https://bethetreehugger-staging.objectstore.e2enetworks.net/bth_files/forest/1781295048640_0_ChatGPT_Image_May_29,_2026,_04_10_37_PM.png",
+              "reading_date": "2025-12-01",
+              "meter_reading": 0.1
+            },
+            {
+              "year": 2026,
+              "quarter": 1,
+              "meter_image": "https://bethetreehugger-staging.objectstore.e2enetworks.net/bth_files/forest/1781295079569_0_ChatGPT_Image_May_29,_2026,_04_10_37_PM.png",
+              "reading_date": "2026-03-01",
+              "meter_reading": 0.1
+            }
+          ],
+          "forest_address": "Vandalur, Tamil Nadu 600048, India",
+          "forest_country": "India",
+          "forest_geo_lat": "12.891256",
+          "land_ownership": {
+            "name": "Kishore",
+            "agreement_status": "agreement_confirmed"
+          },
+          "project_period": 3,
+          "direction_angle": 90,
+          "forest_geo_long": "80.081001",
+          "pathway_spacing": 1,
+          "plantation_date": "2023-06-30",
+          "soil_type_other": "",
+          "species_details": {
+            "health": "good",
+            "health_other": "",
+            "other_issues": "Other Issues",
+            "mortality_rate": 1,
+            "additional_scope": "Additional Scope"
+          },
+          "dashboard_images": [
+            {
+              "name": "Dashboard Image 1",
+              "image": "https://bethetreehugger-staging.objectstore.e2enetworks.net/bth_files/forest/1781294271079_0_ChatGPT_Image_May_29,_2026,_04_10_37_PM.png",
+              "description": "Dashboard Image 1"
+            }
+          ],
+          "irrigation_method": "borewell",
+          "permission_letter": "https://bethetreehugger-staging.objectstore.e2enetworks.net/bth_files/forest/1781294129078_0_ChatGPT_Image_May_29,_2026,_04_10_37_PM.png",
+          "plant_growth_data": {
+            "actual_height_range": [
+              {
+                "max": 1.5,
+                "min": 1,
+                "year": 2023,
+                "quarter": 2
+              },
+              {
+                "max": 2,
+                "min": 1.5,
+                "year": 2023,
+                "quarter": 3
+              },
+              {
+                "max": 2.5,
+                "min": 2,
+                "year": 2023,
+                "quarter": 4
+              },
+              {
+                "max": 3,
+                "min": 2.5,
+                "year": 2024,
+                "quarter": 1
+              },
+              {
+                "max": 3.5,
+                "min": 3,
+                "year": 2024,
+                "quarter": 2
+              },
+              {
+                "max": 4,
+                "min": 3.5,
+                "year": 2024,
+                "quarter": 3
+              },
+              {
+                "max": 4.5,
+                "min": 4,
+                "year": 2024,
+                "quarter": 4
+              },
+              {
+                "max": 5,
+                "min": 4.5,
+                "year": 2025,
+                "quarter": 1
+              },
+              {
+                "max": 5.5,
+                "min": 5,
+                "year": 2025,
+                "quarter": 2
+              },
+              {
+                "max": 6,
+                "min": 5.5,
+                "year": 2025,
+                "quarter": 3
+              },
+              {
+                "max": 6.5,
+                "min": 6,
+                "year": 2025,
+                "quarter": 4
+              },
+              {
+                "max": 7,
+                "min": 6.5,
+                "year": 2026,
+                "quarter": 1
+              }
+            ],
+            "target_height_range": [
+              {
+                "max": 1.5,
+                "min": 1,
+                "year": 0
+              },
+              {
+                "max": 2,
+                "min": 1.5,
+                "year": 1
+              },
+              {
+                "max": 2.5,
+                "min": 2,
+                "year": 2
+              },
+              {
+                "max": 3,
+                "min": 2.5,
+                "year": 3
+              }
+            ]
+          },
+          "forest_internal_id": "702",
+          "box_to_box_distance": 1,
+          "plantation_progress": [
+            {
+              "year": 2023,
+              "image": "https://bethetreehugger-staging.objectstore.e2enetworks.net/bth_files/forest/1781294439719_0_ChatGPT_Image_May_29,_2026,_04_10_37_PM.png",
+              "quarter": 2
+            },
+            {
+              "year": 2023,
+              "image": "https://bethetreehugger-staging.objectstore.e2enetworks.net/bth_files/forest/1781294446266_0_ChatGPT_Image_May_29,_2026,_04_10_37_PM.png",
+              "quarter": 3
+            },
+            {
+              "year": 2023,
+              "image": "https://bethetreehugger-staging.objectstore.e2enetworks.net/bth_files/forest/1781294465730_0_ChatGPT_Image_May_29,_2026,_04_10_37_PM.png",
+              "quarter": 4
+            },
+            {
+              "year": 2024,
+              "image": "https://bethetreehugger-staging.objectstore.e2enetworks.net/bth_files/forest/1781294477044_0_ChatGPT_Image_May_29,_2026,_04_10_37_PM.png",
+              "quarter": 1
+            },
+            {
+              "year": 2024,
+              "image": "https://bethetreehugger-staging.objectstore.e2enetworks.net/bth_files/forest/1781294482649_0_ChatGPT_Image_May_29,_2026,_04_10_37_PM.png",
+              "quarter": 2
+            },
+            {
+              "year": 2024,
+              "image": "https://bethetreehugger-staging.objectstore.e2enetworks.net/bth_files/forest/1781294489134_0_ChatGPT_Image_May_29,_2026,_04_10_37_PM.png",
+              "quarter": 3
+            },
+            {
+              "year": 2024,
+              "image": "https://bethetreehugger-staging.objectstore.e2enetworks.net/bth_files/forest/1781294498305_0_ChatGPT_Image_May_29,_2026,_04_10_37_PM.png",
+              "quarter": 4
+            },
+            {
+              "year": 2025,
+              "image": "https://bethetreehugger-staging.objectstore.e2enetworks.net/bth_files/forest/1781294506947_0_ChatGPT_Image_May_29,_2026,_04_10_37_PM.png",
+              "quarter": 1
+            },
+            {
+              "year": 2025,
+              "image": "https://bethetreehugger-staging.objectstore.e2enetworks.net/bth_files/forest/1781294515340_0_ChatGPT_Image_May_29,_2026,_04_10_37_PM.png",
+              "quarter": 2
+            },
+            {
+              "year": 2025,
+              "image": "https://bethetreehugger-staging.objectstore.e2enetworks.net/bth_files/forest/1781294522733_0_ChatGPT_Image_May_29,_2026,_04_10_37_PM.png",
+              "quarter": 3
+            },
+            {
+              "year": 2025,
+              "image": "https://bethetreehugger-staging.objectstore.e2enetworks.net/bth_files/forest/1781294530003_0_ChatGPT_Image_May_29,_2026,_04_10_37_PM.png",
+              "quarter": 4
+            },
+            {
+              "year": 2026,
+              "image": "https://bethetreehugger-staging.objectstore.e2enetworks.net/bth_files/forest/1781294537087_0_ChatGPT_Image_May_29,_2026,_04_10_37_PM.png",
+              "quarter": 1
+            }
+          ],
+          "plantation_strategy": "mixed_species",
+          "last_inspection_date": "2026-06-01",
+          "temperature_humidity": [
+            {
+              "year": 2023,
+              "quarter": 2,
+              "reading_date": "2023-06-01",
+              "inside_plantation": {
+                "image": "https://bethetreehugger-staging.objectstore.e2enetworks.net/bth_files/forest/1781294696393_0_ChatGPT_Image_May_29,_2026,_04_10_37_PM.png",
+                "humidity": 1,
+                "temperature": 0.5
+              },
+              "outside_plantation": {
+                "image": "https://bethetreehugger-staging.objectstore.e2enetworks.net/bth_files/forest/1781294698913_0_ChatGPT_Image_May_29,_2026,_04_10_37_PM.png",
+                "humidity": 1,
+                "temperature": 0.5
+              }
+            },
+            {
+              "year": 2023,
+              "quarter": 3,
+              "reading_date": "2023-09-01",
+              "inside_plantation": {
+                "image": "https://bethetreehugger-staging.objectstore.e2enetworks.net/bth_files/forest/1781295087160_0_ChatGPT_Image_May_29,_2026,_04_10_37_PM.png",
+                "humidity": 1,
+                "temperature": 0.5
+              },
+              "outside_plantation": {
+                "image": "https://bethetreehugger-staging.objectstore.e2enetworks.net/bth_files/forest/1781295091648_0_ChatGPT_Image_May_29,_2026,_04_10_37_PM.png",
+                "humidity": 1,
+                "temperature": 0.5
+              }
+            },
+            {
+              "year": 2023,
+              "quarter": 4,
+              "reading_date": "2023-12-01",
+              "inside_plantation": {
+                "image": "https://bethetreehugger-staging.objectstore.e2enetworks.net/bth_files/forest/1781295114025_0_ChatGPT_Image_May_29,_2026,_04_10_37_PM.png",
+                "humidity": 1,
+                "temperature": 0.5
+              },
+              "outside_plantation": {
+                "image": "https://bethetreehugger-staging.objectstore.e2enetworks.net/bth_files/forest/1781295121142_0_ChatGPT_Image_May_29,_2026,_04_10_37_PM.png",
+                "humidity": 1,
+                "temperature": 0.5
+              }
+            },
+            {
+              "year": 2024,
+              "quarter": 1,
+              "reading_date": "2024-03-01",
+              "inside_plantation": {
+                "image": "https://bethetreehugger-staging.objectstore.e2enetworks.net/bth_files/forest/1781295139049_0_ChatGPT_Image_May_29,_2026,_04_10_37_PM.png",
+                "humidity": 1,
+                "temperature": 0.5
+              },
+              "outside_plantation": {
+                "image": "https://bethetreehugger-staging.objectstore.e2enetworks.net/bth_files/forest/1781295148359_0_ChatGPT_Image_May_29,_2026,_04_10_37_PM.png",
+                "humidity": 1,
+                "temperature": 0.5
+              }
+            },
+            {
+              "year": 2024,
+              "quarter": 2,
+              "reading_date": "2024-06-01",
+              "inside_plantation": {
+                "image": "https://bethetreehugger-staging.objectstore.e2enetworks.net/bth_files/forest/1781295164417_0_ChatGPT_Image_May_29,_2026,_04_10_37_PM.png",
+                "humidity": 1,
+                "temperature": 0.5
+              },
+              "outside_plantation": {
+                "image": "https://bethetreehugger-staging.objectstore.e2enetworks.net/bth_files/forest/1781295170599_0_ChatGPT_Image_May_29,_2026,_04_10_37_PM.png",
+                "humidity": 1,
+                "temperature": 0.5
+              }
+            },
+            {
+              "year": 2024,
+              "quarter": 3,
+              "reading_date": "2024-09-01",
+              "inside_plantation": {
+                "image": "https://bethetreehugger-staging.objectstore.e2enetworks.net/bth_files/forest/1781295186386_0_ChatGPT_Image_May_29,_2026,_04_10_37_PM.png",
+                "humidity": 1,
+                "temperature": 0.5
+              },
+              "outside_plantation": {
+                "image": "https://bethetreehugger-staging.objectstore.e2enetworks.net/bth_files/forest/1781295197544_0_ChatGPT_Image_May_29,_2026,_04_10_37_PM.png",
+                "humidity": 1,
+                "temperature": 0.5
+              }
+            },
+            {
+              "year": 2024,
+              "quarter": 4,
+              "reading_date": "2024-12-01",
+              "inside_plantation": {
+                "image": "https://bethetreehugger-staging.objectstore.e2enetworks.net/bth_files/forest/1781295228589_0_ChatGPT_Image_May_29,_2026,_04_10_37_PM.png",
+                "humidity": 1,
+                "temperature": 0.5
+              },
+              "outside_plantation": {
+                "image": "https://bethetreehugger-staging.objectstore.e2enetworks.net/bth_files/forest/1781295239073_0_ChatGPT_Image_May_29,_2026,_04_10_37_PM.png",
+                "humidity": 1,
+                "temperature": 0.5
+              }
+            },
+            {
+              "year": 2025,
+              "quarter": 1,
+              "reading_date": "2025-03-01",
+              "inside_plantation": {
+                "image": "https://bethetreehugger-staging.objectstore.e2enetworks.net/bth_files/forest/1781295256183_0_ChatGPT_Image_May_29,_2026,_04_10_37_PM.png",
+                "humidity": 1,
+                "temperature": 0.5
+              },
+              "outside_plantation": {
+                "image": "https://bethetreehugger-staging.objectstore.e2enetworks.net/bth_files/forest/1781295268239_0_ChatGPT_Image_May_29,_2026,_04_10_37_PM.png",
+                "humidity": 1,
+                "temperature": 0.5
+              }
+            },
+            {
+              "year": 2025,
+              "quarter": 2,
+              "reading_date": "2025-06-01",
+              "inside_plantation": {
+                "image": "https://bethetreehugger-staging.objectstore.e2enetworks.net/bth_files/forest/1781295285634_0_ChatGPT_Image_May_29,_2026,_04_10_37_PM.png",
+                "humidity": 1,
+                "temperature": 0.5
+              },
+              "outside_plantation": {
+                "image": "https://bethetreehugger-staging.objectstore.e2enetworks.net/bth_files/forest/1781295292082_0_ChatGPT_Image_May_29,_2026,_04_10_37_PM.png",
+                "humidity": 1,
+                "temperature": 0.5
+              }
+            },
+            {
+              "year": 2025,
+              "quarter": 3,
+              "reading_date": "2025-09-01",
+              "inside_plantation": {
+                "image": "https://bethetreehugger-staging.objectstore.e2enetworks.net/bth_files/forest/1781295305052_0_ChatGPT_Image_May_29,_2026,_04_10_37_PM.png",
+                "humidity": 1,
+                "temperature": 0.5
+              },
+              "outside_plantation": {
+                "image": "https://bethetreehugger-staging.objectstore.e2enetworks.net/bth_files/forest/1781295311325_0_ChatGPT_Image_May_29,_2026,_04_10_37_PM.png",
+                "humidity": 1,
+                "temperature": 0.5
+              }
+            },
+            {
+              "year": 2025,
+              "quarter": 4,
+              "reading_date": "2025-12-01",
+              "inside_plantation": {
+                "image": "https://bethetreehugger-staging.objectstore.e2enetworks.net/bth_files/forest/1781295329467_0_ChatGPT_Image_May_29,_2026,_04_10_37_PM.png",
+                "humidity": 1,
+                "temperature": 0.5
+              },
+              "outside_plantation": {
+                "image": "https://bethetreehugger-staging.objectstore.e2enetworks.net/bth_files/forest/1781295337416_0_ChatGPT_Image_May_29,_2026,_04_10_37_PM.png",
+                "humidity": 1,
+                "temperature": 0.5
+              }
+            },
+            {
+              "year": 2026,
+              "quarter": 1,
+              "reading_date": "2026-03-01",
+              "inside_plantation": {
+                "image": "https://bethetreehugger-staging.objectstore.e2enetworks.net/bth_files/forest/1781295355446_0_ChatGPT_Image_May_29,_2026,_04_10_37_PM.png",
+                "humidity": 1,
+                "temperature": 0.5
+              },
+              "outside_plantation": {
+                "image": "https://bethetreehugger-staging.objectstore.e2enetworks.net/bth_files/forest/1781295362495_0_ChatGPT_Image_May_29,_2026,_04_10_37_PM.png",
+                "humidity": 1,
+                "temperature": 0.5
+              }
+            }
+          ],
+          "authorization_details": {
+            "authorized_date": "2023-06-01",
+            "project_context": "This is Vandalur Forest",
+            "authorized_period": "3",
+            "authorized_by_name": "Kishore",
+            "authorized_by_designation": "Software Engineer"
+          },
+          "maintenance_workforce": [
+            {
+              "year": 2023,
+              "quarter": 2,
+              "total_raining_days": 1,
+              "full_time_gardeners": 1,
+              "part_time_gardeners": 1,
+              "total_watering_days": 1,
+              "total_holidays_festival": 1,
+              "total_holidays_weekly_off": 1,
+              "total_part_time_labour_days": 1
+            },
+            {
+              "year": 2023,
+              "quarter": 3,
+              "total_raining_days": 1,
+              "full_time_gardeners": 1,
+              "part_time_gardeners": 1,
+              "total_watering_days": 1,
+              "total_holidays_festival": 1,
+              "total_holidays_weekly_off": 1,
+              "total_part_time_labour_days": 1
+            },
+            {
+              "year": 2023,
+              "quarter": 4,
+              "total_raining_days": 1,
+              "full_time_gardeners": 1,
+              "part_time_gardeners": 1,
+              "total_watering_days": 1,
+              "total_holidays_festival": 1,
+              "total_holidays_weekly_off": 1,
+              "total_part_time_labour_days": 1
+            },
+            {
+              "year": 2024,
+              "quarter": 1,
+              "total_raining_days": 1,
+              "full_time_gardeners": 1,
+              "part_time_gardeners": 1,
+              "total_watering_days": 1,
+              "total_holidays_festival": 1,
+              "total_holidays_weekly_off": 1,
+              "total_part_time_labour_days": 1
+            },
+            {
+              "year": 2024,
+              "quarter": 2,
+              "total_raining_days": 1,
+              "full_time_gardeners": 1,
+              "part_time_gardeners": 1,
+              "total_watering_days": 1,
+              "total_holidays_festival": 1,
+              "total_holidays_weekly_off": 1,
+              "total_part_time_labour_days": 1
+            },
+            {
+              "year": 2024,
+              "quarter": 3,
+              "total_raining_days": 1,
+              "full_time_gardeners": 1,
+              "part_time_gardeners": 1,
+              "total_watering_days": 1,
+              "total_holidays_festival": 1,
+              "total_holidays_weekly_off": 1,
+              "total_part_time_labour_days": 1
+            },
+            {
+              "year": 2024,
+              "quarter": 4,
+              "total_raining_days": 1,
+              "full_time_gardeners": 1,
+              "part_time_gardeners": 1,
+              "total_watering_days": 1,
+              "total_holidays_festival": 1,
+              "total_holidays_weekly_off": 1,
+              "total_part_time_labour_days": 1
+            },
+            {
+              "year": 2025,
+              "quarter": 1,
+              "total_raining_days": 1,
+              "full_time_gardeners": 1,
+              "part_time_gardeners": 1,
+              "total_watering_days": 1,
+              "total_holidays_festival": 1,
+              "total_holidays_weekly_off": 1,
+              "total_part_time_labour_days": 1
+            },
+            {
+              "year": 2025,
+              "quarter": 2,
+              "total_raining_days": 1,
+              "full_time_gardeners": 1,
+              "part_time_gardeners": 1,
+              "total_watering_days": 1,
+              "total_holidays_festival": 1,
+              "total_holidays_weekly_off": 1,
+              "total_part_time_labour_days": 1
+            },
+            {
+              "year": 2025,
+              "quarter": 3,
+              "total_raining_days": 1,
+              "full_time_gardeners": 1,
+              "part_time_gardeners": 1,
+              "total_watering_days": 1,
+              "total_holidays_festival": 1,
+              "total_holidays_weekly_off": 1,
+              "total_part_time_labour_days": 1
+            },
+            {
+              "year": 2025,
+              "quarter": 4,
+              "total_raining_days": 1,
+              "full_time_gardeners": 1,
+              "part_time_gardeners": 1,
+              "total_watering_days": 1,
+              "total_holidays_festival": 1,
+              "total_holidays_weekly_off": 1,
+              "total_part_time_labour_days": 1
+            },
+            {
+              "year": 2026,
+              "quarter": 1,
+              "total_raining_days": 1,
+              "full_time_gardeners": 1,
+              "part_time_gardeners": 1,
+              "total_watering_days": 1,
+              "total_holidays_festival": 1,
+              "total_holidays_weekly_off": 1,
+              "total_part_time_labour_days": 1
+            }
+          ],
+          "tree_to_tree_distance": 1,
+          "additional_sponsor_logo": [
+            {
+              "logo": "https://bethetreehugger-staging.objectstore.e2enetworks.net/bth_files/forest/1781294003132_0_ChatGPT_Image_May_29,_2026,_04_10_37_PM.png",
+              "name": "Kishore Forest",
+              "type": {
+                "label": "Initiated By",
+                "value": "initiated_by"
+              }
+            },
+            {
+              "logo": "https://bethetreehugger-staging.objectstore.e2enetworks.net/bth_files/forest/1781294027370_0_ChatGPT_Image_May_29,_2026,_04_10_37_PM.png",
+              "name": "Kishore Forest",
+              "type": {
+                "label": "Sponsored By",
+                "value": "sponsored_by"
+              }
+            }
+          ],
+          "irrigation_method_other": "",
+          "plantation_strategy_other": "",
+          "security_and_infrastructure": {
+            "image_data": [
+              {
+                "name": "Security",
+                "image": "https://bethetreehugger-staging.objectstore.e2enetworks.net/bth_files/forest/1781294250450_0_ChatGPT_Image_May_29,_2026,_04_10_37_PM.png",
+                "description": "Security Description"
+              }
+            ],
+            "description": "Security & Infrastructure Description"
+          },
+          "environmental_need_indicators": [
+            {
+              "heading": "Heading",
+              "description": "Description"
+            }
+          ],
+          "forest_value_flow_impact_report": {
+            "long_term": {
+              "land_value": 1,
+              "tree_value": 1,
+              "oxygen_generated": 1,
+              "carbon_sequestration": 1
+            },
+            "short_term": {
+              "land_value": 1,
+              "tree_value": 1,
+              "oxygen_generated": 1,
+              "carbon_sequestration": 1
+            },
+            "medium_term": {
+              "land_value": 1,
+              "tree_value": 1,
+              "oxygen_generated": 1,
+              "carbon_sequestration": 1
+            }
+          },
+          "direct_and_indirect_beneficiaries": {
+            "watering_team": 1,
+            "de_weeding_crew": 1,
+            "people_visiting": "1",
+            "site_supervisor": 1,
+            "schools_colleges": 1,
+            "people_living_near": "1",
+            "plant_health_specialist": 1
+          },
+          "area_population_statistics_details": {
+            "population": 200000,
+            "green_cover": "Green Cover",
+            "environmental_need": "Environmental Need",
+            "google_earth_image": [],
+            "population_density": 15000,
+            "total_jurisdiction_area": 2000
+          }
+        },
+        "method": "POST",
+        "headers": {
+          "content-type": "application/json"
+        }
+      },
+      "result": {
+        "boxes": {
+          "failed": [],
+          "processed": [
+            {
+              "lat": 12.891253261935,
+              "lon": 80.08100380886162,
+              "box_name": "AA",
+              "box_unique_id": "AA"
+            }
+          ],
+          "total_count": 1,
+          "failure_count": 0,
+          "success_count": 1
+        },
+        "trees": {
+          "failed": [],
+          "processed": [
+            {
+              "lat": 12.891253261935,
+              "lon": 80.08100380886162,
+              "tree_name": "Mango",
+              "tree_unique_id": "AA1"
+            }
+          ],
+          "total_count": 1,
+          "failure_count": 0,
+          "success_count": 1
+        },
+        "message": "Forest created successfully",
+        "success": true
+      },
+      "created_by": "d21cabf2-c06c-4c1e-a9ea-d1ea928727d0",
+      "updated_by": "d21cabf2-c06c-4c1e-a9ea-d1ea928727d0",
+      "created_at": "2026-06-12T20:20:31.770Z",
+      "updated_at": "2026-06-12T20:20:33.395Z"
+    }
+  },
+  "roles/list": {
+    "status": 200,
+    "topKeys": [
+      "data",
+      "pagination"
+    ],
+    "count": 2,
+    "rec0Keys": [
+      "id",
+      "name"
+    ],
+    "sample": {
+      "id": 1,
+      "name": "Admin"
+    }
+  }
+}

@@ -1,0 +1,2889 @@
+{
+ "entityCount": 52,
+ "entities": {
+  "BroadcastList": {
+   "columns": [
+    {
+     "name": "nodeId",
+     "type": "ID!"
+    },
+    {
+     "name": "id",
+     "type": "UUID!"
+    },
+    {
+     "name": "profileId",
+     "type": "UUID"
+    },
+    {
+     "name": "initialPlantedOn",
+     "type": "Date"
+    },
+    {
+     "name": "createdAt",
+     "type": "Datetime!"
+    },
+    {
+     "name": "updatedAt",
+     "type": "Datetime!"
+    }
+   ]
+  },
+  "ContactFromWhatsappOrder": {
+   "columns": [
+    {
+     "name": "nodeId",
+     "type": "ID!"
+    },
+    {
+     "name": "id",
+     "type": "UUID!"
+    },
+    {
+     "name": "countryCode",
+     "type": "String"
+    },
+    {
+     "name": "mobile",
+     "type": "String!"
+    },
+    {
+     "name": "name",
+     "type": "String"
+    },
+    {
+     "name": "isUserConverted",
+     "type": "Boolean"
+    },
+    {
+     "name": "isActive",
+     "type": "Boolean"
+    },
+    {
+     "name": "createdAt",
+     "type": "Datetime!"
+    },
+    {
+     "name": "updatedAt",
+     "type": "Datetime!"
+    }
+   ]
+  },
+  "Donor": {
+   "columns": [
+    {
+     "name": "nodeId",
+     "type": "ID!"
+    },
+    {
+     "name": "id",
+     "type": "UUID!"
+    },
+    {
+     "name": "fullName",
+     "type": "String!"
+    },
+    {
+     "name": "donorLogo",
+     "type": "String!"
+    },
+    {
+     "name": "email",
+     "type": "String!"
+    },
+    {
+     "name": "mobileCountryCode",
+     "type": "Int!"
+    },
+    {
+     "name": "mobileNo",
+     "type": "BigInt!"
+    },
+    {
+     "name": "createdBy",
+     "type": "UUID"
+    },
+    {
+     "name": "updatedBy",
+     "type": "UUID"
+    },
+    {
+     "name": "isActive",
+     "type": "Boolean"
+    },
+    {
+     "name": "createdAt",
+     "type": "Datetime!"
+    },
+    {
+     "name": "updatedAt",
+     "type": "Datetime!"
+    }
+   ]
+  },
+  "DonorSponsor": {
+   "columns": [
+    {
+     "name": "nodeId",
+     "type": "ID!"
+    },
+    {
+     "name": "id",
+     "type": "UUID!"
+    },
+    {
+     "name": "donorId",
+     "type": "UUID"
+    },
+    {
+     "name": "sponsorId",
+     "type": "UUID"
+    },
+    {
+     "name": "createdBy",
+     "type": "UUID"
+    },
+    {
+     "name": "updatedBy",
+     "type": "UUID"
+    },
+    {
+     "name": "isActive",
+     "type": "Boolean"
+    },
+    {
+     "name": "createdAt",
+     "type": "Datetime!"
+    },
+    {
+     "name": "updatedAt",
+     "type": "Datetime!"
+    }
+   ]
+  },
+  "DonorTree": {
+   "columns": [
+    {
+     "name": "nodeId",
+     "type": "ID!"
+    },
+    {
+     "name": "id",
+     "type": "UUID!"
+    },
+    {
+     "name": "donorId",
+     "type": "UUID"
+    },
+    {
+     "name": "treeId",
+     "type": "UUID"
+    },
+    {
+     "name": "createdBy",
+     "type": "UUID"
+    },
+    {
+     "name": "updatedBy",
+     "type": "UUID"
+    },
+    {
+     "name": "donatedOn",
+     "type": "Datetime!"
+    },
+    {
+     "name": "isActive",
+     "type": "Boolean"
+    },
+    {
+     "name": "createdAt",
+     "type": "Datetime!"
+    },
+    {
+     "name": "updatedAt",
+     "type": "Datetime!"
+    }
+   ]
+  },
+  "Employee": {
+   "columns": [
+    {
+     "name": "nodeId",
+     "type": "ID!"
+    },
+    {
+     "name": "id",
+     "type": "UUID!"
+    },
+    {
+     "name": "name",
+     "type": "String"
+    },
+    {
+     "name": "profileImage",
+     "type": "String"
+    },
+    {
+     "name": "designation",
+     "type": "String"
+    },
+    {
+     "name": "contactNo",
+     "type": "String"
+    },
+    {
+     "name": "emailId",
+     "type": "String"
+    },
+    {
+     "name": "createdAt",
+     "type": "Datetime!"
+    },
+    {
+     "name": "updatedAt",
+     "type": "Datetime!"
+    },
+    {
+     "name": "createdBy",
+     "type": "UUID"
+    },
+    {
+     "name": "updatedBy",
+     "type": "UUID"
+    },
+    {
+     "name": "isActive",
+     "type": "Boolean"
+    }
+   ]
+  },
+  "ForestAssert": {
+   "columns": [
+    {
+     "name": "nodeId",
+     "type": "ID!"
+    },
+    {
+     "name": "id",
+     "type": "UUID!"
+    },
+    {
+     "name": "isActive",
+     "type": "Boolean"
+    },
+    {
+     "name": "forestId",
+     "type": "UUID"
+    },
+    {
+     "name": "type",
+     "type": "String"
+    },
+    {
+     "name": "url",
+     "type": "String"
+    },
+    {
+     "name": "order",
+     "type": "Int"
+    },
+    {
+     "name": "createdAt",
+     "type": "Datetime"
+    },
+    {
+     "name": "updatedAt",
+     "type": "Datetime"
+    },
+    {
+     "name": "createdBy",
+     "type": "UUID"
+    },
+    {
+     "name": "updatedBy",
+     "type": "UUID"
+    }
+   ]
+  },
+  "ForestBox": {
+   "columns": [
+    {
+     "name": "nodeId",
+     "type": "ID!"
+    },
+    {
+     "name": "id",
+     "type": "UUID!"
+    },
+    {
+     "name": "name",
+     "type": "String"
+    },
+    {
+     "name": "forestId",
+     "type": "UUID"
+    },
+    {
+     "name": "boxDirection",
+     "type": "String"
+    },
+    {
+     "name": "boxBoundary",
+     "type": "JSON"
+    },
+    {
+     "name": "maxRows",
+     "type": "Int"
+    },
+    {
+     "name": "maxColumns",
+     "type": "Int"
+    },
+    {
+     "name": "minDistance",
+     "type": "BigFloat"
+    },
+    {
+     "name": "uniqueId",
+     "type": "String"
+    },
+    {
+     "name": "isActive",
+     "type": "Boolean"
+    },
+    {
+     "name": "createdBy",
+     "type": "UUID"
+    },
+    {
+     "name": "updatedBy",
+     "type": "UUID"
+    },
+    {
+     "name": "createdAt",
+     "type": "Datetime!"
+    },
+    {
+     "name": "updatedAt",
+     "type": "Datetime!"
+    },
+    {
+     "name": "rowPosition",
+     "type": "Int"
+    },
+    {
+     "name": "columnPosition",
+     "type": "Int"
+    },
+    {
+     "name": "boxLat",
+     "type": "String"
+    },
+    {
+     "name": "boxLong",
+     "type": "String"
+    },
+    {
+     "name": "start",
+     "type": "String"
+    },
+    {
+     "name": "prefix",
+     "type": "String"
+    }
+   ]
+  },
+  "ForestCluster": {
+   "columns": [
+    {
+     "name": "nodeId",
+     "type": "ID!"
+    },
+    {
+     "name": "id",
+     "type": "UUID!"
+    },
+    {
+     "name": "lat",
+     "type": "String!"
+    },
+    {
+     "name": "lng",
+     "type": "String!"
+    },
+    {
+     "name": "treeCount",
+     "type": "Int"
+    },
+    {
+     "name": "forestId",
+     "type": "UUID"
+    },
+    {
+     "name": "createdAt",
+     "type": "Datetime!"
+    },
+    {
+     "name": "updatedAt",
+     "type": "Datetime!"
+    },
+    {
+     "name": "zoom",
+     "type": "Int"
+    },
+    {
+     "name": "tree",
+     "type": "JSON"
+    }
+   ]
+  },
+  "ForestClustersCopy": {
+   "columns": [
+    {
+     "name": "id",
+     "type": "UUID"
+    },
+    {
+     "name": "lat",
+     "type": "String"
+    },
+    {
+     "name": "lng",
+     "type": "String"
+    },
+    {
+     "name": "treeCount",
+     "type": "Int"
+    },
+    {
+     "name": "forestId",
+     "type": "UUID"
+    },
+    {
+     "name": "createdAt",
+     "type": "Datetime"
+    },
+    {
+     "name": "updatedAt",
+     "type": "Datetime"
+    },
+    {
+     "name": "zoom",
+     "type": "Int"
+    },
+    {
+     "name": "tree",
+     "type": "JSON"
+    }
+   ]
+  },
+  "ForestPlantTimelineAsset": {
+   "columns": [
+    {
+     "name": "nodeId",
+     "type": "ID!"
+    },
+    {
+     "name": "id",
+     "type": "Int!"
+    },
+    {
+     "name": "timelineId",
+     "type": "Int"
+    },
+    {
+     "name": "type",
+     "type": "String"
+    },
+    {
+     "name": "url",
+     "type": "String"
+    },
+    {
+     "name": "order",
+     "type": "Int"
+    },
+    {
+     "name": "isActive",
+     "type": "Boolean"
+    },
+    {
+     "name": "createdBy",
+     "type": "UUID"
+    },
+    {
+     "name": "updatedBy",
+     "type": "UUID"
+    },
+    {
+     "name": "createdAt",
+     "type": "Datetime!"
+    },
+    {
+     "name": "updatedAt",
+     "type": "Datetime!"
+    }
+   ]
+  },
+  "ForestPlantTimeline": {
+   "columns": [
+    {
+     "name": "nodeId",
+     "type": "ID!"
+    },
+    {
+     "name": "id",
+     "type": "Int!"
+    },
+    {
+     "name": "plantId",
+     "type": "UUID"
+    },
+    {
+     "name": "speciesId",
+     "type": "Int"
+    },
+    {
+     "name": "statusId",
+     "type": "Int"
+    },
+    {
+     "name": "height",
+     "type": "Float"
+    },
+    {
+     "name": "diameter",
+     "type": "Float"
+    },
+    {
+     "name": "age",
+     "type": "Int"
+    },
+    {
+     "name": "latitude",
+     "type": "String"
+    },
+    {
+     "name": "longitude",
+     "type": "String"
+    },
+    {
+     "name": "isActive",
+     "type": "Boolean"
+    },
+    {
+     "name": "createdBy",
+     "type": "UUID"
+    },
+    {
+     "name": "updatedBy",
+     "type": "UUID"
+    },
+    {
+     "name": "createdAt",
+     "type": "Datetime!"
+    },
+    {
+     "name": "updatedAt",
+     "type": "Datetime!"
+    },
+    {
+     "name": "timelineDate",
+     "type": "Date"
+    }
+   ]
+  },
+  "ForestPrefix": {
+   "columns": [
+    {
+     "name": "upper",
+     "type": "String"
+    },
+    {
+     "name": "id",
+     "type": "UUID"
+    }
+   ]
+  },
+  "ForestSponsor": {
+   "columns": [
+    {
+     "name": "nodeId",
+     "type": "ID!"
+    },
+    {
+     "name": "id",
+     "type": "UUID!"
+    },
+    {
+     "name": "isActive",
+     "type": "Boolean"
+    },
+    {
+     "name": "createdAt",
+     "type": "Datetime!"
+    },
+    {
+     "name": "updatedAt",
+     "type": "Datetime!"
+    },
+    {
+     "name": "createdBy",
+     "type": "UUID"
+    },
+    {
+     "name": "updatedBy",
+     "type": "UUID"
+    },
+    {
+     "name": "forestId",
+     "type": "UUID"
+    },
+    {
+     "name": "sponsorId",
+     "type": "UUID"
+    }
+   ]
+  },
+  "ForestTreeActivity": {
+   "columns": [
+    {
+     "name": "nodeId",
+     "type": "ID!"
+    },
+    {
+     "name": "id",
+     "type": "UUID!"
+    },
+    {
+     "name": "forestTreeId",
+     "type": "UUID"
+    },
+    {
+     "name": "isActive",
+     "type": "Boolean"
+    },
+    {
+     "name": "createdAt",
+     "type": "Datetime!"
+    },
+    {
+     "name": "updatedAt",
+     "type": "Datetime!"
+    },
+    {
+     "name": "createdBy",
+     "type": "UUID"
+    },
+    {
+     "name": "updatedBy",
+     "type": "UUID"
+    }
+   ]
+  },
+  "ForestTreeSponsor": {
+   "columns": [
+    {
+     "name": "nodeId",
+     "type": "ID!"
+    },
+    {
+     "name": "id",
+     "type": "UUID!"
+    },
+    {
+     "name": "isActive",
+     "type": "Boolean"
+    },
+    {
+     "name": "createdAt",
+     "type": "Datetime!"
+    },
+    {
+     "name": "updatedAt",
+     "type": "Datetime!"
+    },
+    {
+     "name": "createdBy",
+     "type": "UUID"
+    },
+    {
+     "name": "updatedBy",
+     "type": "UUID"
+    },
+    {
+     "name": "forestTreeId",
+     "type": "UUID"
+    },
+    {
+     "name": "sponsorId",
+     "type": "UUID"
+    }
+   ]
+  },
+  "ForestTree": {
+   "columns": [
+    {
+     "name": "nodeId",
+     "type": "ID!"
+    },
+    {
+     "name": "id",
+     "type": "UUID!"
+    },
+    {
+     "name": "forestId",
+     "type": "UUID"
+    },
+    {
+     "name": "masterPlantSpeciesId",
+     "type": "Int"
+    },
+    {
+     "name": "forestTreeName",
+     "type": "String"
+    },
+    {
+     "name": "forestTreePetname",
+     "type": "String"
+    },
+    {
+     "name": "forestTreeHeight",
+     "type": "String"
+    },
+    {
+     "name": "forestTreeDia",
+     "type": "String"
+    },
+    {
+     "name": "forestTreeAge",
+     "type": "Int"
+    },
+    {
+     "name": "forestTreeOxygen",
+     "type": "String"
+    },
+    {
+     "name": "forestTreeCarbonoffset",
+     "type": "String"
+    },
+    {
+     "name": "forestTreeGeoLat",
+     "type": "String"
+    },
+    {
+     "name": "forestTreeGeoLong",
+     "type": "String"
+    },
+    {
+     "name": "sponsoredBy",
+     "type": "UUID"
+    },
+    {
+     "name": "isActive",
+     "type": "Boolean"
+    },
+    {
+     "name": "plantedBy",
+     "type": "String"
+    },
+    {
+     "name": "createdAt",
+     "type": "Datetime!"
+    },
+    {
+     "name": "updatedAt",
+     "type": "Datetime!"
+    },
+    {
+     "name": "createdBy",
+     "type": "UUID"
+    },
+    {
+     "name": "updatedBy",
+     "type": "UUID"
+    },
+    {
+     "name": "landmark",
+     "type": "String"
+    },
+    {
+     "name": "treeUniqueId",
+     "type": "String"
+    },
+    {
+     "name": "treeStatusId",
+     "type": "Int"
+    },
+    {
+     "name": "plantedOn",
+     "type": "Date"
+    },
+    {
+     "name": "isDisplay",
+     "type": "Boolean"
+    },
+    {
+     "name": "planterId",
+     "type": "Int"
+    },
+    {
+     "name": "planterReasonId",
+     "type": "Int"
+    },
+    {
+     "name": "plantingMessage",
+     "type": "String"
+    },
+    {
+     "name": "boxId",
+     "type": "UUID"
+    },
+    {
+     "name": "clusterIds",
+     "type": "[UUID]"
+    },
+    {
+     "name": "assignedTo",
+     "type": "UUID"
+    }
+   ]
+  },
+  "ForestTreesOur": {
+   "columns": [
+    {
+     "name": "id",
+     "type": "UUID"
+    },
+    {
+     "name": "forestId",
+     "type": "UUID"
+    },
+    {
+     "name": "masterPlantSpeciesId",
+     "type": "Int"
+    },
+    {
+     "name": "forestTreeName",
+     "type": "String"
+    },
+    {
+     "name": "forestTreePetname",
+     "type": "String"
+    },
+    {
+     "name": "forestTreeHeight",
+     "type": "String"
+    },
+    {
+     "name": "forestTreeDia",
+     "type": "String"
+    },
+    {
+     "name": "forestTreeAge",
+     "type": "Int"
+    },
+    {
+     "name": "forestTreeOxygen",
+     "type": "String"
+    },
+    {
+     "name": "forestTreeCarbonoffset",
+     "type": "String"
+    },
+    {
+     "name": "forestTreeGeoLat",
+     "type": "String"
+    },
+    {
+     "name": "forestTreeGeoLong",
+     "type": "String"
+    },
+    {
+     "name": "sponsoredBy",
+     "type": "UUID"
+    },
+    {
+     "name": "isActive",
+     "type": "Boolean"
+    },
+    {
+     "name": "plantedBy",
+     "type": "String"
+    },
+    {
+     "name": "createdAt",
+     "type": "Datetime"
+    },
+    {
+     "name": "updatedAt",
+     "type": "Datetime"
+    },
+    {
+     "name": "createdBy",
+     "type": "UUID"
+    },
+    {
+     "name": "updatedBy",
+     "type": "UUID"
+    },
+    {
+     "name": "landmark",
+     "type": "String"
+    },
+    {
+     "name": "treeUniqueId",
+     "type": "String"
+    },
+    {
+     "name": "treeStatusId",
+     "type": "Int"
+    },
+    {
+     "name": "plantedOn",
+     "type": "Date"
+    },
+    {
+     "name": "isDisplay",
+     "type": "Boolean"
+    },
+    {
+     "name": "planterId",
+     "type": "Int"
+    },
+    {
+     "name": "planterReasonId",
+     "type": "Int"
+    },
+    {
+     "name": "plantingMessage",
+     "type": "String"
+    },
+    {
+     "name": "boxId",
+     "type": "UUID"
+    },
+    {
+     "name": "clusterIds",
+     "type": "[String]"
+    }
+   ]
+  },
+  "ForestTreesOur1": {
+   "columns": [
+    {
+     "name": "id",
+     "type": "UUID"
+    },
+    {
+     "name": "forestId",
+     "type": "UUID"
+    },
+    {
+     "name": "masterPlantSpeciesId",
+     "type": "Int"
+    },
+    {
+     "name": "forestTreeName",
+     "type": "String"
+    },
+    {
+     "name": "forestTreePetname",
+     "type": "String"
+    },
+    {
+     "name": "forestTreeHeight",
+     "type": "String"
+    },
+    {
+     "name": "forestTreeDia",
+     "type": "String"
+    },
+    {
+     "name": "forestTreeAge",
+     "type": "Int"
+    },
+    {
+     "name": "forestTreeOxygen",
+     "type": "String"
+    },
+    {
+     "name": "forestTreeCarbonoffset",
+     "type": "String"
+    },
+    {
+     "name": "forestTreeGeoLat",
+     "type": "String"
+    },
+    {
+     "name": "forestTreeGeoLong",
+     "type": "String"
+    },
+    {
+     "name": "sponsoredBy",
+     "type": "UUID"
+    },
+    {
+     "name": "isActive",
+     "type": "Boolean"
+    },
+    {
+     "name": "plantedBy",
+     "type": "String"
+    },
+    {
+     "name": "createdAt",
+     "type": "Datetime"
+    },
+    {
+     "name": "updatedAt",
+     "type": "Datetime"
+    },
+    {
+     "name": "createdBy",
+     "type": "UUID"
+    },
+    {
+     "name": "updatedBy",
+     "type": "UUID"
+    },
+    {
+     "name": "landmark",
+     "type": "String"
+    },
+    {
+     "name": "treeUniqueId",
+     "type": "String"
+    },
+    {
+     "name": "treeStatusId",
+     "type": "Int"
+    },
+    {
+     "name": "plantedOn",
+     "type": "Date"
+    },
+    {
+     "name": "isDisplay",
+     "type": "Boolean"
+    },
+    {
+     "name": "planterId",
+     "type": "Int"
+    },
+    {
+     "name": "planterReasonId",
+     "type": "Int"
+    },
+    {
+     "name": "plantingMessage",
+     "type": "String"
+    },
+    {
+     "name": "boxId",
+     "type": "UUID"
+    },
+    {
+     "name": "clusterIds",
+     "type": "[String]"
+    }
+   ]
+  },
+  "Forest": {
+   "columns": [
+    {
+     "name": "nodeId",
+     "type": "ID!"
+    },
+    {
+     "name": "id",
+     "type": "UUID!"
+    },
+    {
+     "name": "forestName",
+     "type": "String"
+    },
+    {
+     "name": "forestDesc",
+     "type": "String"
+    },
+    {
+     "name": "forestGeoLat",
+     "type": "String"
+    },
+    {
+     "name": "forestUrl",
+     "type": "String"
+    },
+    {
+     "name": "forestGeoLong",
+     "type": "String"
+    },
+    {
+     "name": "forestGeoRadius",
+     "type": "String"
+    },
+    {
+     "name": "forestGeoShape",
+     "type": "String"
+    },
+    {
+     "name": "forestOxygen",
+     "type": "String"
+    },
+    {
+     "name": "forestCarbonoffset",
+     "type": "String"
+    },
+    {
+     "name": "forestAddress",
+     "type": "String"
+    },
+    {
+     "name": "forestCity",
+     "type": "String"
+    },
+    {
+     "name": "forestCountry",
+     "type": "String"
+    },
+    {
+     "name": "isActive",
+     "type": "Boolean"
+    },
+    {
+     "name": "createdAt",
+     "type": "Datetime!"
+    },
+    {
+     "name": "updatedAt",
+     "type": "Datetime!"
+    },
+    {
+     "name": "createdBy",
+     "type": "UUID"
+    },
+    {
+     "name": "updatedBy",
+     "type": "UUID"
+    },
+    {
+     "name": "forestUniqueId",
+     "type": "String"
+    },
+    {
+     "name": "totalTrees",
+     "type": "Int"
+    },
+    {
+     "name": "averageAge",
+     "type": "Float"
+    },
+    {
+     "name": "totalSpeciesPlanted",
+     "type": "Int"
+    },
+    {
+     "name": "totalDrying",
+     "type": "Int"
+    },
+    {
+     "name": "totalDamaged",
+     "type": "Int"
+    },
+    {
+     "name": "totalEmptyPits",
+     "type": "Int"
+    },
+    {
+     "name": "totalDead",
+     "type": "Int"
+    },
+    {
+     "name": "forestBoundary",
+     "type": "JSON"
+    },
+    {
+     "name": "boxRows",
+     "type": "Int"
+    },
+    {
+     "name": "boxColumn",
+     "type": "Int"
+    },
+    {
+     "name": "boxToBoxDistance",
+     "type": "Float"
+    },
+    {
+     "name": "projectSite",
+     "type": "String"
+    },
+    {
+     "name": "additionalSponsorLogo",
+     "type": "JSON"
+    },
+    {
+     "name": "forestState",
+     "type": "String"
+    },
+    {
+     "name": "landOwnership",
+     "type": "JSON"
+    },
+    {
+     "name": "landArea",
+     "type": "JSON"
+    },
+    {
+     "name": "projectDetails",
+     "type": "JSON"
+    },
+    {
+     "name": "plantationStrategy",
+     "type": "String"
+    },
+    {
+     "name": "irrigationMethod",
+     "type": "String"
+    },
+    {
+     "name": "climate",
+     "type": "String"
+    },
+    {
+     "name": "soilType",
+     "type": "String"
+    },
+    {
+     "name": "digipin",
+     "type": "String"
+    },
+    {
+     "name": "lastInspectionDate",
+     "type": "Datetime"
+    },
+    {
+     "name": "permissionLetter",
+     "type": "String"
+    },
+    {
+     "name": "authorizationDetails",
+     "type": "JSON"
+    },
+    {
+     "name": "areaPopulationStatisticsDetails",
+     "type": "JSON"
+    },
+    {
+     "name": "directAndIndirectBeneficiaries",
+     "type": "JSON"
+    },
+    {
+     "name": "forestValueFlowImpactReport",
+     "type": "JSON"
+    },
+    {
+     "name": "speciesDetails",
+     "type": "JSON"
+    },
+    {
+     "name": "maintenanceWorkforce",
+     "type": "JSON"
+    },
+    {
+     "name": "plantGrowthData",
+     "type": "JSON"
+    },
+    {
+     "name": "siteLayout",
+     "type": "String"
+    },
+    {
+     "name": "pathwaySpacing",
+     "type": "Float"
+    },
+    {
+     "name": "soilPhLevel",
+     "type": "JSON"
+    },
+    {
+     "name": "temperatureHumidity",
+     "type": "JSON"
+    },
+    {
+     "name": "environmentalNeedIndicators",
+     "type": "JSON"
+    },
+    {
+     "name": "securityAndInfrastructure",
+     "type": "JSON"
+    },
+    {
+     "name": "plantationProgress",
+     "type": "JSON"
+    },
+    {
+     "name": "projectPeriod",
+     "type": "Int"
+    },
+    {
+     "name": "isUpdated",
+     "type": "Boolean"
+    },
+    {
+     "name": "plantationDate",
+     "type": "Date"
+    },
+    {
+     "name": "treeRow",
+     "type": "Int"
+    },
+    {
+     "name": "treeColumn",
+     "type": "Int"
+    },
+    {
+     "name": "treeToTreeDistance",
+     "type": "Float"
+    },
+    {
+     "name": "directionAngle",
+     "type": "Int"
+    },
+    {
+     "name": "boundaryGap",
+     "type": "Int"
+    },
+    {
+     "name": "dashboardImages",
+     "type": "JSON"
+    },
+    {
+     "name": "plantationStrategyOther",
+     "type": "String"
+    },
+    {
+     "name": "irrigationMethodOther",
+     "type": "String"
+    },
+    {
+     "name": "climateOther",
+     "type": "String"
+    },
+    {
+     "name": "soilTypeOther",
+     "type": "String"
+    },
+    {
+     "name": "reportImages",
+     "type": "JSON"
+    },
+    {
+     "name": "forestInternalId",
+     "type": "String"
+    }
+   ]
+  },
+  "ForestsEmployee": {
+   "columns": [
+    {
+     "name": "nodeId",
+     "type": "ID!"
+    },
+    {
+     "name": "id",
+     "type": "UUID!"
+    },
+    {
+     "name": "forestId",
+     "type": "UUID"
+    },
+    {
+     "name": "employeeId",
+     "type": "UUID"
+    },
+    {
+     "name": "createdAt",
+     "type": "Datetime!"
+    },
+    {
+     "name": "updatedAt",
+     "type": "Datetime!"
+    },
+    {
+     "name": "createdBy",
+     "type": "UUID"
+    },
+    {
+     "name": "updatedBy",
+     "type": "UUID"
+    },
+    {
+     "name": "isActive",
+     "type": "Boolean"
+    }
+   ]
+  },
+  "ForestsReport": {
+   "columns": [
+    {
+     "name": "nodeId",
+     "type": "ID!"
+    },
+    {
+     "name": "id",
+     "type": "UUID!"
+    },
+    {
+     "name": "forestId",
+     "type": "UUID"
+    },
+    {
+     "name": "reportId",
+     "type": "UUID"
+    },
+    {
+     "name": "createdAt",
+     "type": "Datetime!"
+    },
+    {
+     "name": "updatedAt",
+     "type": "Datetime!"
+    },
+    {
+     "name": "createdBy",
+     "type": "UUID"
+    },
+    {
+     "name": "updatedBy",
+     "type": "UUID"
+    },
+    {
+     "name": "isActive",
+     "type": "Boolean"
+    }
+   ]
+  },
+  "GiftForestPlant": {
+   "columns": [
+    {
+     "name": "nodeId",
+     "type": "ID!"
+    },
+    {
+     "name": "id",
+     "type": "UUID!"
+    },
+    {
+     "name": "giftTreeId",
+     "type": "UUID"
+    },
+    {
+     "name": "salutation",
+     "type": "String"
+    },
+    {
+     "name": "name",
+     "type": "String"
+    },
+    {
+     "name": "userAssetUrl",
+     "type": "String"
+    },
+    {
+     "name": "designation",
+     "type": "String"
+    },
+    {
+     "name": "emailId",
+     "type": "String"
+    },
+    {
+     "name": "mobileNoStdCode",
+     "type": "Int"
+    },
+    {
+     "name": "mobileNo",
+     "type": "BigFloat"
+    },
+    {
+     "name": "organizationName",
+     "type": "String"
+    },
+    {
+     "name": "orgLogoUrl",
+     "type": "String"
+    },
+    {
+     "name": "message",
+     "type": "String"
+    },
+    {
+     "name": "allocatingOn",
+     "type": "Date"
+    },
+    {
+     "name": "isEmailSent",
+     "type": "Boolean"
+    },
+    {
+     "name": "isActive",
+     "type": "Boolean"
+    },
+    {
+     "name": "createdBy",
+     "type": "UUID"
+    },
+    {
+     "name": "updatedBy",
+     "type": "UUID"
+    },
+    {
+     "name": "createdAt",
+     "type": "Datetime!"
+    },
+    {
+     "name": "updatedAt",
+     "type": "Datetime!"
+    },
+    {
+     "name": "giftCertificateUrl",
+     "type": "String"
+    }
+   ]
+  },
+  "Job": {
+   "columns": [
+    {
+     "name": "nodeId",
+     "type": "ID!"
+    },
+    {
+     "name": "id",
+     "type": "UUID!"
+    },
+    {
+     "name": "jobId",
+     "type": "String!"
+    },
+    {
+     "name": "jobType",
+     "type": "String"
+    },
+    {
+     "name": "jobDescription",
+     "type": "JSON"
+    },
+    {
+     "name": "status",
+     "type": "String!"
+    },
+    {
+     "name": "payload",
+     "type": "JSON"
+    },
+    {
+     "name": "result",
+     "type": "JSON"
+    },
+    {
+     "name": "createdAt",
+     "type": "Datetime!"
+    },
+    {
+     "name": "updatedAt",
+     "type": "Datetime!"
+    },
+    {
+     "name": "createdBy",
+     "type": "UUID!"
+    },
+    {
+     "name": "updatedBy",
+     "type": "UUID!"
+    }
+   ]
+  },
+  "MasterPlantingReason": {
+   "columns": [
+    {
+     "name": "nodeId",
+     "type": "ID!"
+    },
+    {
+     "name": "id",
+     "type": "Int!"
+    },
+    {
+     "name": "reason",
+     "type": "String"
+    },
+    {
+     "name": "isActive",
+     "type": "Boolean"
+    },
+    {
+     "name": "createdAt",
+     "type": "Datetime!"
+    },
+    {
+     "name": "updatedAt",
+     "type": "Datetime!"
+    }
+   ]
+  },
+  "MasterPlantspecy": {
+   "columns": [
+    {
+     "name": "nodeId",
+     "type": "ID!"
+    },
+    {
+     "name": "id",
+     "type": "Int!"
+    },
+    {
+     "name": "speciesCategory",
+     "type": "String"
+    },
+    {
+     "name": "speciesName",
+     "type": "String"
+    },
+    {
+     "name": "speciesDesc",
+     "type": "String"
+    },
+    {
+     "name": "speciesOxygenLevel1",
+     "type": "String"
+    },
+    {
+     "name": "speciesOxygenLevel2",
+     "type": "String"
+    },
+    {
+     "name": "speciesOxygenLevel3",
+     "type": "String"
+    },
+    {
+     "name": "speciesOxygenLevel4",
+     "type": "String"
+    },
+    {
+     "name": "speciesOxygenLevel5",
+     "type": "String"
+    },
+    {
+     "name": "isActive",
+     "type": "Boolean"
+    },
+    {
+     "name": "createdAt",
+     "type": "Datetime!"
+    },
+    {
+     "name": "updatedAt",
+     "type": "Datetime!"
+    },
+    {
+     "name": "oxygenPerDay",
+     "type": "Float"
+    },
+    {
+     "name": "carbonOffsetPerDay",
+     "type": "Float"
+    },
+    {
+     "name": "commonName",
+     "type": "String"
+    },
+    {
+     "name": "rate",
+     "type": "Float"
+    },
+    {
+     "name": "saplingOrder",
+     "type": "Int"
+    },
+    {
+     "name": "isSaplingOrderFromWhatsapp",
+     "type": "Boolean"
+    },
+    {
+     "name": "isTimberProduction",
+     "type": "Boolean"
+    },
+    {
+     "name": "isNestingHabitat",
+     "type": "Boolean"
+    },
+    {
+     "name": "isFloweringPlant",
+     "type": "Boolean"
+    },
+    {
+     "name": "isFruitBearing",
+     "type": "Boolean"
+    }
+   ]
+  },
+  "MasterRole": {
+   "columns": [
+    {
+     "name": "nodeId",
+     "type": "ID!"
+    },
+    {
+     "name": "id",
+     "type": "Int!"
+    },
+    {
+     "name": "name",
+     "type": "String"
+    },
+    {
+     "name": "isActive",
+     "type": "Boolean"
+    },
+    {
+     "name": "createdAt",
+     "type": "Datetime!"
+    },
+    {
+     "name": "updatedAt",
+     "type": "Datetime!"
+    }
+   ]
+  },
+  "NudgeConfiguration": {
+   "columns": [
+    {
+     "name": "nodeId",
+     "type": "ID!"
+    },
+    {
+     "name": "id",
+     "type": "Int!"
+    },
+    {
+     "name": "name",
+     "type": "String"
+    },
+    {
+     "name": "specificDate",
+     "type": "Datetime"
+    },
+    {
+     "name": "days",
+     "type": "Int"
+    },
+    {
+     "name": "message",
+     "type": "String!"
+    },
+    {
+     "name": "status",
+     "type": "Boolean"
+    },
+    {
+     "name": "createdAt",
+     "type": "Datetime!"
+    },
+    {
+     "name": "updatedAt",
+     "type": "Datetime!"
+    }
+   ]
+  },
+  "NudgeSequenceConfiguration": {
+   "columns": [
+    {
+     "name": "nodeId",
+     "type": "ID!"
+    },
+    {
+     "name": "id",
+     "type": "Int!"
+    },
+    {
+     "name": "numberOfDaysBeforeNotify",
+     "type": "Int"
+    },
+    {
+     "name": "daysFrequency",
+     "type": "Int"
+    },
+    {
+     "name": "isActive",
+     "type": "Boolean"
+    },
+    {
+     "name": "createdAt",
+     "type": "Datetime!"
+    },
+    {
+     "name": "updatedAt",
+     "type": "Datetime!"
+    }
+   ]
+  },
+  "OrderActivityLog": {
+   "columns": [
+    {
+     "name": "nodeId",
+     "type": "ID!"
+    },
+    {
+     "name": "id",
+     "type": "UUID!"
+    },
+    {
+     "name": "orderId",
+     "type": "UUID!"
+    },
+    {
+     "name": "activityTypeId",
+     "type": "Int"
+    },
+    {
+     "name": "comment",
+     "type": "String"
+    },
+    {
+     "name": "activityDate",
+     "type": "Datetime"
+    },
+    {
+     "name": "createdBy",
+     "type": "UUID"
+    },
+    {
+     "name": "updatedBy",
+     "type": "UUID"
+    },
+    {
+     "name": "isActive",
+     "type": "Boolean"
+    },
+    {
+     "name": "createdAt",
+     "type": "Datetime!"
+    },
+    {
+     "name": "updatedAt",
+     "type": "Datetime!"
+    }
+   ]
+  },
+  "OrderActivityTypeMaster": {
+   "columns": [
+    {
+     "name": "nodeId",
+     "type": "ID!"
+    },
+    {
+     "name": "id",
+     "type": "Int!"
+    },
+    {
+     "name": "activityType",
+     "type": "String!"
+    },
+    {
+     "name": "isActive",
+     "type": "Boolean"
+    },
+    {
+     "name": "createdAt",
+     "type": "Datetime!"
+    },
+    {
+     "name": "updatedAt",
+     "type": "Datetime!"
+    }
+   ]
+  },
+  "OrderPayment": {
+   "columns": [
+    {
+     "name": "nodeId",
+     "type": "ID!"
+    },
+    {
+     "name": "id",
+     "type": "Int!"
+    },
+    {
+     "name": "orderId",
+     "type": "UUID!"
+    },
+    {
+     "name": "paymentModeId",
+     "type": "Int"
+    },
+    {
+     "name": "transactionId",
+     "type": "String!"
+    },
+    {
+     "name": "comment",
+     "type": "String"
+    },
+    {
+     "name": "paymentDate",
+     "type": "Datetime"
+    },
+    {
+     "name": "amount",
+     "type": "Float!"
+    },
+    {
+     "name": "createdBy",
+     "type": "UUID"
+    },
+    {
+     "name": "updatedBy",
+     "type": "UUID"
+    },
+    {
+     "name": "isActive",
+     "type": "Boolean"
+    },
+    {
+     "name": "createdAt",
+     "type": "Datetime!"
+    },
+    {
+     "name": "updatedAt",
+     "type": "Datetime!"
+    },
+    {
+     "name": "paymentJson",
+     "type": "JSON"
+    }
+   ]
+  },
+  "OrderPaymentModesMaster": {
+   "columns": [
+    {
+     "name": "nodeId",
+     "type": "ID!"
+    },
+    {
+     "name": "id",
+     "type": "Int!"
+    },
+    {
+     "name": "paymentModes",
+     "type": "String"
+    },
+    {
+     "name": "isActive",
+     "type": "Boolean"
+    },
+    {
+     "name": "createdAt",
+     "type": "Datetime!"
+    },
+    {
+     "name": "updatedAt",
+     "type": "Datetime!"
+    }
+   ]
+  },
+  "OrderStatusMaster": {
+   "columns": [
+    {
+     "name": "nodeId",
+     "type": "ID!"
+    },
+    {
+     "name": "id",
+     "type": "Int!"
+    },
+    {
+     "name": "status",
+     "type": "String"
+    },
+    {
+     "name": "createdBy",
+     "type": "UUID"
+    },
+    {
+     "name": "updatedBy",
+     "type": "UUID"
+    },
+    {
+     "name": "isActive",
+     "type": "Boolean"
+    },
+    {
+     "name": "createdAt",
+     "type": "Datetime!"
+    },
+    {
+     "name": "updatedAt",
+     "type": "Datetime!"
+    },
+    {
+     "name": "statusArrangeNo",
+     "type": "Int"
+    }
+   ]
+  },
+  "OrderTypeMaster": {
+   "columns": [
+    {
+     "name": "nodeId",
+     "type": "ID!"
+    },
+    {
+     "name": "id",
+     "type": "Int!"
+    },
+    {
+     "name": "type",
+     "type": "String"
+    },
+    {
+     "name": "order",
+     "type": "Int"
+    },
+    {
+     "name": "createdBy",
+     "type": "UUID"
+    },
+    {
+     "name": "updatedBy",
+     "type": "UUID"
+    },
+    {
+     "name": "isActive",
+     "type": "Boolean"
+    },
+    {
+     "name": "createdAt",
+     "type": "Datetime!"
+    },
+    {
+     "name": "updatedAt",
+     "type": "Datetime!"
+    }
+   ]
+  },
+  "Planter": {
+   "columns": [
+    {
+     "name": "nodeId",
+     "type": "ID!"
+    },
+    {
+     "name": "id",
+     "type": "Int!"
+    },
+    {
+     "name": "name",
+     "type": "String"
+    },
+    {
+     "name": "mobileNo",
+     "type": "BigInt"
+    },
+    {
+     "name": "isActive",
+     "type": "Boolean"
+    },
+    {
+     "name": "createdAt",
+     "type": "Datetime!"
+    },
+    {
+     "name": "updatedAt",
+     "type": "Datetime!"
+    }
+   ]
+  },
+  "Report": {
+   "columns": [
+    {
+     "name": "nodeId",
+     "type": "ID!"
+    },
+    {
+     "name": "id",
+     "type": "UUID!"
+    },
+    {
+     "name": "year",
+     "type": "Int"
+    },
+    {
+     "name": "quarter",
+     "type": "Int"
+    },
+    {
+     "name": "reportDate",
+     "type": "Datetime"
+    },
+    {
+     "name": "plantationDate",
+     "type": "Datetime"
+    },
+    {
+     "name": "startDate",
+     "type": "Datetime"
+    },
+    {
+     "name": "endDate",
+     "type": "Datetime"
+    },
+    {
+     "name": "mode",
+     "type": "String"
+    },
+    {
+     "name": "type",
+     "type": "String"
+    },
+    {
+     "name": "version",
+     "type": "Int"
+    },
+    {
+     "name": "reportData",
+     "type": "JSON"
+    },
+    {
+     "name": "createdAt",
+     "type": "Datetime!"
+    },
+    {
+     "name": "updatedAt",
+     "type": "Datetime!"
+    },
+    {
+     "name": "createdBy",
+     "type": "UUID"
+    },
+    {
+     "name": "updatedBy",
+     "type": "UUID"
+    },
+    {
+     "name": "isActive",
+     "type": "Boolean"
+    },
+    {
+     "name": "projectPeriod",
+     "type": "Int"
+    },
+    {
+     "name": "skip",
+     "type": "JSON"
+    },
+    {
+     "name": "forestId",
+     "type": "UUID"
+    }
+   ]
+  },
+  "SaplingOrder": {
+   "columns": [
+    {
+     "name": "nodeId",
+     "type": "ID!"
+    },
+    {
+     "name": "id",
+     "type": "UUID!"
+    },
+    {
+     "name": "orderTypeId",
+     "type": "Int"
+    },
+    {
+     "name": "orderStatusId",
+     "type": "Int"
+    },
+    {
+     "name": "totalAmount",
+     "type": "Float"
+    },
+    {
+     "name": "orderedDate",
+     "type": "Datetime"
+    },
+    {
+     "name": "expectedDeliveryDate",
+     "type": "Datetime"
+    },
+    {
+     "name": "shippingAddressId",
+     "type": "UUID"
+    },
+    {
+     "name": "billingAddressId",
+     "type": "UUID"
+    },
+    {
+     "name": "createdBy",
+     "type": "UUID"
+    },
+    {
+     "name": "updatedBy",
+     "type": "UUID"
+    },
+    {
+     "name": "isActive",
+     "type": "Boolean"
+    },
+    {
+     "name": "createdAt",
+     "type": "Datetime!"
+    },
+    {
+     "name": "updatedAt",
+     "type": "Datetime!"
+    },
+    {
+     "name": "orderNo",
+     "type": "String!"
+    }
+   ]
+  },
+  "SaplingOrderAddress": {
+   "columns": [
+    {
+     "name": "nodeId",
+     "type": "ID!"
+    },
+    {
+     "name": "id",
+     "type": "UUID!"
+    },
+    {
+     "name": "fullName",
+     "type": "String!"
+    },
+    {
+     "name": "mobileCountryCode",
+     "type": "Int!"
+    },
+    {
+     "name": "mobileNo",
+     "type": "BigInt!"
+    },
+    {
+     "name": "pincode",
+     "type": "String!"
+    },
+    {
+     "name": "doorNo",
+     "type": "String!"
+    },
+    {
+     "name": "address1",
+     "type": "String!"
+    },
+    {
+     "name": "address2",
+     "type": "String"
+    },
+    {
+     "name": "landmark",
+     "type": "String!"
+    },
+    {
+     "name": "city",
+     "type": "String!"
+    },
+    {
+     "name": "state",
+     "type": "String!"
+    },
+    {
+     "name": "country",
+     "type": "String!"
+    },
+    {
+     "name": "createdBy",
+     "type": "UUID"
+    },
+    {
+     "name": "updatedBy",
+     "type": "UUID"
+    },
+    {
+     "name": "isActive",
+     "type": "Boolean"
+    },
+    {
+     "name": "createdAt",
+     "type": "Datetime!"
+    },
+    {
+     "name": "updatedAt",
+     "type": "Datetime!"
+    }
+   ]
+  },
+  "SaplingOrderItem": {
+   "columns": [
+    {
+     "name": "nodeId",
+     "type": "ID!"
+    },
+    {
+     "name": "id",
+     "type": "UUID!"
+    },
+    {
+     "name": "saplingOrderId",
+     "type": "UUID"
+    },
+    {
+     "name": "speciesId",
+     "type": "Int"
+    },
+    {
+     "name": "count",
+     "type": "Int"
+    },
+    {
+     "name": "rate",
+     "type": "Float"
+    },
+    {
+     "name": "createdBy",
+     "type": "UUID"
+    },
+    {
+     "name": "updatedBy",
+     "type": "UUID"
+    },
+    {
+     "name": "isActive",
+     "type": "Boolean"
+    },
+    {
+     "name": "createdAt",
+     "type": "Datetime!"
+    },
+    {
+     "name": "updatedAt",
+     "type": "Datetime!"
+    }
+   ]
+  },
+  "SaplingStore": {
+   "columns": [
+    {
+     "name": "nodeId",
+     "type": "ID!"
+    },
+    {
+     "name": "id",
+     "type": "Int!"
+    },
+    {
+     "name": "name",
+     "type": "String!"
+    },
+    {
+     "name": "logo",
+     "type": "String"
+    },
+    {
+     "name": "contact",
+     "type": "String!"
+    },
+    {
+     "name": "desc",
+     "type": "String"
+    },
+    {
+     "name": "address",
+     "type": "JSON"
+    },
+    {
+     "name": "latitude",
+     "type": "Float!"
+    },
+    {
+     "name": "longitude",
+     "type": "Float!"
+    },
+    {
+     "name": "forestId",
+     "type": "UUID"
+    },
+    {
+     "name": "createdAt",
+     "type": "Datetime!"
+    },
+    {
+     "name": "updatedAt",
+     "type": "Datetime!"
+    }
+   ]
+  },
+  "SponserPrefix": {
+   "columns": [
+    {
+     "name": "substr",
+     "type": "String"
+    }
+   ]
+  },
+  "Sponsor": {
+   "columns": [
+    {
+     "name": "nodeId",
+     "type": "ID!"
+    },
+    {
+     "name": "id",
+     "type": "UUID!"
+    },
+    {
+     "name": "sponsorName",
+     "type": "String"
+    },
+    {
+     "name": "sponsorLogo",
+     "type": "String"
+    },
+    {
+     "name": "isActive",
+     "type": "Boolean"
+    },
+    {
+     "name": "createdAt",
+     "type": "Datetime!"
+    },
+    {
+     "name": "updatedAt",
+     "type": "Datetime!"
+    },
+    {
+     "name": "sponsorForestLogo",
+     "type": "String"
+    },
+    {
+     "name": "sponsorTreeLogo",
+     "type": "String"
+    },
+    {
+     "name": "establishedYear",
+     "type": "String"
+    },
+    {
+     "name": "websiteUrl",
+     "type": "String"
+    },
+    {
+     "name": "industry",
+     "type": "String"
+    },
+    {
+     "name": "headquarters",
+     "type": "String"
+    },
+    {
+     "name": "sponsorOgImageUrl",
+     "type": "String"
+    },
+    {
+     "name": "createdBy",
+     "type": "UUID"
+    },
+    {
+     "name": "updatedBy",
+     "type": "UUID"
+    }
+   ]
+  },
+  "Testtree": {
+   "columns": [
+    {
+     "name": "nodeId",
+     "type": "ID!"
+    },
+    {
+     "name": "id",
+     "type": "Int!"
+    },
+    {
+     "name": "name",
+     "type": "String"
+    },
+    {
+     "name": "plantedon",
+     "type": "Datetime"
+    },
+    {
+     "name": "createdby",
+     "type": "UUID"
+    },
+    {
+     "name": "createdAt",
+     "type": "Datetime!"
+    },
+    {
+     "name": "updatedAt",
+     "type": "Datetime!"
+    }
+   ]
+  },
+  "Testuser": {
+   "columns": [
+    {
+     "name": "nodeId",
+     "type": "ID!"
+    },
+    {
+     "name": "id",
+     "type": "UUID!"
+    },
+    {
+     "name": "name",
+     "type": "String"
+    },
+    {
+     "name": "mobileno",
+     "type": "String"
+    },
+    {
+     "name": "age",
+     "type": "Int"
+    },
+    {
+     "name": "createdAt",
+     "type": "Datetime!"
+    },
+    {
+     "name": "updatedAt",
+     "type": "Datetime!"
+    }
+   ]
+  },
+  "TreeAssert": {
+   "columns": [
+    {
+     "name": "nodeId",
+     "type": "ID!"
+    },
+    {
+     "name": "id",
+     "type": "UUID!"
+    },
+    {
+     "name": "isActive",
+     "type": "Boolean"
+    },
+    {
+     "name": "treeId",
+     "type": "UUID"
+    },
+    {
+     "name": "type",
+     "type": "String"
+    },
+    {
+     "name": "url",
+     "type": "String"
+    },
+    {
+     "name": "order",
+     "type": "Int"
+    },
+    {
+     "name": "createdAt",
+     "type": "Datetime"
+    },
+    {
+     "name": "updatedAt",
+     "type": "Datetime"
+    },
+    {
+     "name": "createdBy",
+     "type": "UUID"
+    },
+    {
+     "name": "updatedBy",
+     "type": "UUID"
+    }
+   ]
+  },
+  "TreeIdCount": {
+   "columns": [
+    {
+     "name": "coalesce",
+     "type": "BigInt"
+    }
+   ]
+  },
+  "TreeStatusMaster": {
+   "columns": [
+    {
+     "name": "nodeId",
+     "type": "ID!"
+    },
+    {
+     "name": "id",
+     "type": "Int!"
+    },
+    {
+     "name": "status",
+     "type": "String"
+    },
+    {
+     "name": "isActive",
+     "type": "Boolean"
+    },
+    {
+     "name": "createdAt",
+     "type": "Datetime!"
+    },
+    {
+     "name": "updatedAt",
+     "type": "Datetime!"
+    }
+   ]
+  },
+  "UserProfile": {
+   "columns": [
+    {
+     "name": "nodeId",
+     "type": "ID!"
+    },
+    {
+     "name": "id",
+     "type": "UUID!"
+    },
+    {
+     "name": "firstName",
+     "type": "String"
+    },
+    {
+     "name": "lastName",
+     "type": "String"
+    },
+    {
+     "name": "address",
+     "type": "String"
+    },
+    {
+     "name": "emailId",
+     "type": "String"
+    },
+    {
+     "name": "mobileNo",
+     "type": "BigInt"
+    },
+    {
+     "name": "userId",
+     "type": "Int"
+    },
+    {
+     "name": "isActive",
+     "type": "Boolean"
+    },
+    {
+     "name": "createdAt",
+     "type": "Datetime!"
+    },
+    {
+     "name": "updatedAt",
+     "type": "Datetime!"
+    },
+    {
+     "name": "mobileCountryCode",
+     "type": "String"
+    },
+    {
+     "name": "isVerified",
+     "type": "Boolean"
+    },
+    {
+     "name": "otp",
+     "type": "String"
+    },
+    {
+     "name": "imageUrl",
+     "type": "String"
+    },
+    {
+     "name": "createdBy",
+     "type": "UUID"
+    },
+    {
+     "name": "updatedBy",
+     "type": "UUID"
+    }
+   ]
+  },
+  "UserRoleForestAccess": {
+   "columns": [
+    {
+     "name": "nodeId",
+     "type": "ID!"
+    },
+    {
+     "name": "id",
+     "type": "UUID!"
+    },
+    {
+     "name": "userRoleId",
+     "type": "UUID"
+    },
+    {
+     "name": "forestId",
+     "type": "UUID"
+    },
+    {
+     "name": "isActive",
+     "type": "Boolean"
+    },
+    {
+     "name": "createdAt",
+     "type": "Datetime!"
+    },
+    {
+     "name": "updatedAt",
+     "type": "Datetime!"
+    },
+    {
+     "name": "createdBy",
+     "type": "UUID"
+    },
+    {
+     "name": "updatedBy",
+     "type": "UUID"
+    }
+   ]
+  },
+  "UserRole": {
+   "columns": [
+    {
+     "name": "nodeId",
+     "type": "ID!"
+    },
+    {
+     "name": "id",
+     "type": "UUID!"
+    },
+    {
+     "name": "profileId",
+     "type": "UUID"
+    },
+    {
+     "name": "roleId",
+     "type": "Int"
+    },
+    {
+     "name": "isActive",
+     "type": "Boolean"
+    },
+    {
+     "name": "createdAt",
+     "type": "Datetime!"
+    },
+    {
+     "name": "updatedAt",
+     "type": "Datetime!"
+    },
+    {
+     "name": "createdBy",
+     "type": "UUID"
+    },
+    {
+     "name": "updatedBy",
+     "type": "UUID"
+    }
+   ]
+  },
+  "WhatsappUserStep": {
+   "columns": [
+    {
+     "name": "nodeId",
+     "type": "ID!"
+    },
+    {
+     "name": "id",
+     "type": "UUID!"
+    },
+    {
+     "name": "countryCode",
+     "type": "String"
+    },
+    {
+     "name": "mobile",
+     "type": "String!"
+    },
+    {
+     "name": "currentStep",
+     "type": "String!"
+    },
+    {
+     "name": "isTreePlantingForSpecialOccasion",
+     "type": "Boolean"
+    },
+    {
+     "name": "occasion",
+     "type": "String"
+    },
+    {
+     "name": "name",
+     "type": "String"
+    },
+    {
+     "name": "dateOfOccasion",
+     "type": "Datetime"
+    },
+    {
+     "name": "numberOfTrees",
+     "type": "Int"
+    },
+    {
+     "name": "isDedicationMessage",
+     "type": "Boolean"
+    },
+    {
+     "name": "dedicationMessage",
+     "type": "String"
+    },
+    {
+     "name": "isWantToPurchaseTree",
+     "type": "Boolean"
+    },
+    {
+     "name": "paymentJson",
+     "type": "JSON"
+    },
+    {
+     "name": "metadata",
+     "type": "JSON"
+    },
+    {
+     "name": "whatsappOrderStatus",
+     "type": "String"
+    },
+    {
+     "name": "isActive",
+     "type": "Boolean"
+    },
+    {
+     "name": "createdAt",
+     "type": "Datetime!"
+    },
+    {
+     "name": "updatedAt",
+     "type": "Datetime!"
+    }
+   ]
+  }
+ }
+}

@@ -1,0 +1,15 @@
+node_modules/
+.DS_Store
+*.log
+.env
+
+# App-level ignores (also in app/server/.gitignore and app/client/.gitignore)
+app/server/node_modules/
+app/server/dist/
+app/server/.env
+app/server/.pglite-data/
+app/server/uploads/
+app/client/node_modules/
+app/client/dist/
+app/client/.env
+app/client/*.local
