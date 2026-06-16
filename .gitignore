@@ -14,3 +14,5 @@ app/client/dist/
 app/client/.env
 app/client/*.local
 .vercel
+.env*
+.gstack/

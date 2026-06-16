@@ -1,16 +1,18 @@
 /**
  * Vercel serverless entry point for the CommuniTREE admin platform.
  *
+ * Backend selection (mirrors app/server/src/db.ts):
+ *   - DATABASE_URL set   -> real Postgres (Neon). Data PERSISTS across cold starts.
+ *   - DATABASE_URL unset -> embedded PGlite in /tmp. Data RESETS on cold start.
+ *
  * On cold start:
- *   1. Points PGlite at /tmp (only writable path on Vercel)
- *   2. Runs SQL migrations inline (idempotent, seeds admin user)
- *   3. Loads the compiled Express app
+ *   1. Points uploads at /tmp (only writable path on Vercel).
+ *   2. Runs SQL migrations inline (idempotent, seeds admin user).
+ *   3. Optionally rotates the seeded admin password to ADMIN_PASSWORD.
+ *   4. Loads the compiled Express app (which picks the backend itself).
  *
- * Every request is then handled by the Express app, which re-uses the
- * same PGlite instance for the function's warm lifecycle.
- *
- * Data resets on cold starts — tables/admin are re-seeded automatically.
- * For persistence, set DATABASE_URL to a Postgres connection string.
+ * The Express app re-uses the same pool/PGlite instance for the function's
+ * warm lifecycle.
  */
 
 'use strict';
@@ -18,15 +20,48 @@
 const path = require('path');
 const fs = require('fs');
 
-// MUST be set before requiring app (db.ts + crud.ts read these on first load)
-if (!process.env.PGLITE_DIR) {
-  process.env.PGLITE_DIR = '/tmp/.pglite-data';
-}
+const HAS_PG = !!process.env.DATABASE_URL;
+
+// Uploads always go to /tmp (only writable path on Vercel).
 if (!process.env.UPLOADS_DIR) {
   process.env.UPLOADS_DIR = '/tmp/uploads';
 }
+// PGlite fallback dir only matters when no Postgres is configured.
+if (!HAS_PG && !process.env.PGLITE_DIR) {
+  process.env.PGLITE_DIR = '/tmp/.pglite-data';
+}
 
 const MIGRATIONS_DIR = path.resolve(__dirname, '../app/db/migrations');
+
+// bcrypt hash of the insecure default "communitree123" baked into 002_seed.sql.
+// We only rotate a password that STILL matches this — never one the user changed.
+const DEFAULT_ADMIN_HASH =
+  '$2a$10$ceAYDt3bwrQBCOTepXLqseNPHQnJ59S7J1blahNXbx0zYB5iM9FF6';
+
+function readMigrations() {
+  return fs
+    .readdirSync(MIGRATIONS_DIR)
+    .filter((f) => f.endsWith('.sql'))
+    .sort()
+    .map((file) => ({
+      file,
+      sql: fs.readFileSync(path.join(MIGRATIONS_DIR, file), 'utf8'),
+    }));
+}
+
+// Replace the insecure seeded admin password with ADMIN_PASSWORD, if set.
+// `run` takes {text, values} and runs one parameterized statement.
+async function rotateAdminPassword(run) {
+  const pw = process.env.ADMIN_PASSWORD;
+  if (!pw) return;
+  const bcrypt = require('bcryptjs');
+  const hash = await bcrypt.hash(pw, 10);
+  const username = process.env.ADMIN_USERNAME || 'communitree_admin';
+  await run({
+    text: 'UPDATE user_profiles SET password_hash = $1 WHERE username = $2 AND password_hash = $3',
+    values: [hash, username, DEFAULT_ADMIN_HASH],
+  });
+}
 
 // Run migrations once per cold start via a lazy promise.
 let migrationPromise = null;
@@ -34,19 +69,37 @@ let migrationPromise = null;
 function ensureMigrated() {
   if (!migrationPromise) {
     migrationPromise = (async () => {
-      const { PGlite } = await import('@electric-sql/pglite');
-      const db = new PGlite(process.env.PGLITE_DIR);
-      await db.waitReady;
-      const files = fs
-        .readdirSync(MIGRATIONS_DIR)
-        .filter((f) => f.endsWith('.sql'))
-        .sort();
-      for (const f of files) {
-        const sql = fs.readFileSync(path.join(MIGRATIONS_DIR, f), 'utf8');
-        await db.exec(sql);
+      const files = readMigrations();
+      if (HAS_PG) {
+        const { Client } = await import('pg');
+        // Use the POOLED endpoint: Neon only publishes DNS for the -pooler host,
+        // and multi-statement DDL/seed files run fine through it in one
+        // simple-query round trip (verified against this Neon instance).
+        const client = new Client({ connectionString: process.env.DATABASE_URL });
+        await client.connect();
+        try {
+          for (const { sql } of files) {
+            await client.query(sql);
+          }
+          await rotateAdminPassword((q) => client.query(q.text, q.values));
+        } finally {
+          await client.end();
+        }
+        console.log('[vercel] migrations applied to Postgres');
+      } else {
+        const { PGlite } = await import('@electric-sql/pglite');
+        const db = new PGlite(process.env.PGLITE_DIR);
+        await db.waitReady;
+        try {
+          for (const { sql } of files) {
+            await db.exec(sql);
+          }
+          await rotateAdminPassword((q) => db.query(q.text, q.values));
+        } finally {
+          await db.close();
+        }
+        console.log('[vercel] migrations applied to', process.env.PGLITE_DIR);
       }
-      await db.close();
-      console.log('[vercel] migrations applied to', process.env.PGLITE_DIR);
     })().catch((err) => {
       console.error('[vercel] migration failed:', err);
       migrationPromise = null; // allow retry
@@ -56,7 +109,7 @@ function ensureMigrated() {
   return migrationPromise;
 }
 
-// Lazy-load the Express app after PGLITE_DIR is set + migrations are done.
+// Lazy-load the Express app after env is set + migrations are done.
 let appInstance = null;
 
 function getApp() {
