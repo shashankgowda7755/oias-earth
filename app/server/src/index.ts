@@ -84,11 +84,14 @@ app.use((err: unknown, _req: Request, res: Response, _next: NextFunction) => {
   res.status(500).json({ error: true, message });
 });
 
-app.listen(config.port, () => {
-  // eslint-disable-next-line no-console
-  console.log(
-    `[server] CommuniTREE admin API listening on :${config.port} (db backend: ${DB_BACKEND})`
-  );
-});
+// Only start the HTTP server when run directly (not when imported as a serverless handler).
+if (require.main === module) {
+  app.listen(config.port, () => {
+    // eslint-disable-next-line no-console
+    console.log(
+      `[server] CommuniTREE admin API listening on :${config.port} (db backend: ${DB_BACKEND})`
+    );
+  });
+}
 
 export { app };

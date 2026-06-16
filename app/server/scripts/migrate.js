@@ -20,7 +20,7 @@ const path = require('path');
 require('dotenv').config();
 
 const MIGRATIONS_DIR = path.resolve(__dirname, '..', '..', 'db', 'migrations');
-const PGLITE_DIR = path.resolve(__dirname, '..', '.pglite-data');
+const PGLITE_DIR = process.env.PGLITE_DIR ?? path.resolve(__dirname, '..', '.pglite-data');
 const DATABASE_URL = process.env.DATABASE_URL || '';
 
 function readMigrations() {

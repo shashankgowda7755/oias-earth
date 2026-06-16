@@ -118,7 +118,9 @@ async function initPglite(): Promise<Backend> {
     PGlite: new (dataDir?: string) => PgliteInstance;
   };
   // Persist to a file-backed dir so data survives restarts.
-  const dataDir = path.resolve(__dirname, '..', '.pglite-data');
+  // Use PGLITE_DIR env var when set (e.g. /tmp/.pglite-data on Vercel),
+  // otherwise default to server package root (works for both dev and compiled prod).
+  const dataDir = process.env.PGLITE_DIR ?? path.resolve(process.cwd(), '.pglite-data');
   const db = new mod.PGlite(dataDir);
   await db.waitReady;
 
