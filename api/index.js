@@ -18,9 +18,12 @@
 const path = require('path');
 const fs = require('fs');
 
-// MUST be set before requiring app (db.ts reads this on first query)
+// MUST be set before requiring app (db.ts + crud.ts read these on first load)
 if (!process.env.PGLITE_DIR) {
   process.env.PGLITE_DIR = '/tmp/.pglite-data';
+}
+if (!process.env.UPLOADS_DIR) {
+  process.env.UPLOADS_DIR = '/tmp/uploads';
 }
 
 const MIGRATIONS_DIR = path.resolve(__dirname, '../app/db/migrations');

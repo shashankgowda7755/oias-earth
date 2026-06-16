@@ -44,7 +44,8 @@ export const crudRouter = Router();
 /* Uploads — multipart file fields saved to /uploads, served statically */
 /* ------------------------------------------------------------------ */
 
-export const UPLOADS_DIR = path.resolve(__dirname, '..', '..', 'uploads');
+export const UPLOADS_DIR =
+  process.env.UPLOADS_DIR ?? path.resolve(__dirname, '..', '..', 'uploads');
 fs.mkdirSync(UPLOADS_DIR, { recursive: true });
 
 const storage = multer.diskStorage({
