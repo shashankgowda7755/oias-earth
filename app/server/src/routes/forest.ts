@@ -57,7 +57,8 @@ export const forestRouter = Router();
 /* Uploads (shared dir with crud.ts so /uploads serves both)          */
 /* ------------------------------------------------------------------ */
 
-const UPLOADS_DIR = path.resolve(__dirname, '..', '..', 'uploads');
+const UPLOADS_DIR =
+  process.env.UPLOADS_DIR ?? path.resolve(__dirname, '..', '..', 'uploads');
 fs.mkdirSync(UPLOADS_DIR, { recursive: true });
 const storage = multer.diskStorage({
   destination: (_req, _file, cb) => cb(null, UPLOADS_DIR),

@@ -6,3 +6,4 @@ dist/
 .pglite-data/
 # Uploaded logo/image files saved by the multipart upsert routes
 uploads/
+.vercel
