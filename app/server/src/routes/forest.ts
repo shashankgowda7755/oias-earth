@@ -958,6 +958,18 @@ async function forestGeo(req: Request, res: Response): Promise<void> {
     [forestId]
   );
 
+  // Tagged vs total trees (geo-tagging progress for the capture UI).
+  const counts = await query<{ tagged: string; total: string }>(
+    `SELECT
+       COUNT(*) FILTER (WHERE forest_tree_geo_lat IS NOT NULL
+                         AND forest_tree_geo_long IS NOT NULL) AS tagged,
+       COUNT(*) AS total
+       FROM forest_trees
+      WHERE forest_id = $1 AND is_active = TRUE AND is_display = TRUE`,
+    [forestId]
+  );
+  const c = counts.rows[0] ?? { tagged: '0', total: '0' };
+
   res.json({
     data: {
       center: {
@@ -965,12 +977,81 @@ async function forestGeo(req: Request, res: Response): Promise<void> {
         lng: row.forest_geo_long ? Number(row.forest_geo_long) : null,
       },
       boundary: boundary ?? [],
+      counts: { tagged: Number(c.tagged), total: Number(c.total) },
       trees: trees.rows.map((t) => ({
         tree_unique_id: t.tree_unique_id,
         lat: t.lat ? Number(t.lat) : null,
         lng: t.lng ? Number(t.lng) : null,
         species: t.species,
       })),
+    },
+  });
+}
+
+/**
+ * POST /forest/:id/trees/geo — geo-tag ONE tree (set/update its coordinates).
+ *
+ * Body: { tree_id?: uuid, tree_unique_id?: string, lat: number, lng: number }
+ * Identify the tree by `tree_id` (preferred) or `tree_unique_id`, both scoped
+ * to this forest. Role-gated like every other forest read/write.
+ *
+ * This is the write side of geo-tagging: the capture UI sends coordinates from
+ * device GPS, a map tap/drag, or manual entry — all three land here.
+ */
+async function tagTreeGeo(req: Request, res: Response): Promise<void> {
+  const forestId = String(req.params.id);
+  await assertForestAccess(req, forestId);
+
+  const b = (req.body ?? {}) as Record<string, unknown>;
+  const treeId = typeof b.tree_id === 'string' ? b.tree_id.trim() : '';
+  const treeUid =
+    typeof b.tree_unique_id === 'string' ? b.tree_unique_id.trim() : '';
+  if (!treeId && !treeUid) {
+    throw badRequest('tree_id or tree_unique_id is required');
+  }
+
+  const lat = Number(b.lat);
+  const lng = Number(b.lng);
+  if (!Number.isFinite(lat) || lat < -90 || lat > 90) {
+    throw badRequest('lat must be a number between -90 and 90');
+  }
+  if (!Number.isFinite(lng) || lng < -180 || lng > 180) {
+    throw badRequest('lng must be a number between -180 and 180');
+  }
+
+  const actor = req.auth?.profileId ?? null;
+  // Match by id when given, else by (forest_id, tree_unique_id). Coordinates are
+  // stored as TEXT to mirror the rest of the schema.
+  const result = await query<{
+    id: string;
+    tree_unique_id: string | null;
+    lat: string | null;
+    lng: string | null;
+  }>(
+    `UPDATE forest_trees
+        SET forest_tree_geo_lat = $1,
+            forest_tree_geo_long = $2,
+            updated_by = $3,
+            updated_at = now()
+      WHERE forest_id = $4
+        AND is_active = TRUE
+        AND ( ($5 <> '' AND id = $5::uuid)
+              OR ($5 = '' AND tree_unique_id = $6) )
+      RETURNING id, tree_unique_id,
+                forest_tree_geo_lat AS lat, forest_tree_geo_long AS lng`,
+    [String(lat), String(lng), actor, forestId, treeId, treeUid]
+  );
+
+  if (result.rowCount === 0) {
+    throw notFound('Tree not found in this forest');
+  }
+  const t = result.rows[0]!;
+  res.json({
+    data: {
+      id: t.id,
+      tree_unique_id: t.tree_unique_id,
+      lat: t.lat ? Number(t.lat) : null,
+      lng: t.lng ? Number(t.lng) : null,
     },
   });
 }
@@ -1032,3 +1113,4 @@ forestRouter.post('/forests/trees/bulk-import', wrap(bulkImportTrees));
 forestRouter.get('/forest/:id/dashboard', wrap(forestDashboard));
 forestRouter.get('/forest/:id/geo', wrap(forestGeo));
 forestRouter.post('/forest/:id/trees/list', wrap(forestTreesList));
+forestRouter.post('/forest/:id/trees/geo', wrap(tagTreeGeo));

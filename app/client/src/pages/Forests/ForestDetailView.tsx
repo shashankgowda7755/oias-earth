@@ -36,6 +36,7 @@ import {
   SponsorsSection,
   TempHumiditySection,
 } from './detail/sections';
+import { GeoTagSection } from './GeoTagSection';
 
 interface TabDef {
   key: string;
@@ -45,6 +46,7 @@ interface TabDef {
 
 const TABS: TabDef[] = [
   { key: 'overview', label: 'Overview', render: (f) => <OverviewSection forest={f} /> },
+  { key: 'geo', label: 'Geo-tagging', render: (f) => <GeoTagSection forest={f} /> },
   { key: 'sponsors', label: 'Sponsors / Logos', render: (f) => <SponsorsSection forest={f} /> },
   { key: 'land', label: 'Land & Authorization', render: (f) => <LandSection forest={f} /> },
   {
