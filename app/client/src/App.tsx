@@ -13,6 +13,7 @@ import { ProtectedRoute } from './auth/ProtectedRoute';
 import { ToastProvider } from './components/Toast';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
+import PublicMap from './pages/PublicMap';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -34,6 +35,7 @@ export default function App() {
           <BrowserRouter>
             <Routes>
               <Route path="/" element={<Login />} />
+              <Route path="/map" element={<PublicMap />} />
               <Route
                 path="/dashboard"
                 element={

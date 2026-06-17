@@ -19,6 +19,7 @@ import { authRouter } from './routes/auth';
 import { listRouter } from './routes/lists';
 import { crudRouter, UPLOADS_DIR } from './routes/crud';
 import { forestRouter } from './routes/forest';
+import { publicRouter } from './routes/public';
 import { DB_BACKEND } from './db';
 import { HttpError } from './errors';
 
@@ -46,6 +47,9 @@ app.get('/health', (_req: Request, res: Response) => {
 
 // Public auth.
 app.use('/api/v1/auth', authRouter);
+
+// Public proof registry (no token): forests map + per-forest tagged trees.
+app.use('/api/v1', publicRouter);
 
 // Everything below requires a valid RAW token.
 // forestRouter is mounted FIRST so its full-payload /forest/upsert + the new
