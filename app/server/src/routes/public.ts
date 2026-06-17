@@ -38,6 +38,8 @@ async function forestsMap(_req: Request, res: Response): Promise<void> {
     forest_country: string | null;
     total_trees: string;
     tagged_trees: string;
+    sponsor_name: string | null;
+    sponsor_logo: string | null;
   }>(
     `SELECT f.id, f.forest_name, f.forest_unique_id,
             f.forest_geo_lat, f.forest_geo_long,
@@ -45,12 +47,21 @@ async function forestsMap(_req: Request, res: Response): Promise<void> {
             COUNT(t.id) FILTER (WHERE t.is_active = TRUE) AS total_trees,
             COUNT(t.id) FILTER (WHERE t.is_active = TRUE
                    AND t.forest_tree_geo_lat IS NOT NULL
-                   AND t.forest_tree_geo_long IS NOT NULL) AS tagged_trees
+                   AND t.forest_tree_geo_long IS NOT NULL) AS tagged_trees,
+            sp.sponsor_name, sp.sponsor_logo
        FROM forests f
        LEFT JOIN forest_trees t ON t.forest_id = f.id
+       LEFT JOIN LATERAL (
+         SELECT s.sponsor_name, s.sponsor_logo
+           FROM forest_sponsors fs
+           JOIN sponsors s ON s.id = fs.sponsor_id AND s.is_active = TRUE
+          WHERE fs.forest_id = f.id AND fs.is_active = TRUE
+          ORDER BY fs.created_at
+          LIMIT 1
+       ) sp ON TRUE
       WHERE f.is_active = TRUE
         AND f.forest_geo_lat IS NOT NULL AND f.forest_geo_long IS NOT NULL
-      GROUP BY f.id
+      GROUP BY f.id, sp.sponsor_name, sp.sponsor_logo
       ORDER BY f.forest_name`,
   );
 
@@ -66,6 +77,8 @@ async function forestsMap(_req: Request, res: Response): Promise<void> {
       country: r.forest_country,
       total_trees: Number(r.total_trees),
       tagged_trees: Number(r.tagged_trees),
+      sponsor_name: r.sponsor_name,
+      sponsor_logo: r.sponsor_logo,
     })),
   });
 }

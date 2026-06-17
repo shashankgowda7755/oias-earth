@@ -15,6 +15,8 @@ export interface ForestPin {
   country: string | null;
   total_trees: number;
   tagged_trees: number;
+  sponsor_name?: string | null;
+  sponsor_logo?: string | null;
 }
 
 export interface PublicTree {

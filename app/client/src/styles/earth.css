@@ -54,6 +54,28 @@
 }
 .tree-pin .core { background: var(--alive); box-shadow: 0 0 8px rgba(182,255,60,.8); }
 
+/* Sponsor-logo forest pin — a glowing white medallion holding the corporate
+   logo, with a pulsing bio-lime ring (the forest "belongs" to that sponsor). */
+.forest-logo-pin { position: relative; width: 46px; height: 46px; }
+.forest-logo-pin .ring,
+.forest-logo-pin .badge {
+  position: absolute; left: 50%; top: 50%; width: 46px; height: 46px;
+  margin: -23px 0 0 -23px; border-radius: 50%;
+}
+.forest-logo-pin .ring { border: 2px solid var(--alive); animation: ringPulse 2.6s ease-out infinite; }
+.forest-logo-pin .badge {
+  background: #fff; border: 2.5px solid var(--alive);
+  box-shadow: 0 0 16px rgba(182,255,60,.65), 0 2px 7px rgba(0,0,0,.5);
+  display: flex; align-items: center; justify-content: center; overflow: hidden;
+}
+.forest-logo-pin .badge img { width: 32px; height: 32px; object-fit: contain; }
+.forest-logo-pin .badge.nologo { background: var(--alive); }
+@keyframes ringPulse {
+  0%   { transform: scale(1); opacity: .85; }
+  70%  { transform: scale(2.1); opacity: 0; }
+  100% { transform: scale(2.1); opacity: 0; }
+}
+
 /* Sponsor logo marquee — seamless infinite scroll, pause on hover. */
 .earth .marquee {
   overflow: hidden; position: relative;
