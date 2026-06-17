@@ -8,8 +8,22 @@ import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import 'leaflet.markercluster';
+import 'leaflet.markercluster/dist/MarkerCluster.css';
 import { fetchForestsMap, fetchForestTrees, type ForestPin } from '@/lib/publicApi';
 import '@/styles/earth.css';
+
+function clusterIcon(cluster: L.MarkerCluster): L.DivIcon {
+  const n = cluster.getChildCount();
+  const size = n < 10 ? 42 : n < 50 ? 54 : 66;
+  const fs = n < 100 ? 15 : 13;
+  return L.divIcon({
+    className: 'forest-cluster',
+    html: `<div class="fc" style="font-size:${fs}px"><span>${n}</span><small>forests</small></div>`,
+    iconSize: [size, size],
+    iconAnchor: [size / 2, size / 2],
+  });
+}
 
 const CENTER: [number, number] = [12.2, 79.2];
 const SAT_URL =
@@ -40,7 +54,7 @@ function treePin(): L.DivIcon {
 export default function PublicMap() {
   const elRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<L.Map | null>(null);
-  const forestLayer = useRef<L.LayerGroup | null>(null);
+  const forestLayer = useRef<L.MarkerClusterGroup | null>(null);
   const treeLayer = useRef<L.LayerGroup | null>(null);
 
   const [forests, setForests] = useState<ForestPin[]>([]);
@@ -59,7 +73,13 @@ export default function PublicMap() {
     const map = L.map(elRef.current, { center: CENTER, zoom: 5 });
     L.tileLayer(SAT_URL, { maxZoom: 19, attribution: 'Imagery &copy; Esri' }).addTo(map);
     L.tileLayer(LABELS_URL, { maxZoom: 19, opacity: 0.85, attribution: '&copy; CARTO' }).addTo(map);
-    forestLayer.current = L.layerGroup().addTo(map);
+    forestLayer.current = L.markerClusterGroup({
+      iconCreateFunction: clusterIcon,
+      maxClusterRadius: 48,
+      showCoverageOnHover: false,
+      spiderfyOnMaxZoom: true,
+      chunkedLoading: true,
+    }).addTo(map);
     treeLayer.current = L.layerGroup().addTo(map);
     mapRef.current = map;
     setTimeout(() => map.invalidateSize(), 60);

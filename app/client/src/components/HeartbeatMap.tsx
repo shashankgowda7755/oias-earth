@@ -10,7 +10,21 @@
 import { useEffect, useRef } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import 'leaflet.markercluster';
+import 'leaflet.markercluster/dist/MarkerCluster.css';
 import type { ForestPin } from '@/lib/publicApi';
+
+function clusterIcon(cluster: L.MarkerCluster): L.DivIcon {
+  const n = cluster.getChildCount();
+  const size = n < 10 ? 42 : n < 50 ? 54 : 66;
+  const fs = n < 100 ? 15 : 13;
+  return L.divIcon({
+    className: 'forest-cluster',
+    html: `<div class="fc" style="font-size:${fs}px"><span>${n}</span><small>forests</small></div>`,
+    iconSize: [size, size],
+    iconAnchor: [size / 2, size / 2],
+  });
+}
 
 const INDIA_CENTER: [number, number] = [12.2, 79.2];
 
@@ -49,7 +63,7 @@ export function HeartbeatMap({
 }: HeartbeatMapProps) {
   const elRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<L.Map | null>(null);
-  const layerRef = useRef<L.LayerGroup | null>(null);
+  const layerRef = useRef<L.MarkerClusterGroup | null>(null);
   const cb = useRef(onForest);
   cb.current = onForest;
 
@@ -70,7 +84,13 @@ export function HeartbeatMap({
       attribution: 'Imagery &copy; Esri',
     }).addTo(map);
     L.tileLayer(LABELS_URL, { maxZoom: 19, opacity: 0.85, attribution: '&copy; CARTO' }).addTo(map);
-    layerRef.current = L.layerGroup().addTo(map);
+    layerRef.current = L.markerClusterGroup({
+      iconCreateFunction: clusterIcon,
+      maxClusterRadius: 48,
+      showCoverageOnHover: false,
+      spiderfyOnMaxZoom: true,
+      chunkedLoading: true,
+    }).addTo(map);
     mapRef.current = map;
     setTimeout(() => map.invalidateSize(), 60);
     return () => {
