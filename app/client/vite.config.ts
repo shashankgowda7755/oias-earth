@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import { VitePWA } from 'vite-plugin-pwa';
 import path from 'node:path';
 
 // The REST + GraphQL layers live on the Express server. In dev we proxy
@@ -9,7 +10,50 @@ import path from 'node:path';
 const SERVER_ORIGIN = process.env.SERVER_ORIGIN ?? 'http://localhost:4000';
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    react(),
+    VitePWA({
+      registerType: 'autoUpdate',
+      injectRegister: 'auto',
+      includeAssets: ['leaf.svg'],
+      manifest: {
+        name: 'Be The Tree Hugger — Field',
+        short_name: 'BTTH Field',
+        description: 'Offline field capture: GPS, photo and visit logging for planters.',
+        theme_color: '#16282e',
+        background_color: '#16282e',
+        display: 'standalone',
+        orientation: 'portrait',
+        start_url: '/field',
+        scope: '/',
+        icons: [
+          { src: '/leaf.svg', sizes: 'any', type: 'image/svg+xml', purpose: 'any' },
+          { src: '/leaf.svg', sizes: 'any', type: 'image/svg+xml', purpose: 'maskable' },
+        ],
+      },
+      workbox: {
+        navigateFallback: '/index.html',
+        // App shell precached. Runtime-cache the satellite/map tiles + GET APIs
+        // so a planter who loaded a forest online can still see it offline.
+        runtimeCaching: [
+          {
+            urlPattern: ({ url }) => url.pathname.startsWith('/api/v1/'),
+            handler: 'NetworkFirst',
+            options: { cacheName: 'api', networkTimeoutSeconds: 5 },
+          },
+          {
+            urlPattern: ({ url }) =>
+              url.host.includes('arcgisonline.com') || url.host.includes('basemaps.cartocdn.com'),
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'map-tiles',
+              expiration: { maxEntries: 600, maxAgeSeconds: 60 * 60 * 24 * 30 },
+            },
+          },
+        ],
+      },
+    }),
+  ],
   resolve: {
     alias: {
       '@': path.resolve(__dirname, 'src'),

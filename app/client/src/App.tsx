@@ -16,6 +16,7 @@ import Dashboard from './pages/Dashboard';
 import PublicMap from './pages/PublicMap';
 import Landing from './pages/Landing';
 import TreeProof from './pages/TreeProof';
+import Field from './pages/Field';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -40,6 +41,7 @@ export default function App() {
               <Route path="/login" element={<Login />} />
               <Route path="/map" element={<PublicMap />} />
               <Route path="/tree/:id" element={<TreeProof />} />
+              <Route path="/field" element={<Field />} />
               <Route
                 path="/dashboard"
                 element={

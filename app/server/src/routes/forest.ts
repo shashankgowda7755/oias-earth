@@ -823,7 +823,9 @@ async function recomputeForestTotals(client: DbClient, forestId: string): Promis
 async function assertForestAccess(req: Request, forestId: string): Promise<void> {
   const role = req.auth?.role;
   if (role === 'SuperAdmin') return;
-  if (role === 'Admin') {
+  // Admin (sponsor) and Planter (field worker) are both scoped to assigned
+  // forests via user_role_forest_accesses.
+  if (role === 'Admin' || role === 'Planter') {
     const userRoleId = req.auth?.userRoleId;
     if (!userRoleId) throw forbidden('No forest access for this role');
     const r = await query(
@@ -835,6 +837,58 @@ async function assertForestAccess(req: Request, forestId: string): Promise<void>
     return;
   }
   throw forbidden('Insufficient role for forest access');
+}
+
+/**
+ * GET /my/forests — forests the logged-in user can capture in. SuperAdmin sees
+ * all; Admin/Planter see only forests granted via user_role_forest_accesses.
+ * Drives the field app's forest picker.
+ */
+async function myForests(req: Request, res: Response): Promise<void> {
+  const role = req.auth?.role;
+  const userRoleId = req.auth?.userRoleId;
+  let rows;
+  if (role === 'SuperAdmin') {
+    rows = await query(
+      `SELECT f.id, f.forest_name, f.forest_unique_id, f.forest_city, f.forest_state,
+              COUNT(t.id) FILTER (WHERE t.is_active = TRUE) AS total_trees,
+              COUNT(t.id) FILTER (WHERE t.is_active = TRUE
+                     AND t.forest_tree_geo_lat IS NOT NULL) AS tagged_trees
+         FROM forests f
+         LEFT JOIN forest_trees t ON t.forest_id = f.id
+        WHERE f.is_active = TRUE
+        GROUP BY f.id
+        ORDER BY f.forest_name`
+    );
+  } else if ((role === 'Admin' || role === 'Planter') && userRoleId) {
+    rows = await query(
+      `SELECT f.id, f.forest_name, f.forest_unique_id, f.forest_city, f.forest_state,
+              COUNT(t.id) FILTER (WHERE t.is_active = TRUE) AS total_trees,
+              COUNT(t.id) FILTER (WHERE t.is_active = TRUE
+                     AND t.forest_tree_geo_lat IS NOT NULL) AS tagged_trees
+         FROM forests f
+         JOIN user_role_forest_accesses a
+           ON a.forest_id = f.id AND a.user_role_id = $1 AND a.is_active = TRUE
+         LEFT JOIN forest_trees t ON t.forest_id = f.id
+        WHERE f.is_active = TRUE
+        GROUP BY f.id
+        ORDER BY f.forest_name`,
+      [userRoleId]
+    );
+  } else {
+    throw forbidden('No forest access for this role');
+  }
+  res.json({
+    data: rows.rows.map((r: Record<string, unknown>) => ({
+      id: r.id,
+      name: r.forest_name,
+      unique_id: r.forest_unique_id,
+      city: r.forest_city,
+      state: r.forest_state,
+      total_trees: Number(r.total_trees),
+      tagged_trees: Number(r.tagged_trees),
+    })),
+  });
 }
 
 /* ------------------------------------------------------------------ */
@@ -1203,3 +1257,4 @@ forestRouter.get('/forest/:id/geo', wrap(forestGeo));
 forestRouter.post('/forest/:id/trees/list', wrap(forestTreesList));
 forestRouter.post('/forest/:id/trees/geo', wrap(tagTreeGeo));
 forestRouter.post('/forest/:id/trees/:treeId/visit', upload.any(), wrap(logTreeVisit));
+forestRouter.get('/my/forests', wrap(myForests));
