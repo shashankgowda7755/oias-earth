@@ -66,3 +66,43 @@ export async function tagTreeGeo(
   );
   return res.data.data;
 }
+
+export const TREE_STATUSES = [
+  { id: 1, label: 'Healthy' },
+  { id: 2, label: 'Drying' },
+  { id: 3, label: 'Damaged' },
+  { id: 4, label: 'Dead' },
+];
+
+export interface VisitInput {
+  timeline_date: string;
+  status_id?: number;
+  height?: number;
+  diameter?: number;
+  age?: number;
+  lat?: number;
+  lng?: number;
+  photo?: File | null;
+}
+
+/** Log a longitudinal visit (revisit) for one tree. Multipart (optional photo). */
+export async function logVisit(
+  forestId: string,
+  treeId: string,
+  v: VisitInput,
+): Promise<{ id: number }> {
+  const fd = new FormData();
+  fd.append('timeline_date', v.timeline_date);
+  if (v.status_id != null) fd.append('status_id', String(v.status_id));
+  if (v.height != null) fd.append('height', String(v.height));
+  if (v.diameter != null) fd.append('diameter', String(v.diameter));
+  if (v.age != null) fd.append('age', String(v.age));
+  if (v.lat != null) fd.append('lat', String(v.lat));
+  if (v.lng != null) fd.append('lng', String(v.lng));
+  if (v.photo) fd.append('photo', v.photo);
+  const res = await api.post<{ data: { id: number } }>(
+    `/forest/${forestId}/trees/${treeId}/visit`,
+    fd,
+  );
+  return res.data.data;
+}

@@ -21,6 +21,8 @@ import {
   getForestGeo,
   listForestTrees,
   tagTreeGeo,
+  logVisit,
+  TREE_STATUSES,
   type RegisterTree,
 } from './geoApi';
 
@@ -56,6 +58,14 @@ export function GeoTagSection({ forest }: GeoTagSectionProps) {
   const [lngText, setLngText] = useState('');
   const [saving, setSaving] = useState(false);
   const [locating, setLocating] = useState(false);
+
+  // Log-a-visit form (longitudinal proof).
+  const [vDate, setVDate] = useState('');
+  const [vStatus, setVStatus] = useState(1);
+  const [vHeight, setVHeight] = useState('');
+  const [vDia, setVDia] = useState('');
+  const [vPhoto, setVPhoto] = useState<File | null>(null);
+  const [vSaving, setVSaving] = useState(false);
 
   const load = useCallback(async () => {
     if (!forestId) {
@@ -198,6 +208,32 @@ export function GeoTagSection({ forest }: GeoTagSectionProps) {
     }
   }, [selected, draft, forestId, toast]);
 
+  const submitVisit = useCallback(async () => {
+    if (!selected || !vDate) {
+      toast.show('Pick a visit date first.', 'error');
+      return;
+    }
+    setVSaving(true);
+    try {
+      await logVisit(forestId, selected.id, {
+        timeline_date: vDate,
+        status_id: vStatus,
+        height: vHeight !== '' ? Number(vHeight) : undefined,
+        diameter: vDia !== '' ? Number(vDia) : undefined,
+        photo: vPhoto,
+      });
+      toast.show(`Visit logged for ${selected.tree_unique_id ?? 'tree'}.`, 'success');
+      setVDate('');
+      setVHeight('');
+      setVDia('');
+      setVPhoto(null);
+    } catch (e) {
+      toast.show(e instanceof Error ? e.message : 'Failed to log visit.', 'error');
+    } finally {
+      setVSaving(false);
+    }
+  }, [selected, vDate, vStatus, vHeight, vDia, vPhoto, forestId, toast]);
+
   if (!forestId) {
     return (
       <p className="py-8 text-center text-sm text-textSecondary">
@@ -294,8 +330,8 @@ export function GeoTagSection({ forest }: GeoTagSectionProps) {
               height={420}
             />
 
-            {editable ? (
-              selected ? (
+            {editable && selected ? (
+              <>
                 <div className="rounded-input border border-border p-3">
                   <div className="mb-2 text-sm">
                     Tagging{' '}
@@ -339,11 +375,70 @@ export function GeoTagSection({ forest }: GeoTagSectionProps) {
                     </Button>
                   </div>
                 </div>
-              ) : (
-                <p className="text-sm text-textSecondary">
-                  Select a tree from the list to geo-tag it.
-                </p>
-              )
+                <div className="mt-3 rounded-input border border-border p-3">
+                  <div className="mb-2 flex items-center justify-between gap-2">
+                    <span className="text-sm">
+                      Log a visit — proof of life over time
+                    </span>
+                    <a
+                      href={`/tree/${selected.id}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-xs font-medium text-primary"
+                    >
+                      View public proof ↗
+                    </a>
+                  </div>
+                  <div className="flex flex-wrap items-end gap-3">
+                    <label className="text-xs text-textSecondary">
+                      Date
+                      <input
+                        type="date"
+                        value={vDate}
+                        onChange={(e) => setVDate(e.target.value)}
+                        className="mt-1 block rounded-input border border-border px-2 py-1.5 text-sm"
+                      />
+                    </label>
+                    <label className="text-xs text-textSecondary">
+                      Status
+                      <select
+                        value={vStatus}
+                        onChange={(e) => setVStatus(Number(e.target.value))}
+                        className="mt-1 block rounded-input border border-border px-2 py-1.5 text-sm"
+                      >
+                        {TREE_STATUSES.map((s) => (
+                          <option key={s.id} value={s.id}>
+                            {s.label}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                    <div className="w-24">
+                      <TextField label="Height (m)" value={vHeight} onChange={setVHeight} placeholder="2.4" />
+                    </div>
+                    <div className="w-24">
+                      <TextField label="⌀ (cm)" value={vDia} onChange={setVDia} placeholder="4" />
+                    </div>
+                    <label className="text-xs text-textSecondary">
+                      Photo
+                      <input
+                        type="file"
+                        accept="image/*"
+                        capture="environment"
+                        onChange={(e) => setVPhoto(e.target.files?.[0] ?? null)}
+                        className="mt-1 block max-w-[170px] text-xs"
+                      />
+                    </label>
+                    <Button type="button" variant="primary" onClick={() => void submitVisit()} disabled={vSaving || !vDate}>
+                      {vSaving ? 'Logging…' : 'Log visit'}
+                    </Button>
+                  </div>
+                </div>
+              </>
+            ) : editable && !selected ? (
+              <p className="text-sm text-textSecondary">
+                Select a tree from the list to geo-tag it or log a visit.
+              </p>
             ) : (
               <p className="text-sm text-textSecondary">
                 Click any pin to verify a tree’s location, species, and coordinates.

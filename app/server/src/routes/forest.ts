@@ -1102,6 +1102,94 @@ async function forestTreesList(req: Request, res: Response): Promise<void> {
   res.json({ data: rows.rows, pagination: { total, page, limit } });
 }
 
+/**
+ * POST /forest/:id/trees/:treeId/visit — log a longitudinal VISIT (revisit) for
+ * one tree: a fresh dated record of status + height + diameter + age + optional
+ * photo(s). Appends to forest_plant_timelines (the visit log) + assets, and
+ * reflects the latest values on the tree's current row. This is the supply side
+ * of proof-of-life — what turns a day-zero snapshot into a life record.
+ *
+ * Multipart: scalar fields + optional `photo` file(s). Role-gated.
+ */
+async function logTreeVisit(req: Request, res: Response): Promise<void> {
+  const forestId = String(req.params.id);
+  const treeId = String(req.params.treeId);
+  await assertForestAccess(req, forestId);
+
+  const tr = await query<{ id: string; species_id: number | null }>(
+    `SELECT id, master_plant_species_id AS species_id
+       FROM forest_trees WHERE id = $1 AND forest_id = $2 AND is_active = TRUE LIMIT 1`,
+    [treeId, forestId]
+  );
+  if (tr.rowCount === 0) throw notFound('Tree not found in this forest');
+  const speciesId = tr.rows[0]!.species_id;
+
+  const b = (req.body ?? {}) as Record<string, unknown>;
+  const numOrNull = (v: unknown): number | null =>
+    v != null && v !== '' && Number.isFinite(Number(v)) ? Number(v) : null;
+  const date = typeof b.timeline_date === 'string' && b.timeline_date ? b.timeline_date : null;
+  if (!date) throw badRequest('timeline_date is required');
+  const statusId = numOrNull(b.status_id);
+  const height = numOrNull(b.height);
+  const diameter = numOrNull(b.diameter);
+  const age = numOrNull(b.age);
+  const lat = b.lat != null && b.lat !== '' ? String(b.lat) : null;
+  const lng = b.lng != null && b.lng !== '' ? String(b.lng) : null;
+
+  const actor = req.auth?.profileId ?? null;
+  const files = (req.files as Array<{ filename: string }> | undefined) ?? [];
+
+  const client = await getClient();
+  try {
+    const ins = await client.query<{ id: number }>(
+      `INSERT INTO forest_plant_timelines
+         (plant_id, species_id, status_id, height, diameter, age,
+          latitude, longitude, timeline_date, created_by, updated_by)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$10) RETURNING id`,
+      [treeId, speciesId, statusId, height, diameter, age, lat, lng, date, actor]
+    );
+    const tlId = ins.rows[0]!.id;
+    let order = 0;
+    const photos: string[] = [];
+    for (const f of files) {
+      const url = `/uploads/${f.filename}`;
+      photos.push(url);
+      await client.query(
+        `INSERT INTO forest_plant_timeline_assets (timeline_id, type, url, "order", created_by, updated_by)
+         VALUES ($1, 'image', $2, $3, $4, $4)`,
+        [tlId, url, order++, actor]
+      );
+    }
+    // Reflect the latest visit on the tree's current row.
+    await client.query(
+      `UPDATE forest_trees SET
+         tree_status_id = COALESCE($1, tree_status_id),
+         forest_tree_height = COALESCE($2, forest_tree_height),
+         forest_tree_dia = COALESCE($3, forest_tree_dia),
+         forest_tree_age = COALESCE($4, forest_tree_age),
+         forest_tree_geo_lat = COALESCE($5, forest_tree_geo_lat),
+         forest_tree_geo_long = COALESCE($6, forest_tree_geo_long),
+         updated_by = $7, updated_at = now()
+       WHERE id = $8`,
+      [
+        statusId,
+        height != null ? String(height) : null,
+        diameter != null ? String(diameter) : null,
+        age,
+        lat,
+        lng,
+        actor,
+        treeId,
+      ]
+    );
+    res.json({
+      data: { id: tlId, timeline_date: date, status_id: statusId, height, diameter, age, photos },
+    });
+  } finally {
+    client.release();
+  }
+}
+
 /* ------------------------------------------------------------------ */
 /* Route registration                                                  */
 /* ------------------------------------------------------------------ */
@@ -1114,3 +1202,4 @@ forestRouter.get('/forest/:id/dashboard', wrap(forestDashboard));
 forestRouter.get('/forest/:id/geo', wrap(forestGeo));
 forestRouter.post('/forest/:id/trees/list', wrap(forestTreesList));
 forestRouter.post('/forest/:id/trees/geo', wrap(tagTreeGeo));
+forestRouter.post('/forest/:id/trees/:treeId/visit', upload.any(), wrap(logTreeVisit));

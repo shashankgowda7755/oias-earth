@@ -84,12 +84,14 @@ async function forestTreesPublic(req: Request, res: Response): Promise<void> {
   if (exists.rowCount === 0) throw notFound('Forest not found');
 
   const rows = await query<{
+    id: string;
     tree_unique_id: string | null;
     lat: string | null;
     lng: string | null;
     species: string | null;
   }>(
-    `SELECT ft.tree_unique_id,
+    `SELECT ft.id,
+            ft.tree_unique_id,
             ft.forest_tree_geo_lat AS lat,
             ft.forest_tree_geo_long AS lng,
             COALESCE(sp.common_name, sp.species_name) AS species
@@ -104,6 +106,7 @@ async function forestTreesPublic(req: Request, res: Response): Promise<void> {
 
   res.json({
     data: rows.rows.map((t) => ({
+      id: t.id,
       tree_unique_id: t.tree_unique_id,
       lat: t.lat ? Number(t.lat) : null,
       lng: t.lng ? Number(t.lng) : null,
@@ -112,5 +115,130 @@ async function forestTreesPublic(req: Request, res: Response): Promise<void> {
   });
 }
 
+/**
+ * GET /public/tree/:id — the per-tree PROOF-OF-LIFE page data. Base tree info +
+ * the full longitudinal visit timeline (forest_plant_timelines) with photos,
+ * plus a computed survival verdict and growth delta. This is the moat: not a
+ * day-zero snapshot, but a life record anyone can verify, no login.
+ */
+async function treeProof(req: Request, res: Response): Promise<void> {
+  const treeId = String(req.params.id);
+
+  const t = await query<{
+    id: string;
+    tree_unique_id: string | null;
+    species: string | null;
+    species_name: string | null;
+    forest_id: string | null;
+    forest_name: string | null;
+    forest_unique_id: string | null;
+    city: string | null;
+    state: string | null;
+    planted_on: string | null;
+    lat: string | null;
+    lng: string | null;
+    status: string | null;
+  }>(
+    `SELECT ft.id, ft.tree_unique_id,
+            COALESCE(sp.common_name, sp.species_name) AS species,
+            sp.species_name,
+            f.id AS forest_id, f.forest_name, f.forest_unique_id,
+            f.forest_city AS city, f.forest_state AS state,
+            ft.planted_on,
+            ft.forest_tree_geo_lat AS lat, ft.forest_tree_geo_long AS lng,
+            st.status
+       FROM forest_trees ft
+       LEFT JOIN forests f ON f.id = ft.forest_id
+       LEFT JOIN master_plantspecies sp ON sp.id = ft.master_plant_species_id
+       LEFT JOIN tree_status_master st ON st.id = ft.tree_status_id
+      WHERE ft.id = $1 AND ft.is_active = TRUE
+      LIMIT 1`,
+    [treeId],
+  );
+  if (t.rowCount === 0) throw notFound('Tree not found');
+  const tree = t.rows[0]!;
+
+  const v = await query<{
+    id: number;
+    timeline_date: string | null;
+    status: string | null;
+    status_id: number | null;
+    height: number | null;
+    diameter: number | null;
+    age: number | null;
+    latitude: string | null;
+    longitude: string | null;
+    photos: string[] | null;
+  }>(
+    `SELECT tl.id, tl.timeline_date, st.status, tl.status_id,
+            tl.height, tl.diameter, tl.age, tl.latitude, tl.longitude,
+            COALESCE(
+              (SELECT json_agg(a.url ORDER BY a."order")
+                 FROM forest_plant_timeline_assets a
+                WHERE a.timeline_id = tl.id AND a.is_active = TRUE
+                  AND a.url IS NOT NULL),
+              '[]'::json
+            ) AS photos
+       FROM forest_plant_timelines tl
+       LEFT JOIN tree_status_master st ON st.id = tl.status_id
+      WHERE tl.plant_id = $1 AND tl.is_active = TRUE
+      ORDER BY tl.timeline_date ASC NULLS LAST, tl.id ASC`,
+    [treeId],
+  );
+
+  const visits = v.rows.map((r) => ({
+    id: r.id,
+    date: r.timeline_date,
+    status: r.status,
+    status_id: r.status_id,
+    height: r.height != null ? Number(r.height) : null,
+    diameter: r.diameter != null ? Number(r.diameter) : null,
+    age: r.age != null ? Number(r.age) : null,
+    lat: r.latitude ? Number(r.latitude) : null,
+    lng: r.longitude ? Number(r.longitude) : null,
+    photos: Array.isArray(r.photos) ? r.photos : [],
+  }));
+
+  const latest = visits[visits.length - 1];
+  const first = visits[0];
+  const latestStatusId = latest?.status_id ?? null;
+  // tree_status_master: 1 Healthy, 2 Drying, 3 Damaged, 4 Dead.
+  const survival =
+    latestStatusId === 4 ? 'dead' : visits.length > 0 ? 'alive' : 'unknown';
+  const growthCm =
+    first?.height != null && latest?.height != null
+      ? Math.round((latest.height - first.height) * 100)
+      : null;
+
+  res.json({
+    data: {
+      tree: {
+        id: tree.id,
+        tree_unique_id: tree.tree_unique_id,
+        species: tree.species,
+        species_name: tree.species_name,
+        forest_id: tree.forest_id,
+        forest_name: tree.forest_name,
+        forest_unique_id: tree.forest_unique_id,
+        city: tree.city,
+        state: tree.state,
+        planted_on: tree.planted_on,
+        lat: tree.lat ? Number(tree.lat) : null,
+        lng: tree.lng ? Number(tree.lng) : null,
+      },
+      summary: {
+        survival,
+        visit_count: visits.length,
+        latest_status: latest?.status ?? tree.status ?? null,
+        latest_height: latest?.height ?? null,
+        growth_cm: growthCm,
+        last_seen: latest?.date ?? null,
+      },
+      visits,
+    },
+  });
+}
+
 publicRouter.get('/public/forests-map', wrap(forestsMap));
 publicRouter.get('/public/forest/:id/trees', wrap(forestTreesPublic));
+publicRouter.get('/public/tree/:id', wrap(treeProof));

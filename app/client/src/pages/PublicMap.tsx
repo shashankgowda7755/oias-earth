@@ -114,7 +114,8 @@ export default function PublicMap() {
           .bindPopup(
             `<div style="font-family:'Plus Jakarta Sans',sans-serif"><strong style="color:#b6ff3c">${t.tree_unique_id ?? 'Tree'}</strong>` +
               (t.species ? `<br/><span style="color:#cdd">${t.species}</span>` : '') +
-              `<br/><span style="font-family:'JetBrains Mono',monospace;color:#9ab;font-size:11px">${t.lat.toFixed(6)}, ${t.lng.toFixed(6)}</span></div>`,
+              `<br/><span style="font-family:'JetBrains Mono',monospace;color:#9ab;font-size:11px">${t.lat.toFixed(6)}, ${t.lng.toFixed(6)}</span>` +
+              `<br/><a href="/tree/${t.id}" style="color:#b6ff3c;font-weight:600">View life record →</a></div>`,
           );
         bounds.push([t.lat, t.lng]);
       }
