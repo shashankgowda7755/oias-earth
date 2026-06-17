@@ -1,0 +1,71 @@
+/*
+ * Living Instrument — design system for the public "OIAS Earth" surfaces.
+ * Bloomberg-terminal-for-forests with warmth. Scoped under .earth so it never
+ * bleeds into the admin app. One ownable accent (bio-lime) reserved EXCLUSIVELY
+ * for verified-alive / proof-of-life data — never decoration.
+ */
+.earth {
+  --ink: #16282e;        /* gable near-black */
+  --ink-2: #0f1d22;      /* deeper chrome */
+  --pine: #1d4a47;       /* deep teal-pine */
+  --surface: #eff1f5;    /* cool off-white */
+  --surface-2: #e3e7ee;
+  --paper: #f7f9fc;
+  --alive: #b6ff3c;      /* bio-lime — verified ALIVE only */
+  --alive-dim: #8fcf2e;
+  --amber: #e8a33d;      /* at-risk */
+  --slate: #6b7b82;      /* dead / neutral data */
+  --line: rgba(255,255,255,.12);
+  --line-ink: rgba(22,40,46,.12);
+  --serif: 'Fraunces', Georgia, serif;
+  --sans: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  font-family: var(--sans);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+.earth *,
+.earth *::before,
+.earth *::after { box-sizing: border-box; }
+
+.earth .mono { font-family: var(--mono); font-variant-numeric: tabular-nums; letter-spacing: -.01em; }
+.earth .serif { font-family: var(--serif); }
+
+/* Verified-alive pulsing map marker (the signature element). */
+.alive-pin { position: relative; }
+.alive-pin .core {
+  position: absolute; left: 50%; top: 50%; width: 12px; height: 12px;
+  margin: -6px 0 0 -6px; border-radius: 50%;
+  background: var(--alive); border: 2px solid rgba(255,255,255,.85);
+  box-shadow: 0 0 10px rgba(182,255,60,.9);
+}
+.alive-pin .ring {
+  position: absolute; left: 50%; top: 50%; width: 12px; height: 12px;
+  margin: -6px 0 0 -6px; border-radius: 50%;
+  border: 1.5px solid var(--alive);
+  animation: alivePulse 2.4s ease-out infinite;
+}
+@keyframes alivePulse {
+  0%   { transform: scale(1); opacity: .9; }
+  70%  { transform: scale(4.2); opacity: 0; }
+  100% { transform: scale(4.2); opacity: 0; }
+}
+.tree-pin .core { background: var(--alive); box-shadow: 0 0 8px rgba(182,255,60,.8); }
+
+/* Scroll reveal */
+.earth .reveal { opacity: 0; transform: translateY(18px); transition: opacity .7s ease, transform .7s ease; }
+.earth .reveal.in { opacity: 1; transform: none; }
+
+/* Leaflet dark chrome */
+/* z-index:0 makes the container a stacking context so its internal panes
+   (z-index 200-700) stay contained and don't paint over hero overlays. */
+.earth .leaflet-container { background: #0b1416; font-family: var(--sans); z-index: 0; }
+.earth .leaflet-control-attribution { background: rgba(11,20,22,.6); color: #8aa; }
+.earth .leaflet-control-attribution a { color: #9cc; }
+.earth .leaflet-bar a { background: var(--ink); color: var(--surface); border-color: var(--line); }
+.earth .leaflet-bar a:hover { background: var(--pine); }
+.earth .leaflet-popup-content-wrapper { background: var(--ink); color: var(--surface); border-radius: 10px; border: 1px solid var(--line); }
+.earth .leaflet-popup-tip { background: var(--ink); }
+.earth .leaflet-popup-content { font-family: var(--sans); }

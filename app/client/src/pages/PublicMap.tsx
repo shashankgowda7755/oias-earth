@@ -1,36 +1,35 @@
 /**
- * PublicMap — public, no-login live map of every geo-tagged forest.
- *
- * The consumer-facing "living proof" surface: anyone can open /map and see
- * where the forests are, how many trees are tagged, and drill into a forest to
- * see individual geo-tagged trees. Keyless Leaflet + OpenStreetMap (no Google
- * billing). To switch to Google Maps tiles later, set VITE_GOOGLE_MAPS_KEY and
- * swap the tileLayer for the Google Maps JS SDK — the data layer is unchanged.
+ * PublicMap (/map) — the full explorable Heartbeat Map. Living Instrument
+ * design: keyless satellite basemap (Esri World Imagery) + dark CARTO labels,
+ * forests pulsing bio-lime to signal alive, drill into a forest to see each
+ * geo-tagged tree. No login. The shipped map, elevated to the centerpiece.
  */
 import { useEffect, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { fetchForestsMap, fetchForestTrees, type ForestPin } from '@/lib/publicApi';
+import '@/styles/earth.css';
 
-const DEFAULT_CENTER: [number, number] = [11.0, 78.0];
-const DEFAULT_ZOOM = 5;
+const CENTER: [number, number] = [12.2, 79.2];
+const SAT_URL =
+  'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}';
+const LABELS_URL = 'https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.png';
 
-function forestIcon(count: number, selected: boolean): L.DivIcon {
-  const bg = selected ? '#0b5d06' : '#17970E';
+function alivePin(): L.DivIcon {
   return L.divIcon({
-    className: 'forest-pin',
-    html: `<div style="display:flex;align-items:center;gap:6px;background:${bg};color:#fff;padding:5px 9px;border-radius:14px;font:600 12px 'Plus Jakarta Sans',sans-serif;white-space:nowrap;box-shadow:0 2px 6px rgba(0,0,0,.35);border:2px solid #fff">🌳 ${count}</div>`,
-    iconSize: [0, 0],
-    iconAnchor: [20, 14],
-  });
-}
-
-function treeDot(): L.DivIcon {
-  return L.divIcon({
-    className: 'tree-dot',
-    html: `<span style="display:block;width:12px;height:12px;border-radius:50%;background:#22a818;border:2px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,.4)"></span>`,
+    className: 'alive-pin',
+    html: '<span class="ring"></span><span class="core"></span>',
     iconSize: [12, 12],
     iconAnchor: [6, 6],
+  });
+}
+function treePin(): L.DivIcon {
+  return L.divIcon({
+    className: 'tree-pin',
+    html: '<span class="core" style="position:relative;display:block;width:11px;height:11px;border-radius:50%"></span>',
+    iconSize: [11, 11],
+    iconAnchor: [5.5, 5.5],
   });
 }
 
@@ -51,33 +50,28 @@ export default function PublicMap() {
     { tagged: 0, total: 0 },
   );
 
-  // Init map once.
   useEffect(() => {
     if (mapRef.current || !elRef.current) return;
-    const map = L.map(elRef.current, { center: DEFAULT_CENTER, zoom: DEFAULT_ZOOM });
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19,
-      attribution: '&copy; OpenStreetMap contributors',
-    }).addTo(map);
+    const map = L.map(elRef.current, { center: CENTER, zoom: 5 });
+    L.tileLayer(SAT_URL, { maxZoom: 19, attribution: 'Imagery &copy; Esri' }).addTo(map);
+    L.tileLayer(LABELS_URL, { maxZoom: 19, opacity: 0.85, attribution: '&copy; CARTO' }).addTo(map);
     forestLayer.current = L.layerGroup().addTo(map);
     treeLayer.current = L.layerGroup().addTo(map);
     mapRef.current = map;
-    setTimeout(() => map.invalidateSize(), 0);
+    setTimeout(() => map.invalidateSize(), 60);
     return () => {
       map.remove();
       mapRef.current = null;
     };
   }, []);
 
-  // Load forests.
   useEffect(() => {
     fetchForestsMap()
-      .then((f) => setForests(f))
+      .then(setForests)
       .catch((e) => setError(e instanceof Error ? e.message : 'Failed to load'))
       .finally(() => setLoading(false));
   }, []);
 
-  // Draw forest markers + fit.
   useEffect(() => {
     const map = mapRef.current;
     const layer = forestLayer.current;
@@ -86,21 +80,19 @@ export default function PublicMap() {
     const bounds: [number, number][] = [];
     for (const f of forests) {
       if (f.lat == null || f.lng == null) continue;
-      const m = L.marker([f.lat, f.lng], {
-        icon: forestIcon(f.tagged_trees, selected?.id === f.id),
-      }).addTo(layer);
+      const m = L.marker([f.lat, f.lng], { icon: alivePin() }).addTo(layer);
       const place = [f.city, f.state].filter(Boolean).join(', ');
       m.bindPopup(
-        `<strong>${f.name ?? 'Forest'}</strong><br/>` +
-          `<span style="color:#555">${place || '—'}</span><br/>` +
-          `<span style="color:#17970E;font-weight:600">${f.tagged_trees} tagged</span> / ${f.total_trees} trees`,
+        `<div style="font-family:'Plus Jakarta Sans',sans-serif"><strong style="color:#b6ff3c">${f.name ?? 'Forest'}</strong><br/>` +
+          `<span style="color:#cdd">${place || '—'}</span><br/>` +
+          `<span style="font-family:'JetBrains Mono',monospace;color:#b6ff3c">${f.tagged_trees}</span><span style="color:#9ab"> / ${f.total_trees} trees alive</span></div>`,
       );
       m.on('click', () => selectForest(f));
       bounds.push([f.lat, f.lng]);
     }
-    if (!selected && bounds.length === 1) map.setView(bounds[0]!, 13);
+    if (!selected && bounds.length === 1) map.setView(bounds[0]!, 9);
     else if (!selected && bounds.length > 1)
-      map.fitBounds(L.latLngBounds(bounds), { padding: [50, 50], maxZoom: 12 });
+      map.fitBounds(L.latLngBounds(bounds), { padding: [60, 60], maxZoom: 9 });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [forests, selected]);
 
@@ -117,17 +109,16 @@ export default function PublicMap() {
       const bounds: [number, number][] = [];
       for (const t of trees) {
         if (t.lat == null || t.lng == null) continue;
-        L.marker([t.lat, t.lng], { icon: treeDot() })
+        L.marker([t.lat, t.lng], { icon: treePin() })
           .addTo(layer)
           .bindPopup(
-            `<strong>${t.tree_unique_id ?? 'Tree'}</strong>` +
-              (t.species ? `<br/><span style="color:#555">${t.species}</span>` : '') +
-              `<br/><span style="color:#777;font-size:11px">${t.lat.toFixed(6)}, ${t.lng.toFixed(6)}</span>`,
+            `<div style="font-family:'Plus Jakarta Sans',sans-serif"><strong style="color:#b6ff3c">${t.tree_unique_id ?? 'Tree'}</strong>` +
+              (t.species ? `<br/><span style="color:#cdd">${t.species}</span>` : '') +
+              `<br/><span style="font-family:'JetBrains Mono',monospace;color:#9ab;font-size:11px">${t.lat.toFixed(6)}, ${t.lng.toFixed(6)}</span></div>`,
           );
         bounds.push([t.lat, t.lng]);
       }
-      if (bounds.length > 1)
-        map.fitBounds(L.latLngBounds(bounds), { padding: [40, 40], maxZoom: 18 });
+      if (bounds.length > 1) map.fitBounds(L.latLngBounds(bounds), { padding: [40, 40], maxZoom: 18 });
     } catch {
       /* keep forest view */
     } finally {
@@ -141,58 +132,55 @@ export default function PublicMap() {
   }
 
   return (
-    <div style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", height: '100vh', display: 'flex', flexDirection: 'column' }}>
-      {/* Brand bar */}
-      <header style={{ background: '#1d2a1f', color: '#f7f8f0', padding: '14px 22px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <span style={{ fontSize: 22 }}>🌳</span>
+    <div className="earth" style={{ height: '100vh', display: 'flex', flexDirection: 'column', background: 'var(--ink)', color: 'var(--surface)' }}>
+      <header style={{ background: 'var(--ink-2)', padding: '14px clamp(16px,3vw,28px)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, borderBottom: '1px solid var(--line)' }}>
+        <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none', color: 'var(--surface)' }}>
+          <span style={{ width: 16, height: 16, borderRadius: '50%', background: 'var(--alive)', boxShadow: '0 0 12px rgba(182,255,60,.7)' }} />
           <div>
-            <div style={{ fontWeight: 700, fontSize: 16 }}>Be The Tree Hugger — Live Forest Map</div>
-            <div style={{ fontSize: 12, color: '#b8d44a' }}>Every pin is a real, geo-tagged forest. Click to see the trees.</div>
+            <div style={{ fontWeight: 700, fontSize: 15 }}>Be The Tree Hugger — Heartbeat Map</div>
+            <div className="mono" style={{ fontSize: 11, color: 'var(--alive)' }}>every pulse is a tree verified alive</div>
           </div>
-        </div>
-        <div style={{ display: 'flex', gap: 24, fontSize: 13 }}>
-          <div><b style={{ fontSize: 18 }}>{forests.length}</b><div style={{ color: '#8a9a86' }}>forests</div></div>
-          <div><b style={{ fontSize: 18 }}>{totals.tagged.toLocaleString()}</b><div style={{ color: '#8a9a86' }}>tagged trees</div></div>
+        </Link>
+        <div style={{ display: 'flex', gap: 26 }}>
+          <div><div className="mono" style={{ fontSize: 20, color: 'var(--alive)' }}>{forests.length}</div><div style={{ fontSize: 11, color: '#9fb0ad', textTransform: 'uppercase', letterSpacing: '.08em' }}>forests</div></div>
+          <div><div className="mono" style={{ fontSize: 20, color: 'var(--alive)' }}>{totals.tagged.toLocaleString()}</div><div style={{ fontSize: 11, color: '#9fb0ad', textTransform: 'uppercase', letterSpacing: '.08em' }}>trees alive</div></div>
         </div>
       </header>
 
       <div style={{ flex: 1, display: 'flex', minHeight: 0 }}>
-        {/* Forest list */}
-        <aside style={{ width: 280, borderRight: '1px solid #cdd2bb', overflowY: 'auto', background: '#f7f8f0' }}>
+        <aside style={{ width: 290, borderRight: '1px solid var(--line)', overflowY: 'auto', background: 'var(--ink-2)' }}>
           {selected && (
-            <button onClick={showAll} style={{ width: '100%', textAlign: 'left', padding: '10px 16px', background: '#eef0e4', border: 'none', borderBottom: '1px solid #cdd2bb', cursor: 'pointer', fontSize: 13, color: '#2f4a33', fontWeight: 600 }}>
+            <button onClick={showAll} style={{ width: '100%', textAlign: 'left', padding: '12px 18px', background: 'rgba(255,255,255,.04)', border: 'none', borderBottom: '1px solid var(--line)', cursor: 'pointer', fontSize: 13, color: 'var(--alive)', fontWeight: 600 }}>
               ← All forests
             </button>
           )}
           {loading ? (
-            <p style={{ padding: 16, fontSize: 14, color: '#5a6452' }}>Loading forests…</p>
+            <p style={{ padding: 18, fontSize: 14, color: '#9fb0ad' }}>Loading forests…</p>
           ) : error ? (
-            <p style={{ padding: 16, fontSize: 14, color: '#a04a2e' }}>{error}</p>
+            <p style={{ padding: 18, fontSize: 14, color: 'var(--amber)' }}>{error}</p>
           ) : forests.length === 0 ? (
-            <p style={{ padding: 16, fontSize: 14, color: '#5a6452' }}>No geo-tagged forests yet.</p>
+            <p style={{ padding: 18, fontSize: 14, color: '#9fb0ad' }}>No geo-tagged forests yet.</p>
           ) : (
             forests.map((f) => (
               <button
                 key={f.id}
                 onClick={() => selectForest(f)}
-                style={{ display: 'block', width: '100%', textAlign: 'left', padding: '12px 16px', border: 'none', borderBottom: '1px solid #e2e6d4', cursor: 'pointer', background: selected?.id === f.id ? '#f1f5dd' : 'transparent' }}
+                style={{ display: 'block', width: '100%', textAlign: 'left', padding: '14px 18px', border: 'none', borderBottom: '1px solid var(--line)', cursor: 'pointer', background: selected?.id === f.id ? 'rgba(182,255,60,.08)' : 'transparent', color: 'var(--surface)' }}
               >
-                <div style={{ fontWeight: 600, fontSize: 14, color: '#1d2a1f' }}>{f.name ?? 'Forest'}</div>
-                <div style={{ fontSize: 12, color: '#5a6452' }}>{[f.city, f.state].filter(Boolean).join(', ') || '—'}</div>
-                <div style={{ fontSize: 12, color: '#17970E', fontWeight: 600, marginTop: 2 }}>
-                  {f.tagged_trees} tagged / {f.total_trees} trees
+                <div style={{ fontWeight: 600, fontSize: 14 }}>{f.name ?? 'Forest'}</div>
+                <div style={{ fontSize: 12, color: '#9fb0ad' }}>{[f.city, f.state].filter(Boolean).join(', ') || '—'}</div>
+                <div className="mono" style={{ fontSize: 12, color: 'var(--alive)', marginTop: 4 }}>
+                  {f.tagged_trees} / {f.total_trees} alive
                 </div>
               </button>
             ))
           )}
         </aside>
 
-        {/* Map */}
         <div style={{ flex: 1, position: 'relative' }}>
           <div ref={elRef} style={{ position: 'absolute', inset: 0 }} />
           {treeLoading && (
-            <div style={{ position: 'absolute', top: 12, left: 12, zIndex: 1000, background: '#1d2a1f', color: '#b8d44a', padding: '6px 12px', borderRadius: 4, fontSize: 12, fontFamily: 'monospace' }}>
+            <div className="mono" style={{ position: 'absolute', top: 12, left: 12, zIndex: 1000, background: 'var(--ink)', color: 'var(--alive)', padding: '6px 12px', borderRadius: 6, fontSize: 12, border: '1px solid var(--line)' }}>
               loading trees…
             </div>
           )}
