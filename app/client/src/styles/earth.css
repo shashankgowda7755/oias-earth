@@ -55,25 +55,21 @@
 .tree-pin .core { background: var(--alive); box-shadow: 0 0 8px rgba(182,255,60,.8); }
 
 /* Sponsor-logo forest pin — a glowing white medallion holding the corporate
-   logo, with a pulsing bio-lime ring (the forest "belongs" to that sponsor). */
-.forest-logo-pin { position: relative; width: 46px; height: 46px; }
-.forest-logo-pin .ring,
+   logo. Glow is a CONTAINED box-shadow pulse (no expanding ring) so dense pins
+   never crisscross into a green web. */
+.forest-logo-pin { position: relative; width: 38px; height: 38px; }
 .forest-logo-pin .badge {
-  position: absolute; left: 50%; top: 50%; width: 46px; height: 46px;
-  margin: -23px 0 0 -23px; border-radius: 50%;
+  position: absolute; inset: 0; border-radius: 50%;
+  background: #fff; border: 2px solid var(--alive); overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 0 7px rgba(182,255,60,.55), 0 2px 6px rgba(0,0,0,.5);
+  animation: pinGlow 2.8s ease-in-out infinite;
 }
-.forest-logo-pin .ring { border: 2px solid var(--alive); animation: ringPulse 2.6s ease-out infinite; }
-.forest-logo-pin .badge {
-  background: #fff; border: 2.5px solid var(--alive);
-  box-shadow: 0 0 16px rgba(182,255,60,.65), 0 2px 7px rgba(0,0,0,.5);
-  display: flex; align-items: center; justify-content: center; overflow: hidden;
-}
-.forest-logo-pin .badge img { width: 32px; height: 32px; object-fit: contain; }
+.forest-logo-pin .badge img { width: 26px; height: 26px; object-fit: contain; }
 .forest-logo-pin .badge.nologo { background: var(--alive); }
-@keyframes ringPulse {
-  0%   { transform: scale(1); opacity: .85; }
-  70%  { transform: scale(2.1); opacity: 0; }
-  100% { transform: scale(2.1); opacity: 0; }
+@keyframes pinGlow {
+  0%, 100% { box-shadow: 0 0 6px rgba(182,255,60,.45), 0 2px 6px rgba(0,0,0,.5); }
+  50%      { box-shadow: 0 0 15px rgba(182,255,60,.85), 0 2px 6px rgba(0,0,0,.5); }
 }
 
 /* Cluster bubble — nearby forests collapse into one count badge so the map

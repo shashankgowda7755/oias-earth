@@ -16,14 +16,15 @@ const SPONSORS = [
   'f5786b29-cd96-40aa-abc4-3628cfd99f5e', // Kishore Forest
 ];
 
+// Centres are inland and jitter is small so no forest lands in the sea.
 const CITIES = [
-  { name: 'Bengaluru', state: 'Karnataka', lat: 12.9716, lng: 77.5946, n: 50, jit: 0.09 },
-  { name: 'Chennai', state: 'Tamil Nadu', lat: 13.04, lng: 80.21, n: 18, jit: 0.11 },
-  { name: 'Coimbatore', state: 'Tamil Nadu', lat: 11.0168, lng: 76.9558, n: 8, jit: 0.08 },
-  { name: 'Madurai', state: 'Tamil Nadu', lat: 9.9252, lng: 78.1198, n: 7, jit: 0.08 },
-  { name: 'Mysuru', state: 'Karnataka', lat: 12.2958, lng: 76.6394, n: 7, jit: 0.08 },
-  { name: 'Salem', state: 'Tamil Nadu', lat: 11.6643, lng: 78.146, n: 5, jit: 0.06 },
-  { name: 'Tiruchirappalli', state: 'Tamil Nadu', lat: 10.7905, lng: 78.7047, n: 5, jit: 0.06 },
+  { name: 'Bengaluru', state: 'Karnataka', lat: 12.9716, lng: 77.5946, n: 50, jit: 0.06 },
+  { name: 'Chennai', state: 'Tamil Nadu', lat: 13.01, lng: 80.13, n: 18, jit: 0.05 },
+  { name: 'Coimbatore', state: 'Tamil Nadu', lat: 11.0168, lng: 76.9558, n: 8, jit: 0.05 },
+  { name: 'Madurai', state: 'Tamil Nadu', lat: 9.9252, lng: 78.1198, n: 7, jit: 0.05 },
+  { name: 'Mysuru', state: 'Karnataka', lat: 12.2958, lng: 76.6394, n: 7, jit: 0.05 },
+  { name: 'Salem', state: 'Tamil Nadu', lat: 11.6643, lng: 78.146, n: 5, jit: 0.05 },
+  { name: 'Tiruchirappalli', state: 'Tamil Nadu', lat: 10.7905, lng: 78.7047, n: 5, jit: 0.05 },
 ];
 
 async function main() {

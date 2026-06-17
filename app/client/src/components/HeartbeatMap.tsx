@@ -40,9 +40,9 @@ function forestIcon(f: ForestPin): L.DivIcon {
     : '<span class="badge nologo"></span>';
   return L.divIcon({
     className: 'forest-logo-pin',
-    html: `<span class="ring"></span>${inner}`,
-    iconSize: [46, 46],
-    iconAnchor: [23, 23],
+    html: inner,
+    iconSize: [38, 38],
+    iconAnchor: [19, 19],
   });
 }
 
@@ -86,9 +86,10 @@ export function HeartbeatMap({
     L.tileLayer(LABELS_URL, { maxZoom: 19, opacity: 0.85, attribution: '&copy; CARTO' }).addTo(map);
     layerRef.current = L.markerClusterGroup({
       iconCreateFunction: clusterIcon,
-      maxClusterRadius: 48,
+      maxClusterRadius: 60,
       showCoverageOnHover: false,
-      spiderfyOnMaxZoom: true,
+      spiderfyOnMaxZoom: false,
+      disableClusteringAtZoom: 16,
       chunkedLoading: true,
     }).addTo(map);
     mapRef.current = map;
