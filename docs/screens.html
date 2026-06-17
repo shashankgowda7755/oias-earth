@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Be The Tree Hugger — Screen Map</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;1,9..144,600&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --ink:#16282e; --ink2:#0f1d22; --pine:#1d4a47; --surface:#eff1f5;
+    --alive:#b6ff3c; --amber:#e8a33d; --slate:#6b7b82; --line:rgba(255,255,255,.12);
+    --serif:'Fraunces',Georgia,serif; --sans:'Plus Jakarta Sans',system-ui,sans-serif; --mono:'JetBrains Mono',monospace;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:var(--sans);background:var(--ink);color:var(--surface);line-height:1.6;-webkit-font-smoothing:antialiased}
+  .mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+  a{color:var(--alive);text-decoration:none}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 24px}
+  header.top{padding:56px 0 36px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,var(--ink2),var(--ink))}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:var(--alive);margin-bottom:16px}
+  h1{font-family:var(--serif);font-weight:300;font-size:clamp(32px,5vw,56px);line-height:1.05;letter-spacing:-.01em}
+  h1 em{font-style:italic;font-weight:600;color:var(--alive)}
+  .sub{color:#aebcb9;max-width:60ch;margin-top:14px;font-size:16px}
+  .meta{display:flex;gap:18px;flex-wrap:wrap;margin-top:22px;font-size:13px}
+  .meta a{border:1px solid var(--line);padding:8px 14px;border-radius:999px;color:var(--surface)}
+  .meta a b{color:var(--alive)}
+
+  .creds{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin:32px 0}
+  .cred{background:var(--ink2);border:1px solid var(--line);border-radius:14px;padding:18px 20px}
+  .cred h3{font-family:var(--serif);font-weight:600;font-size:18px;margin-bottom:8px}
+  .cred .row{font-family:var(--mono);font-size:13px;color:#cdd;margin-top:4px}
+  .cred .row b{color:var(--alive)}
+  .cred .who{font-size:12px;color:#9fb0ad;margin-top:8px}
+
+  .seclabel{font-family:var(--mono);font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--amber);margin:44px 0 6px}
+  h2{font-family:var(--serif);font-weight:600;font-size:26px;margin-bottom:18px}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:22px}
+  .card{background:var(--ink2);border:1px solid var(--line);border-radius:16px;overflow:hidden;display:flex;flex-direction:column}
+  .frame{position:relative;height:240px;background:#0b1416;border-bottom:1px solid var(--line);overflow:hidden}
+  .frame iframe{position:absolute;top:0;left:0;width:166.66%;height:166.66%;border:0;transform:scale(.6);transform-origin:top left}
+  .frame .open{position:absolute;top:10px;right:10px;background:var(--alive);color:#16282e;font-weight:700;font-size:12px;padding:5px 11px;border-radius:999px;z-index:3}
+  .frame .tap{position:absolute;inset:0;z-index:2;cursor:pointer}
+  .card .body{padding:18px 20px;display:flex;flex-direction:column;flex:1}
+  .badges{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+  .badge{font-family:var(--mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;padding:3px 9px;border-radius:999px;border:1px solid var(--line)}
+  .b-public{color:var(--alive);border-color:rgba(182,255,60,.4)}
+  .b-auth{color:var(--amber);border-color:rgba(232,163,61,.4)}
+  .b-pwa{color:#7fb7ff;border-color:rgba(127,183,255,.4)}
+  .card h3{font-family:var(--serif);font-weight:600;font-size:21px;margin-bottom:2px}
+  .route{font-family:var(--mono);font-size:12px;color:#9fb0ad;margin-bottom:10px}
+  .card p{font-size:14px;color:#cdd;margin-bottom:10px}
+  .card ul{margin:0 0 12px 16px;font-size:13.5px;color:#aebcb9}
+  .card li{margin-bottom:4px}
+  .card .go{margin-top:auto;font-weight:600;font-size:14px}
+  footer{border-top:1px solid var(--line);margin-top:56px;padding:28px 0 56px;color:#7e8e8a;font-family:var(--mono);font-size:12px}
+  footer b{color:var(--alive)}
+  .note{background:rgba(232,163,61,.08);border:1px solid rgba(232,163,61,.3);border-radius:12px;padding:14px 18px;font-size:13.5px;color:#e8c89a;margin-top:16px}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <div class="eyebrow">Be The Tree Hugger · OIAS Earth</div>
+    <h1>Every screen, <em>one map.</em></h1>
+    <p class="sub">All live screens of the living-proof platform — public site, field-capture app, and admin. Each tile is a live preview; click to open the real page.</p>
+    <div class="meta">
+      <a href="https://communitree-rebuild.vercel.app/" target="_blank">Live site <b>↗</b></a>
+      <a href="https://github.com/artforawarenessofficial-blip/communitree-rebuild" target="_blank">GitHub <b>↗</b></a>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <div class="creds">
+    <div class="cred">
+      <h3>Admin login</h3>
+      <div class="row">user <b>communitree_admin</b></div>
+      <div class="row">pass <b>CTadmin-6AtrcPDT7k</b></div>
+      <div class="who">SuperAdmin — manage users, sponsors, forests, trees, geo-tagging, visits</div>
+    </div>
+    <div class="cred">
+      <h3>Planter login (field app)</h3>
+      <div class="row">user <b>field_planter</b></div>
+      <div class="row">pass <b>FieldTree2026</b></div>
+      <div class="who">Field worker — scoped to assigned forests; offline GPS + photo capture</div>
+    </div>
+    <div class="cred">
+      <h3>Public</h3>
+      <div class="row">no login <b>·</b> anyone</div>
+      <div class="who">Landing, live map, per-tree proof pages — open to the world</div>
+    </div>
+  </div>
+
+  <!-- PUBLIC -->
+  <div class="seclabel">01 · Public — no login</div>
+  <h2>The storefront & proof surface</h2>
+  <div class="grid">
+
+    <div class="card">
+      <div class="frame">
+        <a class="open" href="https://communitree-rebuild.vercel.app/" target="_blank">Open ↗</a>
+        <iframe loading="lazy" src="https://communitree-rebuild.vercel.app/" title="Landing"></iframe>
+        <a class="tap" href="https://communitree-rebuild.vercel.app/" target="_blank" aria-label="Open landing"></a>
+      </div>
+      <div class="body">
+        <div class="badges"><span class="badge b-public">Public</span></div>
+        <h3>Landing</h3>
+        <div class="route">/</div>
+        <p>Cinematic homepage — a live satellite Heartbeat Map where real forests pulse "alive".</p>
+        <ul><li>Live impact count-up</li><li>Proof-not-promises story</li><li>For-business / CSR section</li></ul>
+        <a class="go" href="https://communitree-rebuild.vercel.app/" target="_blank">Open landing →</a>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="frame">
+        <a class="open" href="https://communitree-rebuild.vercel.app/map" target="_blank">Open ↗</a>
+        <iframe loading="lazy" src="https://communitree-rebuild.vercel.app/map" title="Map"></iframe>
+        <a class="tap" href="https://communitree-rebuild.vercel.app/map" target="_blank" aria-label="Open map"></a>
+      </div>
+      <div class="body">
+        <div class="badges"><span class="badge b-public">Public</span></div>
+        <h3>Heartbeat Map</h3>
+        <div class="route">/map</div>
+        <p>Explorable satellite map of every geo-tagged forest. Click a forest to drill into its trees.</p>
+        <ul><li>Free satellite basemap (keyless)</li><li>Forest list + live counts</li><li>Tree pins → life record</li></ul>
+        <a class="go" href="https://communitree-rebuild.vercel.app/map" target="_blank">Open map →</a>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="frame">
+        <a class="open" href="https://communitree-rebuild.vercel.app/tree/7a11c0e0-0000-4000-8000-000000000001" target="_blank">Open ↗</a>
+        <iframe loading="lazy" src="https://communitree-rebuild.vercel.app/tree/7a11c0e0-0000-4000-8000-000000000001" title="Tree proof"></iframe>
+        <a class="tap" href="https://communitree-rebuild.vercel.app/tree/7a11c0e0-0000-4000-8000-000000000001" target="_blank" aria-label="Open tree proof"></a>
+      </div>
+      <div class="body">
+        <div class="badges"><span class="badge b-public">Public</span></div>
+        <h3>Tree proof-of-life</h3>
+        <div class="route">/tree/:id</div>
+        <p>One tree's life record — survival badge, growth chart, photo timeline across years, location.</p>
+        <ul><li>Verified-visit timeline</li><li>Growth measured over time</li><li>Shareable, no login</li></ul>
+        <a class="go" href="https://communitree-rebuild.vercel.app/tree/7a11c0e0-0000-4000-8000-000000000001" target="_blank">Open a tree →</a>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- FIELD -->
+  <div class="seclabel">02 · Field — planter login (installable PWA)</div>
+  <h2>Offline capture in the field</h2>
+  <div class="grid">
+
+    <div class="card">
+      <div class="frame">
+        <a class="open" href="https://communitree-rebuild.vercel.app/field" target="_blank">Open ↗</a>
+        <iframe loading="lazy" src="https://communitree-rebuild.vercel.app/field" title="Field app"></iframe>
+        <a class="tap" href="https://communitree-rebuild.vercel.app/field" target="_blank" aria-label="Open field app"></a>
+      </div>
+      <div class="body">
+        <div class="badges"><span class="badge b-pwa">PWA · offline</span><span class="badge b-auth">Planter login</span></div>
+        <h3>Field Capture app</h3>
+        <div class="route">/field — install: "Add to Home Screen"</div>
+        <p>Planters capture trees on site, even with no signal. Login → forest → tree → GPS + photo + status.</p>
+        <ul><li>Works offline (IndexedDB queue)</li><li>Auto-syncs on reconnect</li><li>Per-planter, forest-scoped</li></ul>
+        <a class="go" href="https://communitree-rebuild.vercel.app/field" target="_blank">Open field app →</a>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ADMIN -->
+  <div class="seclabel">03 · Admin — sign in required</div>
+  <h2>Manage the platform</h2>
+  <div class="grid">
+
+    <div class="card">
+      <div class="frame">
+        <a class="open" href="https://communitree-rebuild.vercel.app/login" target="_blank">Open ↗</a>
+        <iframe loading="lazy" src="https://communitree-rebuild.vercel.app/login" title="Admin login"></iframe>
+        <a class="tap" href="https://communitree-rebuild.vercel.app/login" target="_blank" aria-label="Open admin login"></a>
+      </div>
+      <div class="body">
+        <div class="badges"><span class="badge b-auth">Auth</span></div>
+        <h3>Admin sign in</h3>
+        <div class="route">/login</div>
+        <p>Entry to the admin dashboard. Use the admin credentials above.</p>
+        <a class="go" href="https://communitree-rebuild.vercel.app/login" target="_blank">Open login →</a>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="body" style="padding-top:20px">
+        <div class="badges"><span class="badge b-auth">Auth</span></div>
+        <h3>Admin dashboard</h3>
+        <div class="route">/dashboard — 6 tabs</div>
+        <p>The control room. After login at /login.</p>
+        <ul>
+          <li><b>Users</b> — admin accounts &amp; roles</li>
+          <li><b>Sponsors</b> — CSR sponsors / logos</li>
+          <li><b>Employees</b> — site staff</li>
+          <li><b>Forests</b> — create / edit forests</li>
+          <li><b>Reports</b> — quarterly forest reports</li>
+          <li><b>Jobs</b> — async job log</li>
+        </ul>
+        <a class="go" href="https://communitree-rebuild.vercel.app/login" target="_blank">Sign in to view →</a>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="body" style="padding-top:20px">
+        <div class="badges"><span class="badge b-auth">Auth</span></div>
+        <h3>Forest detail · Geo-tagging</h3>
+        <div class="route">/dashboard → Forests → [forest] → Geo-tagging tab</div>
+        <p>Per-forest detail (13 tabs). The Geo-tagging tab is where trees get located and visits logged.</p>
+        <ul>
+          <li>Map + tree register</li>
+          <li>Geo-tag: GPS / tap-map / manual</li>
+          <li>Log a visit (status, height, ⌀, photo)</li>
+          <li>"View public proof" link per tree</li>
+        </ul>
+        <a class="go" href="https://communitree-rebuild.vercel.app/login" target="_blank">Sign in to view →</a>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="note">
+    Tip: previews are live iframes of the real, deployed app — they may take a second to load and reflect real data. Admin/field screens past the login wall need the credentials above.
+  </div>
+
+</div>
+
+<footer>
+  <div class="wrap">
+    <b>BE THE TREE HUGGER</b> · screen map · living proof, verified monthly · all screens live on communitree-rebuild.vercel.app
+  </div>
+</footer>
+
+</body>
+</html>
