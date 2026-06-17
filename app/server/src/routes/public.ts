@@ -239,6 +239,31 @@ async function treeProof(req: Request, res: Response): Promise<void> {
   });
 }
 
+/**
+ * GET /public/sponsors — active sponsors (name + logo + site) for the public
+ * "backed by" marquee. Public-safe fields only.
+ */
+async function sponsorsPublic(_req: Request, res: Response): Promise<void> {
+  const rows = await query<{
+    sponsor_name: string | null;
+    sponsor_logo: string | null;
+    website_url: string | null;
+  }>(
+    `SELECT sponsor_name, sponsor_logo, website_url
+       FROM sponsors
+      WHERE is_active = TRUE
+      ORDER BY sponsor_name`,
+  );
+  res.json({
+    data: rows.rows.map((s) => ({
+      name: s.sponsor_name,
+      logo: s.sponsor_logo,
+      website: s.website_url,
+    })),
+  });
+}
+
+publicRouter.get('/public/sponsors', wrap(sponsorsPublic));
 publicRouter.get('/public/forests-map', wrap(forestsMap));
 publicRouter.get('/public/forest/:id/trees', wrap(forestTreesPublic));
 publicRouter.get('/public/tree/:id', wrap(treeProof));

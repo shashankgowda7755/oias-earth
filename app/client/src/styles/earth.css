@@ -54,6 +54,27 @@
 }
 .tree-pin .core { background: var(--alive); box-shadow: 0 0 8px rgba(182,255,60,.8); }
 
+/* Sponsor logo marquee — seamless infinite scroll, pause on hover. */
+.earth .marquee {
+  overflow: hidden; position: relative;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+}
+.earth .marquee-track { display: flex; gap: 60px; width: max-content; animation: marquee 38s linear infinite; }
+.earth .marquee:hover .marquee-track { animation-play-state: paused; }
+@keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+.earth .sponsor-item {
+  display: flex; align-items: center; justify-content: center; gap: 12px; height: 52px;
+  opacity: .72; transition: opacity .35s ease;
+}
+.earth .sponsor-item:hover { opacity: 1; }
+.earth .sponsor-item img {
+  height: 30px; width: 30px; object-fit: contain; display: block; border-radius: 6px;
+  background: #fff; padding: 3px;
+}
+.earth .sponsor-name { font-family: var(--serif); font-weight: 600; font-size: 21px; color: var(--surface); white-space: nowrap; }
+.earth .sponsor-chip { font-family: var(--serif); font-weight: 600; font-size: 21px; color: var(--surface); white-space: nowrap; }
+
 /* Scroll reveal */
 .earth .reveal { opacity: 0; transform: translateY(18px); transition: opacity .7s ease, transform .7s ease; }
 .earth .reveal.in { opacity: 1; transform: none; }

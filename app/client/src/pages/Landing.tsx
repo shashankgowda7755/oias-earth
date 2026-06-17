@@ -9,7 +9,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { HeartbeatMap } from '@/components/HeartbeatMap';
-import { fetchForestsMap, type ForestPin } from '@/lib/publicApi';
+import { fetchForestsMap, fetchSponsors, type ForestPin, type Sponsor } from '@/lib/publicApi';
 import '@/styles/earth.css';
 
 function useCountUp(target: number, run: boolean, ms = 1400) {
@@ -55,8 +55,26 @@ const GAPS = [
   { t: 'Honest, including failure', d: 'We publish the dead trees too — real survival %, cause, and replacement status. The first faked record kills the category, so we weaponise honesty.' },
 ];
 
+function SponsorLogo({ s }: { s: Sponsor }) {
+  const [failed, setFailed] = useState(false);
+  const item = (
+    <div className="sponsor-item">
+      {s.logo && !failed && (
+        <img src={s.logo} alt={s.name ?? 'Sponsor'} loading="lazy" onError={() => setFailed(true)} />
+      )}
+      <span className="sponsor-name">{s.name}</span>
+    </div>
+  );
+  return s.website ? (
+    <a href={s.website} target="_blank" rel="noreferrer">{item}</a>
+  ) : (
+    item
+  );
+}
+
 export default function Landing() {
   const [forests, setForests] = useState<ForestPin[]>([]);
+  const [sponsors, setSponsors] = useState<Sponsor[]>([]);
   const [loaded, setLoaded] = useState(false);
   useReveal();
 
@@ -65,6 +83,9 @@ export default function Landing() {
       .then(setForests)
       .catch(() => undefined)
       .finally(() => setLoaded(true));
+    fetchSponsors()
+      .then(setSponsors)
+      .catch(() => undefined);
   }, []);
 
   const treesAlive = forests.reduce((a, f) => a + f.tagged_trees, 0);
@@ -123,6 +144,22 @@ export default function Landing() {
         </div>
         <div style={{ position: 'absolute', bottom: 22, left: '50%', transform: 'translateX(-50%)', zIndex: 10, color: '#9fb0ad', fontSize: 12, letterSpacing: '.1em' }}>scroll</div>
       </header>
+
+      {/* Sponsor marquee */}
+      {sponsors.length > 0 && (
+        <section style={{ padding: 'clamp(26px,4vh,42px) 0', background: 'var(--ink-2)', borderBottom: '1px solid var(--line)' }}>
+          <div style={{ textAlign: 'center', marginBottom: 18 }}>
+            <span className="mono" style={{ fontSize: 11, letterSpacing: '.22em', textTransform: 'uppercase', color: '#9fb0ad' }}>Backed by</span>
+          </div>
+          <div className="marquee">
+            <div className="marquee-track">
+              {[...sponsors, ...sponsors].map((s, i) => (
+                <SponsorLogo key={`${s.name}-${i}`} s={s} />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* The gap / proof not promises */}
       <section id="proof" style={{ padding: 'clamp(64px,9vh,120px) clamp(20px,5vw,56px)', background: 'var(--surface)', color: 'var(--ink)' }}>

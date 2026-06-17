@@ -71,6 +71,19 @@ export async function fetchTreeProof(id: string): Promise<TreeProof> {
   return j.data;
 }
 
+export interface Sponsor {
+  name: string | null;
+  logo: string | null;
+  website: string | null;
+}
+
+export async function fetchSponsors(): Promise<Sponsor[]> {
+  const r = await fetch(`${BASE}/sponsors`);
+  if (!r.ok) throw new Error('Failed to load sponsors');
+  const j = (await r.json()) as { data: Sponsor[] };
+  return j.data;
+}
+
 export async function fetchForestsMap(): Promise<ForestPin[]> {
   const r = await fetch(`${BASE}/forests-map`);
   if (!r.ok) throw new Error('Failed to load forests');
