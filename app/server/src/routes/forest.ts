@@ -53,7 +53,7 @@ import {
   treeCertUrl,
 } from '../lib/geo';
 import { agbKg, CARBON_FRACTION, CO2_PER_C, ROOT_SHOOT, CARBON_METHOD } from '../lib/carbon';
-import { isAllowedEmbedUrl, providerOf, ALLOWED_TOUR_HOSTS } from '../lib/pano';
+import { isAllowedPanoUrl, providerOf, ALLOWED_TOUR_HOSTS } from '../lib/pano';
 
 export const forestRouter = Router();
 
@@ -1381,8 +1381,8 @@ async function addPanorama(req: Request, res: Response): Promise<void> {
   await assertForestAccess(req, forestId);
   const b = (req.body ?? {}) as Record<string, unknown>;
   const embedUrl = typeof b.embed_url === 'string' ? b.embed_url.trim() : '';
-  if (!isAllowedEmbedUrl(embedUrl)) {
-    throw badRequest(`embed_url must be an https link on a supported 360 host (${ALLOWED_TOUR_HOSTS.join(', ')})`);
+  if (!isAllowedPanoUrl(embedUrl)) {
+    throw badRequest(`embed_url must be an https equirectangular image, a same-origin /panoramas/*.jpg, or an embed on a supported 360 host (${ALLOWED_TOUR_HOSTS.join(', ')})`);
   }
   const label = typeof b.label === 'string' && b.label.trim() ? b.label.trim().slice(0, 120) : null;
   const capturedOn = typeof b.captured_on === 'string' && b.captured_on.trim() ? b.captured_on.trim() : null;

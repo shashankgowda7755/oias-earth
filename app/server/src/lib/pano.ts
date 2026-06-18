@@ -26,6 +26,10 @@ function hostMatch(hostname: string): boolean {
   return ALLOWED_HOSTS.some((d) => h === d || h.endsWith('.' + d));
 }
 
+export function isImageUrl(url: string): boolean {
+  return /\.(jpe?g|png|webp)(\?|#|$)/i.test(url);
+}
+
 export function isAllowedEmbedUrl(url: unknown): boolean {
   if (typeof url !== 'string' || url.length > 2000) return false;
   let u: URL;
@@ -37,7 +41,36 @@ export function isAllowedEmbedUrl(url: unknown): boolean {
   return u.protocol === 'https:' && hostMatch(u.hostname);
 }
 
+/**
+ * Accept three kinds of panorama source:
+ *  1. a same-origin static equirectangular image  (/panoramas/x.jpg) — rendered
+ *     in our own in-site viewer, no third party;
+ *  2. an https equirectangular image on any host — rendered in our viewer
+ *     (an image is a texture; it cannot execute script, so the iframe allowlist
+ *     does not apply);
+ *  3. an https embed on an allowlisted 360 host — rendered in a sandboxed iframe.
+ */
+export function isAllowedPanoUrl(url: unknown): boolean {
+  if (typeof url !== 'string' || url.length > 2000) return false;
+  // same-origin static image (leading single slash, not protocol-relative //)
+  if (url.startsWith('/') && !url.startsWith('//')) return isImageUrl(url);
+  let u: URL;
+  try {
+    u = new URL(url);
+  } catch {
+    return false;
+  }
+  if (u.protocol !== 'https:') return false;
+  if (isImageUrl(url)) return true; // any https equirect image
+  return hostMatch(u.hostname); // else must be an allowlisted iframe host
+}
+
 export function providerOf(url: string): string {
+  if (url.startsWith('/') && !url.startsWith('//')) return 'selfhost';
+  if (isImageUrl(url)) {
+    try { return new URL(url).hostname.toLowerCase().replace(/^www\./, '').split('.').slice(-2).join('.') + '-image'; }
+    catch { return 'image'; }
+  }
   try {
     const h = new URL(url).hostname.toLowerCase().replace(/^www\./, '');
     if (h.endsWith('kuula.co')) return 'kuula';

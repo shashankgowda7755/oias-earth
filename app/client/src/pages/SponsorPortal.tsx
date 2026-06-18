@@ -11,7 +11,10 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
 import { fetchSponsor, fetchForestTrees, fetchForestPanoramas, type SponsorSite, type PublicTree, type ForestPanorama } from '@/lib/publicApi';
+import PanoViewer from '@/components/PanoViewer';
 import '@/styles/earth.css';
+
+const isPanoImage = (url: string) => /\.(jpe?g|png|webp)(\?|#|$)/i.test(url);
 
 const BUFFER = 0.18;
 const UNCERTAINTY = 0.1;
@@ -225,17 +228,21 @@ export default function SponsorPortal() {
             </button>
           ) : (
             <div style={{ borderRadius: 14, overflow: 'hidden', border: '1px solid var(--line)', background: '#000', aspectRatio: '16 / 9' }}>
-              <iframe
-                key={tourOpen}
-                src={panos.find((p) => p.id === tourOpen)!.embed_url}
-                title="360° forest tour"
-                loading="lazy"
-                referrerPolicy="no-referrer"
-                allow="fullscreen; accelerometer; gyroscope; xr-spatial-tracking"
-                allowFullScreen
-                sandbox="allow-scripts allow-same-origin allow-popups allow-presentation allow-fullscreen"
-                style={{ width: '100%', height: '100%', border: 'none', display: 'block' }}
-              />
+              {isPanoImage(panos.find((p) => p.id === tourOpen)!.embed_url) ? (
+                <PanoViewer key={tourOpen} src={panos.find((p) => p.id === tourOpen)!.embed_url} />
+              ) : (
+                <iframe
+                  key={tourOpen}
+                  src={panos.find((p) => p.id === tourOpen)!.embed_url}
+                  title="360° forest tour"
+                  loading="lazy"
+                  referrerPolicy="no-referrer"
+                  allow="fullscreen; accelerometer; gyroscope; xr-spatial-tracking"
+                  allowFullScreen
+                  sandbox="allow-scripts allow-same-origin allow-popups allow-presentation allow-fullscreen"
+                  style={{ width: '100%', height: '100%', border: 'none', display: 'block' }}
+                />
+              )}
             </div>
           )}
         </div>

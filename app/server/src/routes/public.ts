@@ -14,7 +14,7 @@ import { Router, type Request, type Response } from 'express';
 import { query } from '../db';
 import { notFound } from '../errors';
 import { treeCo2eKg, netCo2eKg, CARBON_METHOD, BUFFER_PCT, UNCERTAINTY_PCT } from '../lib/carbon';
-import { isAllowedEmbedUrl } from '../lib/pano';
+import { isAllowedPanoUrl } from '../lib/pano';
 
 export const publicRouter = Router();
 
@@ -750,7 +750,7 @@ async function forestPanoramasPublic(req: Request, res: Response): Promise<void>
   );
   res.json({
     data: rows.rows
-      .filter((r) => isAllowedEmbedUrl(r.embed_url)) // defense-in-depth at read
+      .filter((r) => isAllowedPanoUrl(r.embed_url)) // defense-in-depth at read
       .map((r) => ({ id: r.id, label: r.label, provider: r.provider, embed_url: r.embed_url, captured_on: r.captured_on })),
   });
 }
