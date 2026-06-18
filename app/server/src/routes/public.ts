@@ -138,7 +138,7 @@ async function forestTreesPublic(req: Request, res: Response): Promise<void> {
       WHERE ft.forest_id = $1 AND ft.is_active = TRUE AND ft.is_display = TRUE
         AND ft.forest_tree_geo_lat IS NOT NULL
         AND ft.forest_tree_geo_long IS NOT NULL
-      LIMIT 5000`,
+      LIMIT 12000`,
     [forestId],
   );
 

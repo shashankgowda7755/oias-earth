@@ -27,6 +27,19 @@ function clusterIcon(cluster: L.MarkerCluster): L.DivIcon {
   });
 }
 
+// Trees cluster too, so a 10k-tree forest stays smooth; individual health-
+// coloured pins reappear at high zoom (disableClusteringAtZoom below).
+function treeClusterIcon(cluster: L.MarkerCluster): L.DivIcon {
+  const n = cluster.getChildCount();
+  const size = n < 100 ? 30 : n < 1000 ? 38 : 46;
+  return L.divIcon({
+    className: 'tree-cluster',
+    html: `<div class="tc" style="font-size:${n < 1000 ? 12 : 11}px">${n.toLocaleString()}</div>`,
+    iconSize: [size, size],
+    iconAnchor: [size / 2, size / 2],
+  });
+}
+
 const CENTER: [number, number] = [12.2, 79.2];
 const SAT_URL =
   'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}';
@@ -101,7 +114,7 @@ export default function PublicMap() {
   const elRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<L.Map | null>(null);
   const forestLayer = useRef<L.MarkerClusterGroup | null>(null);
-  const treeLayer = useRef<L.LayerGroup | null>(null);
+  const treeLayer = useRef<L.MarkerClusterGroup | null>(null);
   const boundaryLayer = useRef<L.LayerGroup | null>(null);
 
   const [forests, setForests] = useState<ForestPin[]>([]);
@@ -131,7 +144,14 @@ export default function PublicMap() {
       disableClusteringAtZoom: 16,
       chunkedLoading: true,
     }).addTo(map);
-    treeLayer.current = L.layerGroup().addTo(map);
+    treeLayer.current = L.markerClusterGroup({
+      iconCreateFunction: treeClusterIcon,
+      maxClusterRadius: 40,
+      showCoverageOnHover: false,
+      spiderfyOnMaxZoom: false,
+      disableClusteringAtZoom: 17, // flagship (sparse) shows individual pins; dense forests cluster
+      chunkedLoading: true,
+    }).addTo(map);
     boundaryLayer.current = L.layerGroup().addTo(map);
     mapRef.current = map;
     setTimeout(() => map.invalidateSize(), 60);

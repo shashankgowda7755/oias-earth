@@ -21,6 +21,7 @@ import Carbon from './pages/Carbon';
 import Verify from './pages/Verify';
 import Sponsor from './pages/Sponsor';
 import SponsorPortal from './pages/SponsorPortal';
+import AuditPnb from './pages/AuditPnb';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -50,6 +51,7 @@ export default function App() {
               <Route path="/verify" element={<Verify />} />
               <Route path="/sponsor/:id" element={<Sponsor />} />
               <Route path="/portal/:id" element={<SponsorPortal />} />
+              <Route path="/audit/pnb" element={<AuditPnb />} />
               <Route
                 path="/dashboard"
                 element={

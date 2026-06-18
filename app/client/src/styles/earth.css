@@ -100,6 +100,17 @@
 }
 .forest-cluster .fc small { font-size: 9px; color: #9fb0ad; font-weight: 500; margin-top: 2px; letter-spacing: .04em; }
 
+/* Tree cluster bubble — dense forests collapse trees into a count until you
+   zoom in to the individual health-coloured pins. */
+.tree-cluster { background: transparent !important; }
+.tree-cluster .tc {
+  display: flex; align-items: center; justify-content: center;
+  width: 100%; height: 100%; border-radius: 50%;
+  background: rgba(15,29,34,.9); border: 1.5px solid var(--alive); color: var(--alive);
+  font-family: var(--mono); font-weight: 700; line-height: 1;
+  box-shadow: 0 0 12px rgba(182,255,60,.4), 0 2px 6px rgba(0,0,0,.5);
+}
+
 /* Sponsor logo marquee — seamless infinite scroll, pause on hover. */
 .earth .marquee {
   overflow: hidden; position: relative;
