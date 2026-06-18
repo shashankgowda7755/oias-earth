@@ -482,7 +482,135 @@ async function forestTreesGeoJSON(req: Request, res: Response): Promise<void> {
   res.type('application/geo+json').json(fc);
 }
 
+/**
+ * GET /public/sponsor/:id — sponsor microsite data: brand + their forests +
+ * aggregate impact (trees, survival %, verification-ready tCO2e). "Here is YOUR
+ * forest" for a CSR client.
+ */
+async function sponsorMicrosite(req: Request, res: Response): Promise<void> {
+  const id = String(req.params.id);
+  if (!UUID_RE.test(id)) throw notFound('Sponsor not found');
+  const s = await query<{
+    sponsor_name: string | null;
+    sponsor_logo: string | null;
+    website_url: string | null;
+    industry: string | null;
+    headquarters: string | null;
+  }>(
+    `SELECT sponsor_name, sponsor_logo, website_url, industry, headquarters
+       FROM sponsors WHERE id = $1 AND is_active = TRUE LIMIT 1`,
+    [id],
+  );
+  if (s.rowCount === 0) throw notFound('Sponsor not found');
+
+  const forests = await query<Record<string, unknown>>(
+    `SELECT f.id, f.forest_name, f.forest_unique_id, f.forest_city, f.forest_state,
+            f.forest_geo_lat, f.forest_geo_long,
+            COUNT(t.id) FILTER (WHERE t.is_active = TRUE) AS total_trees,
+            COUNT(t.id) FILTER (WHERE t.is_active = TRUE AND t.forest_tree_geo_lat IS NOT NULL) AS tagged_trees,
+            COUNT(t.id) FILTER (WHERE t.is_active = TRUE AND COALESCE(t.tree_status_id,1) <> 4) AS alive_trees
+       FROM forests f
+       JOIN forest_sponsors fs ON fs.forest_id = f.id AND fs.sponsor_id = $1 AND fs.is_active = TRUE
+       LEFT JOIN forest_trees t ON t.forest_id = f.id
+      WHERE f.is_active = TRUE
+      GROUP BY f.id ORDER BY f.forest_name`,
+    [id],
+  );
+
+  // Verification-ready tCO2e across this sponsor's forests (latest measured visit per tree).
+  const co2 = await query<{ wood_density: number | null; height: number | null; diameter: number | null; status_id: number | null }>(
+    `SELECT DISTINCT ON (tl.plant_id) sp.wood_density, tl.height, tl.diameter, tl.status_id
+       FROM forest_plant_timelines tl
+       JOIN forest_trees ft ON ft.id = tl.plant_id AND ft.is_active = TRUE
+       JOIN forest_sponsors fs ON fs.forest_id = ft.forest_id AND fs.sponsor_id = $1 AND fs.is_active = TRUE
+       LEFT JOIN master_plantspecies sp ON sp.id = ft.master_plant_species_id
+      WHERE tl.is_active = TRUE
+      ORDER BY tl.plant_id, tl.timeline_date DESC NULLS LAST, tl.id DESC`,
+    [id],
+  );
+  let grossKg = 0;
+  for (const r of co2.rows) {
+    if (r.status_id === 4) continue;
+    const h = r.height != null ? Number(r.height) : null;
+    const d = r.diameter != null ? Number(r.diameter) : null;
+    const wd = r.wood_density != null ? Number(r.wood_density) : 0.6;
+    if (h != null && d != null) grossKg += treeCo2eKg(wd, d, h);
+  }
+
+  const f = forests.rows.map((r) => {
+    const total = Number(r.total_trees);
+    const alive = Number(r.alive_trees);
+    return {
+      id: r.id,
+      name: r.forest_name,
+      unique_id: r.forest_unique_id,
+      city: r.forest_city,
+      state: r.forest_state,
+      lat: r.forest_geo_lat ? Number(r.forest_geo_lat) : null,
+      lng: r.forest_geo_long ? Number(r.forest_geo_long) : null,
+      total_trees: total,
+      tagged_trees: Number(r.tagged_trees),
+      alive_trees: alive,
+      survival_pct: total > 0 ? Math.round((alive / total) * 1000) / 10 : null,
+    };
+  });
+  const totals = f.reduce(
+    (a, x) => ({ trees: a.trees + x.total_trees, alive: a.alive + x.alive_trees, tagged: a.tagged + x.tagged_trees }),
+    { trees: 0, alive: 0, tagged: 0 },
+  );
+  res.json({
+    data: {
+      sponsor: {
+        name: s.rows[0]!.sponsor_name,
+        logo: s.rows[0]!.sponsor_logo,
+        website: s.rows[0]!.website_url,
+        industry: s.rows[0]!.industry,
+        headquarters: s.rows[0]!.headquarters,
+      },
+      forests: f,
+      totals: {
+        forests: f.length,
+        trees: totals.trees,
+        alive: totals.alive,
+        tagged: totals.tagged,
+        survival_pct: totals.trees > 0 ? Math.round((totals.alive / totals.trees) * 1000) / 10 : null,
+        gross_tco2e: Math.round((grossKg / 1000) * 1000) / 1000,
+        net_tco2e: Math.round((netCo2eKg(grossKg) / 1000) * 1000) / 1000,
+      },
+    },
+  });
+}
+
+/** GET /public/sponsor/:id/report.csv — ESG-ready per-forest CSV for a sponsor. */
+async function sponsorReportCsv(req: Request, res: Response): Promise<void> {
+  const id = String(req.params.id);
+  if (!UUID_RE.test(id)) throw notFound('Sponsor not found');
+  const rows = await query<Record<string, unknown>>(
+    `SELECT f.forest_name, f.forest_unique_id, f.forest_city, f.forest_state,
+            COUNT(t.id) FILTER (WHERE t.is_active = TRUE) AS total_trees,
+            COUNT(t.id) FILTER (WHERE t.is_active = TRUE AND t.forest_tree_geo_lat IS NOT NULL) AS tagged_trees,
+            COUNT(t.id) FILTER (WHERE t.is_active = TRUE AND COALESCE(t.tree_status_id,1) <> 4) AS alive_trees
+       FROM forests f
+       JOIN forest_sponsors fs ON fs.forest_id = f.id AND fs.sponsor_id = $1 AND fs.is_active = TRUE
+       LEFT JOIN forest_trees t ON t.forest_id = f.id
+      WHERE f.is_active = TRUE GROUP BY f.id ORDER BY f.forest_name`,
+    [id],
+  );
+  const esc = (v: unknown) => `"${String(v ?? '').replace(/"/g, '""')}"`;
+  const head = 'forest,unique_id,city,state,trees,tagged,alive,survival_pct';
+  const lines = rows.rows.map((r) => {
+    const total = Number(r.total_trees);
+    const alive = Number(r.alive_trees);
+    const surv = total > 0 ? Math.round((alive / total) * 1000) / 10 : 0;
+    return [r.forest_name, r.forest_unique_id, r.forest_city, r.forest_state, total, Number(r.tagged_trees), alive, surv]
+      .map(esc).join(',');
+  });
+  res.type('text/csv').send([head, ...lines].join('\n') + '\n');
+}
+
 publicRouter.get('/public/sponsors', wrap(sponsorsPublic));
+publicRouter.get('/public/sponsor/:id', wrap(sponsorMicrosite));
+publicRouter.get('/public/sponsor/:id/report.csv', wrap(sponsorReportCsv));
 publicRouter.get('/public/forests.geojson', wrap(forestsGeoJSON));
 publicRouter.get('/public/forest/:id/trees.geojson', wrap(forestTreesGeoJSON));
 publicRouter.get('/public/forests-map', wrap(forestsMap));

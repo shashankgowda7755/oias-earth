@@ -128,6 +128,34 @@ export interface Sponsor {
   website: string | null;
 }
 
+export interface SponsorForest {
+  id: string;
+  name: string | null;
+  unique_id: string | null;
+  city: string | null;
+  state: string | null;
+  lat: number | null;
+  lng: number | null;
+  total_trees: number;
+  tagged_trees: number;
+  alive_trees: number;
+  survival_pct: number | null;
+}
+export interface SponsorSite {
+  sponsor: { name: string | null; logo: string | null; website: string | null; industry: string | null; headquarters: string | null };
+  forests: SponsorForest[];
+  totals: {
+    forests: number; trees: number; alive: number; tagged: number;
+    survival_pct: number | null; gross_tco2e: number; net_tco2e: number;
+  };
+}
+export async function fetchSponsor(id: string): Promise<SponsorSite> {
+  const r = await fetch(`${BASE}/sponsor/${id}`);
+  if (!r.ok) throw new Error('Sponsor not found');
+  const j = (await r.json()) as { data: SponsorSite };
+  return j.data;
+}
+
 export async function fetchSponsors(): Promise<Sponsor[]> {
   const r = await fetch(`${BASE}/sponsors`);
   if (!r.ok) throw new Error('Failed to load sponsors');
