@@ -1469,6 +1469,72 @@ async function createPlanter(req: Request, res: Response): Promise<void> {
   }
 }
 
+/**
+ * GET /admin/planters — list field-worker (Planter) accounts + their assigned
+ * forests. SuperAdmin only.
+ */
+async function adminPlanters(req: Request, res: Response): Promise<void> {
+  if (req.auth?.role !== 'SuperAdmin') throw forbidden('SuperAdmin only');
+  const rows = await query<{ id: string; first_name: string | null; username: string | null; forests: string[] }>(
+    `SELECT up.id, up.first_name, up.username,
+            COALESCE(array_remove(array_agg(DISTINCT f.forest_name), NULL), '{}') AS forests
+       FROM user_profiles up
+       JOIN user_roles ur ON ur.profile_id = up.id AND ur.role_id = 4 AND ur.is_active = TRUE
+       LEFT JOIN user_role_forest_accesses a ON a.user_role_id = ur.id AND a.is_active = TRUE
+       LEFT JOIN forests f ON f.id = a.forest_id
+      WHERE up.is_active = TRUE
+      GROUP BY up.id, up.first_name, up.username
+      ORDER BY up.username`,
+  );
+  res.json({
+    data: rows.rows.map((r) => ({ id: r.id, name: r.first_name, username: r.username, forests: r.forests })),
+  });
+}
+
+/**
+ * POST /admin/planters — create a Planter account scoped to forests.
+ * Body: { username, password, first_name?, forest_ids: uuid[] }. SuperAdmin only.
+ */
+async function adminCreatePlanter(req: Request, res: Response): Promise<void> {
+  if (req.auth?.role !== 'SuperAdmin') throw forbidden('SuperAdmin only');
+  const b = (req.body ?? {}) as Record<string, unknown>;
+  const username = String(b.username ?? '').trim();
+  const password = String(b.password ?? '');
+  const name = String(b.first_name ?? b.name ?? '').trim() || null;
+  const forestIds = Array.isArray(b.forest_ids) ? (b.forest_ids as unknown[]).map(String) : [];
+  if (!username || password.length < 6) throw badRequest('username and a 6+ character password are required');
+  const dup = await query(`SELECT 1 FROM user_profiles WHERE username = $1`, [username]);
+  if (dup.rowCount) throw badRequest('username already taken');
+
+  const hash = await bcrypt.hash(password, 10);
+  const actor = req.auth?.profileId ?? null;
+  const client = await getClient();
+  try {
+    const p = await client.query<{ id: string }>(
+      `INSERT INTO user_profiles (first_name, username, password_hash, is_active, is_verified, created_by, updated_by)
+       VALUES ($1,$2,$3,TRUE,TRUE,$4,$4) RETURNING id`,
+      [name, username, hash, actor],
+    );
+    const pid = p.rows[0]!.id;
+    const ur = await client.query<{ id: string }>(
+      `INSERT INTO user_roles (profile_id, role_id, is_active, created_by, updated_by)
+       VALUES ($1,4,TRUE,$2,$2) RETURNING id`,
+      [pid, actor],
+    );
+    const urid = ur.rows[0]!.id;
+    for (const fid of forestIds) {
+      await client.query(
+        `INSERT INTO user_role_forest_accesses (user_role_id, forest_id, is_active, created_by, updated_by)
+         VALUES ($1,$2,TRUE,$3,$3)`,
+        [urid, fid, actor],
+      );
+    }
+    res.json({ data: { id: pid, username, forests: forestIds.length } });
+  } finally {
+    client.release();
+  }
+}
+
 /* ------------------------------------------------------------------ */
 /* Route registration                                                  */
 /* ------------------------------------------------------------------ */
@@ -1485,5 +1551,7 @@ forestRouter.post('/forest/:id/trees/:treeId/visit', upload.any(), wrap(logTreeV
 forestRouter.get('/my/forests', wrap(myForests));
 forestRouter.post('/forest/:id/boundary', wrap(setForestBoundary));
 forestRouter.get('/admin/integrity', wrap(adminIntegrity));
+forestRouter.get('/admin/planters', wrap(adminPlanters));
+forestRouter.post('/admin/planters', wrap(adminCreatePlanter));
 forestRouter.get('/admin/planters', wrap(listPlanters));
 forestRouter.post('/admin/planters', wrap(createPlanter));
