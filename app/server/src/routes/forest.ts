@@ -50,6 +50,7 @@ import {
   padTreeNumber,
   treeCertUrl,
 } from '../lib/geo';
+import { agbKg, CARBON_FRACTION, CO2_PER_C, ROOT_SHOOT, CARBON_METHOD } from '../lib/carbon';
 
 export const forestRouter = Router();
 
@@ -1236,8 +1237,44 @@ async function logTreeVisit(req: Request, res: Response): Promise<void> {
         treeId,
       ]
     );
+
+    // Carbon ledger: allometric CO2e stock for this visit + delta vs prior.
+    const wdRow = await client.query<{ wood_density: number | null }>(
+      `SELECT wood_density FROM master_plantspecies WHERE id = $1`,
+      [speciesId]
+    );
+    const wd =
+      wdRow.rows[0]?.wood_density != null ? Number(wdRow.rows[0].wood_density) : 0.6;
+    const priorRow = await client.query<{ co2e_kg: number | null }>(
+      `SELECT co2e_kg FROM forest_tree_carbon_ledger
+        WHERE tree_id = $1 ORDER BY measured_at DESC NULLS LAST, id DESC LIMIT 1`,
+      [treeId]
+    );
+    const prior = priorRow.rows[0]?.co2e_kg != null ? Number(priorRow.rows[0].co2e_kg) : 0;
+    const dead = statusId === 4;
+    const agb = !dead && height != null && diameter != null ? agbKg(wd, diameter, height) : 0;
+    const bgb = ROOT_SHOOT * agb;
+    const carbon = (agb + bgb) * CARBON_FRACTION;
+    const co2e = dead ? prior : agb > 0 ? carbon * CO2_PER_C : prior;
+    const vintage = Number(String(date).slice(0, 4)) || null;
+    await client.query(
+      `INSERT INTO forest_tree_carbon_ledger
+         (tree_id, timeline_id, forest_id, species_id, measured_at, dbh_cm, height_m,
+          status_id, wood_density, agb_kg, bgb_kg, carbon_kg, co2e_kg, co2e_delta_kg,
+          vintage_year, method_version, dbh_unverified)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,TRUE)
+       ON CONFLICT (timeline_id) DO NOTHING`,
+      [
+        treeId, tlId, forestId, speciesId, date, diameter, height, statusId, wd,
+        agb, bgb, carbon, co2e, co2e - prior, vintage, CARBON_METHOD,
+      ]
+    );
+
     res.json({
-      data: { id: tlId, timeline_date: date, status_id: statusId, height, diameter, age, photos },
+      data: {
+        id: tlId, timeline_date: date, status_id: statusId, height, diameter, age, photos,
+        co2e_kg: Math.round(co2e * 1000) / 1000,
+      },
     });
   } finally {
     client.release();

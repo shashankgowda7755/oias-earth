@@ -38,6 +38,25 @@ export interface TreeVisit {
   lat: number | null;
   lng: number | null;
   photos: string[];
+  co2e_kg?: number;
+  co2e_delta_kg?: number;
+}
+
+export interface CarbonSummary {
+  measured_trees: number;
+  gross_tco2e: number;
+  net_tco2e: number;
+  buffer_pct: number;
+  uncertainty_pct: number;
+  method: string;
+  label: string;
+}
+
+export async function fetchCarbonSummary(): Promise<CarbonSummary> {
+  const r = await fetch(`${BASE}/carbon`);
+  if (!r.ok) throw new Error('Failed to load carbon summary');
+  const j = (await r.json()) as { data: CarbonSummary };
+  return j.data;
 }
 
 export interface TreeProof {
@@ -62,6 +81,10 @@ export interface TreeProof {
     latest_height: number | null;
     growth_cm: number | null;
     last_seen: string | null;
+    co2e_kg?: number;
+    co2e_net_kg?: number;
+    carbon_method?: string;
+    carbon_label?: string;
   };
   visits: TreeVisit[];
 }

@@ -17,6 +17,7 @@ import PublicMap from './pages/PublicMap';
 import Landing from './pages/Landing';
 import TreeProof from './pages/TreeProof';
 import Field from './pages/Field';
+import Carbon from './pages/Carbon';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -42,6 +43,7 @@ export default function App() {
               <Route path="/map" element={<PublicMap />} />
               <Route path="/tree/:id" element={<TreeProof />} />
               <Route path="/field" element={<Field />} />
+              <Route path="/carbon" element={<Carbon />} />
               <Route
                 path="/dashboard"
                 element={

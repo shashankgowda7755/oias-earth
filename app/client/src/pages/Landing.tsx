@@ -105,6 +105,7 @@ export default function Landing() {
         <div style={{ display: 'flex', alignItems: 'center', gap: 'clamp(14px,2.5vw,30px)', fontSize: 14 }}>
           <a href="#proof" style={{ color: 'var(--surface)', textDecoration: 'none', opacity: .85 }}>The proof</a>
           <Link to="/map" style={{ color: 'var(--surface)', textDecoration: 'none', opacity: .85 }}>Live map</Link>
+          <Link to="/carbon" style={{ color: 'var(--surface)', textDecoration: 'none', opacity: .85 }}>Carbon</Link>
           <a href="#business" style={{ color: 'var(--surface)', textDecoration: 'none', opacity: .85 }}>For business</a>
           <Link to="/login" style={{ color: 'var(--ink)', background: 'var(--alive)', textDecoration: 'none', padding: '8px 16px', borderRadius: 999, fontWeight: 600 }}>Sign in</Link>
         </div>

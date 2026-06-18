@@ -13,6 +13,7 @@
 import { Router, type Request, type Response } from 'express';
 import { query } from '../db';
 import { notFound } from '../errors';
+import { treeCo2eKg, netCo2eKg, CARBON_METHOD, BUFFER_PCT, UNCERTAINTY_PCT } from '../lib/carbon';
 
 export const publicRouter = Router();
 
@@ -151,6 +152,7 @@ async function treeProof(req: Request, res: Response): Promise<void> {
     lat: string | null;
     lng: string | null;
     status: string | null;
+    wood_density: number | null;
   }>(
     `SELECT ft.id, ft.tree_unique_id,
             COALESCE(sp.common_name, sp.species_name) AS species,
@@ -159,7 +161,7 @@ async function treeProof(req: Request, res: Response): Promise<void> {
             f.forest_city AS city, f.forest_state AS state,
             ft.planted_on,
             ft.forest_tree_geo_lat AS lat, ft.forest_tree_geo_long AS lng,
-            st.status
+            st.status, sp.wood_density
        FROM forest_trees ft
        LEFT JOIN forests f ON f.id = ft.forest_id
        LEFT JOIN master_plantspecies sp ON sp.id = ft.master_plant_species_id
@@ -199,18 +201,35 @@ async function treeProof(req: Request, res: Response): Promise<void> {
     [treeId],
   );
 
-  const visits = v.rows.map((r) => ({
-    id: r.id,
-    date: r.timeline_date,
-    status: r.status,
-    status_id: r.status_id,
-    height: r.height != null ? Number(r.height) : null,
-    diameter: r.diameter != null ? Number(r.diameter) : null,
-    age: r.age != null ? Number(r.age) : null,
-    lat: r.latitude ? Number(r.latitude) : null,
-    lng: r.longitude ? Number(r.longitude) : null,
-    photos: Array.isArray(r.photos) ? r.photos : [],
-  }));
+  const wd = tree.wood_density != null ? Number(tree.wood_density) : 0.6;
+  let prevStock = 0;
+  const visits = v.rows.map((r) => {
+    const height = r.height != null ? Number(r.height) : null;
+    const diameter = r.diameter != null ? Number(r.diameter) : null;
+    const dead = r.status_id === 4;
+    // Dead trees freeze stock at the last living value (no further sequestration).
+    const stockKg = dead
+      ? prevStock
+      : height != null && diameter != null
+        ? treeCo2eKg(wd, diameter, height)
+        : prevStock;
+    const deltaKg = Math.round((stockKg - prevStock) * 1000) / 1000;
+    prevStock = stockKg;
+    return {
+      id: r.id,
+      date: r.timeline_date,
+      status: r.status,
+      status_id: r.status_id,
+      height,
+      diameter,
+      age: r.age != null ? Number(r.age) : null,
+      lat: r.latitude ? Number(r.latitude) : null,
+      lng: r.longitude ? Number(r.longitude) : null,
+      photos: Array.isArray(r.photos) ? r.photos : [],
+      co2e_kg: Math.round(stockKg * 1000) / 1000,
+      co2e_delta_kg: deltaKg,
+    };
+  });
 
   const latest = visits[visits.length - 1];
   const first = visits[0];
@@ -222,6 +241,7 @@ async function treeProof(req: Request, res: Response): Promise<void> {
     first?.height != null && latest?.height != null
       ? Math.round((latest.height - first.height) * 100)
       : null;
+  const stockKg = latest?.co2e_kg ?? 0;
 
   res.json({
     data: {
@@ -246,8 +266,61 @@ async function treeProof(req: Request, res: Response): Promise<void> {
         latest_height: latest?.height ?? null,
         growth_cm: growthCm,
         last_seen: latest?.date ?? null,
+        // Carbon: estimated, verification-ready removal — NOT an issued credit.
+        co2e_kg: Math.round(stockKg * 1000) / 1000,
+        co2e_net_kg: Math.round(netCo2eKg(stockKg) * 1000) / 1000,
+        carbon_method: CARBON_METHOD,
+        carbon_label: 'estimated / verification-ready removal',
       },
       visits,
+    },
+  });
+}
+
+/**
+ * GET /public/carbon — platform-wide carbon summary: total verification-ready
+ * removals across all geo-tagged, surviving trees (gross + net of buffer +
+ * uncertainty), computed from the latest measured visit per tree via allometry.
+ * These are ESTIMATES, not issued credits.
+ */
+async function carbonSummary(_req: Request, res: Response): Promise<void> {
+  // Latest visit per tree with measured dbh/height, joined to species wood density.
+  const rows = await query<{
+    height: number | null;
+    diameter: number | null;
+    status_id: number | null;
+    wood_density: number | null;
+  }>(
+    `SELECT DISTINCT ON (tl.plant_id)
+            tl.height, tl.diameter, tl.status_id, sp.wood_density
+       FROM forest_plant_timelines tl
+       JOIN forest_trees ft ON ft.id = tl.plant_id AND ft.is_active = TRUE
+       LEFT JOIN master_plantspecies sp ON sp.id = ft.master_plant_species_id
+      WHERE tl.is_active = TRUE
+      ORDER BY tl.plant_id, tl.timeline_date DESC NULLS LAST, tl.id DESC`,
+  );
+
+  let grossKg = 0;
+  let measured = 0;
+  for (const r of rows.rows) {
+    if (r.status_id === 4) continue; // dead: excluded from live stock
+    const h = r.height != null ? Number(r.height) : null;
+    const d = r.diameter != null ? Number(r.diameter) : null;
+    const wd = r.wood_density != null ? Number(r.wood_density) : 0.6;
+    if (h != null && d != null) {
+      grossKg += treeCo2eKg(wd, d, h);
+      measured += 1;
+    }
+  }
+  res.json({
+    data: {
+      measured_trees: measured,
+      gross_tco2e: Math.round((grossKg / 1000) * 1000) / 1000,
+      net_tco2e: Math.round((netCo2eKg(grossKg) / 1000) * 1000) / 1000,
+      buffer_pct: BUFFER_PCT,
+      uncertainty_pct: UNCERTAINTY_PCT,
+      method: CARBON_METHOD,
+      label: 'estimated / verification-ready removals — not issued credits',
     },
   });
 }
@@ -280,3 +353,4 @@ publicRouter.get('/public/sponsors', wrap(sponsorsPublic));
 publicRouter.get('/public/forests-map', wrap(forestsMap));
 publicRouter.get('/public/forest/:id/trees', wrap(forestTreesPublic));
 publicRouter.get('/public/tree/:id', wrap(treeProof));
+publicRouter.get('/public/carbon', wrap(carbonSummary));

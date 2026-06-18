@@ -100,7 +100,7 @@ export default function TreeProof() {
         {[
           { v: String(summary.visit_count), l: 'verified visits' },
           { v: summary.latest_height != null ? `${summary.latest_height} m` : '—', l: 'current height' },
-          { v: summary.growth_cm != null ? `+${summary.growth_cm} cm` : '—', l: 'growth tracked' },
+          { v: summary.co2e_kg != null ? `${summary.co2e_kg} kg` : '—', l: 'CO₂e captured · est.' },
           { v: fmtDate(summary.last_seen), l: 'last seen' },
         ].map((s) => (
           <div key={s.l} style={{ background: 'var(--ink-2)', border: '1px solid var(--line)', borderRadius: 12, padding: '16px 18px' }}>
@@ -139,10 +139,22 @@ export default function TreeProof() {
               <div className="mono" style={{ fontSize: 12, color: '#9fb0ad', marginTop: 6 }}>
                 {v.height != null ? `${v.height} m` : '—'}{v.diameter != null ? ` · ⌀ ${v.diameter} cm` : ''}
               </div>
+              {v.co2e_kg != null && v.co2e_kg > 0 && (
+                <div className="mono" style={{ fontSize: 12, color: 'var(--alive)', marginTop: 4 }}>
+                  {v.co2e_kg} kg CO₂e{v.co2e_delta_kg != null && v.co2e_delta_kg > 0 ? ` (+${v.co2e_delta_kg})` : ''}
+                </div>
+              )}
             </div>
           </div>
         ))}
       </div>
+
+      {/* Carbon disclaimer */}
+      {summary.co2e_kg != null && summary.co2e_kg > 0 && (
+        <p className="mono" style={{ fontSize: 11.5, color: '#9fb0ad', marginTop: 16, lineHeight: 1.6, maxWidth: '70ch' }}>
+          CO₂e is an <span style={{ color: 'var(--alive)' }}>estimated, verification-ready removal</span> computed from measured diameter + height (Chave 2014 allometry · IPCC factors). Net of buffer + uncertainty ≈ {summary.co2e_net_kg} kg. It is <strong>not</strong> an issued carbon credit until a registry verifies it.
+        </p>
+      )}
 
       {/* Where */}
       {pin.length > 0 && (

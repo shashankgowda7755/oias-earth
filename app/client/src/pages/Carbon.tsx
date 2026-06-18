@@ -1,0 +1,84 @@
+/**
+ * Carbon (/carbon) — public methodology + platform-wide "verification-ready
+ * removals" total. The transparency surface that makes the carbon number
+ * credible (and is the B->A rating lever). Everything is labelled as an
+ * estimate, never an issued credit, until a registry verifies.
+ */
+import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { fetchCarbonSummary, type CarbonSummary } from '@/lib/publicApi';
+import '@/styles/earth.css';
+
+const STEPS = [
+  { k: '01', t: 'Measure', d: 'Each monthly visit records diameter (DBH) + height + photo + GPS for the tree.' },
+  { k: '02', t: 'Biomass', d: 'Measured DBH/height + species wood density → allometric equation (Chave 2014) → above-ground biomass.' },
+  { k: '03', t: 'Carbon', d: '+ roots (24%) → ×0.47 carbon fraction → ×3.667 → kg CO₂e held by the tree (its stock).' },
+  { k: '04', t: 'Sequestration', d: 'The change in stock between visits is the CO₂e removed that year. A dead tree freezes its stock.' },
+  { k: '05', t: 'Aggregate', d: 'Sum every tree across all forests by vintage year into a credit-ready batch.' },
+  { k: '06', t: 'Discount', d: 'Subtract a permanence buffer + an allometric-uncertainty deduction → net removals.' },
+  { k: '07', t: 'Verify & issue', d: 'A registry-approved auditor checks the ledger + photos; the registry issues serial-numbered credits. Only then is it a “credit”.' },
+];
+
+export default function Carbon() {
+  const [s, setS] = useState<CarbonSummary | null>(null);
+  useEffect(() => {
+    fetchCarbonSummary().then(setS).catch(() => undefined);
+  }, []);
+
+  return (
+    <div className="earth" style={{ background: 'var(--ink)', color: 'var(--surface)', minHeight: '100vh' }}>
+      <nav style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '18px clamp(20px,5vw,48px)', borderBottom: '1px solid var(--line)' }}>
+        <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: 10, color: 'var(--surface)', textDecoration: 'none', fontWeight: 700 }}>
+          <span style={{ width: 16, height: 16, borderRadius: '50%', background: 'var(--alive)', boxShadow: '0 0 12px rgba(182,255,60,.7)' }} /> Be The Tree Hugger
+        </Link>
+        <Link to="/map" style={{ color: 'var(--alive)', textDecoration: 'none', fontSize: 14 }}>Live map →</Link>
+      </nav>
+
+      <div style={{ maxWidth: 1000, margin: '0 auto', padding: 'clamp(28px,5vw,56px) clamp(20px,5vw,48px)' }}>
+        <div className="mono" style={{ color: 'var(--alive)', fontSize: 12, letterSpacing: '.2em', textTransform: 'uppercase', marginBottom: 14 }}>Carbon · methodology</div>
+        <h1 className="serif" style={{ fontWeight: 600, fontSize: 'clamp(30px,5vw,52px)', lineHeight: 1.05, margin: 0, maxWidth: '20ch' }}>
+          Every tonne, traceable to a tree.
+        </h1>
+        <p style={{ color: '#aebcb9', marginTop: 16, fontSize: 17, maxWidth: '62ch', lineHeight: 1.6 }}>
+          We compute carbon from <em>measured growth</em> on each tree — not a flat estimate — using the same allometric science registries require. Below is the live total and exactly how it is calculated.
+        </p>
+
+        {/* Live totals */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(180px,1fr))', gap: 16, marginTop: 32 }}>
+          <div style={{ background: 'var(--ink-2)', border: '1px solid var(--line)', borderRadius: 14, padding: '20px 22px' }}>
+            <div className="mono" style={{ fontSize: 30, color: 'var(--alive)' }}>{s ? s.gross_tco2e.toLocaleString() : '…'}</div>
+            <div style={{ fontSize: 12, color: '#9fb0ad', textTransform: 'uppercase', letterSpacing: '.08em', marginTop: 6 }}>tCO₂e gross (estimated)</div>
+          </div>
+          <div style={{ background: 'var(--ink-2)', border: '1px solid var(--line)', borderRadius: 14, padding: '20px 22px' }}>
+            <div className="mono" style={{ fontSize: 30, color: 'var(--alive)' }}>{s ? s.net_tco2e.toLocaleString() : '…'}</div>
+            <div style={{ fontSize: 12, color: '#9fb0ad', textTransform: 'uppercase', letterSpacing: '.08em', marginTop: 6 }}>tCO₂e net of buffer + uncertainty</div>
+          </div>
+          <div style={{ background: 'var(--ink-2)', border: '1px solid var(--line)', borderRadius: 14, padding: '20px 22px' }}>
+            <div className="mono" style={{ fontSize: 30, color: 'var(--alive)' }}>{s ? s.measured_trees.toLocaleString() : '…'}</div>
+            <div style={{ fontSize: 12, color: '#9fb0ad', textTransform: 'uppercase', letterSpacing: '.08em', marginTop: 6 }}>measured trees</div>
+          </div>
+        </div>
+
+        <div className="mono" style={{ marginTop: 14, padding: '12px 16px', borderRadius: 10, background: 'rgba(232,163,61,.1)', border: '1px solid rgba(232,163,61,.35)', color: '#e8c89a', fontSize: 12.5, lineHeight: 1.6 }}>
+          These are <strong>estimated, verification-ready removals</strong> — not issued carbon credits. A credit exists only after a registry-approved auditor verifies and the registry issues it{ s ? ` (buffer ${Math.round(s.buffer_pct * 100)}% · uncertainty ${Math.round(s.uncertainty_pct * 100)}% · method ${s.method})` : '' }.
+        </div>
+
+        {/* Method steps */}
+        <h2 className="serif" style={{ fontWeight: 600, fontSize: 26, margin: '44px 0 18px' }}>How a tree becomes a credit</h2>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(230px,1fr))', gap: 18 }}>
+          {STEPS.map((x) => (
+            <div key={x.k} style={{ borderTop: '2px solid var(--alive)', paddingTop: 16 }}>
+              <div className="mono" style={{ color: 'var(--alive)', fontSize: 13, marginBottom: 8 }}>{x.k}</div>
+              <h3 className="serif" style={{ fontWeight: 600, fontSize: 20, margin: '0 0 6px' }}>{x.t}</h3>
+              <p style={{ fontSize: 14, color: '#aebcb9', lineHeight: 1.6, margin: 0 }}>{x.d}</p>
+            </div>
+          ))}
+        </div>
+
+        <p style={{ marginTop: 40, fontSize: 14, color: '#9fb0ad' }}>
+          Target standards: Plan Vivo (launch) → Verra VM0047 census-based (scale). Per-tree dMRV — monthly photo, GPS, survival — is what makes the aggregate auditable and premium-rated.
+        </p>
+      </div>
+    </div>
+  );
+}
