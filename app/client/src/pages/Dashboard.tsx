@@ -17,6 +17,7 @@ import Forests from './Forests';
 import Reports from './Reports';
 import Jobs from './Jobs';
 import Integrity from './Integrity';
+import Planters from './Planters';
 
 const SECTION_COMPONENTS: Record<SectionTab, ComponentType> = {
   Users,
@@ -26,6 +27,7 @@ const SECTION_COMPONENTS: Record<SectionTab, ComponentType> = {
   Reports,
   Jobs,
   Integrity,
+  Planters,
 };
 
 export default function Dashboard() {
