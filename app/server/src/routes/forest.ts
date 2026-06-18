@@ -1358,6 +1358,43 @@ async function setForestBoundary(req: Request, res: Response): Promise<void> {
   res.json({ data: { boundary: clean, points: clean.length } });
 }
 
+/**
+ * GET /admin/integrity — SuperAdmin review queue: visits flagged for GPS-far-
+ * from-forest (geo_suspect) or a reused/duplicate photo. Surfaces the
+ * capture-integrity layer so a human can review suspect captures.
+ */
+async function adminIntegrity(req: Request, res: Response): Promise<void> {
+  if (req.auth?.role !== 'SuperAdmin') throw forbidden('SuperAdmin only');
+  const rows = await query<Record<string, unknown>>(
+    `SELECT tl.id, tl.timeline_date, tl.geo_suspect, tl.geo_distance_m,
+            ft.id AS tree_id, ft.tree_unique_id, f.id AS forest_id, f.forest_name,
+            (SELECT bool_or(a.is_duplicate) FROM forest_plant_timeline_assets a
+              WHERE a.timeline_id = tl.id AND a.is_active = TRUE) AS dup
+       FROM forest_plant_timelines tl
+       JOIN forest_trees ft ON ft.id = tl.plant_id
+       JOIN forests f ON f.id = ft.forest_id
+      WHERE tl.is_active = TRUE
+        AND ( tl.geo_suspect = TRUE
+              OR EXISTS (SELECT 1 FROM forest_plant_timeline_assets a
+                          WHERE a.timeline_id = tl.id AND a.is_duplicate = TRUE) )
+      ORDER BY tl.timeline_date DESC NULLS LAST, tl.id DESC
+      LIMIT 200`,
+  );
+  res.json({
+    data: rows.rows.map((r) => ({
+      timeline_id: r.id,
+      date: r.timeline_date,
+      geo_suspect: Boolean(r.geo_suspect),
+      geo_distance_m: r.geo_distance_m != null ? Math.round(Number(r.geo_distance_m)) : null,
+      photo_duplicate: Boolean(r.dup),
+      tree_id: r.tree_id,
+      tree_unique_id: r.tree_unique_id,
+      forest_id: r.forest_id,
+      forest_name: r.forest_name,
+    })),
+  });
+}
+
 /* ------------------------------------------------------------------ */
 /* Route registration                                                  */
 /* ------------------------------------------------------------------ */
@@ -1373,3 +1410,4 @@ forestRouter.post('/forest/:id/trees/geo', wrap(tagTreeGeo));
 forestRouter.post('/forest/:id/trees/:treeId/visit', upload.any(), wrap(logTreeVisit));
 forestRouter.get('/my/forests', wrap(myForests));
 forestRouter.post('/forest/:id/boundary', wrap(setForestBoundary));
+forestRouter.get('/admin/integrity', wrap(adminIntegrity));

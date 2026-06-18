@@ -16,6 +16,7 @@ export const SECTION_TABS = [
   'Forests',
   'Reports',
   'Jobs',
+  'Integrity',
 ] as const;
 
 export type SectionTab = (typeof SECTION_TABS)[number];
