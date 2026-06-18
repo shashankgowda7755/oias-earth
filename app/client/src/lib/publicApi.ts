@@ -40,6 +40,8 @@ export interface TreeVisit {
   photos: string[];
   co2e_kg?: number;
   co2e_delta_kg?: number;
+  geo_suspect?: boolean;
+  photo_duplicate?: boolean;
 }
 
 export interface CarbonSummary {
@@ -85,6 +87,11 @@ export interface TreeProof {
     co2e_net_kg?: number;
     carbon_method?: string;
     carbon_label?: string;
+    verification?: {
+      photos_unique: boolean;
+      gps_consistent: boolean;
+      monitored: boolean;
+    };
   };
   visits: TreeVisit[];
 }

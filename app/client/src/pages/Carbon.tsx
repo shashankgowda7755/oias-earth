@@ -78,6 +78,17 @@ export default function Carbon() {
         <p style={{ marginTop: 40, fontSize: 14, color: '#9fb0ad' }}>
           Target standards: Plan Vivo (launch) → Verra VM0047 census-based (scale). Per-tree dMRV — monthly photo, GPS, survival — is what makes the aggregate auditable and premium-rated.
         </p>
+
+        <div style={{ marginTop: 24, paddingTop: 20, borderTop: '1px solid var(--line)' }}>
+          <div className="mono" style={{ fontSize: 12, letterSpacing: '.2em', textTransform: 'uppercase', color: '#9fb0ad', marginBottom: 10 }}>Open data</div>
+          <p style={{ fontSize: 14, color: '#aebcb9', marginBottom: 12, maxWidth: '60ch' }}>
+            Every forest is exportable as standards-compliant GeoJSON (RFC 7946, WGS84, 6-decimal — EUDR-grade), so any GIS, registry or auditor can verify it independently.
+          </p>
+          <a href="/api/v1/public/forests.geojson" target="_blank" rel="noreferrer"
+             style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'var(--alive)', color: '#16282e', textDecoration: 'none', padding: '10px 18px', borderRadius: 999, fontWeight: 700, fontSize: 14 }}>
+            Download forests.geojson ↓
+          </a>
+        </div>
       </div>
     </div>
   );

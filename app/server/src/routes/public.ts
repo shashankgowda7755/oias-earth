@@ -184,16 +184,22 @@ async function treeProof(req: Request, res: Response): Promise<void> {
     latitude: string | null;
     longitude: string | null;
     photos: string[] | null;
+    geo_suspect: boolean | null;
+    has_dup_photo: boolean | null;
   }>(
     `SELECT tl.id, tl.timeline_date, st.status, tl.status_id,
             tl.height, tl.diameter, tl.age, tl.latitude, tl.longitude,
+            tl.geo_suspect,
             COALESCE(
               (SELECT json_agg(a.url ORDER BY a."order")
                  FROM forest_plant_timeline_assets a
                 WHERE a.timeline_id = tl.id AND a.is_active = TRUE
                   AND a.url IS NOT NULL),
               '[]'::json
-            ) AS photos
+            ) AS photos,
+            (SELECT bool_or(a.is_duplicate)
+               FROM forest_plant_timeline_assets a
+              WHERE a.timeline_id = tl.id AND a.is_active = TRUE) AS has_dup_photo
        FROM forest_plant_timelines tl
        LEFT JOIN tree_status_master st ON st.id = tl.status_id
       WHERE tl.plant_id = $1 AND tl.is_active = TRUE
@@ -228,6 +234,8 @@ async function treeProof(req: Request, res: Response): Promise<void> {
       photos: Array.isArray(r.photos) ? r.photos : [],
       co2e_kg: Math.round(stockKg * 1000) / 1000,
       co2e_delta_kg: deltaKg,
+      geo_suspect: Boolean(r.geo_suspect),
+      photo_duplicate: Boolean(r.has_dup_photo),
     };
   });
 
@@ -271,6 +279,12 @@ async function treeProof(req: Request, res: Response): Promise<void> {
         co2e_net_kg: Math.round(netCo2eKg(stockKg) * 1000) / 1000,
         carbon_method: CARBON_METHOD,
         carbon_label: 'estimated / verification-ready removal',
+        // Integrity / trust signals.
+        verification: {
+          photos_unique: !visits.some((x) => x.photo_duplicate),
+          gps_consistent: !visits.some((x) => x.geo_suspect),
+          monitored: visits.length >= 2,
+        },
       },
       visits,
     },

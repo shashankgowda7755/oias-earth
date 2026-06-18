@@ -110,6 +110,30 @@ export default function TreeProof() {
         ))}
       </div>
 
+      {/* Verification / trust signals */}
+      {summary.verification && (
+        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginTop: 16 }}>
+          {[
+            { ok: summary.verification.photos_unique, t: 'Photos verified unique' },
+            { ok: summary.verification.gps_consistent, t: 'GPS within forest' },
+            { ok: summary.verification.monitored, t: 'Monitored over time' },
+          ].map((b) => (
+            <span
+              key={b.t}
+              style={{
+                display: 'inline-flex', alignItems: 'center', gap: 7, fontSize: 12.5,
+                padding: '6px 12px', borderRadius: 999,
+                border: `1px solid ${b.ok ? 'rgba(182,255,60,.4)' : 'rgba(232,163,61,.5)'}`,
+                color: b.ok ? 'var(--alive)' : 'var(--amber)',
+                background: b.ok ? 'rgba(182,255,60,.06)' : 'rgba(232,163,61,.08)',
+              }}
+            >
+              <span style={{ fontWeight: 700 }}>{b.ok ? '✓' : '!'}</span> {b.t}
+            </span>
+          ))}
+        </div>
+      )}
+
       {/* Growth chart */}
       {visits.filter((v) => v.height != null).length >= 2 && (
         <div style={{ marginTop: 34 }}>
