@@ -349,7 +349,90 @@ async function sponsorsPublic(_req: Request, res: Response): Promise<void> {
   });
 }
 
+/** 6-decimal WGS84 (EUDR-grade precision). */
+function r6(v: string | number | null): number | null {
+  if (v == null || v === '') return null;
+  const n = Number(v);
+  return Number.isFinite(n) ? Math.round(n * 1e6) / 1e6 : null;
+}
+
+/**
+ * GET /public/forests.geojson — RFC 7946 FeatureCollection (WGS84, lon/lat,
+ * 6-decimal). Open, standards-based export so any GIS / registry / EUDR tool
+ * can ingest our forests. Addresses the "fragmented standards" landscape gap.
+ */
+async function forestsGeoJSON(_req: Request, res: Response): Promise<void> {
+  const rows = await query<Record<string, unknown>>(
+    `SELECT f.id, f.forest_name, f.forest_unique_id, f.forest_geo_lat, f.forest_geo_long,
+            f.forest_city, f.forest_state, f.forest_country,
+            COUNT(t.id) FILTER (WHERE t.is_active = TRUE) AS total_trees,
+            COUNT(t.id) FILTER (WHERE t.is_active = TRUE AND t.forest_tree_geo_lat IS NOT NULL) AS tagged_trees
+       FROM forests f
+       LEFT JOIN forest_trees t ON t.forest_id = f.id
+      WHERE f.is_active = TRUE AND f.forest_geo_lat IS NOT NULL AND f.forest_geo_long IS NOT NULL
+      GROUP BY f.id ORDER BY f.forest_name`,
+  );
+  const fc = {
+    type: 'FeatureCollection',
+    features: rows.rows
+      .map((r) => {
+        const lng = r6(r.forest_geo_long as string);
+        const lat = r6(r.forest_geo_lat as string);
+        if (lng == null || lat == null) return null;
+        return {
+          type: 'Feature',
+          geometry: { type: 'Point', coordinates: [lng, lat] },
+          properties: {
+            id: r.id,
+            name: r.forest_name,
+            unique_id: r.forest_unique_id,
+            city: r.forest_city,
+            state: r.forest_state,
+            country: r.forest_country,
+            total_trees: Number(r.total_trees),
+            tagged_trees: Number(r.tagged_trees),
+          },
+        };
+      })
+      .filter(Boolean),
+  };
+  res.type('application/geo+json').json(fc);
+}
+
+/** GET /public/forest/:id/trees.geojson — geo-tagged trees of one forest. */
+async function forestTreesGeoJSON(req: Request, res: Response): Promise<void> {
+  const forestId = String(req.params.id);
+  const rows = await query<Record<string, unknown>>(
+    `SELECT ft.tree_unique_id, ft.forest_tree_geo_lat AS lat, ft.forest_tree_geo_long AS lng,
+            COALESCE(sp.common_name, sp.species_name) AS species, ft.planted_on
+       FROM forest_trees ft
+       LEFT JOIN master_plantspecies sp ON sp.id = ft.master_plant_species_id
+      WHERE ft.forest_id = $1 AND ft.is_active = TRUE AND ft.is_display = TRUE
+        AND ft.forest_tree_geo_lat IS NOT NULL AND ft.forest_tree_geo_long IS NOT NULL
+      LIMIT 10000`,
+    [forestId],
+  );
+  const fc = {
+    type: 'FeatureCollection',
+    features: rows.rows
+      .map((r) => {
+        const lng = r6(r.lng as string);
+        const lat = r6(r.lat as string);
+        if (lng == null || lat == null) return null;
+        return {
+          type: 'Feature',
+          geometry: { type: 'Point', coordinates: [lng, lat] },
+          properties: { tree_unique_id: r.tree_unique_id, species: r.species, planted_on: r.planted_on },
+        };
+      })
+      .filter(Boolean),
+  };
+  res.type('application/geo+json').json(fc);
+}
+
 publicRouter.get('/public/sponsors', wrap(sponsorsPublic));
+publicRouter.get('/public/forests.geojson', wrap(forestsGeoJSON));
+publicRouter.get('/public/forest/:id/trees.geojson', wrap(forestTreesGeoJSON));
 publicRouter.get('/public/forests-map', wrap(forestsMap));
 publicRouter.get('/public/forest/:id/trees', wrap(forestTreesPublic));
 publicRouter.get('/public/tree/:id', wrap(treeProof));

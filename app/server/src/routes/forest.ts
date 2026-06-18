@@ -39,6 +39,7 @@ import { Router, type Request, type Response, type NextFunction } from 'express'
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
+import crypto from 'crypto';
 import { query, getClient, type DbClient } from '../db';
 import { badRequest, forbidden, notFound } from '../errors';
 import { parsePageParams, countTotal } from './helpers';
@@ -1206,15 +1207,64 @@ async function logTreeVisit(req: Request, res: Response): Promise<void> {
     const tlId = ins.rows[0]!.id;
     let order = 0;
     const photos: string[] = [];
+    let anyDuplicate = false;
     for (const f of files) {
       const url = `/uploads/${f.filename}`;
       photos.push(url);
+      // Hash the photo: detect recycled/reused images (a known dMRV fraud).
+      let sha: string | null = null;
+      try {
+        sha = crypto
+          .createHash('sha256')
+          .update(fs.readFileSync(path.join(UPLOADS_DIR, f.filename)))
+          .digest('hex');
+      } catch {
+        sha = null;
+      }
+      let dup = false;
+      if (sha) {
+        const seen = await client.query(
+          `SELECT 1 FROM forest_plant_timeline_assets WHERE sha256 = $1 LIMIT 1`,
+          [sha]
+        );
+        dup = (seen.rowCount ?? 0) > 0;
+      }
+      if (dup) anyDuplicate = true;
       await client.query(
-        `INSERT INTO forest_plant_timeline_assets (timeline_id, type, url, "order", created_by, updated_by)
-         VALUES ($1, 'image', $2, $3, $4, $4)`,
-        [tlId, url, order++, actor]
+        `INSERT INTO forest_plant_timeline_assets
+           (timeline_id, type, url, "order", sha256, is_duplicate, created_by, updated_by)
+         VALUES ($1, 'image', $2, $3, $4, $5, $6, $6)`,
+        [tlId, url, order++, sha, dup, actor]
       );
     }
+
+    // GPS plausibility: flag a visit whose location is implausibly far from its
+    // forest centre (likely spoofed or mis-captured).
+    if (lat != null && lng != null) {
+      const fc = await client.query<{ flat: string | null; flng: string | null }>(
+        `SELECT forest_geo_lat AS flat, forest_geo_long AS flng FROM forests WHERE id = $1`,
+        [forestId]
+      );
+      const flat = fc.rows[0]?.flat ? Number(fc.rows[0].flat) : null;
+      const flng = fc.rows[0]?.flng ? Number(fc.rows[0].flng) : null;
+      if (flat != null && flng != null) {
+        const R = 6371000;
+        const toRad = (x: number) => (x * Math.PI) / 180;
+        const dLat = toRad(Number(lat) - flat);
+        const dLng = toRad(Number(lng) - flng);
+        const a =
+          Math.sin(dLat / 2) ** 2 +
+          Math.cos(toRad(flat)) * Math.cos(toRad(Number(lat))) * Math.sin(dLng / 2) ** 2;
+        const distM = 2 * R * Math.asin(Math.min(1, Math.sqrt(a)));
+        const suspect = distM > 5000; // >5km from forest centre
+        await client.query(
+          `UPDATE forest_plant_timelines SET geo_suspect = $1, geo_distance_m = $2 WHERE id = $3`,
+          [suspect, Math.round(distM), tlId]
+        );
+      }
+    }
+    void anyDuplicate;
+
     // Reflect the latest visit on the tree's current row.
     await client.query(
       `UPDATE forest_trees SET
