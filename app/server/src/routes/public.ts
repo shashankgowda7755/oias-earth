@@ -608,7 +608,79 @@ async function sponsorReportCsv(req: Request, res: Response): Promise<void> {
   res.type('text/csv').send([head, ...lines].join('\n') + '\n');
 }
 
+/** Polygon area in hectares (equirectangular shoelace — fine at forest scale). */
+function areaHa(pts: { lat: number; lng: number }[]): number {
+  if (pts.length < 3) return 0;
+  const R = 6378137;
+  const rad = (x: number) => (x * Math.PI) / 180;
+  let a = 0;
+  for (let i = 0; i < pts.length; i++) {
+    const p = pts[i]!;
+    const q = pts[(i + 1) % pts.length]!;
+    const xi = R * rad(p.lng) * Math.cos(rad(p.lat));
+    const yi = R * rad(p.lat);
+    const xj = R * rad(q.lng) * Math.cos(rad(q.lat));
+    const yj = R * rad(q.lat);
+    a += xi * yj - xj * yi;
+  }
+  return Math.round((Math.abs(a / 2) / 10000) * 100) / 100;
+}
+
+/**
+ * GET /public/leaderboard — sponsors ranked by trees, with survival % — the
+ * public "survival index" (trust benchmark of the sector).
+ */
+async function leaderboard(_req: Request, res: Response): Promise<void> {
+  const rows = await query<Record<string, unknown>>(
+    `SELECT s.id, s.sponsor_name, s.sponsor_logo,
+            COUNT(DISTINCT f.id) AS forests,
+            COUNT(t.id) FILTER (WHERE t.is_active = TRUE) AS trees,
+            COUNT(t.id) FILTER (WHERE t.is_active = TRUE AND COALESCE(t.tree_status_id,1) <> 4) AS alive
+       FROM sponsors s
+       JOIN forest_sponsors fs ON fs.sponsor_id = s.id AND fs.is_active = TRUE
+       JOIN forests f ON f.id = fs.forest_id AND f.is_active = TRUE
+       LEFT JOIN forest_trees t ON t.forest_id = f.id
+      WHERE s.is_active = TRUE
+      GROUP BY s.id
+      ORDER BY trees DESC, s.sponsor_name`,
+  );
+  res.json({
+    data: rows.rows.map((r) => {
+      const trees = Number(r.trees);
+      const alive = Number(r.alive);
+      return {
+        id: r.id,
+        name: r.sponsor_name,
+        logo: r.sponsor_logo,
+        forests: Number(r.forests),
+        trees,
+        alive,
+        survival_pct: trees > 0 ? Math.round((alive / trees) * 1000) / 10 : null,
+      };
+    }),
+  });
+}
+
+/** GET /public/forest/:id/boundary — boundary polygon + area (ha) for map render. */
+async function forestBoundaryPublic(req: Request, res: Response): Promise<void> {
+  const id = String(req.params.id);
+  const r = await query<{ forest_boundary: unknown }>(
+    `SELECT forest_boundary FROM forests WHERE id = $1 AND is_active = TRUE LIMIT 1`,
+    [id],
+  );
+  let bd = r.rows[0]?.forest_boundary as unknown;
+  if (typeof bd === 'string') { try { bd = JSON.parse(bd); } catch { bd = null; } }
+  const pts = Array.isArray(bd)
+    ? (bd as Array<Record<string, unknown>>)
+        .map((p) => ({ lat: Number(p.lat), lng: Number(p.lng) }))
+        .filter((p) => Number.isFinite(p.lat) && Number.isFinite(p.lng))
+    : [];
+  res.json({ data: { boundary: pts, area_ha: pts.length >= 3 ? areaHa(pts) : null } });
+}
+
 publicRouter.get('/public/sponsors', wrap(sponsorsPublic));
+publicRouter.get('/public/leaderboard', wrap(leaderboard));
+publicRouter.get('/public/forest/:id/boundary', wrap(forestBoundaryPublic));
 publicRouter.get('/public/sponsor/:id', wrap(sponsorMicrosite));
 publicRouter.get('/public/sponsor/:id/report.csv', wrap(sponsorReportCsv));
 publicRouter.get('/public/forests.geojson', wrap(forestsGeoJSON));

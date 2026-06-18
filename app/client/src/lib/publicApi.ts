@@ -170,6 +170,31 @@ export async function fetchForestsMap(): Promise<ForestPin[]> {
   return j.data;
 }
 
+export interface LeaderRow {
+  id: string;
+  name: string | null;
+  logo: string | null;
+  forests: number;
+  trees: number;
+  alive: number;
+  survival_pct: number | null;
+}
+export async function fetchLeaderboard(): Promise<LeaderRow[]> {
+  const r = await fetch(`${BASE}/leaderboard`);
+  if (!r.ok) throw new Error('Failed');
+  const j = (await r.json()) as { data: LeaderRow[] };
+  return j.data;
+}
+
+export async function fetchForestBoundary(
+  id: string,
+): Promise<{ boundary: { lat: number; lng: number }[]; area_ha: number | null }> {
+  const r = await fetch(`${BASE}/forest/${id}/boundary`);
+  if (!r.ok) return { boundary: [], area_ha: null };
+  const j = (await r.json()) as { data: { boundary: { lat: number; lng: number }[]; area_ha: number | null } };
+  return j.data;
+}
+
 export async function fetchForestTrees(id: string): Promise<PublicTree[]> {
   const r = await fetch(`${BASE}/forest/${id}/trees`);
   if (!r.ok) throw new Error('Failed to load trees');

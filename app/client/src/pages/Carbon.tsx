@@ -6,7 +6,7 @@
  */
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { fetchCarbonSummary, type CarbonSummary } from '@/lib/publicApi';
+import { fetchCarbonSummary, fetchLeaderboard, type CarbonSummary, type LeaderRow } from '@/lib/publicApi';
 import '@/styles/earth.css';
 
 const STEPS = [
@@ -21,8 +21,10 @@ const STEPS = [
 
 export default function Carbon() {
   const [s, setS] = useState<CarbonSummary | null>(null);
+  const [board, setBoard] = useState<LeaderRow[]>([]);
   useEffect(() => {
     fetchCarbonSummary().then(setS).catch(() => undefined);
+    fetchLeaderboard().then(setBoard).catch(() => undefined);
   }, []);
 
   return (
@@ -92,6 +94,27 @@ export default function Carbon() {
             </div>
           ))}
         </div>
+
+        {board.length > 0 && (
+          <>
+            <h2 className="serif" style={{ fontWeight: 600, fontSize: 26, margin: '44px 0 16px' }}>Survival index</h2>
+            <p style={{ fontSize: 14, color: '#9fb0ad', margin: '0 0 16px', maxWidth: '60ch' }}>
+              Sponsors ranked by trees, with live survival % — including losses. The trust benchmark of the sector.
+            </p>
+            <div style={{ border: '1px solid var(--line)', borderRadius: 14, overflow: 'hidden' }}>
+              {board.map((r, i) => (
+                <Link key={r.id} to={`/sponsor/${r.id}`}
+                  style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '13px 16px', textDecoration: 'none', color: 'var(--surface)', background: i % 2 ? 'transparent' : 'rgba(255,255,255,.02)', borderBottom: i < board.length - 1 ? '1px solid var(--line)' : 'none' }}>
+                  <span className="mono" style={{ color: '#9fb0ad', width: 20 }}>{i + 1}</span>
+                  {r.logo && <img src={r.logo} alt="" style={{ width: 24, height: 24, borderRadius: 6, background: '#fff', objectFit: 'contain', padding: 2 }} />}
+                  <span style={{ flex: 1, fontWeight: 600, fontSize: 15 }}>{r.name}</span>
+                  <span className="mono" style={{ fontSize: 13, color: '#9fb0ad' }}>{r.trees.toLocaleString()} trees</span>
+                  <span className="mono" style={{ fontSize: 14, color: 'var(--alive)', width: 64, textAlign: 'right' }}>{r.survival_pct != null ? `${r.survival_pct}%` : '—'}</span>
+                </Link>
+              ))}
+            </div>
+          </>
+        )}
 
         <p style={{ marginTop: 40, fontSize: 14, color: '#9fb0ad' }}>
           Target standards: Plan Vivo (launch) → Verra VM0047 census-based (scale). Per-tree dMRV — monthly photo, GPS, survival — is what makes the aggregate auditable and premium-rated.

@@ -10,7 +10,7 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet.markercluster';
 import 'leaflet.markercluster/dist/MarkerCluster.css';
-import { fetchForestsMap, fetchForestTrees, type ForestPin } from '@/lib/publicApi';
+import { fetchForestsMap, fetchForestTrees, fetchForestBoundary, type ForestPin } from '@/lib/publicApi';
 import '@/styles/earth.css';
 
 function clusterIcon(cluster: L.MarkerCluster): L.DivIcon {
@@ -56,12 +56,14 @@ export default function PublicMap() {
   const mapRef = useRef<L.Map | null>(null);
   const forestLayer = useRef<L.MarkerClusterGroup | null>(null);
   const treeLayer = useRef<L.LayerGroup | null>(null);
+  const boundaryLayer = useRef<L.LayerGroup | null>(null);
 
   const [forests, setForests] = useState<ForestPin[]>([]);
   const [selected, setSelected] = useState<ForestPin | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [treeLoading, setTreeLoading] = useState(false);
+  const [areaHa, setAreaHa] = useState<number | null>(null);
 
   const totals = forests.reduce(
     (a, f) => ({ tagged: a.tagged + f.tagged_trees, total: a.total + f.total_trees }),
@@ -82,6 +84,7 @@ export default function PublicMap() {
       chunkedLoading: true,
     }).addTo(map);
     treeLayer.current = L.layerGroup().addTo(map);
+    boundaryLayer.current = L.layerGroup().addTo(map);
     mapRef.current = map;
     setTimeout(() => map.invalidateSize(), 60);
     return () => {
@@ -131,7 +134,20 @@ export default function PublicMap() {
     const layer = treeLayer.current;
     if (!map || !layer) return;
     layer.clearLayers();
+    boundaryLayer.current?.clearLayers();
+    setAreaHa(null);
     if (f.lat != null && f.lng != null) map.setView([f.lat, f.lng], 16);
+    // Boundary polygon (EUDR) + area.
+    fetchForestBoundary(f.id)
+      .then((b) => {
+        if (b.boundary.length >= 3 && boundaryLayer.current) {
+          L.polygon(b.boundary.map((p) => [p.lat, p.lng] as [number, number]), {
+            color: '#b6ff3c', weight: 2, fillColor: '#b6ff3c', fillOpacity: 0.08,
+          }).addTo(boundaryLayer.current);
+          setAreaHa(b.area_ha);
+        }
+      })
+      .catch(() => undefined);
     setTreeLoading(true);
     try {
       const trees = await fetchForestTrees(f.id);
@@ -159,6 +175,8 @@ export default function PublicMap() {
   function showAll() {
     setSelected(null);
     treeLayer.current?.clearLayers();
+    boundaryLayer.current?.clearLayers();
+    setAreaHa(null);
   }
 
   // Open NASA Worldview at the current view with the MODIS NDVI layer — an
@@ -235,6 +253,11 @@ export default function PublicMap() {
           {treeLoading && (
             <div className="mono" style={{ position: 'absolute', top: 12, left: 12, zIndex: 1000, background: 'var(--ink)', color: 'var(--alive)', padding: '6px 12px', borderRadius: 6, fontSize: 12, border: '1px solid var(--line)' }}>
               loading trees…
+            </div>
+          )}
+          {areaHa != null && (
+            <div className="mono" style={{ position: 'absolute', bottom: 24, left: 12, zIndex: 1000, background: 'var(--ink)', color: 'var(--alive)', padding: '6px 12px', borderRadius: 6, fontSize: 12, border: '1px solid var(--line)' }}>
+              boundary · {areaHa} ha
             </div>
           )}
         </div>
