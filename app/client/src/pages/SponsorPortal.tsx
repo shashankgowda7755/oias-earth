@@ -80,13 +80,14 @@ export default function SponsorPortal() {
     if (!trees) return null;
     const by = { 1: 0, 2: 0, 3: 0, 4: 0 } as Record<number, number>;
     const species = new Set<string>();
-    let grossKg = 0;
+    let grossKg = 0, o2Kg = 0;
     let hSum = 0, hN = 0;
     for (const t of trees) {
       const s = t.status_id ?? 1;
       by[s] = (by[s] ?? 0) + 1;
       if (t.species) species.add(t.species);
       if (s !== 4 && t.co2e_kg != null) grossKg += t.co2e_kg;
+      if (s !== 4 && t.oxygen_kg != null) o2Kg += t.oxygen_kg;
       if (t.height != null) { hSum += t.height; hN++; }
     }
     const alive = trees.length - (by[4] ?? 0);
@@ -100,6 +101,7 @@ export default function SponsorPortal() {
       avgHeight: hN ? Math.round((hSum / hN) * 10) / 10 : null,
       survival_pct: trees.length ? Math.round((alive / trees.length) * 1000) / 10 : null,
       net_tco2e: Math.round((NET(grossKg) / 1000) * 1000) / 1000,
+      oxygen_kg: Math.round(o2Kg),
     };
   }, [trees]);
 
@@ -164,6 +166,7 @@ export default function SponsorPortal() {
         { v: String(stats.species), l: 'species', c: 'var(--surface)' },
         { v: stats.survival_pct != null ? `${stats.survival_pct}%` : '—', l: 'survival', c: 'var(--alive)' },
         { v: stats.net_tco2e.toLocaleString(), l: 'tCO₂e (this forest, net est.)', c: 'var(--alive)' },
+        { v: stats.oxygen_kg >= 1000 ? `${(stats.oxygen_kg / 1000).toFixed(1)} t` : `${stats.oxygen_kg} kg`, l: 'O₂ generated (est.)', c: 'var(--alive)' },
       ]
     : [];
 
@@ -176,6 +179,9 @@ export default function SponsorPortal() {
           <h1 className="serif" style={{ fontWeight: 600, fontSize: 'clamp(24px,4vw,38px)', margin: 0, lineHeight: 1.05 }}>{sponsor.name}</h1>
           <p style={{ color: '#aebcb9', marginTop: 4, fontSize: 14 }}>{[sponsor.industry, sponsor.headquarters].filter(Boolean).join(' · ') || 'Sponsoring living proof'}</p>
         </div>
+        <Link to={`/report/sponsor/${id}`} style={{ marginLeft: 'auto', background: 'var(--alive)', color: '#16282e', textDecoration: 'none', padding: '10px 18px', borderRadius: 999, fontWeight: 700, fontSize: 14 }}>
+          ↓ CSR impact report (PDF)
+        </Link>
       </div>
 
       {/* Forest selector */}

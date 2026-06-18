@@ -13,7 +13,7 @@
 import { Router, type Request, type Response } from 'express';
 import { query } from '../db';
 import { notFound } from '../errors';
-import { treeCo2eKg, netCo2eKg, CARBON_METHOD, BUFFER_PCT, UNCERTAINTY_PCT } from '../lib/carbon';
+import { treeCo2eKg, netCo2eKg, oxygenKg, CARBON_METHOD, BUFFER_PCT, UNCERTAINTY_PCT } from '../lib/carbon';
 import { isAllowedPanoUrl } from '../lib/pano';
 
 export const publicRouter = Router();
@@ -165,6 +165,7 @@ async function forestTreesPublic(req: Request, res: Response): Promise<void> {
         status: t.status,
         survival: t.status_id === 4 ? 'dead' : 'alive',
         co2e_kg: co2e,
+        oxygen_kg: co2e != null ? Math.round(oxygenKg(co2e) * 10) / 10 : null,
         last_seen: t.last_seen,
       };
     }),
@@ -325,6 +326,7 @@ async function treeProof(req: Request, res: Response): Promise<void> {
         // Carbon: estimated, verification-ready removal — NOT an issued credit.
         co2e_kg: Math.round(stockKg * 1000) / 1000,
         co2e_net_kg: Math.round(netCo2eKg(stockKg) * 1000) / 1000,
+        oxygen_kg: Math.round(oxygenKg(stockKg) * 1000) / 1000,
         carbon_method: CARBON_METHOD,
         carbon_label: 'estimated / verification-ready removal',
         // Integrity / trust signals.
@@ -401,6 +403,7 @@ async function carbonSummary(_req: Request, res: Response): Promise<void> {
       measured_trees: measured,
       gross_tco2e: Math.round((grossKg / 1000) * 1000) / 1000,
       net_tco2e: Math.round((netCo2eKg(grossKg) / 1000) * 1000) / 1000,
+      oxygen_kg: Math.round(oxygenKg(grossKg)),
       buffer_pct: BUFFER_PCT,
       uncertainty_pct: UNCERTAINTY_PCT,
       method: CARBON_METHOD,
@@ -625,6 +628,7 @@ async function sponsorMicrosite(req: Request, res: Response): Promise<void> {
         survival_pct: totals.trees > 0 ? Math.round((totals.alive / totals.trees) * 1000) / 10 : null,
         gross_tco2e: Math.round((grossKg / 1000) * 1000) / 1000,
         net_tco2e: Math.round((netCo2eKg(grossKg) / 1000) * 1000) / 1000,
+        oxygen_kg: Math.round(oxygenKg(grossKg)),
       },
     },
   });

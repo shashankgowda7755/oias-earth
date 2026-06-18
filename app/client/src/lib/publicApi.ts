@@ -34,6 +34,7 @@ export interface PublicTree {
   status?: string | null;
   survival?: 'alive' | 'dead';
   co2e_kg?: number | null;
+  oxygen_kg?: number | null;
   last_seen?: string | null;
 }
 
@@ -58,6 +59,7 @@ export interface CarbonSummary {
   measured_trees: number;
   gross_tco2e: number;
   net_tco2e: number;
+  oxygen_kg?: number;
   buffer_pct: number;
   uncertainty_pct: number;
   method: string;
@@ -102,6 +104,7 @@ export interface TreeProof {
     last_seen: string | null;
     co2e_kg?: number;
     co2e_net_kg?: number;
+    oxygen_kg?: number;
     carbon_method?: string;
     carbon_label?: string;
     verification?: {
@@ -157,7 +160,7 @@ export interface SponsorSite {
   forests: SponsorForest[];
   totals: {
     forests: number; trees: number; alive: number; tagged: number;
-    survival_pct: number | null; gross_tco2e: number; net_tco2e: number;
+    survival_pct: number | null; gross_tco2e: number; net_tco2e: number; oxygen_kg?: number;
   };
 }
 export async function fetchSponsor(id: string): Promise<SponsorSite> {

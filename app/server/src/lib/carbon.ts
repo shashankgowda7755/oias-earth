@@ -37,3 +37,14 @@ export function treeCo2eKg(woodDensity: number, dbhCm: number, heightM: number):
 export function netCo2eKg(grossKg: number): number {
   return grossKg * (1 - BUFFER_PCT) * (1 - UNCERTAINTY_PCT);
 }
+
+/**
+ * Oxygen generated, derived from the SAME measured carbon (not the old linear
+ * per-day rate). Photosynthesis fixes 1 mol CO2 and releases 1 mol O2, so by
+ * mass O2 ≈ (32/44) * CO2e ≈ 0.727 kg O2 per kg CO2e sequestered. Tying O2 to
+ * the Chave carbon keeps the two numbers consistent + defensible.
+ */
+export const O2_PER_CO2 = 32 / 44; // ≈ 0.7273
+export function oxygenKg(co2eKg: number): number {
+  return co2eKg > 0 ? co2eKg * O2_PER_CO2 : 0;
+}

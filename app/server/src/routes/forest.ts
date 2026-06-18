@@ -1196,7 +1196,7 @@ async function logTreeVisit(req: Request, res: Response): Promise<void> {
   const lng = b.lng != null && b.lng !== '' ? String(b.lng) : null;
 
   const actor = req.auth?.profileId ?? null;
-  const files = (req.files as Array<{ filename: string }> | undefined) ?? [];
+  const files = (req.files as Array<{ filename: string; mimetype?: string }> | undefined) ?? [];
 
   const client = await getClient();
   try {
@@ -1212,18 +1212,29 @@ async function logTreeVisit(req: Request, res: Response): Promise<void> {
     const photos: string[] = [];
     let anyDuplicate = false;
     for (const f of files) {
-      const url = `/uploads/${f.filename}`;
-      photos.push(url);
-      // Hash the photo: detect recycled/reused images (a known dMRV fraud).
-      let sha: string | null = null;
+      // Read the just-written file once: hash it (recycled-photo fraud check) AND
+      // push it to object storage so it survives serverless cold starts. The
+      // local /uploads path is ephemeral on Vercel (the live photo-404 bug).
+      let buffer: Buffer | null = null;
       try {
-        sha = crypto
-          .createHash('sha256')
-          .update(fs.readFileSync(path.join(UPLOADS_DIR, f.filename)))
-          .digest('hex');
+        buffer = fs.readFileSync(path.join(UPLOADS_DIR, f.filename));
       } catch {
-        sha = null;
+        buffer = null;
       }
+      const sha: string | null = buffer ? crypto.createHash('sha256').update(buffer).digest('hex') : null;
+      let url = `/uploads/${f.filename}`; // fallback (ephemeral) if storage unset
+      if (buffer && process.env.BLOB_READ_WRITE_TOKEN) {
+        try {
+          const blob = await put(`tree-visits/${tlId}-${order}-${f.filename}`, buffer, {
+            access: 'public',
+            contentType: f.mimetype || 'image/jpeg',
+          });
+          url = blob.url;
+        } catch {
+          /* keep ephemeral fallback */
+        }
+      }
+      photos.push(url);
       let dup = false;
       if (sha) {
         const seen = await client.query(
