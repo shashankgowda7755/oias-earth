@@ -52,7 +52,12 @@
   70%  { transform: scale(4.2); opacity: 0; }
   100% { transform: scale(4.2); opacity: 0; }
 }
-.tree-pin .core { background: var(--alive); box-shadow: 0 0 8px rgba(182,255,60,.8); }
+.tree-pin .core { background: var(--alive); box-shadow: 0 0 8px rgba(182,255,60,.8); border: 1px solid rgba(255,255,255,.4); }
+/* Tree pin coloured by health status: 1 healthy, 2 drying, 3 damaged, 4 dead. */
+.tree-pin.s1 .core { background: var(--alive); box-shadow: 0 0 8px rgba(182,255,60,.85); }
+.tree-pin.s2 .core { background: var(--amber); box-shadow: 0 0 6px rgba(232,163,61,.7); }
+.tree-pin.s3 .core { background: #f0792b; box-shadow: 0 0 6px rgba(240,121,43,.7); }
+.tree-pin.s4 .core { background: var(--slate); box-shadow: none; opacity: .9; }
 
 /* Sponsor-logo forest pin — a glowing white medallion holding the corporate
    logo. Glow is a CONTAINED box-shadow pulse (no expanding ring) so dense pins
@@ -70,6 +75,17 @@
 @keyframes pinGlow {
   0%, 100% { box-shadow: 0 0 6px rgba(182,255,60,.45), 0 2px 6px rgba(0,0,0,.5); }
   50%      { box-shadow: 0 0 15px rgba(182,255,60,.85), 0 2px 6px rgba(0,0,0,.5); }
+}
+/* Forest pin ring tinted by forest survival %: warn (75-90%), risk (<75%). */
+.forest-logo-pin.warn .badge {
+  border-color: var(--amber);
+  box-shadow: 0 0 8px rgba(232,163,61,.6), 0 2px 6px rgba(0,0,0,.5);
+  animation: none;
+}
+.forest-logo-pin.risk .badge {
+  border-color: #f0792b;
+  box-shadow: 0 0 8px rgba(240,121,43,.65), 0 2px 6px rgba(0,0,0,.5);
+  animation: none;
 }
 
 /* Cluster bubble — nearby forests collapse into one count badge so the map

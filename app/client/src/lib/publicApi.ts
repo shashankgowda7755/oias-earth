@@ -15,6 +15,8 @@ export interface ForestPin {
   country: string | null;
   total_trees: number;
   tagged_trees: number;
+  alive_trees?: number;
+  survival_pct?: number | null;
   sponsor_name?: string | null;
   sponsor_logo?: string | null;
 }
@@ -22,9 +24,17 @@ export interface ForestPin {
 export interface PublicTree {
   id: string;
   tree_unique_id: string | null;
+  pet_name?: string | null;
   lat: number | null;
   lng: number | null;
   species: string | null;
+  height?: number | null;
+  dbh?: number | null;
+  status_id?: number | null;
+  status?: string | null;
+  survival?: 'alive' | 'dead';
+  co2e_kg?: number | null;
+  last_seen?: string | null;
 }
 
 export interface TreeVisit {

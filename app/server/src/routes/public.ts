@@ -39,6 +39,7 @@ async function forestsMap(_req: Request, res: Response): Promise<void> {
     forest_country: string | null;
     total_trees: string;
     tagged_trees: string;
+    alive_trees: string;
     sponsor_name: string | null;
     sponsor_logo: string | null;
   }>(
@@ -49,6 +50,8 @@ async function forestsMap(_req: Request, res: Response): Promise<void> {
             COUNT(t.id) FILTER (WHERE t.is_active = TRUE
                    AND t.forest_tree_geo_lat IS NOT NULL
                    AND t.forest_tree_geo_long IS NOT NULL) AS tagged_trees,
+            COUNT(t.id) FILTER (WHERE t.is_active = TRUE
+                   AND COALESCE(t.tree_status_id, 1) <> 4) AS alive_trees,
             sp.sponsor_name, sp.sponsor_logo
        FROM forests f
        LEFT JOIN forest_trees t ON t.forest_id = f.id
@@ -78,6 +81,11 @@ async function forestsMap(_req: Request, res: Response): Promise<void> {
       country: r.forest_country,
       total_trees: Number(r.total_trees),
       tagged_trees: Number(r.tagged_trees),
+      alive_trees: Number(r.alive_trees),
+      survival_pct:
+        Number(r.total_trees) > 0
+          ? Math.round((Number(r.alive_trees) / Number(r.total_trees)) * 1000) / 10
+          : null,
       sponsor_name: r.sponsor_name,
       sponsor_logo: r.sponsor_logo,
     })),
@@ -100,17 +108,33 @@ async function forestTreesPublic(req: Request, res: Response): Promise<void> {
   const rows = await query<{
     id: string;
     tree_unique_id: string | null;
+    pet_name: string | null;
     lat: string | null;
     lng: string | null;
     species: string | null;
+    height: string | null;
+    dbh: string | null;
+    wood_density: number | null;
+    status_id: number | null;
+    status: string | null;
+    last_seen: string | null;
   }>(
     `SELECT ft.id,
             ft.tree_unique_id,
+            ft.forest_tree_petname AS pet_name,
             ft.forest_tree_geo_lat AS lat,
             ft.forest_tree_geo_long AS lng,
-            COALESCE(sp.common_name, sp.species_name) AS species
+            COALESCE(sp.common_name, sp.species_name) AS species,
+            ft.forest_tree_height AS height,
+            ft.forest_tree_dia AS dbh,
+            sp.wood_density,
+            COALESCE(ft.tree_status_id, 1) AS status_id,
+            st.status,
+            (SELECT MAX(tl.timeline_date) FROM forest_plant_timelines tl
+              WHERE tl.plant_id = ft.id AND tl.is_active = TRUE) AS last_seen
        FROM forest_trees ft
        LEFT JOIN master_plantspecies sp ON sp.id = ft.master_plant_species_id
+       LEFT JOIN tree_status_master st ON st.id = ft.tree_status_id
       WHERE ft.forest_id = $1 AND ft.is_active = TRUE AND ft.is_display = TRUE
         AND ft.forest_tree_geo_lat IS NOT NULL
         AND ft.forest_tree_geo_long IS NOT NULL
@@ -119,13 +143,30 @@ async function forestTreesPublic(req: Request, res: Response): Promise<void> {
   );
 
   res.json({
-    data: rows.rows.map((t) => ({
-      id: t.id,
-      tree_unique_id: t.tree_unique_id,
-      lat: t.lat ? Number(t.lat) : null,
-      lng: t.lng ? Number(t.lng) : null,
-      species: t.species,
-    })),
+    data: rows.rows.map((t) => {
+      const h = t.height != null ? Number(t.height) : null;
+      const d = t.dbh != null ? Number(t.dbh) : null;
+      const wd = t.wood_density != null ? Number(t.wood_density) : 0.6;
+      const co2e =
+        h != null && d != null && h > 0 && d > 0
+          ? Math.round(treeCo2eKg(wd, d, h) * 10) / 10
+          : null;
+      return {
+        id: t.id,
+        tree_unique_id: t.tree_unique_id,
+        pet_name: t.pet_name,
+        lat: t.lat ? Number(t.lat) : null,
+        lng: t.lng ? Number(t.lng) : null,
+        species: t.species,
+        height: h,
+        dbh: d,
+        status_id: t.status_id,
+        status: t.status,
+        survival: t.status_id === 4 ? 'dead' : 'alive',
+        co2e_kg: co2e,
+        last_seen: t.last_seen,
+      };
+    }),
   });
 }
 

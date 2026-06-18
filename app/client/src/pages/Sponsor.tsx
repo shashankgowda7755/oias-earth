@@ -68,12 +68,16 @@ export default function Sponsor() {
         ))}
       </div>
 
-      <div style={{ marginTop: 16 }}>
-        <a href={`/api/v1/public/sponsor/${id}/report.csv`} target="_blank" rel="noreferrer"
+      <div style={{ marginTop: 16, display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'center' }}>
+        <Link to={`/portal/${id}`}
            style={{ display: 'inline-block', background: 'var(--alive)', color: '#16282e', textDecoration: 'none', padding: '10px 18px', borderRadius: 999, fontWeight: 700, fontSize: 14 }}>
-          Download ESG report (CSV) ↓
+          Open sponsor portal →
+        </Link>
+        <a href={`/api/v1/public/sponsor/${id}/report.csv`} target="_blank" rel="noreferrer"
+           style={{ display: 'inline-block', background: 'transparent', color: 'var(--surface)', textDecoration: 'none', padding: '10px 18px', borderRadius: 999, fontWeight: 600, fontSize: 14, border: '1px solid var(--line)' }}>
+          ESG report (CSV) ↓
         </a>
-        <span className="mono" style={{ fontSize: 12, color: '#9fb0ad', marginLeft: 12 }}>tCO₂e = estimated / verification-ready removal, not an issued credit</span>
+        <span className="mono" style={{ fontSize: 12, color: '#9fb0ad' }}>tCO₂e = estimated / verification-ready removal, not an issued credit</span>
       </div>
 
       {pins.length > 0 && (
@@ -85,13 +89,16 @@ export default function Sponsor() {
       <h2 className="serif" style={{ fontWeight: 600, fontSize: 22, margin: '34px 0 16px' }}>Your forests</h2>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(240px,1fr))', gap: 14 }}>
         {forests.map((f) => (
-          <div key={f.id} style={{ background: 'var(--ink-2)', border: '1px solid var(--line)', borderRadius: 14, padding: 18 }}>
-            <div style={{ fontWeight: 600, fontSize: 16 }}>{f.name}</div>
-            <div style={{ fontSize: 12, color: '#9fb0ad' }}>{[f.city, f.state].filter(Boolean).join(', ') || '—'}</div>
-            <div className="mono" style={{ fontSize: 13, color: 'var(--alive)', marginTop: 8 }}>
-              {f.alive_trees}/{f.total_trees} alive{f.survival_pct != null ? ` · ${f.survival_pct}%` : ''}
+          <Link key={f.id} to={`/portal/${id}?forest=${f.id}`} style={{ textDecoration: 'none', color: 'var(--surface)' }}>
+            <div style={{ background: 'var(--ink-2)', border: '1px solid var(--line)', borderRadius: 14, padding: 18 }}>
+              <div style={{ fontWeight: 600, fontSize: 16 }}>{f.name}</div>
+              <div style={{ fontSize: 12, color: '#9fb0ad' }}>{[f.city, f.state].filter(Boolean).join(', ') || '—'}</div>
+              <div className="mono" style={{ fontSize: 13, color: 'var(--alive)', marginTop: 8 }}>
+                {f.alive_trees}/{f.total_trees} alive{f.survival_pct != null ? ` · ${f.survival_pct}%` : ''}
+              </div>
+              <div style={{ fontSize: 12, color: 'var(--alive)', marginTop: 8, fontWeight: 600 }}>Open forest →</div>
             </div>
-          </div>
+          </Link>
         ))}
       </div>
     </div>,

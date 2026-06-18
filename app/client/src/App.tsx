@@ -20,6 +20,7 @@ import Field from './pages/Field';
 import Carbon from './pages/Carbon';
 import Verify from './pages/Verify';
 import Sponsor from './pages/Sponsor';
+import SponsorPortal from './pages/SponsorPortal';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -48,6 +49,7 @@ export default function App() {
               <Route path="/carbon" element={<Carbon />} />
               <Route path="/verify" element={<Verify />} />
               <Route path="/sponsor/:id" element={<Sponsor />} />
+              <Route path="/portal/:id" element={<SponsorPortal />} />
               <Route
                 path="/dashboard"
                 element={
