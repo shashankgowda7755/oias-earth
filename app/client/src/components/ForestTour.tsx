@@ -38,6 +38,8 @@ export default function ForestTour({ scenes }: { scenes: ForestScene[] }) {
 
   const flat = useMemo(() => !hasWebGL(), []);
   const [failed, setFailed] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const readyRef = useRef(false);
   const [currentId, setCurrentId] = useState<number | null>(scenes[0]?.id ?? null);
   const [drawer, setDrawer] = useState<SceneHotspot | null>(null);
   const [q, setQ] = useState('');
@@ -91,6 +93,14 @@ export default function ForestTour({ scenes }: { scenes: ForestScene[] }) {
     let cancelled = false;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let viewer: any;
+    // If the panorama image can't load, fall back to the flat image — never black.
+    const probe = new Image();
+    probe.onerror = () => { if (!cancelled) setFailed(true); };
+    probe.src = current.image_url;
+    // If PSV never signals ready (WebGL/texture issue), show the flat image.
+    const readyTimer = window.setTimeout(() => {
+      if (!cancelled && !readyRef.current) { setFailed(true); setLoading(false); }
+    }, 9000);
     (async () => {
       try {
         const [{ Viewer }, { MarkersPlugin }] = await Promise.all([
@@ -104,9 +114,13 @@ export default function ForestTour({ scenes }: { scenes: ForestScene[] }) {
           defaultYaw: `${current.default_yaw}deg`,
           defaultPitch: `${current.default_pitch}deg`,
           navbar: ['zoom', 'move', 'fullscreen'],
+          loadingTxt: 'Loading 360°…',
           plugins: [[MarkersPlugin, {}]],
         });
         viewerRef.current = viewer;
+        viewer.addEventListener('ready', () => { readyRef.current = true; if (!cancelled) setLoading(false); }, { once: true });
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        viewer.addEventListener('panorama-error', () => { if (!cancelled) setFailed(true); });
         const mk = viewer.getPlugin(MarkersPlugin);
         markersRef.current = mk;
         mk.setMarkers(markerConfigs(current));
@@ -118,10 +132,12 @@ export default function ForestTour({ scenes }: { scenes: ForestScene[] }) {
         });
       } catch {
         setFailed(true);
+        setLoading(false);
       }
     })();
     return () => {
       cancelled = true;
+      clearTimeout(readyTimer);
       if (viewer) viewer.destroy();
       viewerRef.current = null;
       markersRef.current = null;
@@ -157,7 +173,15 @@ export default function ForestTour({ scenes }: { scenes: ForestScene[] }) {
             </span>
           </div>
         ) : (
-          <div ref={elRef} style={{ position: 'absolute', inset: 0 }} />
+          <>
+            <div ref={elRef} style={{ position: 'absolute', inset: 0 }} />
+            {loading && (
+              <div style={{ position: 'absolute', inset: 0, zIndex: 3, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#0b1416' }}>
+                <img src={current.image_url} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: 0.35 }} />
+                <span className="mono" style={{ position: 'relative', color: 'var(--alive)', fontSize: 13 }}>Loading 360°…</span>
+              </div>
+            )}
+          </>
         )}
         {isDemo && (
           <span style={{ position: 'absolute', top: 10, left: 10, zIndex: 5, background: 'rgba(232,163,61,.92)', color: '#16282e', fontSize: 11, fontWeight: 700, padding: '4px 10px', borderRadius: 999 }}>
