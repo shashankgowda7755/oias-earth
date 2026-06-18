@@ -66,13 +66,22 @@ function treePin(statusId: number): L.DivIcon {
 const STATUS_LABEL: Record<number, string> = { 1: 'Healthy', 2: 'Drying', 3: 'Damaged', 4: 'Dead' };
 const STATUS_COLOR: Record<number, string> = { 1: '#b6ff3c', 2: '#e8a33d', 3: '#f0792b', 4: '#6b7b82' };
 
+// Escape any value interpolated into popup innerHTML (pet names are user-supplied
+// on gift trees → stored-XSS vector without this).
+function esc(v: unknown): string {
+  return String(v ?? '').replace(/[&<>"']/g, (c) =>
+    ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!,
+  );
+}
+const fmtDate = (v: string | null | undefined): string => (v ? String(v).slice(0, 10) : '');
+
 function treePopupHtml(t: PublicTree): string {
   const sid = t.status_id ?? 1;
   const color = STATUS_COLOR[sid] ?? '#b6ff3c';
   const head = t.pet_name
-    ? `<strong style="color:${color}">${t.pet_name}</strong><br/><span style="color:#9ab;font-size:11px">${t.tree_unique_id ?? ''}</span>`
-    : `<strong style="color:${color}">${t.tree_unique_id ?? 'Tree'}</strong>`;
-  const sp = t.species ? `<br/><span style="color:#cdd">${t.species}</span>` : '';
+    ? `<strong style="color:${color}">${esc(t.pet_name)}</strong><br/><span style="color:#9ab;font-size:11px">${esc(t.tree_unique_id)}</span>`
+    : `<strong style="color:${color}">${esc(t.tree_unique_id) || 'Tree'}</strong>`;
+  const sp = t.species ? `<br/><span style="color:#cdd">${esc(t.species)}</span>` : '';
   const badge = `<span style="display:inline-block;margin-top:6px;padding:1px 8px;border-radius:999px;border:1px solid ${color};color:${color};font-size:11px">${STATUS_LABEL[sid] ?? 'Alive'}</span>`;
   const stats: string[] = [];
   if (t.height != null) stats.push(`${t.height} m`);
@@ -81,10 +90,10 @@ function treePopupHtml(t: PublicTree): string {
   const statLine = stats.length
     ? `<br/><span style="font-family:'JetBrains Mono',monospace;color:#9ab;font-size:11px">${stats.join('  ·  ')}</span>`
     : '';
-  const seen = t.last_seen ? `<br/><span style="color:#7a8b91;font-size:10px">last measured ${t.last_seen}</span>` : '';
+  const seen = t.last_seen ? `<br/><span style="color:#7a8b91;font-size:10px">last measured ${fmtDate(t.last_seen)}</span>` : '';
   return (
     `<div style="font-family:'Plus Jakarta Sans',sans-serif;min-width:150px">${head}${sp}<br/>${badge}${statLine}${seen}` +
-    `<br/><a href="/tree/${t.id}" style="color:#b6ff3c;font-weight:600;display:inline-block;margin-top:6px">View life record →</a></div>`
+    `<br/><a href="/tree/${encodeURIComponent(t.id)}" style="color:#b6ff3c;font-weight:600;display:inline-block;margin-top:6px">View life record →</a></div>`
   );
 }
 
@@ -150,13 +159,13 @@ export default function PublicMap() {
       const m = L.marker([f.lat, f.lng], { icon: forestIcon(f) }).addTo(layer);
       const place = [f.city, f.state].filter(Boolean).join(', ');
       const sponsor = f.sponsor_name
-        ? `<span style="color:#9ab">sponsored by </span><span style="color:#b6ff3c">${f.sponsor_name}</span><br/>`
+        ? `<span style="color:#9ab">sponsored by </span><span style="color:#b6ff3c">${esc(f.sponsor_name)}</span><br/>`
         : '';
       const alive = f.alive_trees ?? f.tagged_trees;
       const surv = f.survival_pct != null ? ` · ${f.survival_pct}% alive` : '';
       m.bindPopup(
-        `<div style="font-family:'Plus Jakarta Sans',sans-serif"><strong style="color:#b6ff3c">${f.name ?? 'Forest'}</strong><br/>` +
-          `<span style="color:#cdd">${place || '—'}</span><br/>` +
+        `<div style="font-family:'Plus Jakarta Sans',sans-serif"><strong style="color:#b6ff3c">${esc(f.name) || 'Forest'}</strong><br/>` +
+          `<span style="color:#cdd">${esc(place) || '—'}</span><br/>` +
           sponsor +
           `<span style="font-family:'JetBrains Mono',monospace;color:#b6ff3c">${alive.toLocaleString()}</span><span style="color:#9ab"> / ${f.total_trees.toLocaleString()} trees${surv}</span>` +
           `<br/><span style="color:#b6ff3c;font-weight:600;font-size:12px">click to explore trees →</span></div>`,

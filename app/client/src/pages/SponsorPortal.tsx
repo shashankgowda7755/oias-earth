@@ -21,6 +21,7 @@ const STATUS_COLOR: Record<number, string> = { 1: '#b6ff3c', 2: '#e8a33d', 3: '#
 const STATUS_LABEL: Record<number, string> = { 1: 'Healthy', 2: 'Drying', 3: 'Damaged', 4: 'Dead' };
 
 const PAGE = 10;
+const fmtDate = (v: string | null | undefined): string => (v ? String(v).slice(0, 10) : '—');
 
 export default function SponsorPortal() {
   const { id = '' } = useParams();
@@ -109,7 +110,7 @@ export default function SponsorPortal() {
     const head = 'tree_id,pet_name,species,status,height_m,dbh_cm,co2e_kg,last_seen,lat,lng';
     const lines = trees.map((t) =>
       [t.tree_unique_id, t.pet_name, t.species, t.status ?? (t.status_id === 4 ? 'Dead' : 'Healthy'),
-       t.height, t.dbh, t.co2e_kg, t.last_seen, t.lat, t.lng].map(esc).join(','),
+       t.height, t.dbh, t.co2e_kg, fmtDate(t.last_seen), t.lat, t.lng].map(esc).join(','),
     );
     const blob = new Blob([[head, ...lines].join('\n') + '\n'], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
@@ -236,7 +237,7 @@ export default function SponsorPortal() {
                       <td className="mono" style={{ padding: '10px 12px', whiteSpace: 'nowrap' }}>{t.height != null ? `${t.height} m` : '—'}</td>
                       <td className="mono" style={{ padding: '10px 12px', whiteSpace: 'nowrap' }}>{t.dbh != null ? `${t.dbh} cm` : '—'}</td>
                       <td className="mono" style={{ padding: '10px 12px', whiteSpace: 'nowrap', color: 'var(--alive)' }}>{sid !== 4 && t.co2e_kg != null ? `${t.co2e_kg} kg` : '—'}</td>
-                      <td className="mono" style={{ padding: '10px 12px', color: '#9fb0ad', whiteSpace: 'nowrap' }}>{t.last_seen || '—'}</td>
+                      <td className="mono" style={{ padding: '10px 12px', color: '#9fb0ad', whiteSpace: 'nowrap' }}>{fmtDate(t.last_seen)}</td>
                       <td style={{ padding: '10px 12px', whiteSpace: 'nowrap' }}>
                         <Link to={`/tree/${t.id}`} style={{ color: 'var(--alive)', textDecoration: 'none', fontWeight: 600 }}>View →</Link>
                       </td>
