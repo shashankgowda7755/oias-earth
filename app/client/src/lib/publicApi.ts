@@ -91,6 +91,7 @@ export interface TreeProof {
     planted_on: string | null;
     lat: number | null;
     lng: number | null;
+    is_demo?: boolean;
   };
   summary: {
     survival: 'alive' | 'dead' | 'unknown';

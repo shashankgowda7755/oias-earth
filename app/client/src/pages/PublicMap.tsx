@@ -43,7 +43,7 @@ function survivalClass(pct: number | null | undefined): string {
 function forestIcon(f: ForestPin): L.DivIcon {
   const logo = f.sponsor_logo;
   const inner = logo
-    ? `<span class="badge"><img src="${logo}" alt="" referrerpolicy="no-referrer" onerror="this.remove();this.parentNode.classList.add('nologo')"/></span>`
+    ? `<span class="badge"><img src="${esc(logo)}" alt="" referrerpolicy="no-referrer" onerror="this.remove();this.parentNode.classList.add('nologo')"/></span>`
     : '<span class="badge nologo"></span>';
   return L.divIcon({
     className: 'forest-logo-pin' + survivalClass(f.survival_pct),
@@ -251,7 +251,7 @@ export default function PublicMap() {
           <span style={{ width: 16, height: 16, borderRadius: '50%', background: 'var(--alive)', boxShadow: '0 0 12px rgba(182,255,60,.7)' }} />
           <div>
             <div style={{ fontWeight: 700, fontSize: 15 }}>Be The Tree Hugger — Heartbeat Map</div>
-            <div className="mono" style={{ fontSize: 11, color: 'var(--alive)' }}>every pulse is a tree verified alive</div>
+            <div className="mono" style={{ fontSize: 11, color: 'var(--alive)' }}>every pulse is a monitored tree</div>
           </div>
         </Link>
         <div style={{ display: 'flex', alignItems: 'center', gap: 22 }}>

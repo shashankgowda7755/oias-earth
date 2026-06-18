@@ -33,10 +33,18 @@ const SAT_URL =
 const LABELS_URL =
   'https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.png';
 
+// Escape values interpolated into Leaflet divIcon/popup innerHTML — sponsor
+// name + logo URL are admin free-text and would otherwise be a stored-XSS sink.
+function esc(v: unknown): string {
+  return String(v ?? '').replace(/[&<>"']/g, (c) =>
+    ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!,
+  );
+}
+
 function forestIcon(f: ForestPin): L.DivIcon {
   const logo = f.sponsor_logo;
   const inner = logo
-    ? `<span class="badge"><img src="${logo}" alt="" referrerpolicy="no-referrer" onerror="this.remove();this.parentNode.classList.add('nologo')"/></span>`
+    ? `<span class="badge"><img src="${esc(logo)}" alt="" referrerpolicy="no-referrer" onerror="this.remove();this.parentNode.classList.add('nologo')"/></span>`
     : '<span class="badge nologo"></span>';
   return L.divIcon({
     className: 'forest-logo-pin',
@@ -111,12 +119,12 @@ export function HeartbeatMap({
       const m = L.marker([f.lat, f.lng], { icon: forestIcon(f) }).addTo(layer);
       const place = [f.city, f.state].filter(Boolean).join(', ');
       const sponsor = f.sponsor_name
-        ? `<span style="color:#9ab">sponsored by </span><span style="color:#b6ff3c">${f.sponsor_name}</span><br/>`
+        ? `<span style="color:#9ab">sponsored by </span><span style="color:#b6ff3c">${esc(f.sponsor_name)}</span><br/>`
         : '';
       m.bindPopup(
         `<div style="font-family:'Plus Jakarta Sans',sans-serif">` +
-          `<strong style="color:#b6ff3c">${f.name ?? 'Forest'}</strong><br/>` +
-          `<span style="color:#cdd">${place || '—'}</span><br/>` +
+          `<strong style="color:#b6ff3c">${esc(f.name) || 'Forest'}</strong><br/>` +
+          `<span style="color:#cdd">${esc(place) || '—'}</span><br/>` +
           sponsor +
           `<span style="font-family:'JetBrains Mono',monospace;color:#b6ff3c">${f.tagged_trees}</span>` +
           `<span style="color:#9ab"> / ${f.total_trees} trees alive</span></div>`,

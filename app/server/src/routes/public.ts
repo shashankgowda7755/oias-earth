@@ -198,6 +198,7 @@ async function treeProof(req: Request, res: Response): Promise<void> {
     lng: string | null;
     status: string | null;
     wood_density: number | null;
+    is_demo: boolean | null;
   }>(
     `SELECT ft.id, ft.tree_unique_id,
             COALESCE(sp.common_name, sp.species_name) AS species,
@@ -206,7 +207,7 @@ async function treeProof(req: Request, res: Response): Promise<void> {
             f.forest_city AS city, f.forest_state AS state,
             ft.planted_on,
             ft.forest_tree_geo_lat AS lat, ft.forest_tree_geo_long AS lng,
-            st.status, sp.wood_density
+            st.status, sp.wood_density, f.is_demo
        FROM forest_trees ft
        LEFT JOIN forests f ON f.id = ft.forest_id
        LEFT JOIN master_plantspecies sp ON sp.id = ft.master_plant_species_id
@@ -311,6 +312,7 @@ async function treeProof(req: Request, res: Response): Promise<void> {
         planted_on: tree.planted_on,
         lat: tree.lat ? Number(tree.lat) : null,
         lng: tree.lng ? Number(tree.lng) : null,
+        is_demo: Boolean(tree.is_demo),
       },
       summary: {
         survival,
@@ -326,7 +328,10 @@ async function treeProof(req: Request, res: Response): Promise<void> {
         carbon_label: 'estimated / verification-ready removal',
         // Integrity / trust signals.
         verification: {
-          photos_unique: !visits.some((x) => x.photo_duplicate),
+          // Only a positive signal when photos actually exist AND none recycled —
+          // a tree with zero photos must NOT show a green "verified unique" badge.
+          photos_unique:
+            visits.some((x) => x.photos.length > 0) && !visits.some((x) => x.photo_duplicate),
           gps_consistent: !visits.some((x) => x.geo_suspect),
           monitored: visits.length >= 2,
         },
@@ -351,11 +356,12 @@ async function carbonSummary(_req: Request, res: Response): Promise<void> {
     wood_density: number | null;
   }>(
     `SELECT DISTINCT ON (tl.plant_id)
-            tl.height, tl.diameter, tl.status_id, sp.wood_density
+            tl.height, tl.diameter, ft.tree_status_id AS status_id, sp.wood_density
        FROM forest_plant_timelines tl
        JOIN forest_trees ft ON ft.id = tl.plant_id AND ft.is_active = TRUE
        LEFT JOIN master_plantspecies sp ON sp.id = ft.master_plant_species_id
       WHERE tl.is_active = TRUE
+        AND tl.height IS NOT NULL AND tl.diameter IS NOT NULL
       ORDER BY tl.plant_id, tl.timeline_date DESC NULLS LAST, tl.id DESC`,
   );
 
@@ -560,12 +566,13 @@ async function sponsorMicrosite(req: Request, res: Response): Promise<void> {
 
   // Verification-ready tCO2e across this sponsor's forests (latest measured visit per tree).
   const co2 = await query<{ wood_density: number | null; height: number | null; diameter: number | null; status_id: number | null }>(
-    `SELECT DISTINCT ON (tl.plant_id) sp.wood_density, tl.height, tl.diameter, tl.status_id
+    `SELECT DISTINCT ON (tl.plant_id) sp.wood_density, tl.height, tl.diameter, ft.tree_status_id AS status_id
        FROM forest_plant_timelines tl
        JOIN forest_trees ft ON ft.id = tl.plant_id AND ft.is_active = TRUE
        JOIN forest_sponsors fs ON fs.forest_id = ft.forest_id AND fs.sponsor_id = $1 AND fs.is_active = TRUE
        LEFT JOIN master_plantspecies sp ON sp.id = ft.master_plant_species_id
       WHERE tl.is_active = TRUE
+        AND tl.height IS NOT NULL AND tl.diameter IS NOT NULL
       ORDER BY tl.plant_id, tl.timeline_date DESC NULLS LAST, tl.id DESC`,
     [id],
   );
@@ -675,8 +682,8 @@ async function leaderboard(_req: Request, res: Response): Promise<void> {
   const rows = await query<Record<string, unknown>>(
     `SELECT s.id, s.sponsor_name, s.sponsor_logo,
             COUNT(DISTINCT f.id) AS forests,
-            COUNT(t.id) FILTER (WHERE t.is_active = TRUE) AS trees,
-            COUNT(t.id) FILTER (WHERE t.is_active = TRUE AND COALESCE(t.tree_status_id,1) <> 4) AS alive
+            COUNT(DISTINCT t.id) FILTER (WHERE t.is_active = TRUE) AS trees,
+            COUNT(DISTINCT t.id) FILTER (WHERE t.is_active = TRUE AND COALESCE(t.tree_status_id,1) <> 4) AS alive
        FROM sponsors s
        JOIN forest_sponsors fs ON fs.sponsor_id = s.id AND fs.is_active = TRUE
        JOIN forests f ON f.id = fs.forest_id AND f.is_active = TRUE

@@ -97,7 +97,9 @@ export default function SponsorPortal() {
     const term = q.trim().toLowerCase();
     if (!term) return trees;
     return trees.filter((t) =>
-      [t.tree_unique_id, t.pet_name, t.species, t.status].some((v) => v?.toLowerCase().includes(term)),
+      [t.tree_unique_id, t.pet_name, t.species, t.status ?? STATUS_LABEL[t.status_id ?? 1]].some((v) =>
+        v?.toLowerCase().includes(term),
+      ),
     );
   }, [trees, q]);
 
@@ -109,8 +111,8 @@ export default function SponsorPortal() {
     const esc = (v: unknown) => `"${String(v ?? '').replace(/"/g, '""')}"`;
     const head = 'tree_id,pet_name,species,status,height_m,dbh_cm,co2e_kg,last_seen,lat,lng';
     const lines = trees.map((t) =>
-      [t.tree_unique_id, t.pet_name, t.species, t.status ?? (t.status_id === 4 ? 'Dead' : 'Healthy'),
-       t.height, t.dbh, t.co2e_kg, fmtDate(t.last_seen), t.lat, t.lng].map(esc).join(','),
+      [t.tree_unique_id, t.pet_name, t.species, t.status ?? STATUS_LABEL[t.status_id ?? 1],
+       t.height, t.dbh, t.status_id === 4 ? '' : t.co2e_kg, fmtDate(t.last_seen), t.lat, t.lng].map(esc).join(','),
     );
     const blob = new Blob([[head, ...lines].join('\n') + '\n'], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
@@ -150,7 +152,7 @@ export default function SponsorPortal() {
         { v: String(stats.dead), l: 'dead', c: '#9fb0ad' },
         { v: String(stats.species), l: 'species', c: 'var(--surface)' },
         { v: stats.survival_pct != null ? `${stats.survival_pct}%` : '—', l: 'survival', c: 'var(--alive)' },
-        { v: stats.net_tco2e.toLocaleString(), l: 'tCO₂e (net, est.)', c: 'var(--alive)' },
+        { v: stats.net_tco2e.toLocaleString(), l: 'tCO₂e (this forest, net est.)', c: 'var(--alive)' },
       ]
     : [];
 

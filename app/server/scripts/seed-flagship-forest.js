@@ -34,8 +34,8 @@ const BOUNDARY = [
 ];
 
 const N_TREES = 220;
-const PLANTED_ON = '2024-07-15';
-const NOW_DAYS = 700; // age at the latest visit (≈ 2026-06)
+const PLANTED_ON = '2025-01-15'; // post-1-Jan-2025 → creditability-eligible vintage
+const NOW_DAYS = 510; // age at the latest visit (≈ 2026-06)
 
 // Species palette (id, common name, wood density g/cm3) — native-weighted.
 const SPECIES = [
@@ -71,9 +71,13 @@ function rollStatus() {
 
 // Growth curves (rough, young-sapling, per species + per-tree vigour).
 function heightAt(ageDays, vigour) {
-  return Math.round((0.6 + (ageDays / 365) * 1.55 * vigour) * 100) / 100; // m
+  return Math.round((0.7 + (ageDays / 365) * 1.55 * vigour) * 100) / 100; // m
 }
+// DBH is breast-height (1.3 m) diameter. A stem shorter than 1.3 m has NO DBH —
+// return null so the Chave equation is never fed a fabricated sub-breast-height
+// diameter (and carbon stays 0 until the tree is actually measurable).
 function dbhAt(ageDays, vigour) {
+  if (heightAt(ageDays, vigour) < 1.3) return null;
   return Math.round((1.0 + (ageDays / 365) * 2.9 * vigour) * 10) / 10; // cm
 }
 
@@ -139,7 +143,7 @@ async function main() {
   );
 
   // Visit schedule (days after planting). Latest = NOW_DAYS.
-  const VISIT_DAYS = [0, 240, 470, NOW_DAYS];
+  const VISIT_DAYS = [0, 170, 340, NOW_DAYS];
   const baseDate = new Date(PLANTED_ON + 'T00:00:00Z');
   const dateAt = (d) => {
     const dt = new Date(baseDate.getTime() + d * 86400000);
@@ -178,7 +182,7 @@ async function main() {
        RETURNING id`,
       [
         forestId, sp.id, uid, sp.name, petName,
-        String(hNow), String(dNow), ageNow,
+        String(hNow), dNow != null ? String(dNow) : null, ageNow,
         lat.toFixed(6), lng.toFixed(6),
         PLANTED_ON, finalStatus, SPONSOR_ID, 'Block A',
         `/tree/${FOREST_UID}/${uid}`,
@@ -198,7 +202,7 @@ async function main() {
         `INSERT INTO forest_plant_timelines (plant_id, species_id, status_id,
             height, diameter, age, latitude, longitude, timeline_date,
             dbh_unverified, dbh_method, is_active)
-         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,FALSE,'tape',TRUE)`,
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,TRUE,'modelled',TRUE)`,
         [
           treeId, sp.id, statusId,
           h, d, age,

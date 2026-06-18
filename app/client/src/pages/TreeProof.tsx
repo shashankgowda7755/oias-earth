@@ -79,6 +79,7 @@ export default function TreeProof() {
   if (error || !data) return wrap(<p style={{ padding: 48, color: 'var(--amber)' }}>{error ?? 'Tree not found.'}</p>);
 
   const { tree, summary, visits } = data;
+  const isDemo = Boolean(tree.is_demo);
   const alive = summary.survival === 'alive';
   const badgeColor = alive ? 'var(--alive)' : summary.survival === 'dead' ? '#e2554a' : 'var(--slate)';
   const pin = tree.lat != null && tree.lng != null
@@ -88,7 +89,14 @@ export default function TreeProof() {
   return wrap(
     <div style={{ maxWidth: 1000, margin: '0 auto', padding: 'clamp(28px,5vw,56px) clamp(20px,5vw,48px)' }}>
       {/* Header */}
-      <div className="mono" style={{ color: 'var(--alive)', fontSize: 12, letterSpacing: '.2em', textTransform: 'uppercase', marginBottom: 14 }}>Proof of life · verified record</div>
+      {isDemo && (
+        <div style={{ background: 'rgba(232,163,61,.1)', border: '1px solid rgba(232,163,61,.5)', color: 'var(--amber)', borderRadius: 12, padding: '12px 16px', marginBottom: 18, fontSize: 13.5, lineHeight: 1.55 }}>
+          <strong>Demonstration forest.</strong> Monitoring data here is <strong>simulated</strong> to showcase the platform — measurements, status and coordinates are modelled, not field-captured. Real forests carry field-verified records.
+        </div>
+      )}
+      <div className="mono" style={{ color: isDemo ? 'var(--amber)' : 'var(--alive)', fontSize: 12, letterSpacing: '.2em', textTransform: 'uppercase', marginBottom: 14 }}>
+        {isDemo ? 'Proof of life · demonstration record' : 'Proof of life · verified record'}
+      </div>
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 20, flexWrap: 'wrap' }}>
         <div>
           <h1 className="serif" style={{ fontWeight: 600, fontSize: 'clamp(32px,5vw,56px)', lineHeight: 1.05, margin: 0 }}>
@@ -107,7 +115,7 @@ export default function TreeProof() {
       {/* Stats */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(130px,1fr))', gap: 14, marginTop: 30 }}>
         {[
-          { v: String(summary.visit_count), l: 'verified visits' },
+          { v: String(summary.visit_count), l: isDemo ? 'recorded visits' : 'verified visits' },
           { v: summary.latest_height != null ? `${summary.latest_height} m` : '—', l: 'current height' },
           { v: summary.co2e_kg != null ? `${summary.co2e_kg} kg` : '—', l: 'CO₂e captured · est.' },
           { v: fmtDate(summary.last_seen), l: 'last seen' },
@@ -197,7 +205,7 @@ export default function TreeProof() {
             <HeartbeatMap forests={pin} interactive zoom={16} />
           </div>
           <p className="mono" style={{ fontSize: 12, color: '#9fb0ad', marginTop: 10 }}>
-            {tree.lat?.toFixed(6)}, {tree.lng?.toFixed(6)} · coordinates fixed at planting, re-checked every visit
+            {tree.lat?.toFixed(6)}, {tree.lng?.toFixed(6)} · {isDemo ? 'simulated coordinates (demonstration data)' : 'GPS captured at planting and re-checked each visit'}
           </p>
         </>
       )}
