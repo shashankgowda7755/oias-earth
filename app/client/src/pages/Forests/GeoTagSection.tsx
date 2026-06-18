@@ -23,8 +23,12 @@ import {
   tagTreeGeo,
   logVisit,
   setForestBoundary,
+  listPanoramas,
+  addPanorama,
+  deletePanorama,
   TREE_STATUSES,
   type RegisterTree,
+  type Panorama,
 } from './geoApi';
 
 interface GeoTagSectionProps {
@@ -73,6 +77,13 @@ export function GeoTagSection({ forest }: GeoTagSectionProps) {
   const [boundaryPts, setBoundaryPts] = useState<{ lat: number; lng: number }[]>([]);
   const [boundarySaving, setBoundarySaving] = useState(false);
 
+  // 360 tours (per-plot "walk the forest" embeds).
+  const [panos, setPanos] = useState<Panorama[]>([]);
+  const [panoUrl, setPanoUrl] = useState('');
+  const [panoLabel, setPanoLabel] = useState('');
+  const [panoDate, setPanoDate] = useState('');
+  const [panoSaving, setPanoSaving] = useState(false);
+
   const load = useCallback(async () => {
     if (!forestId) {
       setLoading(false);
@@ -81,11 +92,13 @@ export function GeoTagSection({ forest }: GeoTagSectionProps) {
     setLoading(true);
     setError(null);
     try {
-      const [geo, list] = await Promise.all([
+      const [geo, list, pano] = await Promise.all([
         getForestGeo(forestId).catch(() => null),
         listForestTrees(forestId),
+        listPanoramas(forestId).catch(() => [] as Panorama[]),
       ]);
       setTrees(list.data);
+      setPanos(pano.filter((p) => p.is_active !== false));
       if (geo) {
         setBoundary(geo.boundary ?? []);
         setCenter(geo.center ?? { lat: null, lng: null });
@@ -184,6 +197,44 @@ export function GeoTagSection({ forest }: GeoTagSectionProps) {
       setBoundarySaving(false);
     }
   }, [forestId, boundaryPts, toast]);
+
+  const addPano = useCallback(async () => {
+    if (!panoUrl.trim()) {
+      toast.show('Paste a 360 tour link first.', 'error');
+      return;
+    }
+    setPanoSaving(true);
+    try {
+      const p = await addPanorama(forestId, {
+        embed_url: panoUrl.trim(),
+        label: panoLabel.trim() || undefined,
+        captured_on: panoDate || undefined,
+      });
+      setPanos((prev) => [p, ...prev]);
+      setPanoUrl('');
+      setPanoLabel('');
+      setPanoDate('');
+      toast.show('360 tour added.', 'success');
+    } catch (e: unknown) {
+      const msg = (e as { response?: { data?: { message?: string } } })?.response?.data?.message;
+      toast.show(msg || (e instanceof Error ? e.message : 'Failed to add tour'), 'error');
+    } finally {
+      setPanoSaving(false);
+    }
+  }, [forestId, panoUrl, panoLabel, panoDate, toast]);
+
+  const removePano = useCallback(
+    async (pid: number) => {
+      try {
+        await deletePanorama(forestId, pid);
+        setPanos((prev) => prev.filter((p) => p.id !== pid));
+        toast.show('360 tour removed.', 'success');
+      } catch (e) {
+        toast.show(e instanceof Error ? e.message : 'Failed to remove', 'error');
+      }
+    },
+    [forestId, toast],
+  );
 
   const useMyLocation = useCallback(() => {
     if (!navigator.geolocation) {
@@ -397,6 +448,47 @@ export function GeoTagSection({ forest }: GeoTagSectionProps) {
                     </div>
                   )}
                 </div>
+              </div>
+            )}
+
+            {/* 360 tours — per-plot "walk the forest" embeds (experience, not proof) */}
+            {editable && (
+              <div className="rounded-input border border-border p-3">
+                <div className="mb-1 text-sm font-medium text-textPrimary">
+                  360° tours <span className="font-normal text-textSecondary">(walk the forest — an experience, not a measurement)</span>
+                </div>
+                <p className="mb-2 text-xs text-textSecondary">
+                  Shoot a 360 in Kuula / Momento360 / Theta360 / Street View, publish it there, paste the share/embed link. We embed it — no file upload.
+                </p>
+                <div className="flex flex-wrap items-end gap-2">
+                  <div className="min-w-[240px] flex-1">
+                    <TextField label="360 tour link" value={panoUrl} onChange={setPanoUrl} placeholder="https://kuula.co/share/…" />
+                  </div>
+                  <div className="w-40">
+                    <TextField label="Plot label" value={panoLabel} onChange={setPanoLabel} placeholder="Block A entrance" />
+                  </div>
+                  <label className="text-xs text-textSecondary">
+                    Captured
+                    <input type="date" value={panoDate} onChange={(e) => setPanoDate(e.target.value)} className="mt-1 block rounded-input border border-border px-2 py-1.5 text-sm" />
+                  </label>
+                  <Button type="button" variant="primary" onClick={() => void addPano()} disabled={panoSaving || !panoUrl.trim()}>
+                    {panoSaving ? 'Adding…' : 'Add tour'}
+                  </Button>
+                </div>
+                {panos.length > 0 && (
+                  <ul className="mt-3 divide-y divide-border rounded-input border border-border">
+                    {panos.map((p) => (
+                      <li key={p.id} className="flex items-center justify-between gap-2 px-3 py-2 text-sm">
+                        <span className="min-w-0 flex-1 truncate">
+                          🌐 <span className="font-medium">{p.label || 'Tour'}</span>
+                          <span className="ml-1 text-textSecondary">· {p.provider}{p.captured_on ? ` · ${String(p.captured_on).slice(0, 10)}` : ''}</span>
+                        </span>
+                        <a href={p.embed_url} target="_blank" rel="noreferrer" className="text-xs text-primary">open ↗</a>
+                        <button type="button" onClick={() => void removePano(p.id)} className="text-xs text-red-600">remove</button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </div>
             )}
 

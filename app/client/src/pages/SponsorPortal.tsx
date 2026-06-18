@@ -10,7 +10,7 @@
  */
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
-import { fetchSponsor, fetchForestTrees, type SponsorSite, type PublicTree } from '@/lib/publicApi';
+import { fetchSponsor, fetchForestTrees, fetchForestPanoramas, type SponsorSite, type PublicTree, type ForestPanorama } from '@/lib/publicApi';
 import '@/styles/earth.css';
 
 const BUFFER = 0.18;
@@ -34,6 +34,8 @@ export default function SponsorPortal() {
   const [treeErr, setTreeErr] = useState<string | null>(null);
   const [q, setQ] = useState('');
   const [page, setPage] = useState(1);
+  const [panos, setPanos] = useState<ForestPanorama[]>([]);
+  const [tourOpen, setTourOpen] = useState<number | null>(null);
 
   useEffect(() => {
     fetchSponsor(id).then(setD).catch((e) => setErr(e instanceof Error ? e.message : 'Failed'));
@@ -55,9 +57,12 @@ export default function SponsorPortal() {
     setTreeErr(null);
     setQ('');
     setPage(1);
+    setPanos([]);
+    setTourOpen(null);
     fetchForestTrees(forestId)
       .then(setTrees)
       .catch((e) => setTreeErr(e instanceof Error ? e.message : 'Failed to load trees'));
+    fetchForestPanoramas(forestId).then(setPanos).catch(() => setPanos([]));
   }, [forestId]);
 
   const selectForest = (fid: string) => {
@@ -192,6 +197,49 @@ export default function SponsorPortal() {
         ))}
         {!stats && <p style={{ color: '#9fb0ad', fontSize: 14 }}>Loading forest…</p>}
       </div>
+
+      {/* Walk the forest — 360° tours (experiential, not a measurement) */}
+      {panos.length > 0 && (
+        <div style={{ marginTop: 30 }}>
+          <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
+            <h2 className="serif" style={{ fontWeight: 600, fontSize: 22, margin: 0 }}>Walk the forest · 360°</h2>
+            <span className="mono" style={{ fontSize: 11, color: '#7a8b91' }}>immersive tour · an experience, not a verified measurement</span>
+          </div>
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', margin: '14px 0' }}>
+            {panos.map((p, i) => (
+              <button key={p.id} onClick={() => setTourOpen(p.id)}
+                style={{
+                  padding: '8px 14px', borderRadius: 999, cursor: 'pointer', fontSize: 13,
+                  border: '1px solid ' + (tourOpen === p.id ? 'var(--alive)' : 'var(--line)'),
+                  background: tourOpen === p.id ? 'rgba(182,255,60,.1)' : 'transparent',
+                  color: tourOpen === p.id ? 'var(--alive)' : 'var(--surface)',
+                }}>
+                🌐 {p.label || `Tour ${i + 1}`}{p.captured_on ? <span style={{ color: '#9fb0ad' }}> · {fmtDate(p.captured_on)}</span> : null}
+              </button>
+            ))}
+          </div>
+          {tourOpen == null ? (
+            <button onClick={() => setTourOpen(panos[0]!.id)}
+              style={{ width: '100%', height: 220, borderRadius: 14, border: '1px dashed var(--line)', background: 'var(--ink-2)', color: 'var(--alive)', cursor: 'pointer', fontSize: 15, fontWeight: 600 }}>
+              ▶ Tap to enter the 360° tour
+            </button>
+          ) : (
+            <div style={{ borderRadius: 14, overflow: 'hidden', border: '1px solid var(--line)', background: '#000', aspectRatio: '16 / 9' }}>
+              <iframe
+                key={tourOpen}
+                src={panos.find((p) => p.id === tourOpen)!.embed_url}
+                title="360° forest tour"
+                loading="lazy"
+                referrerPolicy="no-referrer"
+                allow="fullscreen; accelerometer; gyroscope; xr-spatial-tracking"
+                allowFullScreen
+                sandbox="allow-scripts allow-same-origin allow-popups allow-presentation allow-fullscreen"
+                style={{ width: '100%', height: '100%', border: 'none', display: 'block' }}
+              />
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Trees register */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap', margin: '30px 0 14px' }}>

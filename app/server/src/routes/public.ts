@@ -14,6 +14,7 @@ import { Router, type Request, type Response } from 'express';
 import { query } from '../db';
 import { notFound } from '../errors';
 import { treeCo2eKg, netCo2eKg, CARBON_METHOD, BUFFER_PCT, UNCERTAINTY_PCT } from '../lib/carbon';
+import { isAllowedEmbedUrl } from '../lib/pano';
 
 export const publicRouter = Router();
 
@@ -726,6 +727,34 @@ async function forestBoundaryPublic(req: Request, res: Response): Promise<void> 
   res.json({ data: { boundary: pts, area_ha: pts.length >= 3 ? areaHa(pts) : null } });
 }
 
+/**
+ * GET /public/forest/:id/panoramas — the "Walk the forest" 360 tour links for a
+ * forest. Experiential, not proof. Returns only allowlisted external embed URLs
+ * (the UI labels them "an experience, not a verified measurement"). Demo/sample
+ * tours are labelled as such by the admin who adds them, not hidden.
+ */
+async function forestPanoramasPublic(req: Request, res: Response): Promise<void> {
+  const id = String(req.params.id);
+  if (!UUID_RE.test(id)) throw notFound('Forest not found');
+  const exists = await query(
+    `SELECT 1 FROM forests WHERE id = $1 AND is_active = TRUE`,
+    [id],
+  );
+  if (exists.rowCount === 0) throw notFound('Forest not found');
+  const rows = await query<{ id: number; label: string | null; provider: string | null; embed_url: string; captured_on: string | null }>(
+    `SELECT id, label, provider, embed_url, captured_on
+       FROM forest_panoramas
+      WHERE forest_id = $1 AND is_active = TRUE
+      ORDER BY captured_on DESC NULLS LAST, id`,
+    [id],
+  );
+  res.json({
+    data: rows.rows
+      .filter((r) => isAllowedEmbedUrl(r.embed_url)) // defense-in-depth at read
+      .map((r) => ({ id: r.id, label: r.label, provider: r.provider, embed_url: r.embed_url, captured_on: r.captured_on })),
+  });
+}
+
 publicRouter.get('/public/sponsors', wrap(sponsorsPublic));
 publicRouter.get('/public/leaderboard', wrap(leaderboard));
 publicRouter.get('/public/forest/:id/boundary', wrap(forestBoundaryPublic));
@@ -735,6 +764,7 @@ publicRouter.get('/public/forests.geojson', wrap(forestsGeoJSON));
 publicRouter.get('/public/forest/:id/trees.geojson', wrap(forestTreesGeoJSON));
 publicRouter.get('/public/forests-map', wrap(forestsMap));
 publicRouter.get('/public/forest/:id/trees', wrap(forestTreesPublic));
+publicRouter.get('/public/forest/:id/panoramas', wrap(forestPanoramasPublic));
 /**
  * GET /public/lookup?q= — resolve a tree (by UUID or tree_unique_id) or a
  * forest (by unique id / name) for the public Verify search. Returns the type

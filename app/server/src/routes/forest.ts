@@ -53,6 +53,7 @@ import {
   treeCertUrl,
 } from '../lib/geo';
 import { agbKg, CARBON_FRACTION, CO2_PER_C, ROOT_SHOOT, CARBON_METHOD } from '../lib/carbon';
+import { isAllowedEmbedUrl, providerOf, ALLOWED_TOUR_HOSTS } from '../lib/pano';
 
 export const forestRouter = Router();
 
@@ -1360,6 +1361,52 @@ async function setForestBoundary(req: Request, res: Response): Promise<void> {
 }
 
 /**
+ * 360 tours (per-forest/plot "walk the forest" embeds). We store only an
+ * external embed URL (no bytes); the host must be on the allowlist so the
+ * sandboxed iframe can never point at an arbitrary page.
+ */
+async function listPanoramas(req: Request, res: Response): Promise<void> {
+  const forestId = String(req.params.id);
+  await assertForestAccess(req, forestId);
+  const r = await query<Record<string, unknown>>(
+    `SELECT id, label, provider, embed_url, captured_on, is_active
+       FROM forest_panoramas WHERE forest_id = $1 ORDER BY captured_on DESC NULLS LAST, id`,
+    [forestId],
+  );
+  res.json({ data: r.rows });
+}
+
+async function addPanorama(req: Request, res: Response): Promise<void> {
+  const forestId = String(req.params.id);
+  await assertForestAccess(req, forestId);
+  const b = (req.body ?? {}) as Record<string, unknown>;
+  const embedUrl = typeof b.embed_url === 'string' ? b.embed_url.trim() : '';
+  if (!isAllowedEmbedUrl(embedUrl)) {
+    throw badRequest(`embed_url must be an https link on a supported 360 host (${ALLOWED_TOUR_HOSTS.join(', ')})`);
+  }
+  const label = typeof b.label === 'string' && b.label.trim() ? b.label.trim().slice(0, 120) : null;
+  const capturedOn = typeof b.captured_on === 'string' && b.captured_on.trim() ? b.captured_on.trim() : null;
+  const r = await query<Record<string, unknown>>(
+    `INSERT INTO forest_panoramas (forest_id, label, provider, embed_url, captured_on)
+     VALUES ($1, $2, $3, $4, $5) RETURNING id, label, provider, embed_url, captured_on, is_active`,
+    [forestId, label, providerOf(embedUrl), embedUrl, capturedOn],
+  );
+  res.status(201).json({ data: r.rows[0] });
+}
+
+async function deletePanorama(req: Request, res: Response): Promise<void> {
+  const forestId = String(req.params.id);
+  await assertForestAccess(req, forestId);
+  const pid = Number(req.params.pid);
+  if (!Number.isInteger(pid)) throw badRequest('invalid panorama id');
+  await query(
+    `UPDATE forest_panoramas SET is_active = FALSE WHERE id = $1 AND forest_id = $2`,
+    [pid, forestId],
+  );
+  res.json({ data: { id: pid, removed: true } });
+}
+
+/**
  * GET /admin/integrity — SuperAdmin review queue: visits flagged for GPS-far-
  * from-forest (geo_suspect) or a reused/duplicate photo. Surfaces the
  * capture-integrity layer so a human can review suspect captures.
@@ -1550,6 +1597,9 @@ forestRouter.post('/forest/:id/trees/geo', wrap(tagTreeGeo));
 forestRouter.post('/forest/:id/trees/:treeId/visit', upload.any(), wrap(logTreeVisit));
 forestRouter.get('/my/forests', wrap(myForests));
 forestRouter.post('/forest/:id/boundary', wrap(setForestBoundary));
+forestRouter.get('/forest/:id/panoramas', wrap(listPanoramas));
+forestRouter.post('/forest/:id/panoramas', wrap(addPanorama));
+forestRouter.post('/forest/:id/panoramas/:pid/delete', wrap(deletePanorama));
 forestRouter.get('/admin/integrity', wrap(adminIntegrity));
 forestRouter.get('/admin/planters', wrap(adminPlanters));
 forestRouter.post('/admin/planters', wrap(adminCreatePlanter));

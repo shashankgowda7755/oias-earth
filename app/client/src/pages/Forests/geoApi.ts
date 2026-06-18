@@ -78,6 +78,32 @@ export async function setForestBoundary(
   return res.data.data;
 }
 
+export interface Panorama {
+  id: number;
+  label: string | null;
+  provider: string | null;
+  embed_url: string;
+  captured_on: string | null;
+  is_active?: boolean;
+}
+
+export async function listPanoramas(forestId: string): Promise<Panorama[]> {
+  const res = await api.get<{ data: Panorama[] }>(`/forest/${forestId}/panoramas`);
+  return res.data.data;
+}
+
+export async function addPanorama(
+  forestId: string,
+  body: { embed_url: string; label?: string; captured_on?: string },
+): Promise<Panorama> {
+  const res = await api.post<{ data: Panorama }>(`/forest/${forestId}/panoramas`, body);
+  return res.data.data;
+}
+
+export async function deletePanorama(forestId: string, pid: number): Promise<void> {
+  await api.post(`/forest/${forestId}/panoramas/${pid}/delete`, {});
+}
+
 export const TREE_STATUSES = [
   { id: 1, label: 'Healthy' },
   { id: 2, label: 'Drying' },

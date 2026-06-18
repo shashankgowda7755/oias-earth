@@ -212,3 +212,17 @@ export async function fetchForestTrees(id: string): Promise<PublicTree[]> {
   const j = (await r.json()) as { data: PublicTree[] };
   return j.data;
 }
+
+export interface ForestPanorama {
+  id: number;
+  label: string | null;
+  provider: string | null;
+  embed_url: string;
+  captured_on: string | null;
+}
+export async function fetchForestPanoramas(id: string): Promise<ForestPanorama[]> {
+  const r = await fetch(`${BASE}/forest/${id}/panoramas`);
+  if (!r.ok) return [];
+  const j = (await r.json()) as { data: ForestPanorama[] };
+  return j.data;
+}
