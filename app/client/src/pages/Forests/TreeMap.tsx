@@ -35,6 +35,8 @@ export interface TreeMapProps {
   selectedKey?: string | null;
   /** Unsaved capture point for the selected tree. */
   draft?: { lat: number; lng: number } | null;
+  /** In-progress boundary being drawn (amber, dashed). */
+  boundaryDraft?: { lat: number; lng: number }[];
   editable?: boolean;
   height?: number;
   onMapClick?: (lat: number, lng: number) => void;
@@ -66,6 +68,7 @@ export function TreeMap({
   boundary = [],
   selectedKey,
   draft,
+  boundaryDraft = [],
   editable = false,
   height = 420,
   onMapClick,
@@ -158,6 +161,18 @@ export function TreeMap({
       bounds.push([draft.lat, draft.lng]);
     }
 
+    // In-progress boundary being drawn (amber dashed + vertices).
+    if (boundaryDraft.length > 0) {
+      const ring = boundaryDraft.map((p) => [p.lat, p.lng] as [number, number]);
+      if (ring.length >= 2) {
+        L.polyline([...ring, ring[0]!], { color: '#f59e0b', weight: 2, dashArray: '6 5' }).addTo(layer);
+      }
+      ring.forEach((c) =>
+        L.circleMarker(c, { radius: 4, color: '#f59e0b', fillColor: '#f59e0b', fillOpacity: 1 }).addTo(layer),
+      );
+      bounds.push(...ring);
+    }
+
     // Center pin (forest centre) — only used to seed the view if no trees.
     if (center?.lat != null && center?.lng != null && bounds.length === 0) {
       bounds.push([center.lat, center.lng]);
@@ -168,7 +183,7 @@ export function TreeMap({
     } else if (bounds.length > 1) {
       map.fitBounds(L.latLngBounds(bounds), { padding: [30, 30], maxZoom: 18 });
     }
-  }, [trees, boundary, center, selectedKey, draft]);
+  }, [trees, boundary, center, selectedKey, draft, boundaryDraft]);
 
   return <div ref={elRef} style={{ height, width: '100%' }} className="rounded-input overflow-hidden border border-border" />;
 }

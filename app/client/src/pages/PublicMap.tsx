@@ -161,6 +161,19 @@ export default function PublicMap() {
     treeLayer.current?.clearLayers();
   }
 
+  // Open NASA Worldview at the current view with the MODIS NDVI layer — an
+  // independent, NASA-hosted satellite vegetation cross-check (no API key).
+  function openNdvi() {
+    const m = mapRef.current;
+    if (!m) return;
+    const b = m.getBounds();
+    const v = `${b.getWest().toFixed(3)},${b.getSouth().toFixed(3)},${b.getEast().toFixed(3)},${b.getNorth().toFixed(3)}`;
+    const url =
+      `https://worldview.earthdata.nasa.gov/?v=${v}` +
+      `&l=Reference_Labels_15m,Coastlines_15m,MODIS_Terra_NDVI_8Day`;
+    window.open(url, '_blank', 'noopener');
+  }
+
   return (
     <div className="earth" style={{ height: '100vh', display: 'flex', flexDirection: 'column', background: 'var(--ink)', color: 'var(--surface)' }}>
       <header style={{ background: 'var(--ink-2)', padding: '14px clamp(16px,3vw,28px)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, borderBottom: '1px solid var(--line)' }}>
@@ -171,7 +184,17 @@ export default function PublicMap() {
             <div className="mono" style={{ fontSize: 11, color: 'var(--alive)' }}>every pulse is a tree verified alive</div>
           </div>
         </Link>
-        <div style={{ display: 'flex', gap: 26 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 22 }}>
+          <button
+            onClick={openNdvi}
+            title="Open NASA Worldview satellite NDVI for this area"
+            style={{
+              fontFamily: 'var(--mono)', fontSize: 12, padding: '7px 13px', borderRadius: 999, cursor: 'pointer',
+              border: '1px solid var(--line)', background: 'transparent', color: 'var(--surface)',
+            }}
+          >
+            🛰 NDVI ↗
+          </button>
           <div><div className="mono" style={{ fontSize: 20, color: 'var(--alive)' }}>{forests.length}</div><div style={{ fontSize: 11, color: '#9fb0ad', textTransform: 'uppercase', letterSpacing: '.08em' }}>forests</div></div>
           <div><div className="mono" style={{ fontSize: 20, color: 'var(--alive)' }}>{totals.tagged.toLocaleString()}</div><div style={{ fontSize: 11, color: '#9fb0ad', textTransform: 'uppercase', letterSpacing: '.08em' }}>trees alive</div></div>
         </div>

@@ -67,6 +67,17 @@ export async function tagTreeGeo(
   return res.data.data;
 }
 
+export async function setForestBoundary(
+  forestId: string,
+  boundary: { lat: number; lng: number }[],
+): Promise<{ points: number }> {
+  const res = await api.post<{ data: { points: number } }>(
+    `/forest/${forestId}/boundary`,
+    { boundary },
+  );
+  return res.data.data;
+}
+
 export const TREE_STATUSES = [
   { id: 1, label: 'Healthy' },
   { id: 2, label: 'Drying' },

@@ -1331,6 +1331,33 @@ async function logTreeVisit(req: Request, res: Response): Promise<void> {
   }
 }
 
+/**
+ * POST /forest/:id/boundary — set a forest's boundary polygon (EUDR-style).
+ * Body: { boundary: [{lat,lng}, ...] } (>=3 points, or [] to clear).
+ * Stored in forests.forest_boundary (jsonb); exported as a GeoJSON Polygon.
+ */
+async function setForestBoundary(req: Request, res: Response): Promise<void> {
+  const forestId = String(req.params.id);
+  await assertForestAccess(req, forestId);
+  const b = (req.body ?? {}) as Record<string, unknown>;
+  const raw = Array.isArray(b.boundary) ? (b.boundary as Array<Record<string, unknown>>) : [];
+  const clean = raw
+    .map((p) => ({ lat: Number(p.lat), lng: Number(p.lng) }))
+    .filter(
+      (p) =>
+        Number.isFinite(p.lat) && Number.isFinite(p.lng) &&
+        Math.abs(p.lat) <= 90 && Math.abs(p.lng) <= 180,
+    );
+  if (clean.length > 0 && clean.length < 3) {
+    throw badRequest('a boundary needs at least 3 points');
+  }
+  await query(
+    `UPDATE forests SET forest_boundary = $1::jsonb, updated_at = now() WHERE id = $2`,
+    [JSON.stringify(clean), forestId],
+  );
+  res.json({ data: { boundary: clean, points: clean.length } });
+}
+
 /* ------------------------------------------------------------------ */
 /* Route registration                                                  */
 /* ------------------------------------------------------------------ */
@@ -1345,3 +1372,4 @@ forestRouter.post('/forest/:id/trees/list', wrap(forestTreesList));
 forestRouter.post('/forest/:id/trees/geo', wrap(tagTreeGeo));
 forestRouter.post('/forest/:id/trees/:treeId/visit', upload.any(), wrap(logTreeVisit));
 forestRouter.get('/my/forests', wrap(myForests));
+forestRouter.post('/forest/:id/boundary', wrap(setForestBoundary));

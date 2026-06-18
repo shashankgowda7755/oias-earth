@@ -63,6 +63,24 @@ export default function Carbon() {
           These are <strong>estimated, verification-ready removals</strong> — not issued carbon credits. A credit exists only after a registry-approved auditor verifies and the registry issues it{ s ? ` (buffer ${Math.round(s.buffer_pct * 100)}% · uncertainty ${Math.round(s.uncertainty_pct * 100)}% · method ${s.method})` : '' }.
         </div>
 
+        {/* On-chain anchor */}
+        {s?.anchor && (
+          <div style={{ marginTop: 18, padding: '16px 18px', borderRadius: 12, background: 'var(--ink-2)', border: '1px solid var(--line)' }}>
+            <div className="mono" style={{ fontSize: 11, letterSpacing: '.2em', textTransform: 'uppercase', color: 'var(--alive)', marginBottom: 8 }}>
+              <i className="ti" aria-hidden="true"></i>⛓ Anchored to Bitcoin · OpenTimestamps
+            </div>
+            <p style={{ fontSize: 13.5, color: '#aebcb9', margin: '0 0 8px', lineHeight: 1.6 }}>
+              The full carbon ledger is fingerprinted into one Merkle root and timestamped on the Bitcoin blockchain — so the record is tamper-evident and independently verifiable.
+            </p>
+            <div className="mono" style={{ fontSize: 12, color: '#cdd', wordBreak: 'break-all' }}>
+              root <span style={{ color: 'var(--alive)' }}>{s.anchor.root_hash.slice(0, 32)}…</span>
+            </div>
+            <div className="mono" style={{ fontSize: 12, color: '#9fb0ad', marginTop: 4 }}>
+              status {s.anchor.status} · {s.anchor.ledger_rows} ledger rows
+            </div>
+          </div>
+        )}
+
         {/* Method steps */}
         <h2 className="serif" style={{ fontWeight: 600, fontSize: 26, margin: '44px 0 18px' }}>How a tree becomes a credit</h2>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(230px,1fr))', gap: 18 }}>

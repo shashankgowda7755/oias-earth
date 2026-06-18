@@ -326,6 +326,24 @@ async function carbonSummary(_req: Request, res: Response): Promise<void> {
       measured += 1;
     }
   }
+  const a = await query<{
+    root_hash: string;
+    ledger_rows: number | null;
+    ots_status: string | null;
+    anchored_at: string | null;
+  }>(
+    `SELECT root_hash, ledger_rows, ots_status, anchored_at
+       FROM carbon_anchors ORDER BY anchored_at DESC LIMIT 1`,
+  );
+  const anchor = a.rows[0]
+    ? {
+        root_hash: a.rows[0].root_hash,
+        ledger_rows: a.rows[0].ledger_rows,
+        status: a.rows[0].ots_status,
+        anchored_at: a.rows[0].anchored_at,
+      }
+    : null;
+
   res.json({
     data: {
       measured_trees: measured,
@@ -335,6 +353,7 @@ async function carbonSummary(_req: Request, res: Response): Promise<void> {
       uncertainty_pct: UNCERTAINTY_PCT,
       method: CARBON_METHOD,
       label: 'estimated / verification-ready removals — not issued credits',
+      anchor,
     },
   });
 }
@@ -378,7 +397,7 @@ function r6(v: string | number | null): number | null {
 async function forestsGeoJSON(_req: Request, res: Response): Promise<void> {
   const rows = await query<Record<string, unknown>>(
     `SELECT f.id, f.forest_name, f.forest_unique_id, f.forest_geo_lat, f.forest_geo_long,
-            f.forest_city, f.forest_state, f.forest_country,
+            f.forest_city, f.forest_state, f.forest_country, f.forest_boundary,
             COUNT(t.id) FILTER (WHERE t.is_active = TRUE) AS total_trees,
             COUNT(t.id) FILTER (WHERE t.is_active = TRUE AND t.forest_tree_geo_lat IS NOT NULL) AS tagged_trees
        FROM forests f
@@ -393,9 +412,24 @@ async function forestsGeoJSON(_req: Request, res: Response): Promise<void> {
         const lng = r6(r.forest_geo_long as string);
         const lat = r6(r.forest_geo_lat as string);
         if (lng == null || lat == null) return null;
+        // Polygon when a boundary is set (EUDR), else a centre Point.
+        let geometry: { type: string; coordinates: unknown } = { type: 'Point', coordinates: [lng, lat] };
+        let bd = r.forest_boundary as unknown;
+        if (typeof bd === 'string') { try { bd = JSON.parse(bd); } catch { bd = null; } }
+        if (Array.isArray(bd) && bd.length >= 3) {
+          const ring = bd
+            .map((p: Record<string, unknown>) => [r6(p.lng as number), r6(p.lat as number)])
+            .filter((c) => c[0] != null && c[1] != null) as number[][];
+          if (ring.length >= 3) {
+            if (ring[0]![0] !== ring[ring.length - 1]![0] || ring[0]![1] !== ring[ring.length - 1]![1]) {
+              ring.push([ring[0]![0]!, ring[0]![1]!]);
+            }
+            geometry = { type: 'Polygon', coordinates: [ring] };
+          }
+        }
         return {
           type: 'Feature',
-          geometry: { type: 'Point', coordinates: [lng, lat] },
+          geometry,
           properties: {
             id: r.id,
             name: r.forest_name,

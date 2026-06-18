@@ -52,6 +52,12 @@ export interface CarbonSummary {
   uncertainty_pct: number;
   method: string;
   label: string;
+  anchor?: {
+    root_hash: string;
+    ledger_rows: number | null;
+    status: string | null;
+    anchored_at: string | null;
+  } | null;
 }
 
 export async function fetchCarbonSummary(): Promise<CarbonSummary> {

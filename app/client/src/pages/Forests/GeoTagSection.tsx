@@ -22,6 +22,7 @@ import {
   listForestTrees,
   tagTreeGeo,
   logVisit,
+  setForestBoundary,
   TREE_STATUSES,
   type RegisterTree,
 } from './geoApi';
@@ -66,6 +67,11 @@ export function GeoTagSection({ forest }: GeoTagSectionProps) {
   const [vDia, setVDia] = useState('');
   const [vPhoto, setVPhoto] = useState<File | null>(null);
   const [vSaving, setVSaving] = useState(false);
+
+  // EUDR boundary editor.
+  const [boundaryMode, setBoundaryMode] = useState(false);
+  const [boundaryPts, setBoundaryPts] = useState<{ lat: number; lng: number }[]>([]);
+  const [boundarySaving, setBoundarySaving] = useState(false);
 
   const load = useCallback(async () => {
     if (!forestId) {
@@ -152,11 +158,32 @@ export function GeoTagSection({ forest }: GeoTagSectionProps) {
 
   const onMapClick = useCallback(
     (lat: number, lng: number) => {
+      if (boundaryMode) {
+        setBoundaryPts((p) => [...p, { lat, lng }]);
+        return;
+      }
       if (!editable || !selectedId) return;
       setDraftCoords(lat, lng);
     },
-    [editable, selectedId, setDraftCoords],
+    [boundaryMode, editable, selectedId, setDraftCoords],
   );
+
+  const saveBoundary = useCallback(async () => {
+    setBoundarySaving(true);
+    try {
+      await setForestBoundary(forestId, boundaryPts);
+      setBoundary(boundaryPts);
+      toast.show(
+        boundaryPts.length ? `Boundary saved (${boundaryPts.length} points)` : 'Boundary cleared',
+        'success',
+      );
+      setBoundaryMode(false);
+    } catch (e) {
+      toast.show(e instanceof Error ? e.message : 'Failed to save boundary', 'error');
+    } finally {
+      setBoundarySaving(false);
+    }
+  }, [forestId, boundaryPts, toast]);
 
   const useMyLocation = useCallback(() => {
     if (!navigator.geolocation) {
@@ -324,13 +351,56 @@ export function GeoTagSection({ forest }: GeoTagSectionProps) {
               center={center}
               selectedKey={selectedId}
               draft={draft}
-              editable={editable && Boolean(selectedId)}
+              boundaryDraft={boundaryMode ? boundaryPts : []}
+              editable={editable && (Boolean(selectedId) || boundaryMode)}
               onMapClick={onMapClick}
               onSelectTree={selectTree}
               height={420}
             />
 
-            {editable && selected ? (
+            {/* EUDR boundary editor */}
+            {editable && (
+              <div className="rounded-input border border-border p-3">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <span className="text-sm">
+                    Forest boundary <span className="text-textSecondary">(EUDR polygon)</span>
+                    {boundary.length >= 3 && !boundaryMode ? (
+                      <span className="ml-2 text-xs text-primary">✓ {boundary.length}-point boundary set</span>
+                    ) : null}
+                  </span>
+                  {!boundaryMode ? (
+                    <Button
+                      type="button"
+                      variant="outlined"
+                      onClick={() => {
+                        setBoundaryMode(true);
+                        setBoundaryPts(boundary);
+                        setSelectedId(null);
+                      }}
+                    >
+                      {boundary.length >= 3 ? 'Edit boundary' : 'Draw boundary'}
+                    </Button>
+                  ) : (
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="text-xs text-textSecondary">
+                        Tap the map to add corners ({boundaryPts.length})
+                      </span>
+                      <Button type="button" variant="outlined" onClick={() => setBoundaryPts((p) => p.slice(0, -1))} disabled={!boundaryPts.length}>
+                        Undo
+                      </Button>
+                      <Button type="button" variant="outlined" onClick={() => setBoundaryPts([])} disabled={!boundaryPts.length}>
+                        Clear
+                      </Button>
+                      <Button type="button" variant="primary" onClick={() => void saveBoundary()} disabled={boundarySaving || (boundaryPts.length > 0 && boundaryPts.length < 3)}>
+                        {boundarySaving ? 'Saving…' : 'Save boundary'}
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {editable && selected && !boundaryMode ? (
               <>
                 <div className="rounded-input border border-border p-3">
                   <div className="mb-2 text-sm">
