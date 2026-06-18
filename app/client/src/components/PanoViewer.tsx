@@ -8,11 +8,24 @@
 import { useEffect, useRef, useState } from 'react';
 import '@photo-sphere-viewer/core/index.css';
 
+function hasWebGL(): boolean {
+  try {
+    const c = document.createElement('canvas');
+    return !!(c.getContext('webgl') || c.getContext('experimental-webgl'));
+  } catch {
+    return false;
+  }
+}
+
 export default function PanoViewer({ src }: { src: string }) {
   const ref = useRef<HTMLDivElement | null>(null);
   const [err, setErr] = useState(false);
+  // No WebGL (old device / headless) → show the flat equirect so the forest still
+  // appears, just not interactive. Graceful degradation beats an error message.
+  const [flat] = useState(() => !hasWebGL());
 
   useEffect(() => {
+    if (flat) return;
     let cancelled = false;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let viewer: any;
@@ -37,12 +50,17 @@ export default function PanoViewer({ src }: { src: string }) {
       cancelled = true;
       if (viewer) viewer.destroy();
     };
-  }, [src]);
+  }, [src, flat]);
 
-  if (err) {
+  if (flat || err) {
+    // Flat equirect fallback (no WebGL or viewer failed). Shows the scene,
+    // non-interactive, with an honest note.
     return (
-      <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#9fb0ad', fontSize: 13 }}>
-        360° view unavailable.
+      <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+        <img src={src} alt="360° panorama (flat view)" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+        <span style={{ position: 'absolute', bottom: 8, left: 8, background: 'rgba(0,0,0,.55)', color: '#cdd', fontSize: 11, padding: '3px 8px', borderRadius: 6 }}>
+          flat view · 360° needs WebGL
+        </span>
       </div>
     );
   }
