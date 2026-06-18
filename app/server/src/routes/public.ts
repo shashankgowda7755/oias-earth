@@ -135,8 +135,12 @@ async function forestTreesPublic(req: Request, res: Response): Promise<void> {
  * plus a computed survival verdict and growth delta. This is the moat: not a
  * day-zero snapshot, but a life record anyone can verify, no login.
  */
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 async function treeProof(req: Request, res: Response): Promise<void> {
   const treeId = String(req.params.id);
+  // Reject malformed ids cleanly (else Postgres throws on the uuid cast -> 500).
+  if (!UUID_RE.test(treeId)) throw notFound('Tree not found');
 
   const t = await query<{
     id: string;
@@ -483,5 +487,48 @@ publicRouter.get('/public/forests.geojson', wrap(forestsGeoJSON));
 publicRouter.get('/public/forest/:id/trees.geojson', wrap(forestTreesGeoJSON));
 publicRouter.get('/public/forests-map', wrap(forestsMap));
 publicRouter.get('/public/forest/:id/trees', wrap(forestTreesPublic));
+/**
+ * GET /public/lookup?q= — resolve a tree (by UUID or tree_unique_id) or a
+ * forest (by unique id / name) for the public Verify search. Returns the type
+ * + id to route to, or null.
+ */
+async function lookup(req: Request, res: Response): Promise<void> {
+  const q = String(req.query.q ?? '').trim();
+  if (!q) {
+    res.json({ data: null });
+    return;
+  }
+  if (UUID_RE.test(q)) {
+    const t = await query<{ id: string }>(
+      `SELECT id FROM forest_trees WHERE id = $1 AND is_active = TRUE LIMIT 1`,
+      [q],
+    );
+    if (t.rowCount) {
+      res.json({ data: { type: 'tree', id: t.rows[0]!.id } });
+      return;
+    }
+  }
+  const tu = await query<{ id: string }>(
+    `SELECT id FROM forest_trees WHERE tree_unique_id ILIKE $1 AND is_active = TRUE LIMIT 1`,
+    [q],
+  );
+  if (tu.rowCount) {
+    res.json({ data: { type: 'tree', id: tu.rows[0]!.id } });
+    return;
+  }
+  const f = await query<{ id: string; forest_name: string | null }>(
+    `SELECT id, forest_name FROM forests
+      WHERE (forest_unique_id ILIKE $1 OR forest_name ILIKE $2) AND is_active = TRUE
+      ORDER BY forest_name LIMIT 1`,
+    [q, `%${q}%`],
+  );
+  if (f.rowCount) {
+    res.json({ data: { type: 'forest', id: f.rows[0]!.id, name: f.rows[0]!.forest_name } });
+    return;
+  }
+  res.json({ data: null });
+}
+
 publicRouter.get('/public/tree/:id', wrap(treeProof));
 publicRouter.get('/public/carbon', wrap(carbonSummary));
+publicRouter.get('/public/lookup', wrap(lookup));

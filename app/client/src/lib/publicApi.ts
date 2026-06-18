@@ -102,6 +102,19 @@ export interface TreeProof {
   visits: TreeVisit[];
 }
 
+export interface LookupResult {
+  type: 'tree' | 'forest';
+  id: string;
+  name?: string | null;
+}
+
+export async function lookup(q: string): Promise<LookupResult | null> {
+  const r = await fetch(`${BASE}/lookup?q=${encodeURIComponent(q)}`);
+  if (!r.ok) return null;
+  const j = (await r.json()) as { data: LookupResult | null };
+  return j.data;
+}
+
 export async function fetchTreeProof(id: string): Promise<TreeProof> {
   const r = await fetch(`${BASE}/tree/${id}`);
   if (!r.ok) throw new Error('Tree not found');

@@ -18,6 +18,7 @@ import Landing from './pages/Landing';
 import TreeProof from './pages/TreeProof';
 import Field from './pages/Field';
 import Carbon from './pages/Carbon';
+import Verify from './pages/Verify';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -44,6 +45,7 @@ export default function App() {
               <Route path="/tree/:id" element={<TreeProof />} />
               <Route path="/field" element={<Field />} />
               <Route path="/carbon" element={<Carbon />} />
+              <Route path="/verify" element={<Verify />} />
               <Route
                 path="/dashboard"
                 element={

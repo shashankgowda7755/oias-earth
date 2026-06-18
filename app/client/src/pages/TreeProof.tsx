@@ -6,6 +6,7 @@
  */
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
+import QRCode from 'qrcode';
 import { HeartbeatMap } from '@/components/HeartbeatMap';
 import { fetchTreeProof, type TreeProof as TP } from '@/lib/publicApi';
 import '@/styles/earth.css';
@@ -45,6 +46,7 @@ export default function TreeProof() {
   const [data, setData] = useState<TP | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [qr, setQr] = useState<string | null>(null);
 
   useEffect(() => {
     setLoading(true);
@@ -52,6 +54,13 @@ export default function TreeProof() {
       .then(setData)
       .catch((e) => setError(e instanceof Error ? e.message : 'Failed to load'))
       .finally(() => setLoading(false));
+  }, [id]);
+
+  useEffect(() => {
+    const url = `${window.location.origin}/tree/${id}`;
+    QRCode.toDataURL(url, { margin: 1, width: 320, color: { dark: '#16282e', light: '#ffffff' } })
+      .then(setQr)
+      .catch(() => setQr(null));
   }, [id]);
 
   const wrap = (children: React.ReactNode) => (
@@ -190,6 +199,25 @@ export default function TreeProof() {
           <p className="mono" style={{ fontSize: 12, color: '#9fb0ad', marginTop: 10 }}>
             {tree.lat?.toFixed(6)}, {tree.lng?.toFixed(6)} · coordinates fixed at planting, re-checked every visit
           </p>
+        </>
+      )}
+
+      {/* On-site QR plaque */}
+      {qr && (
+        <>
+          <h2 className="serif" style={{ fontWeight: 600, fontSize: 22, margin: '36px 0 16px' }}>On-site plaque</h2>
+          <div style={{ display: 'flex', gap: 22, alignItems: 'center', flexWrap: 'wrap', background: 'var(--ink-2)', border: '1px solid var(--line)', borderRadius: 14, padding: 22 }}>
+            <img src={qr} alt={`QR to ${tree.tree_unique_id}`} width={140} height={140} style={{ borderRadius: 10, background: '#fff' }} />
+            <div style={{ flex: 1, minWidth: 220 }}>
+              <p style={{ fontSize: 15, color: '#cdd', margin: '0 0 6px', lineHeight: 1.6 }}>
+                Print this QR for a plaque at the tree. Anyone who scans it lands on this live record — the physical tree linked to its proof of life.
+              </p>
+              <a href={qr} download={`plaque-${tree.tree_unique_id ?? tree.id}.png`}
+                 style={{ display: 'inline-block', marginTop: 8, background: 'var(--alive)', color: '#16282e', textDecoration: 'none', padding: '9px 18px', borderRadius: 999, fontWeight: 700, fontSize: 14 }}>
+                Download QR plaque ↓
+              </a>
+            </div>
+          </div>
         </>
       )}
     </div>,
