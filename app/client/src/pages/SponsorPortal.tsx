@@ -10,7 +10,7 @@
  */
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
-import { fetchSponsor, fetchForestTrees, fetchForestPanoramas, type SponsorSite, type PublicTree, type ForestPanorama } from '@/lib/publicApi';
+import { fetchSponsor, fetchForestTrees, fetchForestPanoramas, fetchForestScenes, type SponsorSite, type PublicTree, type ForestPanorama } from '@/lib/publicApi';
 import PanoViewer from '@/components/PanoViewer';
 import '@/styles/earth.css';
 
@@ -39,6 +39,7 @@ export default function SponsorPortal() {
   const [page, setPage] = useState(1);
   const [panos, setPanos] = useState<ForestPanorama[]>([]);
   const [tourOpen, setTourOpen] = useState<number | null>(null);
+  const [hasTour, setHasTour] = useState(false);
 
   useEffect(() => {
     fetchSponsor(id).then(setD).catch((e) => setErr(e instanceof Error ? e.message : 'Failed'));
@@ -66,6 +67,8 @@ export default function SponsorPortal() {
       .then(setTrees)
       .catch((e) => setTreeErr(e instanceof Error ? e.message : 'Failed to load trees'));
     fetchForestPanoramas(forestId).then(setPanos).catch(() => setPanos([]));
+    setHasTour(false);
+    fetchForestScenes(forestId).then((s) => setHasTour(s.length > 0)).catch(() => setHasTour(false));
   }, [forestId]);
 
   const selectForest = (fid: string) => {
@@ -200,6 +203,14 @@ export default function SponsorPortal() {
         ))}
         {!stats && <p style={{ color: '#9fb0ad', fontSize: 14 }}>Loading forest…</p>}
       </div>
+
+      {/* Interactive 360 walk-through CTA (only when scenes exist) */}
+      {hasTour && (
+        <Link to={`/forest/${forestId}/tour`}
+          style={{ display: 'inline-flex', alignItems: 'center', gap: 8, marginTop: 20, background: 'var(--alive)', color: '#16282e', textDecoration: 'none', padding: '12px 22px', borderRadius: 999, fontWeight: 700, fontSize: 15 }}>
+          🌲 Enter the interactive 360° walk-through →
+        </Link>
+      )}
 
       {/* Walk the forest — 360° tours (experiential, not a measurement) */}
       {panos.length > 0 && (
