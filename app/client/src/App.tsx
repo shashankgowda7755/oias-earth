@@ -28,6 +28,7 @@ const Verify = lazy(() => import('./pages/Verify'));
 const Sponsor = lazy(() => import('./pages/Sponsor'));
 const SponsorPortal = lazy(() => import('./pages/SponsorPortal'));
 const AuditPnb = lazy(() => import('./pages/AuditPnb'));
+const ForestTourPage = lazy(() => import('./pages/ForestTourPage'));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -67,6 +68,7 @@ export default function App() {
                 <Route path="/sponsor/:id" element={<Sponsor />} />
                 <Route path="/portal/:id" element={<SponsorPortal />} />
                 <Route path="/audit/pnb" element={<AuditPnb />} />
+              <Route path="/forest/:id/tour" element={<ForestTourPage />} />
                 <Route
                   path="/dashboard"
                   element={

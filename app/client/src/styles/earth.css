@@ -100,6 +100,19 @@
 }
 .forest-cluster .fc small { font-size: 9px; color: #9fb0ad; font-weight: 500; margin-top: 2px; letter-spacing: .04em; }
 
+/* 360 tour markers: tree hotspots (status-coloured dots) + nav arrows. */
+.tour-pin { width: 22px; height: 22px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 8px rgba(0,0,0,.6); cursor: pointer; }
+.tour-pin.s1 { background: #b6ff3c; box-shadow: 0 0 11px rgba(182,255,60,.9); }
+.tour-pin.s2 { background: #e8a33d; }
+.tour-pin.s3 { background: #f0792b; }
+.tour-pin.s4 { background: #6b7b82; }
+.tour-arrow {
+  display: flex; align-items: center; justify-content: center;
+  width: 44px; height: 44px; border-radius: 50%;
+  background: rgba(15,29,34,.85); border: 2px solid var(--alive); color: var(--alive);
+  font-size: 18px; cursor: pointer; box-shadow: 0 0 12px rgba(182,255,60,.5);
+}
+
 /* Tree cluster bubble — dense forests collapse trees into a count until you
    zoom in to the individual health-coloured pins. */
 .tree-cluster { background: transparent !important; }

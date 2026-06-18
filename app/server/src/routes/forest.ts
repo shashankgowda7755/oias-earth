@@ -54,6 +54,7 @@ import {
 } from '../lib/geo';
 import { agbKg, CARBON_FRACTION, CO2_PER_C, ROOT_SHOOT, CARBON_METHOD } from '../lib/carbon';
 import { isAllowedPanoUrl, providerOf, ALLOWED_TOUR_HOSTS } from '../lib/pano';
+import { put } from '@vercel/blob';
 
 export const forestRouter = Router();
 
@@ -1406,6 +1407,175 @@ async function deletePanorama(req: Request, res: Response): Promise<void> {
   res.json({ data: { id: pid, removed: true } });
 }
 
+// ---------------------------------------------------------------------------
+// Interactive 360 tour: scenes + tree hotspots + navigation links (admin CRUD).
+// ---------------------------------------------------------------------------
+const sceneUpload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 25 * 1024 * 1024 } });
+
+const pnum = (v: unknown, d = 0): number => {
+  const n = Number(v);
+  return Number.isFinite(n) ? n : d;
+};
+
+/** POST /forest/:id/scenes/upload — store an equirect image in object storage
+ *  (Vercel Blob) and return its public URL. Needs BLOB_READ_WRITE_TOKEN. */
+async function uploadSceneImage(req: Request, res: Response): Promise<void> {
+  const forestId = String(req.params.id);
+  await assertForestAccess(req, forestId);
+  const file = (req as unknown as { file?: { buffer: Buffer; originalname: string; mimetype: string } }).file;
+  if (!file) throw badRequest('image file is required (field "image")');
+  if (!/^image\//.test(file.mimetype)) throw badRequest('file must be an image');
+  if (!process.env.BLOB_READ_WRITE_TOKEN) {
+    throw badRequest('object storage not configured — set BLOB_READ_WRITE_TOKEN (Vercel Blob) or paste an external https equirect URL instead');
+  }
+  const ext = (file.originalname.split('.').pop() || 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '');
+  const key = `panoramas/${forestId}/${Date.now()}.${ext}`;
+  const blob = await put(key, file.buffer, { access: 'public', contentType: file.mimetype });
+  res.status(201).json({ data: { url: blob.url } });
+}
+
+async function listScenesAdmin(req: Request, res: Response): Promise<void> {
+  const forestId = String(req.params.id);
+  await assertForestAccess(req, forestId);
+  const scenes = await query<Record<string, unknown>>(
+    `SELECT id, label, image_url, lat, lng, default_yaw, default_pitch, display_order, is_demo, is_active
+       FROM forest_scenes WHERE forest_id = $1 AND is_active = TRUE ORDER BY display_order, id`,
+    [forestId],
+  );
+  const ids = scenes.rows.map((s) => s.id as number);
+  const hs = ids.length
+    ? await query<Record<string, unknown>>(
+        `SELECT h.id, h.scene_id, h.tree_id, h.yaw, h.pitch, ft.tree_unique_id,
+                COALESCE(sp.common_name, sp.species_name) AS species
+           FROM scene_hotspots h JOIN forest_trees ft ON ft.id = h.tree_id
+           LEFT JOIN master_plantspecies sp ON sp.id = ft.master_plant_species_id
+          WHERE h.scene_id = ANY($1::int[]) AND h.is_active = TRUE`,
+        [ids],
+      )
+    : { rows: [] as Record<string, unknown>[] };
+  const ln = ids.length
+    ? await query<Record<string, unknown>>(
+        `SELECT id, from_scene_id, to_scene_id, yaw, pitch, label FROM scene_links
+          WHERE from_scene_id = ANY($1::int[]) AND is_active = TRUE`,
+        [ids],
+      )
+    : { rows: [] as Record<string, unknown>[] };
+  res.json({ data: { scenes: scenes.rows, hotspots: hs.rows, links: ln.rows } });
+}
+
+async function createScene(req: Request, res: Response): Promise<void> {
+  const forestId = String(req.params.id);
+  await assertForestAccess(req, forestId);
+  const b = (req.body ?? {}) as Record<string, unknown>;
+  const imageUrl = typeof b.image_url === 'string' ? b.image_url.trim() : '';
+  if (!isAllowedPanoUrl(imageUrl)) {
+    throw badRequest('image_url must be an https equirect image, a stored /panoramas URL, or an allowlisted host');
+  }
+  const label = typeof b.label === 'string' ? b.label.trim().slice(0, 120) || null : null;
+  const r = await query<{ id: number }>(
+    `INSERT INTO forest_scenes (forest_id, label, image_url, lat, lng, default_yaw, default_pitch, display_order, is_demo)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING id`,
+    [
+      forestId, label, imageUrl,
+      b.lat != null ? pnum(b.lat) : null, b.lng != null ? pnum(b.lng) : null,
+      pnum(b.default_yaw), pnum(b.default_pitch), pnum(b.display_order),
+      b.is_demo === true,
+    ],
+  );
+  res.status(201).json({ data: { id: r.rows[0]!.id } });
+}
+
+async function deleteScene(req: Request, res: Response): Promise<void> {
+  const forestId = String(req.params.id);
+  await assertForestAccess(req, forestId);
+  const sid = Number(req.params.sid);
+  if (!Number.isInteger(sid)) throw badRequest('invalid scene id');
+  // Soft-delete the scene and its hotspots + links (in or out).
+  await query(`UPDATE forest_scenes SET is_active = FALSE WHERE id = $1 AND forest_id = $2`, [sid, forestId]);
+  await query(`UPDATE scene_hotspots SET is_active = FALSE WHERE scene_id = $1`, [sid]);
+  await query(`UPDATE scene_links SET is_active = FALSE WHERE from_scene_id = $1 OR to_scene_id = $1`, [sid]);
+  res.json({ data: { id: sid, removed: true } });
+}
+
+/** assert a scene belongs to the forest; returns nothing or throws 404. */
+async function assertSceneInForest(sceneId: number, forestId: string): Promise<void> {
+  const r = await query(`SELECT 1 FROM forest_scenes WHERE id = $1 AND forest_id = $2 AND is_active = TRUE`, [sceneId, forestId]);
+  if (r.rowCount === 0) throw notFound('Scene not found in this forest');
+}
+
+async function addHotspot(req: Request, res: Response): Promise<void> {
+  const forestId = String(req.params.id);
+  await assertForestAccess(req, forestId);
+  const sid = Number(req.params.sid);
+  if (!Number.isInteger(sid)) throw badRequest('invalid scene id');
+  await assertSceneInForest(sid, forestId);
+  const b = (req.body ?? {}) as Record<string, unknown>;
+  const yaw = pnum(b.yaw);
+  const pitch = pnum(b.pitch);
+  if (yaw < 0 || yaw > 360 || pitch < -90 || pitch > 90) throw badRequest('yaw 0-360, pitch -90..90');
+  // Resolve the tree by id or unique id AND confirm it belongs to this forest.
+  let treeId = typeof b.tree_id === 'string' ? b.tree_id : null;
+  const tree = await query<{ id: string }>(
+    treeId
+      ? `SELECT id FROM forest_trees WHERE id = $1 AND forest_id = $2 AND is_active = TRUE`
+      : `SELECT id FROM forest_trees WHERE tree_unique_id = $1 AND forest_id = $2 AND is_active = TRUE`,
+    [treeId ?? String(b.tree_unique_id ?? ''), forestId],
+  );
+  if (tree.rowCount === 0) throw badRequest('tree not found in this forest (cross-forest hotspots are rejected)');
+  treeId = tree.rows[0]!.id;
+  const r = await query<{ id: number }>(
+    `INSERT INTO scene_hotspots (scene_id, tree_id, yaw, pitch) VALUES ($1,$2,$3,$4)
+     ON CONFLICT (scene_id, tree_id) DO UPDATE SET yaw = EXCLUDED.yaw, pitch = EXCLUDED.pitch, is_active = TRUE
+     RETURNING id`,
+    [sid, treeId, yaw, pitch],
+  );
+  res.status(201).json({ data: { id: r.rows[0]!.id, tree_id: treeId } });
+}
+
+async function deleteHotspot(req: Request, res: Response): Promise<void> {
+  const forestId = String(req.params.id);
+  await assertForestAccess(req, forestId);
+  const hid = Number(req.params.hid);
+  if (!Number.isInteger(hid)) throw badRequest('invalid hotspot id');
+  await query(
+    `UPDATE scene_hotspots SET is_active = FALSE
+      WHERE id = $1 AND scene_id IN (SELECT id FROM forest_scenes WHERE forest_id = $2)`,
+    [hid, forestId],
+  );
+  res.json({ data: { id: hid, removed: true } });
+}
+
+async function addLink(req: Request, res: Response): Promise<void> {
+  const forestId = String(req.params.id);
+  await assertForestAccess(req, forestId);
+  const sid = Number(req.params.sid);
+  const b = (req.body ?? {}) as Record<string, unknown>;
+  const toId = Number(b.to_scene_id);
+  if (!Number.isInteger(sid) || !Number.isInteger(toId)) throw badRequest('invalid scene id');
+  if (sid === toId) throw badRequest('a scene cannot link to itself');
+  await assertSceneInForest(sid, forestId);
+  await assertSceneInForest(toId, forestId); // both must be in the SAME forest
+  const label = typeof b.label === 'string' ? b.label.trim().slice(0, 80) || null : null;
+  const r = await query<{ id: number }>(
+    `INSERT INTO scene_links (from_scene_id, to_scene_id, yaw, pitch, label) VALUES ($1,$2,$3,$4,$5) RETURNING id`,
+    [sid, toId, pnum(b.yaw), pnum(b.pitch), label],
+  );
+  res.status(201).json({ data: { id: r.rows[0]!.id } });
+}
+
+async function deleteLink(req: Request, res: Response): Promise<void> {
+  const forestId = String(req.params.id);
+  await assertForestAccess(req, forestId);
+  const lid = Number(req.params.lid);
+  if (!Number.isInteger(lid)) throw badRequest('invalid link id');
+  await query(
+    `UPDATE scene_links SET is_active = FALSE
+      WHERE id = $1 AND from_scene_id IN (SELECT id FROM forest_scenes WHERE forest_id = $2)`,
+    [lid, forestId],
+  );
+  res.json({ data: { id: lid, removed: true } });
+}
+
 /**
  * GET /admin/integrity — SuperAdmin review queue: visits flagged for GPS-far-
  * from-forest (geo_suspect) or a reused/duplicate photo. Surfaces the
@@ -1600,6 +1770,15 @@ forestRouter.post('/forest/:id/boundary', wrap(setForestBoundary));
 forestRouter.get('/forest/:id/panoramas', wrap(listPanoramas));
 forestRouter.post('/forest/:id/panoramas', wrap(addPanorama));
 forestRouter.post('/forest/:id/panoramas/:pid/delete', wrap(deletePanorama));
+// 360 tour: scenes + hotspots + links
+forestRouter.get('/forest/:id/scenes', wrap(listScenesAdmin));
+forestRouter.post('/forest/:id/scenes', wrap(createScene));
+forestRouter.post('/forest/:id/scenes/upload', sceneUpload.single('image'), wrap(uploadSceneImage));
+forestRouter.post('/forest/:id/scenes/:sid/delete', wrap(deleteScene));
+forestRouter.post('/forest/:id/scenes/:sid/hotspots', wrap(addHotspot));
+forestRouter.post('/forest/:id/hotspots/:hid/delete', wrap(deleteHotspot));
+forestRouter.post('/forest/:id/scenes/:sid/links', wrap(addLink));
+forestRouter.post('/forest/:id/links/:lid/delete', wrap(deleteLink));
 forestRouter.get('/admin/integrity', wrap(adminIntegrity));
 forestRouter.get('/admin/planters', wrap(adminPlanters));
 forestRouter.post('/admin/planters', wrap(adminCreatePlanter));

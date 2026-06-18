@@ -226,3 +226,33 @@ export async function fetchForestPanoramas(id: string): Promise<ForestPanorama[]
   const j = (await r.json()) as { data: ForestPanorama[] };
   return j.data;
 }
+
+export interface SceneHotspot {
+  tree_id: string;
+  tree_unique_id: string | null;
+  species: string | null;
+  status_id?: number | null;
+  status?: string | null;
+  survival?: 'alive' | 'dead';
+  yaw: number;
+  pitch: number;
+}
+export interface SceneLink { to_scene_id: number; yaw: number; pitch: number; label: string | null }
+export interface ForestScene {
+  id: number;
+  label: string | null;
+  image_url: string;
+  lat: number | null;
+  lng: number | null;
+  default_yaw: number;
+  default_pitch: number;
+  is_demo: boolean;
+  hotspots: SceneHotspot[];
+  links: SceneLink[];
+}
+export async function fetchForestScenes(id: string): Promise<ForestScene[]> {
+  const r = await fetch(`${BASE}/forest/${id}/scenes`);
+  if (!r.ok) return [];
+  const j = (await r.json()) as { data: { scenes: ForestScene[] } };
+  return j.data.scenes ?? [];
+}

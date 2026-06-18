@@ -50,8 +50,13 @@ export function isAllowedEmbedUrl(url: unknown): boolean {
  *     does not apply);
  *  3. an https embed on an allowlisted 360 host — rendered in a sandboxed iframe.
  */
+const DANGEROUS_SCHEME = /^\s*(data|javascript|vbscript|file|blob):/i;
+
 export function isAllowedPanoUrl(url: unknown): boolean {
   if (typeof url !== 'string' || url.length > 2000) return false;
+  // Explicit scheme denylist (defense-in-depth: the same-origin branch below
+  // skips URL parsing, so reject dangerous schemes by name up front).
+  if (DANGEROUS_SCHEME.test(url)) return false;
   // same-origin static image (leading single slash, not protocol-relative //)
   if (url.startsWith('/') && !url.startsWith('//')) return isImageUrl(url);
   let u: URL;

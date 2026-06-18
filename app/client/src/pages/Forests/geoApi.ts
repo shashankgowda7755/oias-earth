@@ -104,6 +104,43 @@ export async function deletePanorama(forestId: string, pid: number): Promise<voi
   await api.post(`/forest/${forestId}/panoramas/${pid}/delete`, {});
 }
 
+// ---- 360 tour: scenes + hotspots + links ----
+export interface SceneRow { id: number; label: string | null; image_url: string; lat: number | null; lng: number | null; default_yaw: number; default_pitch: number; display_order: number; is_demo: boolean }
+export interface HotspotRow { id: number; scene_id: number; tree_id: string; yaw: number; pitch: number; tree_unique_id: string | null; species: string | null }
+export interface LinkRow { id: number; from_scene_id: number; to_scene_id: number; yaw: number; pitch: number; label: string | null }
+
+export async function listScenes(forestId: string): Promise<{ scenes: SceneRow[]; hotspots: HotspotRow[]; links: LinkRow[] }> {
+  const r = await api.get<{ data: { scenes: SceneRow[]; hotspots: HotspotRow[]; links: LinkRow[] } }>(`/forest/${forestId}/scenes`);
+  return r.data.data;
+}
+export async function uploadSceneImage(forestId: string, file: File): Promise<string> {
+  const fd = new FormData();
+  fd.append('image', file);
+  const r = await api.post<{ data: { url: string } }>(`/forest/${forestId}/scenes/upload`, fd);
+  return r.data.data.url;
+}
+export async function createScene(forestId: string, body: { image_url: string; label?: string; default_yaw?: number; default_pitch?: number; is_demo?: boolean }): Promise<{ id: number }> {
+  const r = await api.post<{ data: { id: number } }>(`/forest/${forestId}/scenes`, body);
+  return r.data.data;
+}
+export async function deleteScene(forestId: string, sid: number): Promise<void> {
+  await api.post(`/forest/${forestId}/scenes/${sid}/delete`, {});
+}
+export async function addHotspot(forestId: string, sid: number, body: { tree_id?: string; tree_unique_id?: string; yaw: number; pitch: number }): Promise<{ id: number }> {
+  const r = await api.post<{ data: { id: number } }>(`/forest/${forestId}/scenes/${sid}/hotspots`, body);
+  return r.data.data;
+}
+export async function deleteHotspot(forestId: string, hid: number): Promise<void> {
+  await api.post(`/forest/${forestId}/hotspots/${hid}/delete`, {});
+}
+export async function addLink(forestId: string, sid: number, body: { to_scene_id: number; yaw: number; pitch: number; label?: string }): Promise<{ id: number }> {
+  const r = await api.post<{ data: { id: number } }>(`/forest/${forestId}/scenes/${sid}/links`, body);
+  return r.data.data;
+}
+export async function deleteLink(forestId: string, lid: number): Promise<void> {
+  await api.post(`/forest/${forestId}/links/${lid}/delete`, {});
+}
+
 export const TREE_STATUSES = [
   { id: 1, label: 'Healthy' },
   { id: 2, label: 'Drying' },

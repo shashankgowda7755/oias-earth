@@ -755,6 +755,87 @@ async function forestPanoramasPublic(req: Request, res: Response): Promise<void>
   });
 }
 
+/**
+ * GET /public/forest/:id/scenes — the full interactive 360 tour in one payload:
+ * scenes (equirect image + default view), each with its tree hotspots (JOINed to
+ * tree_unique_id/species/status for the marker) and navigation links. Field-
+ * whitelisted (no internal ids/PII). Scenes with an invalid/disallowed image_url
+ * are skipped (defense-in-depth via isAllowedPanoUrl).
+ */
+async function forestScenesPublic(req: Request, res: Response): Promise<void> {
+  const id = String(req.params.id);
+  if (!UUID_RE.test(id)) throw notFound('Forest not found');
+  const exists = await query(`SELECT 1 FROM forests WHERE id = $1 AND is_active = TRUE`, [id]);
+  if (exists.rowCount === 0) throw notFound('Forest not found');
+
+  const scenes = await query<{
+    id: number; label: string | null; image_url: string;
+    lat: number | null; lng: number | null;
+    default_yaw: number; default_pitch: number; display_order: number; is_demo: boolean;
+  }>(
+    `SELECT id, label, image_url, lat, lng, default_yaw, default_pitch, display_order, is_demo
+       FROM forest_scenes
+      WHERE forest_id = $1 AND is_active = TRUE
+      ORDER BY display_order, id`,
+    [id],
+  );
+  const sceneIds = scenes.rows.map((s) => s.id);
+  if (sceneIds.length === 0) {
+    res.json({ data: { scenes: [] } });
+    return;
+  }
+
+  const hotspots = await query<{
+    scene_id: number; tree_id: string; yaw: number; pitch: number;
+    tree_unique_id: string | null; species: string | null; status_id: number | null; status: string | null;
+  }>(
+    `SELECT h.scene_id, h.tree_id, h.yaw, h.pitch,
+            ft.tree_unique_id, COALESCE(sp.common_name, sp.species_name) AS species,
+            COALESCE(ft.tree_status_id, 1) AS status_id, st.status
+       FROM scene_hotspots h
+       JOIN forest_trees ft ON ft.id = h.tree_id AND ft.is_active = TRUE
+       LEFT JOIN master_plantspecies sp ON sp.id = ft.master_plant_species_id
+       LEFT JOIN tree_status_master st ON st.id = ft.tree_status_id
+      WHERE h.scene_id = ANY($1::int[]) AND h.is_active = TRUE`,
+    [sceneIds],
+  );
+  const links = await query<{ from_scene_id: number; to_scene_id: number; yaw: number; pitch: number; label: string | null }>(
+    `SELECT from_scene_id, to_scene_id, yaw, pitch, label
+       FROM scene_links
+      WHERE from_scene_id = ANY($1::int[]) AND is_active = TRUE`,
+    [sceneIds],
+  );
+
+  const hsByScene = new Map<number, unknown[]>();
+  for (const h of hotspots.rows) {
+    if (!hsByScene.has(h.scene_id)) hsByScene.set(h.scene_id, []);
+    hsByScene.get(h.scene_id)!.push({
+      tree_id: h.tree_id, tree_unique_id: h.tree_unique_id, species: h.species,
+      status_id: h.status_id, status: h.status,
+      survival: h.status_id === 4 ? 'dead' : 'alive', yaw: h.yaw, pitch: h.pitch,
+    });
+  }
+  const lnByScene = new Map<number, unknown[]>();
+  for (const l of links.rows) {
+    if (!lnByScene.has(l.from_scene_id)) lnByScene.set(l.from_scene_id, []);
+    lnByScene.get(l.from_scene_id)!.push({ to_scene_id: l.to_scene_id, yaw: l.yaw, pitch: l.pitch, label: l.label });
+  }
+
+  res.json({
+    data: {
+      scenes: scenes.rows
+        .filter((s) => isAllowedPanoUrl(s.image_url))
+        .map((s) => ({
+          id: s.id, label: s.label, image_url: s.image_url,
+          lat: s.lat, lng: s.lng, default_yaw: s.default_yaw, default_pitch: s.default_pitch,
+          is_demo: s.is_demo,
+          hotspots: hsByScene.get(s.id) ?? [],
+          links: lnByScene.get(s.id) ?? [],
+        })),
+    },
+  });
+}
+
 publicRouter.get('/public/sponsors', wrap(sponsorsPublic));
 publicRouter.get('/public/leaderboard', wrap(leaderboard));
 publicRouter.get('/public/forest/:id/boundary', wrap(forestBoundaryPublic));
@@ -765,6 +846,7 @@ publicRouter.get('/public/forest/:id/trees.geojson', wrap(forestTreesGeoJSON));
 publicRouter.get('/public/forests-map', wrap(forestsMap));
 publicRouter.get('/public/forest/:id/trees', wrap(forestTreesPublic));
 publicRouter.get('/public/forest/:id/panoramas', wrap(forestPanoramasPublic));
+publicRouter.get('/public/forest/:id/scenes', wrap(forestScenesPublic));
 /**
  * GET /public/lookup?q= — resolve a tree (by UUID or tree_unique_id) or a
  * forest (by unique id / name) for the public Verify search. Returns the type

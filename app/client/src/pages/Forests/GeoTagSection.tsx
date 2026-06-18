@@ -17,6 +17,7 @@ import { Button, Spinner, TextField, useToast } from '@/components';
 import { useAuth } from '@/auth/AuthContext';
 import type { FullForestPayload } from './fullTypes';
 import { TreeMap, type MapTree } from './TreeMap';
+import { TourEditor } from './TourEditor';
 import {
   getForestGeo,
   listForestTrees,
@@ -491,6 +492,8 @@ export function GeoTagSection({ forest }: GeoTagSectionProps) {
                 )}
               </div>
             )}
+
+            {editable && <TourEditor forestId={forestId} trees={trees} />}
 
             {editable && selected && !boundaryMode ? (
               <>
