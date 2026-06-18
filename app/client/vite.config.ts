@@ -59,6 +59,19 @@ export default defineConfig({
       '@': path.resolve(__dirname, 'src'),
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        // Split big shared deps into long-cached vendor chunks so map pages
+        // share one Leaflet bundle instead of duplicating it per route chunk.
+        manualChunks: {
+          'vendor-react': ['react', 'react-dom', 'react-router-dom', '@tanstack/react-query'],
+          'vendor-leaflet': ['leaflet', 'leaflet.markercluster'],
+          'vendor-qrcode': ['qrcode'],
+        },
+      },
+    },
+  },
   server: {
     port: 5173,
     proxy: {
