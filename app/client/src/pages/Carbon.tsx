@@ -11,7 +11,7 @@ import '@/styles/earth.css';
 
 const STEPS = [
   { k: '01', t: 'Measure', d: 'Each monthly visit records diameter (DBH) + height + photo + GPS for the tree.' },
-  { k: '02', t: 'Biomass', d: 'Measured DBH/height + species wood density → allometric equation (Chave 2014) → above-ground biomass.' },
+  { k: '02', t: 'Biomass', d: 'Measured DBH/height + per-species wood density (Global Wood Density DB / ICRAF) → allometric equation (Chave 2014) → above-ground biomass.' },
   { k: '03', t: 'Carbon', d: '+ roots (24%) → ×0.47 carbon fraction → ×3.667 → kg CO₂e held by the tree (its stock).' },
   { k: '04', t: 'Sequestration', d: 'The change in stock between visits is the CO₂e removed that year. A dead tree freezes its stock.' },
   { k: '05', t: 'Aggregate', d: 'Sum every tree across all forests by vintage year into a credit-ready batch.' },
