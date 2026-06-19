@@ -27,9 +27,14 @@ import {
   listPanoramas,
   addPanorama,
   deletePanorama,
+  listGifts,
+  setGift,
+  sendGift,
+  sendAllGifts,
   TREE_STATUSES,
   type RegisterTree,
   type Panorama,
+  type GiftRow,
 } from './geoApi';
 
 interface GeoTagSectionProps {
@@ -78,6 +83,14 @@ export function GeoTagSection({ forest }: GeoTagSectionProps) {
   const [boundaryPts, setBoundaryPts] = useState<{ lat: number; lng: number }[]>([]);
   const [boundarySaving, setBoundarySaving] = useState(false);
 
+  // Gifting: recipient per tree + email the certificate.
+  const [gifts, setGifts] = useState<GiftRow[]>([]);
+  const [mailReady, setMailReady] = useState(false);
+  const [giftName, setGiftName] = useState('');
+  const [giftEmail, setGiftEmail] = useState('');
+  const [giftMsg, setGiftMsg] = useState('');
+  const [giftBusy, setGiftBusy] = useState(false);
+
   // 360 tours (per-plot "walk the forest" embeds).
   const [panos, setPanos] = useState<Panorama[]>([]);
   const [panoUrl, setPanoUrl] = useState('');
@@ -93,13 +106,16 @@ export function GeoTagSection({ forest }: GeoTagSectionProps) {
     setLoading(true);
     setError(null);
     try {
-      const [geo, list, pano] = await Promise.all([
+      const [geo, list, pano, gift] = await Promise.all([
         getForestGeo(forestId).catch(() => null),
         listForestTrees(forestId),
         listPanoramas(forestId).catch(() => [] as Panorama[]),
+        listGifts(forestId).catch(() => ({ gifts: [] as GiftRow[], mailReady: false })),
       ]);
       setTrees(list.data);
       setPanos(pano.filter((p) => p.is_active !== false));
+      setGifts(gift.gifts);
+      setMailReady(gift.mailReady);
       if (geo) {
         setBoundary(geo.boundary ?? []);
         setCenter(geo.center ?? { lat: null, lng: null });
@@ -114,6 +130,57 @@ export function GeoTagSection({ forest }: GeoTagSectionProps) {
   useEffect(() => {
     void load();
   }, [load]);
+
+  // Prefill the gift form from the selected tree's existing recipient.
+  useEffect(() => {
+    const g = gifts.find((x) => x.gift_tree_id === selectedId);
+    setGiftName(g?.name ?? '');
+    setGiftEmail(g?.email_id ?? '');
+    setGiftMsg(g?.message ?? '');
+  }, [selectedId, gifts]);
+
+  const saveGift = useCallback(async () => {
+    if (!selectedId) return;
+    setGiftBusy(true);
+    try {
+      await setGift(forestId, selectedId, { name: giftName, email: giftEmail, message: giftMsg });
+      const g = await listGifts(forestId).catch(() => null);
+      if (g) { setGifts(g.gifts); setMailReady(g.mailReady); }
+      toast.show('Recipient saved.', 'success');
+    } catch (e) {
+      toast.show(e instanceof Error ? e.message : 'Failed to save recipient', 'error');
+    } finally { setGiftBusy(false); }
+  }, [forestId, selectedId, giftName, giftEmail, giftMsg, toast]);
+
+  const sendOneGift = useCallback(async () => {
+    if (!selectedId) return;
+    setGiftBusy(true);
+    try {
+      const r = await sendGift(forestId, selectedId);
+      const g = await listGifts(forestId).catch(() => null);
+      if (g) setGifts(g.gifts);
+      toast.show(`Certificate emailed to ${r.sent_to}.`, 'success');
+    } catch (e: unknown) {
+      const m = (e as { response?: { data?: { message?: string } } })?.response?.data?.message;
+      toast.show(m || (e instanceof Error ? e.message : 'Failed to send'), 'error');
+    } finally { setGiftBusy(false); }
+  }, [forestId, selectedId, toast]);
+
+  const sendAll = useCallback(async () => {
+    setGiftBusy(true);
+    try {
+      const r = await sendAllGifts(forestId, false);
+      const g = await listGifts(forestId).catch(() => null);
+      if (g) setGifts(g.gifts);
+      toast.show(`Sent ${r.sent} of ${r.total} gift certificates.${r.errors.length ? ` ${r.errors.length} failed.` : ''}`, r.errors.length ? 'error' : 'success');
+    } catch (e: unknown) {
+      const m = (e as { response?: { data?: { message?: string } } })?.response?.data?.message;
+      toast.show(m || (e instanceof Error ? e.message : 'Failed'), 'error');
+    } finally { setGiftBusy(false); }
+  }, [forestId, toast]);
+
+  const giftCount = gifts.length;
+  const giftSent = gifts.filter((g) => g.is_email_sent).length;
 
   const mapTrees: MapTree[] = useMemo(
     () =>
@@ -338,9 +405,20 @@ export function GeoTagSection({ forest }: GeoTagSectionProps) {
           <span className="font-medium text-textPrimary">{taggedCount}</span>
           <span className="text-textSecondary"> / {trees.length} trees geo-tagged</span>
         </div>
-        <Button type="button" variant="outlined" onClick={() => void load()}>
-          Refresh
-        </Button>
+        <div className="flex items-center gap-2">
+          {giftCount > 0 && (
+            <span className="text-xs text-textSecondary">{giftSent}/{giftCount} gifts emailed</span>
+          )}
+          {editable && giftCount > 0 && (
+            <Button type="button" variant="outlined" onClick={() => void sendAll()} disabled={giftBusy || !mailReady}
+              title={mailReady ? 'Email every unsent gift certificate' : 'email not configured (set RESEND_API_KEY)'}>
+              Email all gifts
+            </Button>
+          )}
+          <Button type="button" variant="outlined" onClick={() => void load()}>
+            Refresh
+          </Button>
+        </div>
       </div>
 
       {trees.length === 0 ? (
@@ -598,6 +676,23 @@ export function GeoTagSection({ forest }: GeoTagSectionProps) {
                       {vSaving ? 'Logging…' : 'Log visit'}
                     </Button>
                   </div>
+                </div>
+                <div className="mt-3 rounded-input border border-border p-3">
+                  <div className="mb-2 flex items-center justify-between gap-2">
+                    <span className="text-sm">Gift this tree <span className="text-textSecondary">— recipient gets a live certificate by email</span></span>
+                    <a href={`/report/tree/${selected.id}`} target="_blank" rel="noreferrer" className="text-xs font-medium text-primary">Preview certificate ↗</a>
+                  </div>
+                  <div className="flex flex-wrap items-end gap-3">
+                    <div className="w-40"><TextField label="Recipient name" value={giftName} onChange={setGiftName} placeholder="Aarav Kumar" /></div>
+                    <div className="w-52"><TextField label="Recipient email" value={giftEmail} onChange={setGiftEmail} placeholder="aarav@email.com" /></div>
+                    <div className="min-w-[160px] flex-1"><TextField label="Message (optional)" value={giftMsg} onChange={setGiftMsg} placeholder="Happy birthday!" /></div>
+                    <Button type="button" variant="outlined" onClick={() => void saveGift()} disabled={giftBusy}>Save</Button>
+                    <Button type="button" variant="primary" onClick={() => void sendOneGift()} disabled={giftBusy || !giftEmail.trim() || !mailReady}
+                      title={mailReady ? '' : 'email not configured (set RESEND_API_KEY)'}>
+                      {giftBusy ? '…' : 'Send certificate email'}
+                    </Button>
+                  </div>
+                  {!mailReady && <p className="mt-1 text-xs text-amber-600">Email sending is off until RESEND_API_KEY is set in the server env (resend.com).</p>}
                 </div>
               </>
             ) : editable && !selected ? (

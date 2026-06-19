@@ -50,6 +50,7 @@ export default function ReportTree() {
           <div style={{ fontSize: 12, letterSpacing: '.18em', textTransform: 'uppercase', color: pine, fontWeight: 700 }}>Certificate of Living Proof</div>
           <h1 style={{ fontSize: 30, margin: '6px 0 0', fontWeight: 700 }}>{tree.species ?? 'Tree'}</h1>
           <div style={{ color: muted, fontSize: 14 }}>{tree.tree_unique_id}</div>
+          {tree.gifted_to && <div style={{ marginTop: 10, fontSize: 16 }}>Planted for <strong style={{ color: pine }}>{tree.gifted_to}</strong></div>}
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: photo || qr ? '1fr 200px' : '1fr', gap: 22, marginTop: 18 }}>

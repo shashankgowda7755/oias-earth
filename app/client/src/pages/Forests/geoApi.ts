@@ -141,6 +141,24 @@ export async function deleteLink(forestId: string, lid: number): Promise<void> {
   await api.post(`/forest/${forestId}/links/${lid}/delete`, {});
 }
 
+// ---- Gifting: recipient per tree + email the certificate ----
+export interface GiftRow { id: string; gift_tree_id: string; name: string | null; email_id: string | null; message: string | null; is_email_sent: boolean; tree_unique_id: string | null }
+export async function listGifts(forestId: string): Promise<{ gifts: GiftRow[]; mailReady: boolean }> {
+  const r = await api.get<{ data: GiftRow[]; mail_ready: boolean }>(`/forest/${forestId}/gifts`);
+  return { gifts: r.data.data, mailReady: r.data.mail_ready };
+}
+export async function setGift(forestId: string, treeId: string, body: { name?: string; email?: string; message?: string }): Promise<void> {
+  await api.post(`/forest/${forestId}/trees/${treeId}/gift`, body);
+}
+export async function sendGift(forestId: string, treeId: string): Promise<{ sent_to: string }> {
+  const r = await api.post<{ data: { sent_to: string } }>(`/forest/${forestId}/trees/${treeId}/gift/send`, {});
+  return r.data.data;
+}
+export async function sendAllGifts(forestId: string, resend = false): Promise<{ sent: number; total: number; errors: string[] }> {
+  const r = await api.post<{ data: { sent: number; total: number; errors: string[] } }>(`/forest/${forestId}/gifts/send-all`, { resend: String(resend) });
+  return r.data.data;
+}
+
 export const TREE_STATUSES = [
   { id: 1, label: 'Healthy' },
   { id: 2, label: 'Drying' },

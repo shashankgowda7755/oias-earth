@@ -201,6 +201,7 @@ async function treeProof(req: Request, res: Response): Promise<void> {
     status: string | null;
     wood_density: number | null;
     is_demo: boolean | null;
+    gifted_to: string | null;
   }>(
     `SELECT ft.id, ft.tree_unique_id,
             COALESCE(sp.common_name, sp.species_name) AS species,
@@ -209,7 +210,8 @@ async function treeProof(req: Request, res: Response): Promise<void> {
             f.forest_city AS city, f.forest_state AS state,
             ft.planted_on,
             ft.forest_tree_geo_lat AS lat, ft.forest_tree_geo_long AS lng,
-            st.status, sp.wood_density, f.is_demo
+            st.status, sp.wood_density, f.is_demo,
+            (SELECT name FROM gift_forest_plants g WHERE g.gift_tree_id = ft.id AND g.is_active = TRUE ORDER BY created_at DESC LIMIT 1) AS gifted_to
        FROM forest_trees ft
        LEFT JOIN forests f ON f.id = ft.forest_id
        LEFT JOIN master_plantspecies sp ON sp.id = ft.master_plant_species_id
@@ -315,6 +317,7 @@ async function treeProof(req: Request, res: Response): Promise<void> {
         lat: tree.lat ? Number(tree.lat) : null,
         lng: tree.lng ? Number(tree.lng) : null,
         is_demo: Boolean(tree.is_demo),
+        gifted_to: tree.gifted_to,
       },
       summary: {
         survival,

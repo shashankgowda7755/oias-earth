@@ -55,6 +55,7 @@ import {
 import { agbKg, CARBON_FRACTION, CO2_PER_C, ROOT_SHOOT, CARBON_METHOD } from '../lib/carbon';
 import { isAllowedPanoUrl, providerOf, ALLOWED_TOUR_HOSTS } from '../lib/pano';
 import { put } from '@vercel/blob';
+import { sendGiftEmail, mailReady } from '../lib/mail';
 
 export const forestRouter = Router();
 
@@ -1587,6 +1588,129 @@ async function deleteLink(req: Request, res: Response): Promise<void> {
   res.json({ data: { id: lid, removed: true } });
 }
 
+// ---------------------------------------------------------------------------
+// Gifting: every tree can be gifted to a recipient (name + email); sending
+// emails them a link to the tree's live certificate / report card.
+// ---------------------------------------------------------------------------
+function appBase(req: Request): string {
+  return process.env.APP_URL || `https://${req.get('host')}`;
+}
+
+async function assertTreeInForest(treeId: string, forestId: string): Promise<{ species: string | null; uid: string | null; forest_name: string | null }> {
+  const r = await query<{ species: string | null; uid: string | null; forest_name: string | null }>(
+    `SELECT COALESCE(sp.common_name, sp.species_name) AS species, ft.tree_unique_id AS uid, f.forest_name
+       FROM forest_trees ft
+       JOIN forests f ON f.id = ft.forest_id
+       LEFT JOIN master_plantspecies sp ON sp.id = ft.master_plant_species_id
+      WHERE ft.id = $1 AND ft.forest_id = $2 AND ft.is_active = TRUE`,
+    [treeId, forestId],
+  );
+  if (r.rowCount === 0) throw notFound('Tree not found in this forest');
+  return r.rows[0]!;
+}
+
+async function listGifts(req: Request, res: Response): Promise<void> {
+  const forestId = String(req.params.id);
+  await assertForestAccess(req, forestId);
+  const r = await query<Record<string, unknown>>(
+    `SELECT g.id, g.gift_tree_id, g.name, g.email_id, g.message, g.is_email_sent, ft.tree_unique_id
+       FROM gift_forest_plants g
+       JOIN forest_trees ft ON ft.id = g.gift_tree_id
+      WHERE ft.forest_id = $1 AND g.is_active = TRUE
+      ORDER BY ft.tree_unique_id`,
+    [forestId],
+  );
+  res.json({ data: r.rows, mail_ready: mailReady() });
+}
+
+async function setGift(req: Request, res: Response): Promise<void> {
+  const forestId = String(req.params.id);
+  await assertForestAccess(req, forestId);
+  const treeId = String(req.params.treeId);
+  await assertTreeInForest(treeId, forestId);
+  const b = (req.body ?? {}) as Record<string, unknown>;
+  const name = typeof b.name === 'string' ? b.name.trim().slice(0, 120) || null : null;
+  const email = typeof b.email === 'string' ? b.email.trim().slice(0, 200) || null : null;
+  const message = typeof b.message === 'string' ? b.message.trim().slice(0, 500) || null : null;
+  if (email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) throw badRequest('invalid email');
+  const certUrl = `/report/tree/${treeId}`;
+  const actor = req.auth?.profileId ?? null;
+  const existing = await query<{ id: string }>(
+    `SELECT id FROM gift_forest_plants WHERE gift_tree_id = $1 AND is_active = TRUE LIMIT 1`,
+    [treeId],
+  );
+  if (existing.rowCount) {
+    await query(
+      `UPDATE gift_forest_plants SET name=$2, email_id=$3, message=$4, gift_certificate_url=$5, updated_by=$6, updated_at=now() WHERE id=$1`,
+      [existing.rows[0]!.id, name, email, message, certUrl, actor],
+    );
+  } else {
+    await query(
+      `INSERT INTO gift_forest_plants (gift_tree_id, name, email_id, message, gift_certificate_url, allocating_on, is_email_sent, is_active, created_by, updated_by)
+       VALUES ($1,$2,$3,$4,$5, CURRENT_DATE, FALSE, TRUE, $6,$6)`,
+      [treeId, name, email, message, certUrl, actor],
+    );
+  }
+  res.json({ data: { tree_id: treeId, name, email, message } });
+}
+
+async function sendGift(req: Request, res: Response): Promise<void> {
+  const forestId = String(req.params.id);
+  await assertForestAccess(req, forestId);
+  if (!mailReady()) throw badRequest('email not configured — set RESEND_API_KEY (resend.com) in env, then redeploy');
+  const treeId = String(req.params.treeId);
+  const tree = await assertTreeInForest(treeId, forestId);
+  const g = await query<{ id: string; name: string | null; email_id: string | null; message: string | null }>(
+    `SELECT id, name, email_id, message FROM gift_forest_plants WHERE gift_tree_id = $1 AND is_active = TRUE LIMIT 1`,
+    [treeId],
+  );
+  if (g.rowCount === 0 || !g.rows[0]!.email_id) throw badRequest('set a recipient email for this tree first');
+  await sendGiftEmail({
+    to: g.rows[0]!.email_id!,
+    recipientName: g.rows[0]!.name,
+    species: tree.species,
+    treeUid: tree.uid,
+    forestName: tree.forest_name,
+    message: g.rows[0]!.message,
+    certUrl: `${appBase(req)}/report/tree/${treeId}`,
+  });
+  await query(`UPDATE gift_forest_plants SET is_email_sent = TRUE, updated_at = now() WHERE id = $1`, [g.rows[0]!.id]);
+  res.json({ data: { tree_id: treeId, sent_to: g.rows[0]!.email_id } });
+}
+
+async function sendAllGifts(req: Request, res: Response): Promise<void> {
+  const forestId = String(req.params.id);
+  await assertForestAccess(req, forestId);
+  if (!mailReady()) throw badRequest('email not configured — set RESEND_API_KEY (resend.com) in env, then redeploy');
+  const resend = String((req.body as Record<string, unknown>)?.resend ?? '') === 'true';
+  const rows = await query<{ tree_id: string; name: string | null; email_id: string; message: string | null; species: string | null; uid: string | null; forest_name: string | null }>(
+    `SELECT g.gift_tree_id AS tree_id, g.name, g.email_id, g.message,
+            COALESCE(sp.common_name, sp.species_name) AS species, ft.tree_unique_id AS uid, f.forest_name
+       FROM gift_forest_plants g
+       JOIN forest_trees ft ON ft.id = g.gift_tree_id
+       JOIN forests f ON f.id = ft.forest_id
+       LEFT JOIN master_plantspecies sp ON sp.id = ft.master_plant_species_id
+      WHERE ft.forest_id = $1 AND g.is_active = TRUE AND g.email_id IS NOT NULL
+        AND ($2::boolean OR g.is_email_sent = FALSE)`,
+    [forestId, resend],
+  );
+  let sent = 0;
+  const errors: string[] = [];
+  for (const r of rows.rows) {
+    try {
+      await sendGiftEmail({
+        to: r.email_id, recipientName: r.name, species: r.species, treeUid: r.uid,
+        forestName: r.forest_name, message: r.message, certUrl: `${appBase(req)}/report/tree/${r.tree_id}`,
+      });
+      await query(`UPDATE gift_forest_plants SET is_email_sent = TRUE, updated_at = now() WHERE gift_tree_id = $1 AND is_active = TRUE`, [r.tree_id]);
+      sent++;
+    } catch (e) {
+      errors.push(`${r.uid ?? r.tree_id}: ${e instanceof Error ? e.message : 'failed'}`);
+    }
+  }
+  res.json({ data: { sent, total: rows.rowCount, errors } });
+}
+
 /**
  * GET /admin/integrity — SuperAdmin review queue: visits flagged for GPS-far-
  * from-forest (geo_suspect) or a reused/duplicate photo. Surfaces the
@@ -1790,6 +1914,11 @@ forestRouter.post('/forest/:id/scenes/:sid/hotspots', wrap(addHotspot));
 forestRouter.post('/forest/:id/hotspots/:hid/delete', wrap(deleteHotspot));
 forestRouter.post('/forest/:id/scenes/:sid/links', wrap(addLink));
 forestRouter.post('/forest/:id/links/:lid/delete', wrap(deleteLink));
+// Gifting: recipient per tree + email the certificate
+forestRouter.get('/forest/:id/gifts', wrap(listGifts));
+forestRouter.post('/forest/:id/trees/:treeId/gift', wrap(setGift));
+forestRouter.post('/forest/:id/trees/:treeId/gift/send', wrap(sendGift));
+forestRouter.post('/forest/:id/gifts/send-all', wrap(sendAllGifts));
 forestRouter.get('/admin/integrity', wrap(adminIntegrity));
 forestRouter.get('/admin/planters', wrap(adminPlanters));
 forestRouter.post('/admin/planters', wrap(adminCreatePlanter));
