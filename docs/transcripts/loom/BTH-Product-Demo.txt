@@ -1,0 +1,342 @@
+# BTH Product Demo (69f4d6d094e4413faa2b671e26c9c59f)
+
+[02:40] Hello.
+[02:43] Hi, Shashank.
+[02:44] Hi, Deepika. Hello, Shashank. Hi, Jonathan. How are you guys? Good, good. How are you? Yeah, I'm doing great.
+[02:55] Jai Surya. Jai Surya, bro. So, as everyone joined, can we start? Yes, everyone joined, so you can start now.
+[03:09] Okay. I think Arun will join in another 2-3 minutes. So, I'll just give the basic brief. Hi, we are here.
+[03:18] Almost since last few months, we were working on the quarterly reporting automated system, which we are creating every month manually.
+[03:27] Okay, first of all, Deepika, can you just introduce Shashank to all the supervisors? Deepika, Jonathan, so that everyone will know Shashank.
+[03:34] I don't know whether everyone knows Shashank, right?
+[03:37] There's not quite a few.
+[03:40] Sure, sure, sir. So, Shashank has been here for almost like three months, if I'm not wrong. Shashank, you can help me.
+[03:48] So, he is the technical person who is supporting us, is trying to back us with the technical aspects of the projects.
+[03:56] right now, here we are to discuss on the, long-pending automated quarterly reports that we were actually following up with Triyagar.
+[04:06] Now, Sashank has coordinated, and right now, it's fruitful. So, he will give us the demo, how we should be going about it in terms of automation.
+[04:15] Apart from that, from this, Sashank has supported us in various aspects, right from Zoho, CRM, all the systems that is in place has been supported by Sashank with multiple other people.
+[04:27] So, yeah.
+[04:29] Thank you, Sashank. Sashank, you can take it forward.
+[04:32] I hope the brief introduction helps who you are. If you have anything else to say,
+[04:38] you can
+[04:38] keep on.
+[04:40] Well, it's with all your support, guys. So, thank you. So, we'll go forward. So, the basic thing is for us to enter the data.
+[04:55] So, whatever we were doing it on PowerPoint, Google Slides, Excel sheets. We are not using any of the platforms from now on.
+[05:04] So, this would be our one stop solution. We will just log on to this website. Anyone would be accessing reports or adding up new forests or anything.
+[05:14] So, we will log on to this website so everyone will be getting their user ID and credentials. So, this is a basic page where you'll be getting your credentials and your login.
+[05:26] So, there are few sections which are added by the. Either Jaisurya or the backend or or by the team. So that is this users.
+[05:37] So this is for geotagging. So from now on, maybe Jaisurya, Mayfuse and Deepika, Jonathan would be aware of this. So when we are adding a new client for geotagging.
+[05:47] This is where we add the new profile of a client. That will be giving them credentials to access their. Geotagging report and stuff.
+[05:57] So based on this. We will be adding up the. Users I mean those are the user IDs for the clients.
+[06:08] So the main module is for forest creation. So we have about almost 180 forest about more than 100. Forest is active.
+[06:16] We are sending more than 100 reports every quarter. So all those 100 forests. Our main task for the next two weeks to three weeks is to add all the forest what we have.
+[06:32] So we have added some demo. Now let us try adding some actual forest. So let's assume we'll go ahead with adding.
+[06:41] CGI Chennai, which is in Elkhart. So you just come to the screen. This is how exactly the screen. It would look like.
+[06:49] We just click on add forest. So this is the basic. First screen so we can just correlate this with our existing reports.
+[07:00] So forest name means the client name. For example, this is CGI. We have a description, urban afforestation. So, before, we were just adding the coordinates by checking on Google Maps.
+[07:30] Now, since every supervisor is aware of their locations, for example, Azim would be aware of what are the forests and where it is available.
+[07:39] So, we are not entering the latitude or longitude directly. We will just enter the coordinate. We'll just mark the coordinate from here.
+[07:49] Itself from the Google Maps. I'm looking for Elkhart. Okay. Okay. I hope this is our site. I think you are correct.
+[08:04] Ok. Thank you. Okay. So you just mark a point. The whole forest is being, so wherever you feel, which is relevant to that.
+[08:19] You just select that coordinate and then you enter. It will get the lat and long automatically, where this would also help in the geotagging part for the treehugger's team, if we are geotagging and then the basic addresses.
+[08:35] So, this will be filled as a dropdown.
+[08:45] Now, we are having it as a textbox. So, that was for the first screen. So, now, we have the saplings which is being planted.
+[08:59] For example, there might be 100 saplings or 200 saplings where we have converted them. Convert them into boxes. For example, on that particular forest, if we have.
+[09:08] 5 boxes. So we will. Enter with the number of boxes where we will be. Selecting so we will not be typing.
+[09:20] Not doing anything, so we'll be selecting the number of rows and columns. Let's assume we have about 3 rows. And 2 columns.
+[09:30] So which will be 6. On particular. That forest. Or Azim bro, can you help me with the actual data? Of any of the CGI forest.
+[09:40] 2 row, 2
+[09:47] column, Shashank,
+[09:47] Shashank, there are 2 going to be 5,000 trees. See, there are going to be 3,000 trees, okay? Okay. So 3,000 trees meaning, you're going to be, it has to be each box versus it.
+[09:58] You're given the total number of boxes. If we have 100 boxes. 10 cross 10.
+[10:11] So what is the total number of rows over here and what is the total number of V's? OK, Arun is here.
+[10:20] Hi Arun. Yeah, so this is Arun team. so he's working and coordinating with us for this project. Arun, can you take over on this section?
+[10:35] Yeah, OK. Basically, here it is boxes concept. So, for us, there will be a box, number of boxes. and each boxes contain a number of trees, right?
+[10:49] So, here I have separated it as box and then in each boxes, how much tree there will be in a row and a column.
+[10:58] So, for this example, we can take it as 2 x 2 boxes. Just enter 2 x 2. The distance between each box is mentioned here.
+[11:11] It's everything is in feet, feet unit, so two feet, and here. In each boxes, how many, I mean, how many rows of trees and how many columns of trees.
+[11:22] So, okay, and the distance between each tree. This angle is, just for now, we have kept an angle. I'll just explain it later.
+[11:33] And then this boundary gap is between the compound and the forest plantation. That's also a feedcon. So I'll just give a context why we are having this approach.
+[11:47] So we are geotagging for all the, for some of the forest what we have. While geotagging, to get that exact location of the particular sapling and the box.
+[11:59] So we are using this concept. As you were telling something, it got interrupted. Sashank, I have a doubt. I'm I'm, I'm, I'm able to understand the tree rows, tree column, tree distance, and even with that, I want to know whether it is, what is the measurement that we are considering?
+[12:17] Is it feet, inches? Is there anything? When I feed it, what will come? It will be with feet. Okay. In the, in the outcome, so it will show 10 feet by, I mean, 10 by 10 feet, 1 feet up, it will show, right?
+[12:35] Yes. Or it will mention only 10 by 10. So I'll just draw and show you a basic example. Oh, it should come with the numbers.
+[12:47] For example, if you're saying 10 by 10 trees, it should come with 100 numbers. Yeah, that's 100 counts. And if it is in terms of area, then it should come with 2 feet, 3 feet, 5 feet, etc.
+[13:00] No, no, with water, it whatever measurements, it should come with the suffix feet count.
+[13:11] It should mention, I'm saying. It should not be just numbers. No, no, that will be mentioned. That suffix will be mentioned.
+[13:18] Okay. secondly, I have a doubt in the box. Aspect, what is box row and box column that you're mentioning? Total number of boxes, what we are looking at?
+[13:28] Yes, see, let's assume this is the plantation side. We have about. Yes, Arun. That's
+[13:36] not me. Okay, yes, Azim.
+[13:38] Before that, there is one
+[13:39] note for me, Shashank. Yes, bro. For example, in that, for example, 20 into 20, 20 row into 20 column is 400 per box will come.
+[13:50] Okay. 8 rows, 8 into 400, 3200 saplings. 20 into 15, 300 saplings. That is 6 boxes into 300, 1800. So now, this, now, here, there are 2 different boxes, sizes.
+[14:05] Okay. One
+[14:07] is 400, another one is 300. This is how you will feed there.
+[14:12] So, over here, we can select what is the number of saplings per box. That Can you go back to that particular space, to the page that you were explaining?
+[14:26] Okay, on this
+[14:27] one? So, yeah. Grid. Config, grid, CONFGRID, CONFGRID, One second. Okay.
+[14:45] Huh. You can go ahead and answer now. So what he was asking is if the box sizes is diversified, versatile, it is not standard.
+[14:55] Each box size comes with its own number of sapling count.
+[14:59] One box might accommodate 300, one box might accommodate 400, whereas the size of the box also will change, right? So, do we have the option of adding one as per each box information?
+[15:13] No Deepika, for now we don't have that option. We have, we have to keep it as ISP. We have of trees in a box.
+[15:19] If a plant, I mean, if a forest has three boxes with different number of total number
+[15:25] of trees in each box,
+[15:27] we
+[15:27] have to
+[15:28] feed the highest, number. But then the information would be invalid, no? No, this is for capacity alone. Arun, we just have to move this page.
+[15:43] Let us not spend time on this. This page is wrong. This is not what we had asked for. Can we just move on to the next page?
+[15:56] You have to rework on this page. I think we, Deepika and I already agreed on this. We will discuss about this, Arun, but I'm not sure, yeah.
+[16:11] So we will assign who is the site manager. Who would be the sponsor? So that was the data which we are, we were working on.
+[16:30] What is this row 1, column 1? So over here, whatever data we had entered, so it was two rows. Do we have a sample report, Shashank?
+[16:44] So this is the sampled report. So the total number of saplings will be.
+[17:00] Which quarter? The location. This is being captured from the text field. This initiated by community would be default. The sponsor, sponsored by logo.
+[17:10] And if we have any additional other entries. MGO or anything which would be on the 3rd block and on the 4th block the land partner logo.
+[17:19] So max of we can add up only four logos on this on the current existing report. If we don't have any other.
+[17:27] Logos we can skip this up as well. Can we change the names what we desire? For example, implemented by sponsored by a partner?
+[17:36] Yes, yes, we can change the headings can be changed. Yes, yes, the headings can be changed. No, it is in our control each time, right?
+[17:44] So for now, no, but I'll take this as an input and I'll pass it on. We will. It's a simple thing we can add a text box for that.
+[17:54] OK. So this content space. If we are, we have an option to skip the page if we don't want that, maybe in some reports we may not require.
+[18:07] So if we skip the page, that page would be excluded and the report will be generated. So based on whatever content is available.
+[18:16] This would be. Automatically reflected. On the contents page. So this is the basic description of the land.
+[18:35] What we have. The location. Who would be the landowner? What is the total area of the project? And the status.
+[18:46] Which is also fetching the location of. So all these are the data points for where we will be filling it up.
+[19:04] Can I scroll? What do you mean by climate is moderate?
+[19:17] That is a data point we should based on the climate of that place. Now what climate are you talking about?
+[19:24] Climate about that particular. Quarter which we are in the report form. For example, if you're. Filling it in. The first quarter of the morning.
+[19:37] We are trying to summer or after. Winter like that is it? Yes, something like that so we can have a drop down and a custom field.
+[19:43] What we what we have. OK. Irrigation methods oil type. So few of them will be default which can be set one time.
+[19:54] The rest of. Often can be the drop downs and editable. Fine, alright OK. So this is regarding the permission letter.
+[20:03] So this is mandatory to upload a copy of. Authorized by date. So. End the period. Fine, alright OK.
+[20:18] So this we were giving it on a text. What is the total area of it? What is the population of a density?
+[20:26] So we were giving some stats of that particular place. So that is being represented on this slide. And. These three images are the satellite images of the past, like maybe 5 years or 10 years based on the availability.
+[20:42] So we are adding the images of it. What is, how is the satellite image on 2026, 2020 or 2024? This is going to be pulled directly by Google Earth or we have to feed it?
+[20:59] On Google Earth, we have a limitation. We can only pull from 2017. So we are going ahead with drag and drop.
+[21:09] So we are uploading it. Okay. It's fine. We move on. Okay. So site manager, Supervisor. These are all minor points.
+[21:23] Just the numbers what we would be filling in. Okay. These all are entry, one time entry, right? Okay. Yeah. Yes.
+[21:32] This This is stagnant. This is already fixed where we'll be choosing when we are creating a report, whether they should be there on this report or do we have a different field?
+[21:42] If there are no schools, we may add a different one if it is required. We will use this field. Go to the previous page.
+[21:49] OK. Go to the previous page. OK. This talks about the area and population statistics. So, OK. Population in that particular area, is it?
+[21:56] Yes. What area is it? When you say six to seven kilometers radius, is it? so this is a manual data point what we will be playing for, let's assume our forest is in Bangalore University.
+[22:08] What does that mean? Let's assume our forest is in Bangalore University. Can you increase the volume Shasha? Is it audible now?
+[22:18] Okay, let's assume our forest is in Bangalore University. So we are manually entering that stats on one of the slide.
+[22:30] So the same stats. These are entered by us. Yes, yes. One time entry. Okay. Jonathan, what are the, you know, area-wise, entries you're making?
+[22:41] Jonathan, are you there? Yes, yes, sir. Yeah. What are the, what are the informations we are capturing about the area?
+[22:57] the, populations, eh, the male population, female population. Uh-huh. and, the number of women. Vehicles, also, we are capturing, sir. Vehicles traveling in the public.
+[23:09] No, were you able to capture those information and data? from various, so, one website is there, where we can, get, the exact, data for the, population, the number of male population and female population, and the total, population that is available.
+[23:22] That is exact, that we can get it. The vehicles and the other, aspects, we- No, last time, last time, we had captured some data for the, assessment, right?
+[23:32] HSBC or Goodera, someone asked us, and we started capturing that. I told you to start with it in all the reports, isn't it?
+[23:39] Yes, yes. For Lenovo's report, they had asked about the, population details. For example, if we- Take PU College, what is the number of students studying?
+[23:47] So, for Whitefield main- No, no, no, no, no, no, no, no, you're not getting it right. It is not about the school.
+[23:55] Zone-wise or the panchayat-wise, right? That, for example, Anjur means, Anjur's population is what we had captured. Yes. Then, so what, what are the information you have captured?
+[24:09] Do you have any idea? Do you have it in front of Not right now. Just give me a minute, sir.
+[24:15] I'll just get it. These are the slides which we took as a reference. The description of those places. See here it has to be area-wise.
+[24:26] If it is Bangalore University, Bangalore University must be one particular area, right? It must be Hepbal or Banargata or Kempagoda, whatever.
+[24:36] Okay. So the population should be of that Kempagoda, that Hepbal, that thing. Something like that. Jain Nagar, Indira Nagar, like that.
+[24:46] It cannot be six to seven kilometers. It's very vague. These are, yeah, these are manual data points. Where we will be filling in.
+[24:56] So, we should get, and also, okay, fine. All right. So probably the headings have to change or whatever the population.
+[25:05] Yes. Okay. Yeah, we move on. This we are done. So for the forest, the forest value is
+[25:19] calculated automatically, isn't it? Yes, the forest value is calculated automatically. We have a metric. Which is preset based on that particular sapling.
+[25:30] So if we are selecting that particular sapling. See, I'm, I'm, I'm more keen about what is the entry points for our supervisors.
+[25:38] How many entry points? Should they make five entries every week or monthly once? Or ten entries? How many entries are there?
+[25:46] And what are those entries and how will they be making those 1, 2, 3, 4, 5, 6, 7, 8. It would be less than 50-60 entries at one time.
+[26:09] Which would be there on a text box. The next quarter we'll be changing only three slides. Or the monthly maintenance.
+[26:18] And the watering weather data. So watering weather data we are trying to fetch it with API, but which is costing.
+[26:25] So we'll look into the commercial parts and we'll think about. So approximate forest value is also being captured automatically once we are selecting the number species which are there on that particular forest.
+[26:38] All these things will be calculated and they're being displayed fine. This one is OK. Go to the previous page.
+[27:10] This is the native species planted. OK, next. Don't enter in summary. So, What is 92, 71, 56, 15, 32? Total number of days, total number of working days, working days.
+[27:42] That's the descriptions. Why is it so light and grey and unreadable? Okay, I'll read it and we'll make it bold.
+[27:51] Or else I'll try changing the font. Can I move on?
+[28:17] Hello? Okay, so that is about the, number of working, number of, working days and watering days, right?
+[28:35] Yes. First two are quarter and, yeah, till date and second is, this one, okay. Fine, alright. So this report's done, month-wise also.
+[28:47] Yeah, we can generate it month-wise also, but now it is not designed in month-wise version. Maybe within a week we can get it in month-wise version because the data points would change a bit for month-wise.
+[29:01] OK, but it is fine, we move on. The workforce contribution. So this we can read at one time while creating the report.
+[29:13] Instead of going with every quarter. No, adding full-time. Full-time Labor Days, is it? Full-time Gardeners? So here it says full-time gardeners as two, but then full-time laborers as one.
+[29:50] What does it mean? It's a, we, we will get to the maybe Wagely Laborers, correct? If we have, we can enter, else we can make it as zero.
+[30:11] Do we have the other laborers also coming in for the sites right now? For weeding, deweeding, we would get people in bulk.
+[30:25] Something like Hello? See, full-time effort you're saying 121 hours, which is like showing orange.
+[30:44] Part-time effort you're showing is 9 hours, but the 9 hours is showing large green. So, is it a problem with the design, or what is that?
+[30:51] It's a mock up what is being put up here.
+[31:05] So that will be set actually. It's not the actual calculated version. It's a mock up. I think you should show us a one quarters reports proper report.
+[31:18] Shashank wanted and I think so. We'll be able to understand our visual identity. It's all of them, because, see, if you really look at, you know, Anwar or Jagan or Raju or Josefa, I don't think so.
+[31:32] They understand technology, technical terms. So it has to be very, very easy. Probably Loganathan may understand because he's doing research.
+[31:43] So, if you look at me, I don't know much about, technology. But, you know, the framework and stuff like that.
+[31:49] See, I, we wanted a basic input from everyone so that we can go with the. We move on to the next page.
+[31:57] Yeah. So we have till date and, quarterly, so we have divided into two different slides because of space constraints. Okay, so the plant growth.
+[32:31] So the, so is this, is this a ready or not ready? Once we enter the data while generating the report, we will get the report.
+[32:44] get some data points or some changes. That is the only thing pending. We have tried. For example, you know, for the, for example, in this particular case, at the end of year two, you're showing a seven to eight feet.
+[32:56] Okay. But then in the design, you're showing as true. so what is it? Is it still in the, this is the mock-up of these.
+[33:03] Once I enter the actual data, the logic would work. This is the mock-up. It's like a mock-up which I can click here.
+[33:20] So this, I think we should move it to the top. The layout of it. See that, that's what, you know, you have, there are different boxes of different sizes.
+[33:34] So, I think we also, the box is the only, thing which has to be relooked into, but otherwise everything looks, okay for now from my side, I think.
+[33:43] So, what do you say, Jonathan, Deepika? Sir, I think we should all. Also, let, Sashank show us how we enter the data, only then we will be able to know, for example, we identify, you know, with respect to grid details and all that it should be this, that certain inputs come from us so that it will be
+[34:03] finalized. maybe Jaisurya, Aseem, or Mapfuse, anybody can support in giving the inputs because Mapfuse are raised the concern each box can be, diversified also, so we might be needing that dynamic support.
+[34:17] approach in the slides. So, those inputs we have to give them, so it I'll just show you can get the finalized.
+[34:34] Right. Okay. the mockup which is generated here either one that we are uploading the manual.
+[34:53] A layout what we are generating. It is not auto generated over here. This is we are uploading it from our end.
+[35:00] So regarding that concern, I'll address at the end of it, so we'll finish off this reporting. So this is regarding the soil pH.
+[35:14] So this is a image which would be updating every quarter. So whatever value we choose at the creation of the report that will be selected auto.
+[35:36] Can I move? The temperature inside the plantation Fine, we should be mentioning their time and date.
+[36:12] Or is it auto-capture? Measure at 11 a.m. to 8 a.m. This is auto-capture. It captured on the report time actually.
+[36:20] Whenever the report is being created, it will be captured. That will be made. Okay. Or else we can set a default date.
+[36:28] If we are sending the report every month. First, we will mark it as two days or three days before that, 10 o'clock, 11 o'clock, something like that.
+[36:45] So these are data points which we can type or select. OK, this all can be ignored. Shashank, see these all are one time entries.
+[36:53] All can be ignored. OK, OK, I'm concerned more about the. Variables OK. So this is the total number of saplings.
+[37:04] Nesting, flowering, fruiting. GRI framework fixed. Site. Create infrastructure images where they'll be uploading. There should be 4, 4 walls, no?
+[37:37] We have, we can upload 2 or 4. Like one over here, since it was portrait, we have added it as 2.
+[37:47] So we should be mindful while create capturing the images. For example, if we capture a portrait image. Or the quarterly images, if.
+[37:56] Every quarter we had one image, so every time when we are capturing, we should make sure we are capturing only the landscape images.
+[38:03] So we'll have a proper. Layout for that image. If it is a quarter one, let us have it in landscape.
+[38:11] If it is infrastructure, let us have it in portrait. If it is for some other block, let us have it in portrait.
+[38:16] In the Maree, while capturing photos, we should make sure. Because it will look odd if we don't do that. So.
+[38:31] I'll just come to that section. So, will we be having year one, quarter one, year Y1, quarter two, year two, quarter two, year three, quarter three, like that?
+[38:41] Yes, like here. So, totally at the end of the, program, they would get to see 36 images, right? yes. So, first quarter one, it'll have one image on full screen.
+[38:54] First quarter Second quarter, it'll have one of two images. One image here, one image here. Third quarter, it'll get into three.
+[39:04] Fourth quarter, four images. That is for year one. When it comes to year two, we will have one more new slide, where year one will, sorry, quarter one will have one.
+[39:14] The same thing follows. So, by the end of three years, we'll have a total of three slides for images. Okay.
+[39:23] Okay. So, now I'll address the concern which Mayfooz had. So, let's assume, I'll share the screen.
+[39:41] So, this is a forest.
+[39:53] So, one box is consisting of, This has about 200. So, this is what Mephisto would have ordered, correct? Mephisto? Ah, Seshank.
+[40:15] So, tell him, bro. Yes, yes. Yes, yes. hello. Yeah, Seshank, yes, it is. Okay.
+[40:25] Okay, so, is my other screen visible? Okay. Yes, we will select it as one cross two boxes itself. Sushant, Editing is not Box count cannot OK, I'll tell them to shut later on.
+[41:00] OK. So we will select it with this count. So we will know the distance. What is the distance in each?
+[41:17] So we will select the maximum number. For example, on the first box, we had maximum number of 100 trees. On the second box, we had maximum number of 200 trees.
+[41:27] So while entering over here, we will be entering the maximum number data. That is. 20 by 20. So the usual distance for every sampling water is 1 feet.
+[41:44] Pathway spacing 3, Boundary area 3. So. The maximum number of samples what we can count on that is 400.
+[41:59] So here we will select what is the number of saplings we have. For example, on the first box we have only.
+[42:05] 100 saplings. So we will choose the species. What is the count on the first box we are choosing only 100?
+[42:17] So it can hold up to 400 but we're choosing only 100. And on the second box.
+[42:29] It has about. Double of. Since the size of it was doubled. Before we go, will this answer your question? While selecting, we'll select the maximum number of saplings what we have.
+[42:58] And we will enter the exact number over here in the box, box data loop. So, by doing this, we are not entering the total number of species anywhere else.
+[43:13] This is the only stop where we are entering. The total number of saplings is being calculated from here. The calculation for each specie, what is carbon generated, what is the carbon, oxygen sequestered, the total value of it is also captured from here.
+[43:30] So, each, for each box, we have to select the species. Yes. So, for example, each box, 400, 20 by 20 means it's 400.
+[43:39] That means we have to select 20 species for each box. If there are only 20, I mean, it depends on the number of species, right?
+[43:49] So, each, each species, if there are 7 species, so we have to select, Ashoka, 25, Neem, 20, Goa, 42, like that.
+[43:54] Yes, for each box. For each box we have to select. Yes, because the supervisors will be knowing the data, what is planted on which box.
+[44:09] So, the whole system is designed. The supervisor who will be working on that site will enter the data, because someone who doesn't know about that particular forest at all, entering the data doesn't make sense, because we may make mistakes, but if Azeem is entering the data of You , he'll be knowing
+[44:31] in and out of it, what is the distance and everything. And this is one time. At the first time, as soon as the project is set, that time you'll have to do it.
+[44:43] Yes. You have to, we don't, do the calculation, which, how many snappings in each box specific, because it's a mixed variety.
+[44:52] Okay. Yeah. We'll discuss more in detail. Yeah. Next. Okay. The reason we are using. This is for geotagging. For geotagging, he'll be fetching all these details from here itself.
+[45:06] Okay. We are giving a number in for every sapling, which we have planted, maybe a one to hundred. So, this is already captured over here.
+[45:17] So, each sapling has already got a number, so that we are not dependent on BeanTreeListing. We can generate the tree certificates and this on our own.
+[45:27] Fine. All right. Okay. Okay. Got it. Okay. Okay. Can you help us about what are the entries which the, all of us will have to be making?
+[45:46] So, what is the first slide? acts as the first slide. So, the location, the client name, the lat and long of the forest, secondly, the total number of grids.
+[46:07] This is regarding to the plantation, and when was it planted, and the total number of stone it. Next thing is what is the who is the client?
+[46:18] It's just drop down, we'll just select. So this is the exact. Description. Of. The total number of saplings on that.
+[46:37] The sponsor details the sponsor name and their logos. The landowner details this one time. This usually comes with a agreement confirmed.
+[46:48] What is the total number of acres? Let's assume Elkhart. In Elkhart the total acres will be 10. 1 out of 10 acres for this particular forest.
+[46:58] How much have we used, utilized on the money? So irrigation method. It's DigiPen, SoilType, NERC, Formation Letter, Image Upload, what kind of climate, authority names.
+[47:23] So these are the applications. So we will add this as a custom on editing option. So the Google Earth images, what I told, we had three Google Earth images.
+[47:36] So we can add up to a max of three. So we will be here and we will use that particular image.
+[47:44] Direct indirect beneficiary, what inking, the total number of team. Is 11 almost d. So it will automatically choose the next three years every time.
+[48:04] So 2026 is. No, see, I think all this is part of the project management. OK, so this all has to be done and then handed over to the site's providers.
+[48:18] OK, projects team would be doing. No, Mayfuse should be doing it once he completes it. So this is what is the completing handle handing over and then giving it.
+[48:29] OK. Yeah, cool. But for the entry of all the hundred forests, what we have, so far now, we have to enter almost a hundred data, correct?
+[48:42] So who will be working on that? I think Mayfuse only should be doing it because I think so involving all the people who for doing this and if there is any error or something, that's going to be chaotic.
+[48:52] Okay. You should just give the hand over this to Mayfuse and then he has to hand over. And then what we should be telling, them is the, the quarterly entries or monthly entries, whatever, that alone should be given the response to them.
+[49:06] Now asking them to enter all these things, if there is need to make errors in the rows and columns and all this is going to be very chaotic.
+[49:14] sir, I think I defer in this. Consider if Loganathan is taking care of a site in Coimbatore for WaterTech, he will know the specifications better and he can fill in all the information, irrespective of MAFUS.
+[49:28] MAFUS will be operating from here and then giving instruction to multiple people. For example, Legrand is happening in NASIC. He will give commands from here to make sure the project is implemented well.
+[49:40] But people who have been working there, who's there for Loganathan or any project, they will know what is the number of bamboos that is there, what is, what all exact details they will know.
+[49:52] I agree. I'm not saying about the new project which is going to be coming up, Ma. I'm talking about right now, what Shashank is planning.
+[50:00] What planning is, is, handing over to their responsibilities to Raju and Ucefa and Loganathan and Anwar and ask them to do the entries of the past of the hundred.
+[50:11] So there they may not be aware and there they may not be, paying attention. New projects, for example, WaterTech projects, Loganathan can enter.
+[50:18] Raju has done last week's CGI, he can enter. But I'm talking about the older projects. What do you think, Shashank?
+[50:31] I feel supervisors entering this would be good, maybe in terms of data points, else they should be on a call with me and tell him, for example, the number of sapling count and the bottom boxes.
+[50:48] There'll be some data points Mefus would be aware of, comparatively, but some data points the supervisors would be aware of.
+[50:56] Maybe we can do one thing. We can ask them to get me to come to office. Two, three days. Even I'll be there.
+[51:04] Had all of us considered to do it? Yes, just straight away, two, three days. Everyone will be knowing everything and any issues we'll sort out right away.
+[51:13] Okay, and one more thing is, is it possible to update half and half? For example, Jonathan may enter the population and statistics.
+[51:21] I may enter, the company names and logos and all those things. possible, possible. It will be on CronJobs. Yeah. They can enter any data at any point of time.
+[51:34] So, we can keep adding, adding, adding until it's full, right? Yeah. Yes. Alright, fine, yeah. So, what I, I feel is all of us being in office for two or three days and then finishing it off.
+[51:51] What do you think? Yeah, yeah, possible. At least two, three people. Yeah, yeah, yeah. So, first what we'll do is we'll, We'll just do a sample, a couple of reports and then see, how is it working or full thing properly, correctly, rightly, and then see, the, challenges which are facing and all those
+[52:09] things, sort it out and then we'll bring the whole team and then we'll get it done. Okay, folks, no worries.
+[52:17] Yeah. So that we, us, will be able to coach others, right? I may coach, Anwar, Deepika may coach, you know, Nobita.
+[52:25] Then Jonathan may coach, see if all of us get ready with that. Yes, got it. Fine, alright. So, So what are the monthly, is it monthly, end-to end-to the supervisors will have to be making, or, the quarterly entries the supervisors will have to be making?
+[52:42] Quarterly entry. for few clients we have monthly reports for them. We are planning on the monthly thing, rest of them quarterly thing.
+[52:49] Okay, right now you do not have monthly, so, once it is done, we'll be entering monthly, right? Yes, once it is done, we'll be entering monthly.
+[52:59] Okay, so monthly will turn out to become quarterly also. Oh, yes. And annual, final submission what we are giving. At any given point, it can be, it can be, say, as on date reported.
+[53:10] For example, if you look at bank statements and all those things, from my moment, I may be able to take up till date, Yes.
+[53:19] So it can, we can always withdraw, withdraw, or we can take the details. Fine, sure, alright, okay. So. This is the last stage where we'll be entering the recurring data.
+[53:33] Maintenance. The total this is for one quarter, one entry, the second quarter, second entry, etc. So every quarter we come up with new new entries.
+[53:47] So this is what every quarter. Oh, the supervisors would be entering this quarter, they'll just change these things. And. For plantation progress, the photos on the last slide what we have.
+[54:04] We'll just select them. And then upload a photo. And the height of the speech is here we select.
+[54:18] What is the current height and stuff? Site layout is an image. Soil pH reading and the reading mentioned it is being selected here.
+[54:29] And the reading will be entered manually according to the reading. Same It will be entering every quarter, right? Yes. The rest of them are on a history.
+[54:44] Yes. OK. Inside the plantation, outside the plantation, temperature, humidity, we enter manually and add a image. Indicators is one time.
+[54:56] Security infrastructure. If we want to update, we can update from here. Else we can have it the same. Whatever the old data was there, it will be, you know, it will same captured.
+[55:07] So this is a dashboard. The first image we can change it maybe every quarter or if we want the same thing to be there, we can also have the same.
+[55:21] So in terms of UI, I am working on this since last few months. I feel this is easier for someone who is seeing this for the first time.
+[55:31] I just wanted your inputs. What do you feel? How do you feel? Do you feel this is complex or? There are a lot of data points, should we minimize it or should we break it down into different different?
+[55:43] Slides as we have done here. So I would require everyone's input. That is the reason we scheduled this meeting. So overall, what do you feel, Abhis?
+[55:58] I feel only that rows and columns of boxes alone could be slightly tricky, but otherwise everything is output only, right?
+[56:06] For me, the concern is about the, you know, the last entries only, what you shared now. I think that it seems to be very easy.
+[56:11] So that is what you should be doing every quarter. Okay. What is the heading called? heading. we will rename this.
+[56:18] It is called Advanced Settings something. We will rename this. Yeah. Right, okay. So this is the only page you should be entering every quarter, isn't it?
+[56:26] Yes, this is the only page where we'll be entering all the recurring data, repeated data. Right, so depending upon, for example, here you're saying the minimum height and maximum height, isn't it?
+[56:37] So here, depending upon the height we put in, it will show in that image over there. What is the height over there?
+[56:43] Right, in the report. Yes, that will be displayed, but we have something called actual height. We are also mentioning the actual height.
+[56:51] For that we have a data point. So that will be selected automatically. Current height we will enter it manually as a data point.
+[57:01] This will be moved automatically according to the pattern what we select. This is preset, so we are animating it. So, in that way, we will be achieving this.
+[57:12] Shashank, actually I had a plan of getting this actual height from the sapling itself. I mean, the total number of saplings they have height, right, from that itself.
+[57:23] We'll be able to derive it. I'm planning on taking that from that data. Okay, we'll plan that. Yeah, we don't need to enter.
+[57:33] Sure. Okay, I'm done with my questions. I think some boys. Azim, Nugunathan, Anwar, Jagan, Uzaifa, Raju. If you have any questions about your entry points, please ask and get clarified.
+[57:52] So Azim, what do you feel about the flow? Is it easy? Confusing? Would it be more simpler? Actually, we have minimized maximum number of data capture as much as we can.
+[58:12] We had to minimize. But still, if you want, we can work on that also. Yes, Sushant, Any inputs, any other challenges out of the box, we will work on it again, I'll call you.
+[58:42] Sushant, once, once when we start doing it, we may have a doubts or clarification we ah, we will have. Then we can speak regarding this one.
+[58:51] In terms of UI, the flow of this, is it simple? Sushant, what I suggest is, what I suggest is, let all the supervisors can try from their end, some small side switch.
+[59:04] lesser information, you'll cite something like CJIE, Tata, Atlassian, Marie, so, of course they will know what is the challenge they have, how, what is it, and everything, and we will have a call by Friday or Monday after that, maybe we'll set a timeline.
+[59:19] To, for them to try it out one time, by Wednesday or Thursday, and on Friday we will have a feedback call for 30 minutes, based on that we will close it, we'll keep it as soon as possible and then finish it off.
+[59:36] What we'll do is we'll create two or three dummy IDs and you will know whatever data you want and you can put this in the same ID itself, and at the time when we can finalize, we can remove all the junk data.
+[59:58] The important thing is for example, you'll connect to the Jusifa, and DufaCGI, you'll connect to Raju, and DufaLenovo, you'll connect to Logonath, and DufaSolidWare for water tech.
+[60:09] So sit beside them, share the screen space, and do one site thoroughly and completely. Okay, works. Yeah, so one, one, one site, sit with them and complete off so that you're there.
+[60:22] You can handle them, complete them. Then they can get a thorough idea about that. Okay. Yeah, that's better, right? Okay, this works.
+[60:32] Jonathan, any inputs? Okay, when are you going to start this, start this off?
+[60:45] maybe from tomorrow, I'll check on all of them. I think, more, something very, all the, all the places where we have a CGI, for example, CGI Chennai, CGI Bangalore, CGI Pune, Hyderabad, things like that.
+[61:01] So probably, and the numbers are also very small, thousand numbers like that. We can start off like that. We will start with CGI because they'll get to know what all data points is required for the other forests so that they can collect in the meantime.
+[61:15] So, we'll start off with CGI. Yeah, having said that, for other, operation people who are working in Coimbatore, Madurai, we can also, Zestiria, make sure you allot one.
+[61:26] It's better. It's better for them to try it off for CGI itself, because we have almost 24 sites in CGI for all, See, for example, if it is Arun, Anwar, let Anwar do IDFC, ma.
+[61:40] Let them do their respective sites. Oh, okay. So, what I'm saying is... Anwar can do HCL. Yes, yes, yes, correct.
+[61:53] Just one second, what we'll do is, I'll Okay, just one thing. What I feel.
+[62:17] What we do is give this dummy ID to everyone. Everyone login, do whatever you want just explore for a day.
+[62:22] Post that I'll get her a one hour on call with everyone. Then we will actually feed the actual data. Then we'll start according to that.
+[62:34] Because for them to explore about the platform, try whether it's working, not working, what's new. Let's. Let them try out every feature on it, which would not even affect anything.
+[62:46] At this phase, I'll give a dummy ID to everyone. I think this is better. Is it okay, bro? Okay, whether you give a dummy ID or a real But it would affect nothing.
+[63:09] So, post that, I will, once they, explore everything. They'll have a lot of doubts. I'll get on a one on call with everyone and then I'll sit with them.
+[63:17] We then we'll make sure they enter a data. So that they'll get a flow because if you're trying out even Instagram, you'll be curious to see what all buttons are these.
+[63:26] What all features are these? So let them explore. Sure, fine. All right. Okay. Okay. All right. We'll be sharing the idea.
+[63:34] Looking forward. I think so. We've been taking away so much of the headache of Jayasuriya and Asim and Loganathan and all the boys for the quarterly reports.
+[63:43] Yeah, yeah, yeah. Let's look forward. Okay. I think so. Let's see that the first quarter goes off smoothly. Yeah. Yeah.
+[63:55] All right. Good luck. Boys, if you have anything, you can continue the conversation and, otherwise, I can exit. Yes. Yes.
+[64:06] Okay. Yes. Yes, We are making geo-tagging for some clients, correct?
+[64:23] Second one is, if you take up your manual reports, we have a lot of data points where we enter each sapling.
+[64:34] Each sapling data. Each sapling data only. Like, what is the revenues? I mean, carbon sequestered, oxygen generated, total value of that.
+[64:47] Mainly, the purpose of this is geotagging. What can I say carbon sequestration? Carbon sequestration is for geotagging.
+[65:07] will be naming every sapling. So if you are doing this, you will be capturing every three or six months a photo, each sapling photograph.
+[65:16] For some clients who have requested for geotagging and you send it to either Jaisurya or Deepika, they really like it and send it to Jaisurya.
+[65:26] So it's a loop of process, correct? So we are trying to cut down both the things. They rename it and But, grid wise data, that data we have to know, we know that.
+[65:47] Okay. So, Loganathan, we have something called geotagging.
+[65:59] So, whatever saplings we plant. If the company, the client is requesting, yes, we want geotagging, geotagging means. They will have a portal, the portal which I had opened just now.
+[66:11] Now my screen is visible, right? Arun, what is the admin ID for CGI? Give me CGI. CGI admin, ah? That's mine.
+[66:25] Password will vary a lot Get it now.
+[66:37] Okay. able to track each sapling. We, whatever photos we update, they'll get the exact location. So we are updating the lat PnbCredentials, that's, I mean, PnbUserName, I mean.
+[67:20] OK. So Pnb has their forest in our LCOT. So it will mark, it will mark like this. This is their forest.
+[67:30] So anyone who has. As this access can view this. So here they're getting the value. What is oxygen generated carbon sequestered?
+[67:39] Total number of plants, age of plants, the basic details. So, after this, each session We have tree photo.
+[68:03] Ok, a particular tree photo, ah? Arun, how to check that? Yeah. And, details. Details, ah? Right-hand sides, Karthik. Ok.
+[68:19] Here, ah? No, go Ok. Right sides. Ok, done, done, done. Ok. So, with every sapling, we have mapped the data.
+[68:32] This is a tree number This is the photo No, that's a viewer issue. Arun, when will this be fixed? We can clear all OK.
+[69:01] OK, so for every sapling Loganathan we have this data. Each sapling has this data.
+[69:14] And we have something called Tree Certificate for each sapling. For that we We have taken individual average count of it and we have fed it actually.
+[69:38] Okay, yeah. Carbon sequestration. That count is mainly for... I mean, I understand your What data do What data do you have?
+[70:06] Data, I have grid of 400 species. You have the Yes, I have the number of boxes.
+[70:32] Okay. You know, the species is a good, you know, on the species. You know, the species is a good, you know, on the species.
+[70:41] But in the other the number of the number of the of the assume funny number MMM, MMM.
+[71:25] exact data. Okay, okay. I thought, for carbon sequestration, it if we had only the total plants, right? If we only the data of each we wouldn't need the how many species are there for each right?
+[72:05] That's what I thought. No, not like that. But for carbon sequestration, we can use this data to calculate. Okay, okay.
+[72:13] Sure, sure, sure. Ah, that's okay. I understand that. Okay, okay, Okay, Azim bro, Surya bro, tell me Sushant, is there any input or shall we wind up the meeting?
+[73:11] Sushant, yeah, Surya bro, that's the thing, ah, once we started to create report, then we will know exactly what's, Okay, I will, I will, I will send a dummy user ID and credentials.
+[73:25] I will the link Okay, wow. Sushant, I will give each person their own email. Yeah, yeah, yeah. Tell them to sit like that.
+[73:34] Okay, done. Sushant, can you give the phone number of Nemo? I'll give the address to Surya. Surya, do you have all these details?
+[73:47] Name, designation, email, contact number. Surya Surya. Who's, who's? This employee is We have the user. User? This employee is in the report.
+[74:01] We put the site manager. Okay. the poll is not working. It's not working. Okay, done. I'll We'll wrap up the meeting.
+[74:19] I'll send these credentials. Thank you, Shisha. Thank you. Thank you, Rachel. Thank you.
+[74:32] We'll wind up. Thanks, Arun.

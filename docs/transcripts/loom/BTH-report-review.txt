@@ -1,0 +1,402 @@
+# BTH report review (ddd0ef7be18a4f958258fb43e7c81c18)
+
+[00:16] Thank you for calling.
+[00:17] Ya. One minute. I'm going
+[00:19] to share some slides. OK. and a few others.
+[00:55] So, That's it. Thank you. And
+[01:01] remember to join. Thank Sourcetree,
+[01:54] Thanks for watching! Please, please. Ciao, ciao. Okay.
+[03:06] Okay. Okay. Okay. Sorry. Advance and, for what
+[03:08] we are giving. Yeah. There are only three roles. We didn't use Planter at all. Let's remove it. The existing data is coming from the night.
+[03:20] I'll see you now. I'm going Okay. Super admin. Super admin. Okay.
+[03:34] The Dashboard and Tree will be there in the Login page Okay. This is for our clients. Okay.
+[03:57] This is basic information. Logo and, three to five details.
+[04:03] Okay.
+[04:06] is for our employees. Okay. This is basic information. This is profile image.
+[04:18] And then, four details. Okay.
+[04:24] We
+[04:25] are these two areas. There is a lot of data in this. Old, old Okay.
+[05:03] Okay. Okay. Forest Creation. Mm. Give certificates.
+[05:32] , , , , , ... ... ...
+[05:48] ... ... ... ...
+[06:21] Okay. And, and the same time, we can download it if we click on it one by one. If we select it, it will the gift certificate.
+[06:47] It will open in we will be in the gift certificate. Same one, Same, same.
+[06:56] OK. OK.
+[06:59] And, and, then, if we want the gift to partner, the particular, it the unset that, the, OK. For
+[07:13] the template, we are
+[07:16] putting the details. next, the coordinates in the row. And then location
+[07:33] Since, the,
+[07:39] preview if
+[07:42] preview if it's a look and
+[07:54] review
+[07:58] if
+[07:59] it's a look.
+[08:10] Okay,
+[08:12] because,
+[08:12] We do this for events.
+[08:15] I mean, I have the
+[08:17] same
+[08:17] modules, but users will generate on their own device. After generating 10 or 15 certificates, catch a problem.
+[08:32] It will not, This is
+[08:33] just for the preview. We didn't do anything here. Okay. We didn't generate the PDF Okay? I just got the data here.
+[08:43] I will in two modes. First, I will the ad certificate, the ad recipient and buy the
+[08:48] data here. And then, I will upload it in Excel buy it. The sample Excel will come
+[08:52] in Okay. I will show you the details. You know, it's a bulk item that you You can put whatever you want in it and upload it.
+[09:17] The egg will be replaced with
+[09:29] whatever you do here. In case you give it
+[09:34] empty, with just the tree's ID, that
+[09:36] certificate will be deactivated. Got Got it.
+[09:59] So, other than that we'll implement. I'll tell you first that all this
+[10:04] is Next door, down the line, I have 2-3 things. We'll see which one is pre-attended
+[10:11] and do it.
+[10:12] Okay. So if they submit this, this will be added. I didn't put this data. If they had told me, I
+[10:19] would have put it.
+[10:19] This is a gift certificate. Now forest generation. So, it's trio.
+[10:58] This is a sample. This Okay. This is a different site. I took the same geotagging and put it here. This is how I'm going geotag.
+[11:05] Okay.
+[11:09] This is the boundary of the forest. This is the boundary This is the box. This box of the on the
+[11:15] box. on the base. Okay. I need to confirm all
+[11:46] in the initial stage. Okay. I have
+[11:49] only
+[11:49] that as mandatory. The rest are non-mandatory items. This If you see this, when Google Earth, but the UI will be bit odd.
+[11:57] I
+[11:57] have a, Okay. Yeah.
+[12:12] Once the entry is done, we will come here. For that, we will only the view and delete. Because, I old data.
+[12:22] I will our system and then open it. I have set only one Boolean for that.
+[12:29] No, Arun. Can you come again? I meant,
+[12:32] the old data. Nothing will come here. The view and edit
+[12:35] will not come.
+[12:36] Okay. You should do that manually, correct? No, no. We have to correct the data and keep it Then only, we will open Okay.
+[12:43] Certificate and Forest. Both of them will
+[12:45] be here itself. Yes, yes. Both will
+[12:48] be here only. Okay.
+[12:50] After that, in the report, All the reports will be generated here. How many reports will be generated
+[12:57] will be here. And then, there are two options to create. One is, if you select Forest, I'm fixing an API error here.
+[13:05] If you select Forest,
+[13:07] it will the data from the and fill it here.
+[13:10] We had the
+[13:10] data there
+[13:10] initially. 7-0. Got Okay.
+[13:36] Okay. Okay.
+[14:17] Ah,
+[14:18] different versions. We have
+[14:19] one version now. Yeah, no, not for now. like,
+[14:23] post we complete everything. I have or two things that are job-oriented. Because, in Bulk-Up, Okay. That will come here for us.
+[14:49] Got it?
+[14:50] In that
+[14:51] job, you will get to here. What
+[14:53] all have. Okay. Got it.
+[14:57] So, for now, this is what we Now, what pending things are there in our
+[15:01] work, One is, emailing
+[15:11] the
+[15:12] gift certificate. Okay.
+[15:15] Emailing to client. For that,
+[15:18] API key, but, SendGrid SendGrid, pricing, okay, what about the pricing for that? Is it on, included or an external thing?
+[15:39] Is SendGrid not costly?
+[15:41] No, I don't know what they did Someone already did the emailing and left. There's only the API and the function.
+[15:50] They only did that Okay. For InScape, it was like sending 100 emails a day. Is
+[15:58] that key?
+[16:00] Ah, I don't know. I have to check. In case you're changing the cost, if you're checking for a you can the API key
+[16:11] for that. Is Resend okay?
+[16:14] Resend, Resend.
+[16:16] Provider?
+[16:18] I don't know.
+[16:19] Do you ship I'm using it actually. I'm working on a
+[16:22] different project.
+[16:24] Okay. I started using
+[16:26] it yesterday.
+[16:28] Okay. Okay. Not implementing. Okay.
+[16:30] If you have any ready-to-go, you can use it.
+[16:33] APK? Yes, APK.
+[16:39] It's your own. You're using it as your Everything
+[16:43] I'm using is the same. It's a personal. Everything is from
+[17:02] I mean, you can create an account in the and implement it here.
+[17:07] or else can we use Gmail API? I
+[17:11] haven't Gmail API yet, There's already
+[17:15] a
+[17:16] workspace, right?
+[17:17] There's a
+[17:17] workspace, but I can't do in Gmail. I'm I'm I can't
+[17:24] I was asked to it in Gmail,
+[17:26] but
+[17:27] I can't do it in Even
+[17:30] with scripting?
+[17:38] Scripting, because now I'm sending emails through
+[17:38] scripting itself. I link it with Excel.
+[17:42] Whatever emails we have, we should redirect that scripting. So,
+[17:46] it's to Excel. And then, images upload. Timeline images The phone is not available with the I mean, the network is not available with them.
+[18:25] They were a lot of challenges.
+[18:28] okay. So,
+[18:29] what should I say? I mean, field executive. app, but provision provision.
+[18:35] Okay,
+[18:37] we'll do one thing.
+[18:43] We will create
+[18:45] a dashboard,
+[18:47] let them drag and drop, like The thing is, you upload
+[18:53] in bulk, right? Yes. When you upload in it should a stabilized internet, in
+[19:01] one place. Okay.
+[19:02] For that, I mind map. I this in my mind. If I put it like it will correct. Similarly, in that, there are a few things.
+[19:13] that The timeline is like everything is only upload only, In that timeline, what you do is, in case it is dead, you should put an image for that.
+[19:25] And then, replanting. Next is something else, deweeding.
+[19:29] growth-based.
+[19:29] There is no timeline for that yet. Ask Deepika about that.
+[19:42] Ask her Or you can in the Timeline's logics. Upload and logics timeline. After this, forest data.
+[20:27] What
+[20:29] is it Old forest data will migrate. Okay. they'll add everything newly itself. We can match. I, I'll ask them to, they have a meeting today.
+[20:42] So, if you tell me. Can we test out one? Today is Tuesday. They'll be having a
+[20:49] projects meeting. I'll
+[20:51] ask everyone. Everyone will Wait a minute. I have a data. I have a file, I think. Arun, last time you had shared me a format, right?
+[21:12] Do you the filename?
+[21:14] we
+[21:15] were creating via Excel format, is that correct?
+[21:22] You had shared me one sheet, actually.
+[21:28] Can you see it
+[21:31] Actually, I that Excel format. Because, it had a lot of data At that time,
+[21:35] we had to put each and
+[21:39] Yeah.
+[21:47] Okay.
+[21:55] You have tested this,
+[21:58] report, Arun, forest forms.
+[22:03] If I ask them to start now.
+[22:09] Okay, They'll start working. When shall I ask them to start, filling the
+[22:14] data, Arun? tomorrow we'll do it, mom, we'll do
+[22:16] a full
+[22:19] If they do it now, the data
+[22:21] will go inside unnecessarily. If they it now, the data will go
+[22:25] inside unnecessarily. It'll of junk.
+[22:27] I'm not the progress. I don't get
+[22:36] them today,
+[22:38] Huffy will be there today in
+[22:43] the meeting.
+[22:47] There, something, they, they'll talk according to them and it'll work out for me, it'll be helpful. Else, I should
+[22:54] run behind them. Okay.
+[22:57] Okay. Latitude, longitude is not working. Can you come to the forest module, Arun? Try
+[23:06] Hard Refresh.
+[23:07] There's an update.
+[23:10] Hard Refresh,
+[23:10] Control Shift. Control Shift.
+[23:13] Not working.
+[23:14] Hello? A lot longer.
+[23:22] Edit.
+[23:24] Okay. Oh, okay. Okay. You're done like this. But before this feature was not there, correct, ah?
+[23:32] Aama,
+[23:33] aama, That was also better, Arun.
+[23:35] Editing, is it? Yes.
+[23:40] They only, they themselves were entering the lat-long. That's the problem.
+[23:45] I'll give the option
+[23:46] to edit.
+[23:47] One thing is, lat-long is, not normal data. It's serious data. Even if it changes a it will go somewhere else.
+[23:56] Okay. That's why I'm doing this here and clicking. Okay. You can get normal If you click and it goes somewhere else, it's like a generator, right?
+[24:07] It's like on top and fixing In case it's normal, it's okay two or three boxes. If it's a lot of boxes, it's like I'm writing a separate
+[24:18] script for it. Okay.
+[24:20] The reason I've done like this is because I don't want to put form correctly in your the the problem in the end of the day, even if
+[24:35] we have done it'll get Already they have a form. The form they put it was just a lot of data entry.
+[24:44] Each and every time, to generate a I had an entry.
+[24:48] They didn't record it. They didn't use it at They just showed it once, and that's it. They didn't use it after It became a waste.
+[24:53] I bought this entry as a one-time entry, and the rest of it, I did it and If we give them bulk and all, to make their work easier, it'll not work.
+[25:06] Okay? So, we are thinking, let us give them bulk options. They may feel hard for that,
+[25:12] if we give them bulk options, and maybe individual photo eyes.
+[25:19] Okay, A1 one photo, A2 one photo. One option for capturing, one option for uploading. That's their problem.
+[25:29] No, that's what I'm trying to If we tell what their workload is, they won't do it at all. They use it at all.
+[25:38] I've never seen anything I don't think this far with the gift certificate. I
+[25:49] can simply edit the gift certificate and send it
+[25:54] to you.
+[25:55] But
+[25:57] you won't even use it. It's as simple as that. There are a lot of numbers, right? There are counts, The resource for that take a whole day.
+[26:10] It
+[26:10] would whole day, even two days. In case there are 10,000 trees, right? Every month, in case you come to an occasion and you gift a thousand trees, it will an Even if you put in Excel, you can import it
+[26:24] and keep going. Click on it. Send, Okay. It's a little It's a
+[27:02] little cumbersome. It's a little cumbersome. It's cumbersome.
+[27:14] It's a It's a little cumbersome. It's a
+[27:17] You
+[27:17] need a little
+[27:20] We to the toilet and we sit back wait, so Arun, one option. To mark in red color or when the To To when the data field is not the field.
+[27:31] data field. I'm submitting a form. Okay.
+[27:34] for
+[27:35] me, it is not popping up. Actually, I'm not getting that Okay, okay, Submit
+[28:16] Do you the I think we have already
+[28:24] shared it. Can you share the screen with the screen with Malaponga?
+[29:02] You
+[29:04] have set any default for Logo? Click
+[29:09] on Logo. It will come.
+[29:13] Is there
+[29:13] a default
+[29:14] file format There is an image format. That's Ok. I'll tell why
+[29:34] I'll tell you why this I'll tell you why this in. The UI, you can put the stitches, and I'll write it in the rough.
+[29:42] You know, it's I should give a
+[30:02] website today, actually. Delivery not done. Working on that.
+[30:13] So, I'll plan accordingly, Arun. You have some existing mock-up, correct, ah?
+[30:19] I took
+[30:19] this form, so I have to put This form has the basic code, right? Share that code.
+[30:24] I told you regarding the mailing, correct, ah?
+[30:35] See, in the Excel, we put all this data bulkly. Okay, well, we can refine however we want. Format, subject, everything will be set on the Excel sheet.
+[30:49] Okay. In the script, we
+[30:51] have the script base huh, script base It is
+[30:54] actually working. Problem another, we can send almost thousands of 1,500 mails a day from Gmail.
+[31:01] Max for one day, we can send 1,500. So, you don't want to know. I, once I enter the data over here, you don't want the two days, three days later it will get complete.
+[31:13] Maximum 1,000, 2,000.
+[31:30] Already worked Okay. So, we generate the data from the front-end and download the Okay.
+[32:10] So,
+[32:10] the data will populate from the backend itself.
+[32:18] Do
+[32:18] you what I'm saying? You don't have to manually fill this excel
+[32:23] Yes, we'll not fill this. Whatever forms we have, we should capture it from there.
+[32:30] What do you mean by Oh, now, how do we, have the email already saved with us? There's only one field here.
+[32:41] Yes. That one, we
+[32:43] will link it to this Google Sheet. That's
+[32:46] what I'm saying. I'm
+[32:50] going to give
+[32:53] First, you have to put the data here.
+[32:55] Is that Yes. Then, you have certificate. That particular one.
+[33:30] Excellent. Got it. What's the big plan?
+[33:42] Got it. I idea. However, what is being charged? What is being done? So, if it is an additional cost, again, then they'll ask me.
+[34:07] So, even if it's, Ah, have
+[34:09] a question. Even though there is a problem, delivery rate?
+[34:12] Yeah. Excelscript. Also, it depends on how many emails we are sending.
+[34:43] If it is less number of emails, if it is at low price, it's okay.
+[34:47] SendGrid costing, I don't know actually. Is it similar to MailChimp?
+[34:50] Actually, I mailing before.
+[34:57] I don't know about it. It is somewhere related to MailChimp. MailChimp is very costly. Delivery rate is good, but I am not sure about SendGrid.
+[35:07] It is from Twilio, I think.
+[35:08] I think so. But, wait. In case your email address is marked as spam, it might an issue for a lot of people.
+[35:18] we
+[35:19] should figure that out. It depends on the total
+[35:26] number of emails, If you
+[35:27] feel so, please let us
+[35:45] We'll
+[35:47] see, Arun. I'll check what could be done. You let me know what is the total number of emails or should I check that with Deepika?
+[35:59] okay. Okay, no worries
+[36:14] Okay. Last time on the sentry, 100 emails a one day, when I was I
+[36:19] was
+[36:19] okay, I can send 100 emails But if you send 100 emails a day, your total clients keep increasing. Email sending clients keep increasing.
+[36:29] If a day, increasing. It's a tedious job.
+[36:34] Agulasi, cost saving is not the solution. So, like that. If we can know a price, Icing, I can give them a comparison.
+[36:45] Maybe back then, they
+[36:47] were, I don't know about
+[36:49] I mean, it's, it's, Recently, it's on subscription basis. Monthly subscription. So, I am purchasing maybe recently. For the company. So, maybe we can integrate.
+[37:01] One more option is we have Zoho campaigns.
+[37:04] Zoho emails.
+[37:06] I
+[37:06] am getting that as well. So, existing, if we
+[37:11] can make out. If
+[37:12] it is charging three thousand, four thousand, five thousand, If it is going beyond that, or if it Basic question then.
+[37:23] So, you
+[37:25] let me know whether, is it on single email usage or how is it? Based on that we will plan. Read it.
+[37:34] Parangu. One minute. I'll screenshot it. Okay, second plan,
+[37:58] second plan, second plan, essentially. 60,000 to 100,000 emails. Is
+[38:07] that okay, $20? Ah, 4,000. $2,000.
+[38:12] Okay, then, is that no problem? If
+[38:14] that's the then I a minute.
+[38:20] You let me know the basic count. I don't if you have
+[38:24] I don't The count What's the third plan, Arun? Third
+[38:31] plan, $30? $90? $10? $1,000,000 emails, This
+[38:42] is the excess that should be Dedicated IP, Includer, Sub, Single Sign-On. I won't use big names.
+[38:50] Email Email Validator, where is No. But, pricing is high. Okay. I think we can go with the second plan. Can you check for recent?
+[38:59] Recent pricing? Recent,
+[39:01] I think, is only 10,000.
+[39:05] Recent,
+[39:06] the cost is not there, I
+[39:07] think, it was like that. Recent also, same pricing.
+[39:12] $20, 50,000 emails. But, this is more convenient for us.
+[39:24] Automation runs are like. But, now we are going to use only Yes, yes. API API is there.
+[39:53] We'll go towards Okay. that time,
+[40:14] no,
+[40:14] no, no. You can get a Chai, I'll be Oh, I'll bring it. I'll bring it. I'll bring it.
+[41:06] This is quite I can't believe $4,000?
+[41:31] $4,500.00 to $6,200.00 For single company
+[41:37] or total?
+[41:38] Multiple company. We'll go with that.
+[42:11] I'll
+[42:12] get one
+[42:14] and I'll give you the API key access. 400, 100, simple. No, no, 100 version.
+[42:27] I'll get one and I'll give
+[42:29] the API key access.
+[42:35] Okay.
+[42:35] I'm
+[42:36] anyway getting recent. I'll give you the recent credentials. Okay.
+[42:43] Other than this, in
+[42:48] order to
+[42:49] be sure.
+[42:51] Other issue on the, will it get Because if I tell them now, they'll start working, they'll start feeding the data.
+[43:12] Data is a little, Actually, I would only one thing. Which is... Initially, I would data.
+[43:22] Data. Sourcetree, Statuspage, Trello, Hello?
+[43:54] Hello? Sorry Krishna,
+[44:35] power
+[44:38] cut off aayachi. Ah, okay, okay.
+[44:41] Okay,
+[44:42] so, If I don't allow you we can a box and create it ourselves. Okay. For example, this box is 3x3, and this tree is 10x10.
+[44:59] We can 100
+[45:01] trees in one
+[45:01] 100 trees Okay. Correct? Now, we can put an A and start from 0,
+[45:10] 0, 1, 1. Getting one ticket, ask the ticket checker, you being in the black dress, ask them where
+[45:22] I can find train, where I can find local train for Srinu. I've checked the app, it's
+[45:31] saying that there's going to be
+[45:33] a platform, the app is not, you know, proper.
+[45:37] So, they might change the platform as well. So,
+[45:39] have a
+[45:41] I think it's
+[45:57] I think it's a complex issue.
+[45:59] There
+[46:09] is All the data bulk. Like I usually put it in, how can I say this? We get huge data discrepancy.
+[46:21] You have to You have look and put correctly. You can't put it In case it goes wrong, you have to me, only then I
+[46:27] can correct
+[46:29] Otherwise, the API will become very complex. Necessarily, very minute edge cases will be like we are doing this. We have handle it.
+[46:37] We handle it, minor edge cases. We have to predict it. If we edge cases, there will be a lot of edge cases.
+[46:45] I allow as can.
+[46:50] I
+[46:50] allow much as I I allow as For example, count to increase.
+[46:56] I allow as can. For example, if they put count as 25 or 20, next year, they will another species.
+[47:25] Okay, you
+[47:26] are even You're also linking this with the geotagging, if
+[47:37] I'm not correct, ah? Yes,
+[47:43] The geotagging that I have done now is, the center of the is the geotagging all the plants in that box.
+[47:48] Okay. I didn't put it individually. I but I used Okay. Okay. Okay.
+[48:23] So, you complete this and let me know by today. I'll test it out today. Once Okay?
+[48:39] It's actually 13, but we've created
+[48:48] We've created same way, but we've a So, what happens is, the A51.
+[48:53] It won't straight. It will forward and backward. That's why it says put it correctly
+[48:59] Got it. See, for end of the day, we should get that, carbon sequestration report. That's it. If it is,
+[49:04] They
+[49:05] are one
+[49:06] time, right? If it one time, it should put correctly.
+[49:08] got it.
+[49:10] If it daily entry, we can give a lot of provision. If it daily entry, we can They can't Then, it's okay.
+[49:18] If a forester does it, it's done. There is that. The plantation time will be 6 to 7 months. In that forest area.
+[49:26] If it's daily entry, we can 1 crore plants. So, done. Got it.
+[49:53] We can do it. It will time. We can edge cases when we get them. We handle them for 1-2 days.
+[50:00] We have done it before. We can engage them. We We can engage them.
+[50:08] It's okay, It's okay, right? Yes,
+[50:14] Hello. Okay. How okay. Okay. Okay. Giftworking okay.
+[50:27] Giftworking okay. Main module of Forest Aid. No,
+[50:32] no, that's what I'm saying. for? I
+[50:52] think they, he will, Mahesh call Hafeez or what is, in the?
+[50:57] No, he doesn't talk much. He only talks through If you say
+[51:01] If they ask me, I'll tell them we're testing out on it. It's done.
+[51:06] Okay.
+[51:07] But actually, when this will be done, because last time when I left, Mayfood was there itself. So they're asking, can I ask all the executives to start filling the data?
+[51:21] When shall I ask them to fill the This
+[51:23] is a question. He always that. He says we can do or we can't do it. He doesn't do anything.
+[51:28] But, that's it. See, for this, it's in. If I loop in
+[51:33] Hafeez,
+[51:34] okay, wow.
+[51:36] If I loop in Hafeez, What's the problem? Okay, then I'll leave today. No, leave it for today. I'll finish it today.
+[51:44] I'll finish it and I'll handover When I handover it, I'll let you know. If I, if I, I'll schedule a meeting
+[51:54] with the field executives tomorrow. If that meeting is scheduled for you also, the problem is solved. Okay. They're having a product demo tomorrow for all the executives.
+[52:02] It is sorted without even you telling him anything. Everything
+[52:07] is done. You can just simply tell him tomorrow we have scheduled a meeting, product demo. But tomorrow we
+[52:12] want
+[52:13] the product to be ready at any cost. It should be working. No errors should be there. It will operate. Okay.
+[52:50] That is the idea.
+[53:03] This is very less. Actually, this is 4x4. We are going to do 2x2. But if you the actual data, 2000 lines will go.
+[53:17] That is where it very annoying, whether the key will go or not. That is why we have to be very careful.
+[53:22] We have be very careful when we are working on the I will finish it
+[53:27] Akka, shall I
+[53:28] ask them to schedule
+[53:29] a meeting?
+[53:30] Because, don't do it as last time. Last time, everything went wrong.
+[53:34] Only, I can manage. You guys were not there, that's why. But this time, it can't
+[53:40] be done.
+[53:42] Okay, okay. You
+[53:45] guys schedule it. I'll come. Okay,
+[53:53] done, Arun. I'll start it tomorrow. Tomorrow, I'll schedule it at 11 o'clock. Morning. Oh, okay, okay. Okay, Arun.
+[54:02] Done. Right.

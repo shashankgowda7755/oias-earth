@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>OIAS Earth / Be The Tree Hugger — Business Document</title>
+<style>
+  :root{
+    --ink:#16282e; --ink2:#0f1d22; --paper:#f7f9fc; --surface:#fff;
+    --pine:#1d6b3f; --lime:#3f9e2e; --amber:#c47f1d; --red:#b4452f; --slate:#6b7b82;
+    --line:#e2e7e3; --muted:#5a6b72;
+    --serif:Georgia,'Times New Roman',serif; --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:var(--sans);color:var(--ink);background:var(--paper);line-height:1.6;font-size:15px}
+  .wrap{max-width:1000px;margin:0 auto;padding:0 24px}
+  header.hero{background:linear-gradient(160deg,var(--ink),var(--ink2));color:#eef3ef;padding:54px 0 44px}
+  header.hero .wrap{max-width:1000px}
+  .kicker{font-family:var(--sans);letter-spacing:.22em;text-transform:uppercase;font-size:12px;color:#b6ff3c;font-weight:700}
+  h1{font-family:var(--serif);font-size:clamp(30px,5vw,46px);margin:8px 0 6px;line-height:1.08}
+  .sub{color:#bcd;font-size:17px;max-width:62ch}
+  .meta{margin-top:18px;font-size:12.5px;color:#9fb0ad}
+  h2{font-family:var(--serif);font-size:26px;margin:46px 0 6px;padding-top:14px;border-top:2px solid var(--pine)}
+  h3{font-size:17px;margin:24px 0 6px;color:var(--ink)}
+  p{margin:8px 0}
+  a{color:var(--pine)}
+  .lead{font-size:16.5px;color:#33454c}
+  ul,ol{margin:8px 0 8px 2px;padding-left:20px}
+  li{margin:4px 0}
+  table{width:100%;border-collapse:collapse;margin:14px 0;font-size:14px}
+  th,td{text-align:left;padding:9px 11px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{background:#eef2ee;font-weight:700;color:#33454c}
+  .tag{display:inline-block;font-size:11px;font-weight:700;padding:2px 9px;border-radius:999px;white-space:nowrap}
+  .built{background:#e4f4e0;color:var(--lime)} .partial{background:#fbf0db;color:var(--amber)} .pending{background:#f7e2dc;color:var(--red)}
+  .grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));margin:14px 0}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 18px}
+  .card .n{font-size:24px;font-weight:800;color:var(--pine)}
+  .card .l{font-size:12px;color:var(--muted);margin-top:3px}
+  .callout{background:#eef6ef;border:1px solid #cfe6d2;border-left:4px solid var(--pine);border-radius:8px;padding:14px 16px;margin:16px 0}
+  .warn{background:#fbf4e6;border-color:#ecdcb6;border-left-color:var(--amber)}
+  .toc{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 18px;margin:26px 0;columns:2;font-size:13.5px}
+  .toc a{display:block;padding:3px 0;text-decoration:none;color:#33454c}
+  code{background:#eef2ee;padding:1px 5px;border-radius:4px;font-size:13px}
+  footer{color:var(--muted);font-size:12px;padding:30px 0;border-top:1px solid var(--line);margin-top:40px}
+  @media print{ header.hero{background:#fff;color:#000} .kicker{color:var(--pine)} body{font-size:12px} .toc{display:none} h2{break-after:avoid} }
+  @media(max-width:640px){ .toc{columns:1} }
+</style>
+</head>
+<body>
+<header class="hero"><div class="wrap">
+  <div class="kicker">Business Document · for internal audit</div>
+  <h1>OIAS Earth — the Living-Proof Tree Platform</h1>
+  <p class="sub">A digital Measurement-Reporting-Verification (dMRV) platform that doesn't just plant trees and hand out a certificate — it proves, tree by tree, that they're still alive, and turns that proof into reports corporates pay for.</p>
+  <div class="meta">Trading: Be The Tree Hugger · Live: communitree-rebuild.vercel.app · Anchor partner: GNF (Tiruchirappalli) · Status: working product, demo-populated · Generated 19 Jun 2026</div>
+</div></header>
+
+<div class="wrap">
+
+<div class="toc">
+  <strong>Contents</strong>
+  <a href="#summary">1. Executive summary</a>
+  <a href="#problem">2. The problem &amp; the insight</a>
+  <a href="#product">3. The product (what it does)</a>
+  <a href="#how">4. How it works (tech + science)</a>
+  <a href="#money">5. Business model — where the money is</a>
+  <a href="#econ">6. Unit economics</a>
+  <a href="#moat">7. Moat &amp; differentiation</a>
+  <a href="#compete">8. Competitive teardown + the PNB story</a>
+  <a href="#status">9. Build status — honest ledger</a>
+  <a href="#risks">10. Risks &amp; open items</a>
+  <a href="#integrity">11. Integrity rules (non-negotiable)</a>
+  <a href="#legal">12. Legal / registry path</a>
+  <a href="#gtm">13. 90-day go-to-market</a>
+</div>
+
+<h2 id="summary">1. Executive summary</h2>
+<p class="lead">Most tree-planting platforms sell a <strong>birth certificate</strong>: a geotag and a photo at planting day. After that, nobody knows if the tree lived. We sell a <strong>life record</strong>: a longitudinal, independently verifiable trail proving the tree is still alive — every monitoring visit dated, measured, photographed, and tamper-evident — and we package that proof into the carbon, oxygen, and survival <strong>reports</strong> that corporate CSR buyers need to justify their spend.</p>
+<div class="grid">
+  <div class="card"><div class="n">Life record</div><div class="l">not a day-zero certificate — the moat</div></div>
+  <div class="card"><div class="n">4 engines</div><div class="l">B2C gifting · B2B CSR · white-label · carbon-ready</div></div>
+  <div class="card"><div class="n">~0 marginal</div><div class="l">verification layer adds ~no cost → "verified" premium is ~all margin</div></div>
+  <div class="card"><div class="n">Clean-room</div><div class="l">built original, not forked from the incumbent</div></div>
+</div>
+<p>The platform is <strong>live and runs end-to-end</strong> (map → geo-tag → monitor → prove → carbon/oxygen → report). Today it is populated with <strong>demo / imported data</strong>, not real field captures — it is a working <em>product</em>, not yet a working <em>operation</em>. Feeding it one real forest (real coordinates, real 360, real visit photos) turns the same screens real, with no rebuild.</p>
+
+<h2 id="problem">2. The problem &amp; the insight</h2>
+<p>Corporates spend on tree-planting CSR and get a spreadsheet + some planting-day photos. They cannot prove to an auditor, a journalist, or their own board that the trees survived. Survival in real plantings is 60–90%, not 100% — yet every competitor reports "100% alive" because <strong>they never check</strong>. The day someone measures one tree, the claim collapses.</p>
+<div class="callout"><strong>The insight:</strong> the scarce, defensible thing is not the tree — it's the <em>continuously verified proof the tree is alive</em>. That proof is what makes a CSR report audit-grade, what justifies a premium price, and what nobody else is doing. Build the proof engine; everything else (gifting, CSR, carbon) sells off the same verified dataset.</p>
+
+<h2 id="product">3. The product (what it does)</h2>
+<p>Three layers on one verified dataset:</p>
+<h3>Layer 1 — Capture</h3>
+<ul>
+  <li><strong>Field PWA</strong> (<code>/field</code>): planters log in (Planter role), pick their assigned forest, capture each visit — GPS + in-app photo + status/height/diameter/date. Offline-first, syncs on reconnect.</li>
+  <li><strong>Box-grid coordinate engine:</strong> for dense plantings (e.g. 1-ft spacing), per-tree GPS is useless (consumer GPS resolves ~3–5 m). Instead: capture the <strong>4 corners</strong> of a planting box + the grid (rows×cols, spacing) → we <strong>compute every tree's exact position</strong> to the centimetre. 5,000 trees = 50 corner-readings, not 5,000 GPS fixes.</li>
+</ul>
+<h3>Layer 2 — Verify</h3>
+<ul>
+  <li><strong>Carbon ledger</strong> (append-only) — per-visit CO₂e from measured growth (see §4).</li>
+  <li><strong>Oxygen</strong> generated, derived from the same measured carbon.</li>
+  <li><strong>Integrity checks:</strong> every photo SHA-256-hashed (catches recycled-photo fraud); GPS &gt;5 km from the forest centre flagged as suspect.</li>
+  <li><strong>Tamper-evidence:</strong> carbon ledger Merkle-rooted and anchored to Bitcoin via OpenTimestamps (free, no wallet). <span class="tag partial">anchor job pending</span></li>
+</ul>
+<h3>Layer 3 — Experience &amp; Reporting</h3>
+<ul>
+  <li><strong>Public heartbeat map</strong> — satellite, forests pinned, drill into a forest to see each tree coloured by health; boundary polygon; NDVI cross-check.</li>
+  <li><strong>Per-tree proof page</strong> — life record: visit timeline, growth chart, survival verdict, carbon + oxygen, QR plaque.</li>
+  <li><strong>Interactive 360° tour</strong> — walk the site Street-View-style; every sapling is a clickable hotspot → its record; auto-placed from the grid coordinates.</li>
+  <li><strong>Sponsor portal</strong> — a corporate's forests, live stats, searchable tree register.</li>
+  <li><strong>Reports (the money):</strong> downloadable, branded <strong>CSR impact report</strong> (carbon + oxygen + survival + per-forest + map + methodology) and a per-tree <strong>gift certificate</strong>.</li>
+</ul>
+
+<h2 id="how">4. How it works (tech + science)</h2>
+<h3>Stack</h3>
+<p>React + Vite frontend · Express + TypeScript API · Neon Postgres · deployed serverless on Vercel. Live at communitree-rebuild.vercel.app. Object storage (Vercel Blob) for photos/panoramas. <span class="tag pending">storage token to be enabled</span></p>
+<h3>Carbon method (defensible, registry-aligned)</h3>
+<table>
+  <tr><th>Step</th><th>Formula</th></tr>
+  <tr><td>Above-ground biomass</td><td><code>AGB = 0.0673 × (WD·DBH²·H)^0.976</code> (Chave 2014 pantropical)</td></tr>
+  <tr><td>Below-ground</td><td><code>+ 0.24 × AGB</code> (IPCC root:shoot)</td></tr>
+  <tr><td>Carbon → CO₂e</td><td><code>× 0.47</code> carbon fraction <code>× 3.667</code></td></tr>
+  <tr><td>Oxygen generated</td><td><code>≈ 0.727 × CO₂e</code> (photosynthesis stoichiometry, tied to the same measured carbon)</td></tr>
+  <tr><td>Net removals</td><td><code>gross × (1 − 0.18 buffer) × (1 − 0.10 uncertainty)</code> ≈ 72%</td></tr>
+</table>
+<p>Wood density is real and per-species (Global Wood Density DB / ICRAF) for all 96 catalog species — not a flat default. Sequestration = the change in stock between visits. Numbers are always labelled <strong>"estimated / verification-ready removal" — never "credit"</strong> until a registry verifies.</p>
+
+<h2 id="money">5. Business model — where the money is</h2>
+<table>
+  <tr><th>Engine</th><th>Who pays</th><th>Price</th><th>Note</th></tr>
+  <tr><td><strong>A. B2C gifting</strong></td><td>individuals</td><td>₹299–999 / tree</td><td>emotional; gift certificate + live proof page</td></tr>
+  <tr><td><strong>B. B2B CSR</strong> (primary)</td><td>corporates</td><td>₹3–8 / tree / month</td><td>BRSR/ESG-grade impact reports — <strong>this is the core revenue</strong></td></tr>
+  <tr><td><strong>C. White-label SaaS</strong></td><td>other NGOs / event firms</td><td>licence</td><td>the proof engine as a product; anchor tenant = case study</td></tr>
+  <tr><td><strong>D. Carbon-ready dMRV</strong></td><td>carbon buyers</td><td>slow, later</td><td><strong>credibility layer, not the revenue engine</strong> — don't lead with it</td></tr>
+</table>
+<div class="callout">The verification layer adds <strong>~zero marginal cost</strong> per tree, so the premium customers pay for "verified vs unverified" is almost entirely margin. CSR retention is driven by <em>trust in the proof</em> (survival data + carbon/oxygen reports), not by flashy UX.</div>
+
+<h2 id="econ">6. Unit economics (carbon side, indicative)</h2>
+<ul>
+  <li>1 surviving native tree ≈ <strong>0.4–0.9 tCO₂e</strong> over 20 years.</li>
+  <li>Carbon gross ≈ <strong>₹9–30 / mature tree / year</strong>; ~zero in years 1–3; first issuance 2–3 years out.</li>
+  <li>A 10,000-tree forest ≈ <strong>$1–3k / year</strong> carbon — modest. Carbon is the <em>credibility</em> lever, not the cash cow.</li>
+  <li>Rigorous dMRV lifts a project's carbon rating band: roughly <strong>B-grade (~$11/t) → A-grade (~$40/t)</strong>. That re-rating, not volume, is the carbon upside.</li>
+  <li>B2C gifting + B2B CSR are the near-term cash; carbon compounds later.</li>
+</ul>
+
+<h2 id="moat">7. Moat &amp; differentiation</h2>
+<ul>
+  <li><strong>Proof, not promise.</strong> We <em>show</em> the living tree + its measured trail; competitors promise and never show.</li>
+  <li><strong>Integrity as brand.</strong> We publish dead trees. The first faked record would kill the moat — so we never fake one.</li>
+  <li><strong>Honest carbon.</strong> Scientific allometry + buffer + uncertainty, labelled estimated. Smaller, true numbers survive audit; big fragile ones don't.</li>
+  <li><strong>Grid-derived geo + auto-hotspots.</strong> Centimetre placement of thousands of trees from a few corner readings — and the 360 hotspots place themselves from that geometry.</li>
+</ul>
+
+<h2 id="compete">8. Competitive teardown + the PNB story</h2>
+<p>We tore down the licensed incumbent's corporate portal (clean-room, look-not-copy). Findings:</p>
+<table>
+  <tr><th>Dimension</th><th>Incumbent</th><th>Us</th></tr>
+  <tr><td>Map</td><td>one logo blob per forest — 10,800 trees collapse to a dot</td><td>per-tree health-coloured pins, clusters, boundary, NDVI</td></tr>
+  <tr><td>Tree page</td><td>one photo + static stats</td><td>visit timeline + growth + survival + verification</td></tr>
+  <tr><td>Carbon</td><td>flat linear; 103 kg for every tree regardless of growth</td><td>measured allometry, buffered, labelled estimated</td></tr>
+  <tr><td>Survival</td><td>100% "alive" (never checked)</td><td>measured per visit; dead shown</td></tr>
+  <tr><td>Coordinates</td><td>synthetic spread (~impossible density)</td><td>grid-derived, centimetre-exact</td></tr>
+</table>
+<div class="callout"><strong>The PNB audit (sales weapon):</strong> on the real 10,800-tree PNB export, the incumbent reports <strong>931 t</strong> carbon; our honest recompute on their own dimensions is <strong>2.2 t net — a 312× overstatement</strong>, plus 0 trees ever marked lost. A bank's ESG report cannot rest on a number 312× too high. Live at <code>/audit/pnb</code>.</div>
+
+<h2 id="status">9. Build status — honest ledger</h2>
+<p>For your cross-audit: what actually exists today vs what's still to do.</p>
+<table>
+  <tr><th>Capability</th><th>Status</th><th>Note</th></tr>
+  <tr><td>Live app + persistent DB</td><td><span class="tag built">Built</span></td><td>Vercel + Neon</td></tr>
+  <tr><td>Forest map + per-tree health pins</td><td><span class="tag built">Built</span></td><td>satellite, clusters, boundary, NDVI launch</td></tr>
+  <tr><td>Per-tree proof page (timeline, growth, survival)</td><td><span class="tag built">Built</span></td><td>+ QR plaque</td></tr>
+  <tr><td>Carbon (Chave + real wood densities) + Oxygen</td><td><span class="tag built">Built</span></td><td>surfaced across all surfaces</td></tr>
+  <tr><td>Sponsor portal + CSR PDF report + tree certificate</td><td><span class="tag built">Built</span></td><td>carbon+oxygen+survival+map+methodology</td></tr>
+  <tr><td>PNB data-integrity audit</td><td><span class="tag built">Built</span></td><td>312× contrast page</td></tr>
+  <tr><td>360° interactive hotspot tour + admin editor</td><td><span class="tag built">Built</span></td><td>grid auto-placement</td></tr>
+  <tr><td>Box-grid coordinate engine (4 corners → exact)</td><td><span class="tag built">Built</span></td><td>verified at 1-ft spacing</td></tr>
+  <tr><td>Field capture PWA + planter accounts</td><td><span class="tag built">Built</span></td><td>offline-first</td></tr>
+  <tr><td>Visit photo persistence (object storage)</td><td><span class="tag partial">Wired</span></td><td>code done; needs Vercel Blob token enabled</td></tr>
+  <tr><td>Bitcoin anchoring of the carbon ledger</td><td><span class="tag partial">Partial</span></td><td>manual script works; scheduled job pending</td></tr>
+  <tr><td>Real field data (any real captured tree)</td><td><span class="tag pending">Pending</span></td><td>all current data is demo/imported</td></tr>
+  <tr><td>Baseline ledger row for every tree</td><td><span class="tag pending">Pending</span></td><td>only visited trees have a ledger row</td></tr>
+  <tr><td>Rich auditor / EUDR export (CSV/XLSX)</td><td><span class="tag pending">Pending</span></td><td>basic GeoJSON + CSV exist</td></tr>
+  <tr><td>Gift email + recipient page</td><td><span class="tag pending">Pending</span></td><td>data model exists, delivery not wired</td></tr>
+  <tr><td>Per-species allometry; dead-tree permanence buffer</td><td><span class="tag pending">Pending</span></td><td>methodology hardening for registry</td></tr>
+  <tr><td>Legal SPV + registry registration</td><td><span class="tag pending">Pending</span></td><td>see §12</td></tr>
+</table>
+
+<h2 id="risks">10. Risks &amp; open items</h2>
+<ul>
+  <li><strong>No real data yet.</strong> The whole thing is demo/imported. The business is real only once a real forest is captured. Highest-priority de-risk.</li>
+  <li><strong>DBH convention.</strong> Diameter must be measured at breast height (1.3 m) or carbon is wrong + a verifier rejects it. Needs a field SOP.</li>
+  <li><strong>Storage.</strong> Photos/360 uploads need the Blob token enabled or they don't persist.</li>
+  <li><strong>Carbon over-promise.</strong> Never call estimated numbers "credits". Don't lead the pitch with carbon revenue.</li>
+  <li><strong>Legal/IP.</strong> Clean-room must be maintained (no forking the licensed incumbent); platform IP vs tenant data must be papered before any resale.</li>
+</ul>
+
+<h2 id="integrity">11. Integrity rules (non-negotiable)</h2>
+<ul>
+  <li><strong>Never fake a record.</strong> Demo/simulated data is always labelled "demonstration / not a verified capture".</li>
+  <li><strong>Publish dead trees.</strong> Honest survival is the brand.</li>
+  <li><strong>Clean-room.</strong> Original build; do not fork the incumbent or reuse its keys/assets.</li>
+  <li><strong>Vocabulary.</strong> "Permanent verified record / living proof / tamper-proof timeline." Avoid "NFT"/"crypto" in consumer/CSR copy. No tradable tokens.</li>
+  <li><strong>Carbon labelling.</strong> "Estimated / verification-ready removal" until a registry verifies — never "credit".</li>
+</ul>
+
+<h2 id="legal">12. Legal / registry path</h2>
+<ul>
+  <li><strong>Entity:</strong> Indian Section-8 SPV; treat carbon/data revenue as export-of-services (not FCRA); GST registered. <span class="tag pending">to set up</span></li>
+  <li><strong>Registry:</strong> launch on <strong>Plan Vivo</strong> (low barrier, smallholder/NGO fit, ex-ante cash), build the data product to <strong>Verra VM0047</strong> census spec, dual-list later. Avoid India CCTS for foreign sales (domestic price low, exclusivity).</li>
+  <li>Only post-1-Jan-2025 plantings are creditable; baseline / additionality / permanence package + land-tenure / carbon-rights needed before any sale.</li>
+</ul>
+
+<h2 id="gtm">13. 90-day go-to-market</h2>
+<ol>
+  <li><strong>Capture one real flagship forest</strong> (GNF/Trichy): 4 corners per box, a real 360, real visit photos. Turns the demo real.</li>
+  <li><strong>Enable object storage</strong> (Blob) so photos/360s persist.</li>
+  <li><strong>Land one CSR sponsor</strong> on the strength of the live proof + downloadable report + the PNB-audit contrast.</li>
+  <li><strong>Harden for audit:</strong> baseline ledger for all trees, rich auditor export, DBH SOP, scheduled Bitcoin anchor.</li>
+  <li><strong>Stand up the legal SPV</strong> and open the Plan Vivo conversation.</li>
+</ol>
+
+<footer>
+  Internal business document — for audit/cross-audit. Figures are indicative; carbon/oxygen are estimated, verification-ready, not issued credits.
+  Platform: communitree-rebuild.vercel.app · Generated 19 Jun 2026.
+</footer>
+
+</div>
+</body>
+</html>

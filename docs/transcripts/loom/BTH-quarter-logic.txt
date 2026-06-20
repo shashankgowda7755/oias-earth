@@ -1,0 +1,80 @@
+# BTH (57becd05b1f949a6a1ea213d44762b35)
+
+[00:00] Some. Hehehe. Hehehe. What? Hehehe. Hehehe.
+[00:11] What are we learning Thank you so much joining us, and we'll see you next I have not noticed that deeply, I did not feel that, I do want to be able to .
+[02:23] . . . . . . . . Hello? Oh, sure.
+[02:48] I need
+[02:48] the part that you have in.
+[02:51] You
+[02:51] can log in to the dashboard, Arun. I'll show you. My laptop is in the other room. So you can't go in.
+[02:57] If you OK,
+[02:59] can you open to get into the reports module? maybe. The CGI. Scroll down. Scroll. Oh, next page.
+[03:16] Thanks for your time. this page. It's showing 000. It just launched in January.
+[03:30] This is one data point. Arun, the same one, the, Kaleshwari. You can open Kaleshwari
+[04:57] That's all.
+[04:59] Thank
+[05:00] you. Bye bye. Thank you. Thanks Sorry, Arun.
+[06:22] I don't know to I'll give it to you. I don't need it. I don't need it. asking What? Alright, all 25 sites have a status of overpumps.
+[08:26] Abdul, my friend, you have to discuss. You know what I'm saying? I'll check it.
+[11:15] It's
+[11:16] in the portal, and
+[11:18] it's in
+[11:19] the record I put in.
+[11:20] I'm it's the right data. We will address the UI
+[11:36] challenges what we are looking for now, the ones we updated yesterday.
+[11:37] That is done, we will get into this. Okay, one more thing is, I think I have
+[11:45] told you yesterday,
+[11:47] the
+[11:47] starting of every quarter
+[11:54] that is
+[11:55] from financial year starting, not from year start. I think the current logic is set at year start. That is, we should change it to financial year start.
+[12:07] April is the first quarter start. No, no, no. It is not
+[12:14] based on
+[12:16] the
+[12:16] plantation data. See, let's assume a corporate has planted yesterday. June 30th, they'll get their first quarter report. Okay.
+[12:30] First
+[12:32] quarter
+[12:33] means it is starting from June, July, August. Sorry. April, May, July, May, June.
+[12:43] That is the first quarter. April, May, June,
+[12:46] first quarter. July, August, September, per second quarter on the Maria VR we have. Thank you very much.
+[13:18] Great. I'm going to be, Yeah.
+[13:59] It's called, current is, June 15th, I mean, June 15th, June 5th on the, Plantation date and it's going on.
+[14:16] Sorry, Arun? June 5th, June 5th on the Plantation date and it's going Okay. Okay. If one of
+[14:23] the, is actually a
+[14:25] 3-year period, Yes, sir. Okay, for the 3-year
+[14:30] period, actually, our report is by
+[14:32] October 26th. Wait, wait, wait, wait. This is the confusion. No, I'll tell you
+[14:39] what I've Initially, I'll tell what I've understood and what I've done. Okay,
+[14:43] okay, okay. Q3, 26.
+[14:48] Q4, 26. likewise on the Q1, 27. Q4, 27, likewise
+[14:58] 28, 29,
+[15:00] Q1. Q1. Q2. Q3. Q4. Q5. Q7. Q8. Q14.
+[15:27] Q18. Q19. Q21. Q22. Q23. Q24. Q27. Q28. Q2, Q3
+[16:16] Q1, Q1, Q1. Richard, can you share?
+[16:43] Open that Excel sheet. Mods. It is good. Mods.
+[16:56] For
+[16:56] an instance, I can confirm. It's gone.
+[17:18] Okay. it's still on. Hello. Arun, one second Arun.
+[19:00] Oh. This logic, this logic will will start from financial year. I don't The starting quarter is financial year.
+[19:32] I I don't I need like this in
+[19:37] a financial year, I don't need
+[19:49] like this in a financial year, like this in a according to
+[19:58] the summary. CGI plantation date on the January, correct?
+[20:06] Okay, CGI, the CGI plantation date, is it? Here only. Jan, okay, date
+[20:15] of the plantation. Jan 24th. So, this should be, if we are generating this now, it should be Q1, because the starting of every report, Q1 starts from April,
+[20:40] May, June,
+[20:40] April,
+[20:42] May,
+[20:42] June, and
+[20:44] June, May, June, is Q1.
+[21:00] How do you know?
+[21:04] It'd be a contract.
+[21:07] Correctly, sir. Okay.
+[21:15] Trenton Lodge, Mortimer, Backendless,
+[21:16] I
+[21:16] don't know. Sigfali. Sigfali Transfer, wrong. Correctly, sir.
+[21:26] Done. No, that's okay, sir. You can finish off the old two ones. I'll mention
+[21:35] this now. You put a reply in the group stating that you will deliver it tomorrow, right? Yes, I did. I
+[21:53] just posted it yesterday. Oh, I see. If you say today, I thought that, The output would be for today. Put it in the group.
+[22:04] I got If there are any inputs, I'll call you.
+[22:13] Okay. Okay.
