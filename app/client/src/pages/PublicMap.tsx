@@ -209,7 +209,7 @@ export default function PublicMap() {
           `<span style="color:#cdd">${esc(place) || '—'}</span><br/>` +
           sponsor +
           `<span style="font-family:'JetBrains Mono',monospace;color:#b6ff3c">${alive.toLocaleString()}</span><span style="color:#9ab"> / ${f.total_trees.toLocaleString()} trees${surv}</span>` +
-          `<br/><span style="color:#b6ff3c;font-weight:600;font-size:12px">click to explore trees →</span></div>`,
+          `<br/><a href="/forest/${encodeURIComponent(f.id)}" style="color:#b6ff3c;font-weight:600;font-size:12px;text-decoration:none">Open this forest →</a></div>`,
       );
       m.on('click', () => selectForest(f));
       bounds.push([f.lat, f.lng]);
