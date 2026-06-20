@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Auto Geo-Tag Pipeline — Build & Ops Blueprint</title>
+<style>
+  :root{--paper:#0d1518;--card:#13242a;--card2:#16282e;--line:rgba(255,255,255,.12);--lime:#b6ff3c;--muted:#8aa0a3;--amber:#e8a33d;--red:#f0792b;--ink:#e7efea}
+  *{box-sizing:border-box} body{margin:0;background:var(--paper);color:var(--ink);font-family:'Plus Jakarta Sans',system-ui,sans-serif;line-height:1.55;font-size:15px}
+  .wrap{max-width:1060px;margin:0 auto;padding:0 22px 70px}
+  header{border-bottom:1px solid var(--line);padding:30px 0 20px}
+  .klabel{color:var(--lime);font-size:12px;letter-spacing:.22em;text-transform:uppercase;font-weight:700}
+  h1{font-size:29px;margin:8px 0 6px;line-height:1.1} .sub{color:var(--muted);font-size:14px}
+  h2{font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--lime);margin:32px 0 12px;border-bottom:1px solid var(--line);padding-bottom:7px}
+  p{margin:8px 0} .grid{display:grid;gap:12px} .g4{grid-template-columns:repeat(auto-fit,minmax(180px,1fr))} .g2{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:15px 17px}
+  .card h3{margin:0 0 4px;font-size:15px} .card .n{font-size:11px;color:var(--lime);font-weight:700;letter-spacing:.06em;text-transform:uppercase} .card p{margin:5px 0 0;font-size:13px;color:#c7d3cf}
+  table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-top:6px;font-size:13.5px}
+  th,td{padding:10px 13px;text-align:left;border-bottom:1px solid var(--line)} th{color:var(--muted);text-transform:uppercase;font-size:11px;letter-spacing:.05em}
+  td.r,th.r{text-align:right;font-variant-numeric:tabular-nums} tr:last-child td{border-bottom:none}
+  .hot{color:var(--lime);font-weight:700} .ok{color:var(--lime)} .warn{color:var(--amber)} .no{color:var(--red)}
+  code{font-family:'JetBrains Mono',monospace;background:rgba(255,255,255,.06);padding:1px 6px;border-radius:5px;font-size:12.5px;color:#fff}
+  .note{border-radius:12px;padding:13px 16px;font-size:13.5px;margin:12px 0}
+  .note.amber{background:rgba(232,163,61,.09);border:1px solid rgba(232,163,61,.4);color:#e8c89a}
+  .note.lime{background:rgba(182,255,60,.08);border:1px solid rgba(182,255,60,.35);color:#cde8a8}
+  ul{margin:8px 0;padding-left:20px} li{margin:5px 0;font-size:14px;color:#cdd9d5}
+  .flow{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0} .step{flex:1;min-width:150px;background:var(--card);border:1px solid var(--line);border-radius:11px;padding:11px 13px} .step b{color:var(--lime);font-size:12px} .step div{font-size:12.5px;color:#c7d3cf;margin-top:3px}
+  .arrow{align-self:center;color:var(--muted)} .foot{margin-top:30px;border-top:1px solid var(--line);padding-top:14px;color:var(--muted);font-size:12px}
+  .big{display:flex;flex-wrap:wrap;gap:18px;align-items:center;background:linear-gradient(120deg,rgba(182,255,60,.08),transparent);border:1px solid var(--lime);border-radius:16px;padding:18px 22px;margin:10px 0}
+  .big .num{font-size:34px;font-weight:800;color:var(--lime);line-height:1} .big .num small{font-size:14px;color:var(--muted);font-weight:600} .big .txt{flex:1;min-width:240px;font-size:13.5px;color:#c7d3cf}
+</style>
+</head>
+<body><div class="wrap">
+<header>
+  <div class="klabel">Be The Tree Hugger · Build &amp; Ops Blueprint</div>
+  <h1>Auto Geo-Tag Pipeline — capture once, tag itself</h1>
+  <div class="sub">Decoded by a task swarm: hardware · travel · AI auto-tag pipeline · capture modules. The real engineering, the real numbers, the honest economics.</div>
+</header>
+
+<h2>The swarm (one agent per task)</h2>
+<div class="grid g4">
+  <div class="card"><div class="n">📷 Hardware</div><p>360 cam + per-tree device + kit cost</p></div>
+  <div class="card"><div class="n">✈️ Travel</div><p>6-city solo circuit, quarterly, expenses</p></div>
+  <div class="card"><div class="n">🤖 AI pipeline</div><p>filename→tree, GPS→hotspot, auto-everything</p></div>
+  <div class="card"><div class="n">📱 Capture modules</div><p>web drag-drop + ultra-fast live app</p></div>
+</div>
+
+<h2>1 · Camera — Insta360 vs DJI vs the pick</h2>
+<table>
+  <tr><th>Option</th><th>Built-in GPS</th><th>Auto-stitch</th><th>India ₹</th><th>Verdict</th></tr>
+  <tr><td><b>Ricoh Theta X</b></td><td class="ok">YES (writes GPS to EXIF)</td><td class="ok">YES, in-camera</td><td class="r">~₹70,000</td><td class="hot">PICK — only one that auto-geo-tags</td></tr>
+  <tr><td>Insta360 X4 / X5</td><td class="no">No (needs ₹25k GPS remote)</td><td>Yes</td><td class="r">₹45–55k</td><td>Best image, but GPS add-on kills the auto-flow</td></tr>
+  <tr><td>DJI Osmo 360</td><td class="no">No (separate GPS module)</td><td>Yes</td><td class="r">~₹45k</td><td>Exists (Jul-2025) but no GPS → not for tagging</td></tr>
+  <tr><td>DJI drone (Mini)</td><td>—</td><td>—</td><td class="r">~₹1L</td><td class="warn">Aerial ortho ONLY (optional), not the 360 walk</td></tr>
+</table>
+<p><b>Per-tree flat photos:</b> a dual-band-GNSS Android (e.g. <b>Poco X7 Pro ~₹28k</b>, L1+L5 + NavIC) + a GPS-stamp camera app — most accurate point fix, fastest, and it's your 360-controller anyway. Don't crop the sphere for per-tree shots.</p>
+<div class="note lime"><b>Kit (one-time): ≈ ₹1.1–1.4 lakh</b> — Theta X (₹70k) + 2 phones (₹56k) + spares/cards/monopod/power. Amortizes to &lt;₹0.30/tree. Why Theta over the sharper Insta360: <b>built-in GPS + in-camera stitch = the whole auto-pipeline works with zero accessories or desktop.</b></div>
+
+<h2>2 · Travel — you, solo, 6 cities, quarterly (expenses only)</h2>
+<p>Circuit: <b>Chennai (home) → Bengaluru → Hyderabad → Mumbai → Jaipur → Chennai</b>, 2 days/city, ~12 days/trip, ×4/yr. Fly (trains add ~70 hrs/trip for ₹60k/yr saved — not worth the lost days).</p>
+<table>
+  <tr><th>Scenario</th><th class="r">Per trip</th><th class="r">Annual</th></tr>
+  <tr><td><b>Flight, quarterly (recommended)</b></td><td class="r">₹61,300</td><td class="r hot">~₹2.45 lakh</td></tr>
+  <tr><td>Train, frugal, quarterly</td><td class="r">₹46,400</td><td class="r">~₹1.86 lakh</td></tr>
+  <tr><td>Flight, semi-annual (2×/yr)</td><td class="r">₹61,300</td><td class="r">~₹1.23 lakh</td></tr>
+</table>
+<p style="color:var(--muted);font-size:13px">Levers: trip frequency (4× vs 2× halves it) &gt; flight-vs-train (~₹60k/yr) &gt; lodging tier.</p>
+
+<div class="note amber">⚠️ <b>The honest economics catch.</b> ₹7/tree for 3 years × 100k trees = <b>₹7 lakh total revenue (~₹2.3 L/yr)</b>. Your <b>solo quarterly travel alone is ₹2.45 L/yr</b> — it eats the whole deal. Solo-travel only works if: (a) <b>volume is much higher</b> (≈300k+ trees, so travel/tree → negligible), or (b) <b>semi-annual</b> not quarterly (₹1.23 L/yr), or (c) <b>local crews per city</b> (no travel — you stop flying). At 100k + quarterly + solo, the travel sinks it. This is the real costing decision — not the photo capture.</div>
+
+<h2>3 · The auto-tag pipeline — "drop the folder, it tags itself"</h2>
+<div class="flow">
+  <div class="step"><b>GRID</b><div>4 corners + spacing → every tree's exact lat/lng + number (cm-accurate)</div></div><div class="arrow">→</div>
+  <div class="step"><b>PHOTOS (named)</b><div>AA001.jpg → matched to tree AA001 by filename, attached</div></div><div class="arrow">→</div>
+  <div class="step"><b>360s (GPS)</b><div>each sphere's GPS+heading → hotspots auto-placed for nearby trees</div></div><div class="arrow">→</div>
+  <div class="step"><b>RENDER</b><div>aerial dots + 360 walk; tap any → tree record</div></div>
+</div>
+<div class="grid g2">
+  <div class="card"><div class="n">PATH A — per-tree photos</div><h3>Fully automatic</h3><p>Drop 10k <code>AA001.jpg…</code> → each links to its tree by filename (our import already keys on <code>tree_unique_id</code>), inherits its grid coordinate. <b>Zero manual.</b> Unmatched names fall into a review list.</p></div>
+  <div class="card"><div class="n">PATH B — 360 spheres</div><h3>Automatic (+1 nudge)</h3><p>Drop the 360 folder → each sphere's GPS (Theta EXIF) + heading → <code>computeHotspots</code> (bearing→yaw, dist→pitch, 25 m radius, nearest-sphere dedup) auto-places numbered pins. One <b>drag-to-north per sphere</b> only if the heading tag is missing (~10 taps, once).</p></div>
+</div>
+<div class="note lime"><b>No AI/CV needed.</b> It's deterministic GPS trigonometry + filename matching — the system is <i>told</i> the trees' positions (grid) and the camera's position (GPS), so it computes geometry, not guesses from pixels. (ML is a later option for health-from-leaf-colour, not now.)</div>
+
+<h2>4 · Two capture modules (backups of each other)</h2>
+<div class="grid g2">
+  <div class="card"><div class="n">MODULE 1 — WEB DRAG-DROP (office)</div><h3>Bulk ingest</h3><p>Drop a folder of named photos + a folder of 360s → match preview (matched / unmatched) → resolve misses → <b>Publish</b>. Auto-links + auto-places everything. Use after a trip with a standalone 360 cam.</p></div>
+  <div class="card"><div class="n">MODULE 2 — LIVE APP (field)</div><h3>Ultra-fast "2-sec" capture</h3><p>Rapid mode in the planter app: live viewfinder, big shutter, GPS auto-stamps, <b>auto-advance to next tree</b>, sticky status, offline queue + batch sync. "Tap, step, tap, step." For a quick per-tree survival pass.</p></div>
+</div>
+
+<h2>5 · Build ledger — mostly wiring what exists</h2>
+<table>
+  <tr><th>Already built (reuse)</th><th>New (small — ~250 lines total)</th></tr>
+  <tr><td>Tree upsert keyed on <code>tree_unique_id</code> + GPS</td><td>Folder-ingest script (filename→tree)</td></tr>
+  <tr><td>Photo→storage + SHA-dedup + asset rows</td><td><code>POST …/trees/by-uid/photo</code> (attach by id)</td></tr>
+  <tr><td>Grid geodesy (<code>layoutQuad</code>, proven)</td><td>Wire grid into create (swap placeholder)</td></tr>
+  <tr><td>Scene + hotspot store + PSV render</td><td><code>computeHotspots</code> + <code>auto-hotspots</code> endpoint</td></tr>
+  <tr><td>/field PWA (login→capture→offline queue)</td><td>Rapid-capture mode + bulk-ingest screen</td></tr>
+  <tr><td>Storage helper (Blob/Supabase/R2)</td><td><code>exifr</code> dep (read GPS/heading from images)</td></tr>
+</table>
+<div class="big"><div class="num">~250<small> lines new</small></div><div class="txt">2 scripts + 2 endpoints + 2 pure functions + 1 dep. Everything else — the grid math, the viewer, the storage, the capture app — already ships. <b>The auto-tagger is glue, not a rebuild.</b></div></div>
+
+<div class="foot">Sources: Theta X GPS + in-camera stitch (Ricoh official); Insta360/DJI GPS gap (360Rumors, DJI India); Poco X7 Pro dual-band GNSS; India 2025-26 flight/train fares (IndiGo/ixigo/MakeMyTrip). Codebase refs: <code>grid-geo.js</code>, <code>forest.ts</code> (bulkImport/logTreeVisit/addHotspot), <code>Field.tsx</code>, <code>TourEditor.tsx</code>, <code>ForestTour.tsx</code>. Travel/economics are estimates; validate trees-per-day + km-of-path with a 1-day pilot. · Internal blueprint.</div>
+</div></body></html>
