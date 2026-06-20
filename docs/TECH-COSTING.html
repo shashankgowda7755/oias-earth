@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Tech Costing — Per-Tree Breakdown</title>
+<style>
+  :root{--paper:#0d1518;--card:#13242a;--line:rgba(255,255,255,.12);--lime:#b6ff3c;--muted:#8aa0a3;--amber:#e8a33d;--red:#f0792b;--ink:#e7efea}
+  *{box-sizing:border-box} body{margin:0;background:var(--paper);color:var(--ink);font-family:'Plus Jakarta Sans',system-ui,sans-serif;line-height:1.5;font-size:15px}
+  .wrap{max-width:960px;margin:0 auto;padding:0 22px 70px}
+  header{border-bottom:1px solid var(--line);padding:28px 0 18px}
+  .klabel{color:var(--lime);font-size:12px;letter-spacing:.22em;text-transform:uppercase;font-weight:700}
+  h1{font-size:27px;margin:8px 0 6px} .sub{color:var(--muted);font-size:14px}
+  h2{font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--lime);margin:30px 0 10px;border-bottom:1px solid var(--line);padding-bottom:6px}
+  table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-top:6px;font-size:14px}
+  th,td{padding:10px 14px;text-align:left;border-bottom:1px solid var(--line)} th{color:var(--muted);text-transform:uppercase;font-size:11px;letter-spacing:.05em}
+  td.r,th.r{text-align:right;font-variant-numeric:tabular-nums} tr:last-child td{border-bottom:none}
+  tr.tot td{background:rgba(182,255,60,.07);font-weight:700} .hot{color:var(--lime);font-weight:700}
+  .cards{display:flex;gap:14px;flex-wrap:wrap;margin:6px 0}
+  .kpi{flex:1;min-width:200px;background:linear-gradient(120deg,rgba(182,255,60,.08),transparent);border:1px solid var(--lime);border-radius:14px;padding:16px 18px}
+  .kpi .n{font-size:32px;font-weight:800;color:var(--lime);line-height:1} .kpi .n small{font-size:13px;color:var(--muted);font-weight:600} .kpi .l{font-size:12.5px;color:#c7d3cf;margin-top:6px}
+  .note{border-radius:12px;padding:13px 16px;font-size:13.5px;margin:12px 0}
+  .amber{background:rgba(232,163,61,.09);border:1px solid rgba(232,163,61,.4);color:#e8c89a}
+  .lime{background:rgba(182,255,60,.08);border:1px solid rgba(182,255,60,.35);color:#cde8a8}
+  .muted{color:var(--muted);font-size:13px} .foot{margin-top:28px;border-top:1px solid var(--line);padding-top:14px;color:var(--muted);font-size:12px}
+</style>
+</head>
+<body><div class="wrap">
+<header>
+  <div class="klabel">Be The Tree Hugger · Tech Cost Sheet</div>
+  <h1>Per-tree costing — what it actually costs to deliver</h1>
+  <div class="sub">Basis: <b>100,000 trees</b>, monitored <b>quarterly for 3 years</b> (12 captures), local crews. All-in real cost, then your quote. ₹, 2025-26.</div>
+</header>
+
+<div class="cards">
+  <div class="kpi"><div class="n">₹8.5<small>/tree</small></div><div class="l">Our all-in COST to deliver, over 3 years (100k, quarterly)</div></div>
+  <div class="kpi"><div class="n">₹12<small>/tree</small></div><div class="l">Recommended QUOTE to client (3 years) — covers cost + your fee + margin</div></div>
+  <div class="kpi"><div class="n">₹50<small>/tree</small></div><div class="l">What the client resells at — so ₹12 leaves them ₹38 (76%)</div></div>
+</div>
+
+<h2>1 · One-time setup (capex)</h2>
+<table>
+  <tr><th>Item</th><th class="r">₹</th></tr>
+  <tr><td>Ricoh Theta X — 360 camera (built-in GPS + auto-stitch)</td><td class="r">70,000</td></tr>
+  <tr><td>2 × dual-band-GNSS phones (per-tree capture)</td><td class="r">56,000</td></tr>
+  <tr><td>Spares · microSD · monopod · power banks</td><td class="r">16,000</td></tr>
+  <tr><td>The platform (map, 360 tour, carbon, certs, reports, auto-tagger)</td><td class="r hot">₹0 — already built by AI</td></tr>
+  <tr><td>Domain + setup</td><td class="r">3,000</td></tr>
+  <tr class="tot"><td>Capex total (one-time)</td><td class="r">₹1,45,000</td></tr>
+</table>
+<p class="muted">No software dev cost — the whole platform is built. Capex spread over 100k trees × 3 yr = <b>₹1.45/tree</b>.</p>
+
+<h2>2 · Tech / cloud — recurring (per year)</h2>
+<table>
+  <tr><th>Service</th><th>Role</th><th class="r">₹/year</th></tr>
+  <tr><td>Vercel</td><td>app hosting</td><td class="r">20,000</td></tr>
+  <tr><td>Neon Postgres</td><td>database (trees, carbon, timelines)</td><td class="r">18,000</td></tr>
+  <tr><td>Cloudflare R2</td><td>photo + 360 storage (zero egress)</td><td class="r">8,000</td></tr>
+  <tr><td>Resend</td><td>certificate emails</td><td class="r">6,000</td></tr>
+  <tr><td>Monitoring · backup · buffer</td><td>ops</td><td class="r">8,000</td></tr>
+  <tr class="tot"><td>Recurring tech / year</td><td></td><td class="r">₹60,000</td></tr>
+  <tr class="tot"><td>× 3 years</td><td></td><td class="r">₹1,80,000</td></tr>
+</table>
+<p class="muted">AI auto-tagging = deterministic GPS math → <b>no per-use AI cost.</b> Cloud is small + flat. Over 100k × 3 yr = <b>₹1.80/tree</b>.</p>
+
+<h2>3 · Operations — field capture (the real variable)</h2>
+<p class="muted">Capture = ~2 sec/tree at 1-ft spacing → <b>~2,500 trees/person/day</b> (validate with a 1-day pilot). 100k ÷ 2,500 = 40 person-days per cycle. Quarterly × 3 yr = 12 cycles = 480 person-days. Local crews per city (no inter-city travel).</p>
+<table>
+  <tr><th>Line (over 3 years)</th><th class="r">₹</th></tr>
+  <tr><td>Field labour — 480 person-days × ₹800/day</td><td class="r">3,84,000</td></tr>
+  <tr><td>Local transport + recruit/train</td><td class="r">90,000</td></tr>
+  <tr><td>QA + spoilage/redo + management (~15%)</td><td class="r">90,000</td></tr>
+  <tr class="tot"><td>Operations total (3 yr)</td><td class="r">₹5,64,000</td></tr>
+</table>
+<p class="muted">Over 100k × 3 yr = <b>₹5.64/tree</b>. This is the biggest line — and it's labour, not tech.</p>
+
+<h2>4 · All-in cost → per tree (3 years)</h2>
+<table>
+  <tr><th>Bucket</th><th class="r">₹ total (3 yr)</th><th class="r">₹ / tree</th></tr>
+  <tr><td>Capex (kit + setup)</td><td class="r">1,45,000</td><td class="r">1.45</td></tr>
+  <tr><td>Tech / cloud</td><td class="r">1,80,000</td><td class="r">1.80</td></tr>
+  <tr><td>Operations (capture)</td><td class="r">5,64,000</td><td class="r">5.64</td></tr>
+  <tr class="tot"><td>COST to deliver</td><td class="r">₹8,89,000</td><td class="r">₹8.89</td></tr>
+</table>
+<p class="muted">Round: <b>~₹8.5–9 per tree</b> to deliver 100k trees, quarterly, for 3 years. <b>Your salary / service fee is ON TOP</b> — see §5.</p>
+
+<h2>5 · Your service fee + the quote</h2>
+<p>You're the service provider — your fee sits on top of cost. <b>Quote − Cost = your earnings.</b></p>
+<table>
+  <tr><th>Quote /tree (3yr)</th><th class="r">Revenue (100k)</th><th class="r">Cost</th><th class="r">Your fee/profit</th><th>Client keeps (of ₹50)</th></tr>
+  <tr><td>₹7 (match incumbent)</td><td class="r">₹7.0 L</td><td class="r">₹8.9 L</td><td class="r no">−₹1.9 L (loss)</td><td>₹43</td></tr>
+  <tr><td><b>₹12 (recommended)</b></td><td class="r">₹12.0 L</td><td class="r">₹8.9 L</td><td class="r hot">+₹3.1 L</td><td>₹38</td></tr>
+  <tr><td>₹15 (premium scope)</td><td class="r">₹15.0 L</td><td class="r">₹8.9 L</td><td class="r hot">+₹6.1 L</td><td>₹35</td></tr>
+</table>
+<div class="note amber">⚠️ <b>You cannot match ₹7 at 100k + quarterly</b> — cost is ₹8.9. ₹7 was the incumbent's number; it only works for them at huge volume or a lighter (sample/annual, no 360) job. <b>Don't anchor to ₹7 — anchor to the ₹50 resale.</b></div>
+<div class="note lime"><b>Quote ₹12/tree for 3 years.</b> Client still keeps ₹38 (76%) on their ₹50, and gets <b>5× the product</b> (live map + 360 walk + carbon + certificates + sharing the incumbent can't match). You earn <b>~₹3.1 lakh</b> on 100k — your service fee, clean.</div>
+
+<h2>6 · The levers (how to get cheaper / quote lower)</h2>
+<table>
+  <tr><th>Lever</th><th>Effect on cost/tree</th></tr>
+  <tr><td><b>More volume</b> (300k instead of 100k)</td><td>Capex + cloud spread thinner → cost ~₹6–7 → ₹7 becomes possible</td></tr>
+  <tr><td><b>Semi-annual</b> (2×/yr not 4×)</td><td>Capture labour halves → cost ~₹6 → healthy margin at ₹10</td></tr>
+  <tr><td><b>Lean cloud tiers</b> (free Vercel/Neon at low usage)</td><td>−₹1.5/tree</td></tr>
+  <tr><td><b>Higher throughput</b> (3,500/day vs 2,500)</td><td>−₹1.5/tree on labour</td></tr>
+</table>
+
+<div class="foot">Validate before quoting: run a 1-day pilot in one dense plot → real trees/person/day (the single number that moves everything). All figures ₹, 2025-26, estimates. Cloud = Vercel/Neon/Cloudflare R2/Resend list pricing. Platform build cost = ₹0 (AI-built). · Internal tech cost sheet.</div>
+</div></body></html>
