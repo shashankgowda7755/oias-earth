@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Fixed Costing — Total (not per tree)</title>
+<style>
+  :root{--paper:#0d1518;--card:#13242a;--line:rgba(255,255,255,.12);--lime:#b6ff3c;--muted:#8aa0a3;--amber:#e8a33d;--ink:#e7efea}
+  *{box-sizing:border-box} body{margin:0;background:var(--paper);color:var(--ink);font-family:'Plus Jakarta Sans',system-ui,sans-serif;line-height:1.5;font-size:15px}
+  .wrap{max-width:900px;margin:0 auto;padding:0 22px 60px}
+  header{border-bottom:1px solid var(--line);padding:28px 0 18px}
+  .klabel{color:var(--lime);font-size:12px;letter-spacing:.22em;text-transform:uppercase;font-weight:700}
+  h1{font-size:27px;margin:8px 0 6px} .sub{color:var(--muted);font-size:14px}
+  h2{font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--lime);margin:28px 0 10px;border-bottom:1px solid var(--line);padding-bottom:6px}
+  table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-top:6px;font-size:14px}
+  th,td{padding:11px 14px;text-align:left;border-bottom:1px solid var(--line)} th{color:var(--muted);text-transform:uppercase;font-size:11px;letter-spacing:.05em}
+  td.r,th.r{text-align:right;font-variant-numeric:tabular-nums} tr:last-child td{border-bottom:none}
+  tr.tot td{background:rgba(182,255,60,.08);font-weight:700;color:var(--lime)}
+  .cards{display:flex;gap:14px;flex-wrap:wrap;margin:8px 0}
+  .kpi{flex:1;min-width:180px;background:linear-gradient(120deg,rgba(182,255,60,.08),transparent);border:1px solid var(--lime);border-radius:14px;padding:16px 18px}
+  .kpi .n{font-size:30px;font-weight:800;color:var(--lime);line-height:1} .kpi .l{font-size:12.5px;color:#c7d3cf;margin-top:6px}
+  .muted{color:var(--muted);font-size:13px} .note{border-radius:12px;padding:13px 16px;font-size:13.5px;margin:12px 0;background:rgba(232,163,61,.09);border:1px solid rgba(232,163,61,.4);color:#e8c89a}
+  .foot{margin-top:26px;border-top:1px solid var(--line);padding-top:14px;color:var(--muted);font-size:12px}
+</style>
+</head>
+<body><div class="wrap">
+<header>
+  <div class="klabel">Be The Tree Hugger · Fixed Cost</div>
+  <h1>Total fixed cost to run the operation</h1>
+  <div class="sub">Camera + cloud + travel. Fixed — same whether it's 10 trees or 1 lakh. Your salary is separate, on top. ₹, 2025-26.</div>
+</header>
+
+<div class="cards">
+  <div class="kpi"><div class="n">₹1.42 L</div><div class="l">One-time setup (gear)</div></div>
+  <div class="kpi"><div class="n">₹3.05 L</div><div class="l">Per year (cloud + travel)</div></div>
+  <div class="kpi"><div class="n">₹10.57 L</div><div class="l">3-year all-in (gear + 3× yearly)</div></div>
+</div>
+
+<h2>1 · One-time setup — gear (paid once)</h2>
+<table>
+  <tr><th>Item</th><th class="r">₹</th></tr>
+  <tr><td>Ricoh Theta X — 360° camera (built-in GPS + auto-stitch)</td><td class="r">70,000</td></tr>
+  <tr><td>2 × GPS smartphones (per-tree photo capture)</td><td class="r">56,000</td></tr>
+  <tr><td>Spare batteries · microSD cards · monopod · power banks</td><td class="r">16,000</td></tr>
+  <tr><td>Platform / software (map, 360 tour, carbon, certificates, auto-tagging)</td><td class="r">0 — built by AI</td></tr>
+  <tr class="tot"><td>ONE-TIME TOTAL</td><td class="r">₹1,42,000</td></tr>
+</table>
+
+<h2>2 · Cloud / tech — per year</h2>
+<table>
+  <tr><th>Service</th><th>Role</th><th class="r">₹/year</th></tr>
+  <tr><td>Vercel</td><td>website + app hosting</td><td class="r">20,000</td></tr>
+  <tr><td>Neon Postgres</td><td>the database</td><td class="r">18,000</td></tr>
+  <tr><td>Cloudflare R2</td><td>photo + 360 storage</td><td class="r">8,000</td></tr>
+  <tr><td>Resend</td><td>certificate emails</td><td class="r">6,000</td></tr>
+  <tr><td>Domain · monitoring · buffer</td><td>ops</td><td class="r">8,000</td></tr>
+  <tr class="tot"><td>CLOUD / YEAR</td><td></td><td class="r">₹60,000</td></tr>
+</table>
+<p class="muted">No per-use AI charge — the auto-tagging is GPS math, not a paid AI API.</p>
+
+<h2>3 · Travel — per year (you, 6 cities, quarterly)</h2>
+<p class="muted">Chennai · Bengaluru · Hyderabad · Mumbai · Jaipur — 2 days each, 4 trips/year (flights + lodging + local + food).</p>
+<table>
+  <tr><th>Cadence</th><th class="r">₹/year</th></tr>
+  <tr><td>Quarterly — 4 trips/year (recommended coverage)</td><td class="r">2,45,000</td></tr>
+  <tr><td>Semi-annual — 2 trips/year (lower cost option)</td><td class="r">1,23,000</td></tr>
+  <tr class="tot"><td>TRAVEL / YEAR (quarterly)</td><td class="r">₹2,45,000</td></tr>
+</table>
+
+<h2>4 · Totals</h2>
+<table>
+  <tr><th>Period</th><th class="r">Quarterly</th><th class="r">Semi-annual</th></tr>
+  <tr><td>One-time gear</td><td class="r">1,42,000</td><td class="r">1,42,000</td></tr>
+  <tr><td>Cloud / year</td><td class="r">60,000</td><td class="r">60,000</td></tr>
+  <tr><td>Travel / year</td><td class="r">2,45,000</td><td class="r">1,23,000</td></tr>
+  <tr class="tot"><td>RUNNING / YEAR (cloud + travel)</td><td class="r">₹3,05,000</td><td class="r">₹1,83,000</td></tr>
+  <tr class="tot"><td>YEAR 1 (gear + running)</td><td class="r">₹4,47,000</td><td class="r">₹3,25,000</td></tr>
+  <tr class="tot"><td>3-YEAR ALL-IN (gear + 3× running)</td><td class="r">₹10,57,000</td><td class="r">₹6,91,000</td></tr>
+</table>
+
+<div class="note">⚠️ <b>Travel is the big number</b> (₹2.45 L/yr = 80% of yearly running). It's fixed no matter how many trees. Two ways to shrink it: <b>go semi-annual</b> (→ ₹6.91 L over 3 yr) or <b>hire local crews per city</b> so you stop flying (travel → near zero, replaced by small local wages). <b>Your salary is separate</b> — it sits on top of these costs as your service fee.</div>
+
+<div class="foot">Fixed operating cost only (gear + cloud + travel). Excludes your salary/service fee and any per-tree field wages if you hire crews instead of travelling yourself. Travel = India 2025-26 flight/lodging estimates. Cloud = Vercel/Neon/Cloudflare R2/Resend list pricing. Platform build = ₹0 (AI-built). · Internal fixed-cost sheet.</div>
+</div></body></html>
