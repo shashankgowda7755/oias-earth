@@ -137,6 +137,7 @@ export default function PublicMap() {
   const forestLayer = useRef<L.MarkerClusterGroup | null>(null);
   const treeLayer = useRef<L.MarkerClusterGroup | null>(null);
   const boundaryLayer = useRef<L.LayerGroup | null>(null);
+  const allBoundaryLayer = useRef<L.LayerGroup | null>(null); // faint outline for every forest, always on
 
   const [forests, setForests] = useState<ForestPin[]>([]);
   const [selected, setSelected] = useState<ForestPin | null>(null);
@@ -173,6 +174,7 @@ export default function PublicMap() {
       disableClusteringAtZoom: 17, // flagship (sparse) shows individual pins; dense forests cluster
       chunkedLoading: true,
     }).addTo(map);
+    allBoundaryLayer.current = L.layerGroup().addTo(map); // added first → selected polygon draws on top
     boundaryLayer.current = L.layerGroup().addTo(map);
     mapRef.current = map;
     setTimeout(() => map.invalidateSize(), 60);
@@ -219,6 +221,27 @@ export default function PublicMap() {
       map.fitBounds(L.latLngBounds(bounds), { padding: [60, 60], maxZoom: 9 });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [forests, selected]);
+
+  // Always-on faint boundary outline for every forest (EUDR footprint at any zoom),
+  // separate from the bright selected-forest polygon so selecting one doesn't clear them.
+  useEffect(() => {
+    const lyr = allBoundaryLayer.current;
+    if (!lyr) return;
+    lyr.clearLayers();
+    let cancelled = false;
+    for (const f of forests) {
+      fetchForestBoundary(f.id)
+        .then((b) => {
+          if (cancelled || !allBoundaryLayer.current || b.boundary.length < 3) return;
+          L.polygon(b.boundary.map((p) => [p.lat, p.lng] as [number, number]), {
+            color: '#b6ff3c', weight: 1, opacity: 0.5, fillColor: '#b6ff3c', fillOpacity: 0.04,
+            dashArray: '4 4', interactive: false,
+          }).addTo(allBoundaryLayer.current);
+        })
+        .catch(() => undefined);
+    }
+    return () => { cancelled = true; };
+  }, [forests]);
 
   async function selectForest(f: ForestPin) {
     setSelected(f);
