@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Outreach Engine — Be The Tree Hugger</title>
+<style>
+  :root{--paper:#0b1316;--card:#13242a;--card2:#0f1d22;--line:rgba(255,255,255,.12);--lime:#b6ff3c;--amber:#e8a33d;--red:#f0792b;--cyan:#5ad7e0;--ink:#e7efea;--muted:#8aa0a3}
+  *{box-sizing:border-box} body{margin:0;background:var(--paper);color:var(--ink);font-family:'Plus Jakarta Sans',system-ui,sans-serif;line-height:1.5;font-size:15px}
+  .wrap{max-width:1140px;margin:0 auto;padding:0 20px 70px}
+  header{border-bottom:1px solid var(--line);padding:24px 0 14px;position:sticky;top:0;background:var(--paper);z-index:5}
+  .klabel{color:var(--lime);font-size:11px;letter-spacing:.22em;text-transform:uppercase;font-weight:700}
+  h1{font-size:25px;margin:7px 0 4px} .sub{color:var(--muted);font-size:13.5px;max-width:880px}
+  h2{font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--lime);margin:30px 0 10px;border-bottom:1px solid var(--line);padding-bottom:6px}
+  .cards{display:flex;gap:12px;flex-wrap:wrap;margin:14px 0}
+  .kpi{flex:1;min-width:120px;background:linear-gradient(135deg,rgba(182,255,60,.10),transparent);border:1px solid var(--lime);border-radius:13px;padding:13px 15px}
+  .kpi .n{font-size:25px;font-weight:800;color:var(--lime);line-height:1;font-variant-numeric:tabular-nums} .kpi .l{font-size:11.5px;color:#c7d3cf;margin-top:6px}
+  .filters{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0 4px}
+  .fbtn{background:var(--card);border:1px solid var(--line);color:var(--ink);border-radius:20px;padding:6px 14px;font-size:12.5px;font-weight:700;cursor:pointer}
+  .fbtn.on{background:var(--lime);color:#06210a;border-color:var(--lime)}
+  details{background:var(--card);border:1px solid var(--line);border-radius:14px;margin:12px 0;overflow:hidden}
+  summary{padding:14px 18px;cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:12px}
+  summary::-webkit-details-marker{display:none}
+  summary h3{margin:0;font-size:16px}
+  .cmeta{padding:0 18px 14px;border-top:1px solid var(--line)}
+  .angle{font-size:13px;color:#cdd9d5;margin:10px 0;line-height:1.5}
+  .target{font-size:12px;color:var(--muted)}
+  .tierbadge{font-size:10px;font-weight:800;letter-spacing:.06em;padding:3px 9px;border-radius:20px;background:rgba(90,215,224,.14);color:var(--cyan);white-space:nowrap}
+  table{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:8px}
+  th,td{padding:7px 10px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top} th{color:var(--muted);text-transform:uppercase;font-size:10px;letter-spacing:.05em}
+  tr.hide{display:none}
+  .pri{font-size:10px;font-weight:800;padding:2px 8px;border-radius:20px;white-space:nowrap}
+  .p-Warm{background:rgba(182,255,60,.18);color:var(--lime)} .p-High{background:rgba(232,163,61,.16);color:var(--amber)} .p-Medium{background:rgba(90,215,224,.13);color:var(--cyan)} .p-Low{background:rgba(255,255,255,.06);color:var(--muted)}
+  .tcell{font-size:11px;color:var(--muted)}
+  .tpl{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:13px 16px;margin:10px 0}
+  .tpl .t{color:var(--lime);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+  .tpl .s{font-weight:700;margin:7px 0 4px;font-size:14px} .tpl .o{font-size:13px;color:#cdd9d5;line-height:1.5}
+  ol{padding-left:20px} ol li{margin:9px 0;font-size:13.5px;line-height:1.5}
+  .note{border-radius:12px;padding:12px 16px;font-size:13px;line-height:1.5;margin:12px 0;background:rgba(182,255,60,.08);border:1px solid rgba(182,255,60,.35);color:#cde8a8}
+  a{color:var(--cyan);text-decoration:none} a:hover{text-decoration:underline}
+  .foot{margin-top:26px;border-top:1px solid var(--line);padding-top:13px;color:var(--muted);font-size:11px}
+</style>
+</head>
+<body><div class="wrap">
+<header>
+  <div class="klabel">Be The Tree Hugger · Outreach Engine</div>
+  <h1>117 prospects · 8 categories · who to hit, in what order, with what line</h1>
+  <div class="sub">Tier-mapped (Low/Mid/High) buyers + channel partners + white-label + carbon-vertical. Warm = incumbent's own tree-CSR clients. Working tracker: <a href="OUTREACH-ENGINE.csv">OUTREACH-ENGINE.csv</a></div>
+</header>
+
+<div class="cards">
+  <div class="kpi"><div class="n">117</div><div class="l">named prospects</div></div>
+  <div class="kpi"><div class="n">8</div><div class="l">warm anchors (incumbent clients)</div></div>
+  <div class="kpi"><div class="n">~52</div><div class="l">High-tier (₹49.5L)</div></div>
+  <div class="kpi"><div class="n">~33</div><div class="l">Mid-tier (₹28L)</div></div>
+  <div class="kpi"><div class="n">10</div><div class="l">channel partners (resell)</div></div>
+  <div class="kpi"><div class="n">16</div><div class="l">carbon-vertical (dMRV)</div></div>
+</div>
+
+<div class="note">🎯 <b>The motion is pilot-first.</b> Don't sell a 3-year contract cold. Open with a paid <b>living-proof pilot</b> (geotag + QR + survival-track ONE existing site, 500–2,000 trees, 6–8 weeks), priced in the Low band (~₹13.5L) so it clears a CSR head's discretionary sign-off without a tender — then expand to Mid/High on renewal once survival data proves out.</div>
+
+<h2>The 5 waves (sequence)</h2>
+<ol>
+  <li><b>Wave 1 — Warmest first:</b> the 8 incumbent tree-CSR clients + warm channel — <b>CGI, IDFC FIRST, PNB, HCLTech, HSBC, Tata, Lenovo, Temenos + Goodera</b>. They already pay a tree-CSR vendor → pitch is displacement + upgrade, not education. CGI & IDFC = the two bullseyes (open here for the first reference logo). Lenovo & Temenos = verify-first (open with a discovery question). <b>Goal: 2–3 signed pilots + 1–2 reference logos.</b></li>
+  <li><b>Wave 2 — Channel partners (parallel):</b> Goodera → United Way Mumbai → CSRBOX + NGOBOX → Sattva, SoulAce → Samhita, ConnectFor, Give.do, GuideStar, LetsEndorse, Dhwani, Grant Thornton. White-label/resell + revenue share. <b>Highest multiplier — one signed channel = many downstream pilots.</b> Staff it the moment the first reference exists.</li>
+  <li><b>Wave 3 — White-label the planting NGOs (geography-first):</b> Vanam India + NIZHAL (Tamil Nadu, your turf) → Green Yatra, Grow-Trees, SayTrees (also the implementer behind CGI/Capgemini/Dell — landing them = reach into those accounts), Heartfulness, Give Me Trees. Treat SankalpTaru / Grow Billion / Tree Tag as partner-or-benchmark (they already have geo-tag MRV).</li>
+  <li><b>Wave 4 — Cold corporates, High-priority first (volume engine, once a reference exists):</b> lead where survival KPIs are explicit — Hero MotoCorp (90% survival KPI), Capgemini (admits 92,448/222,117 survived), Mahindra Hariyali, Adani, ITC, Tata Motors/Steel, Standard Chartered Treedom, Axis, HDFC — then the rest of the High rows. Drop to Medium only after High is worked.</li>
+  <li><b>Wave 5 — PSU / Green-Credit + Carbon track (specialist, parallel, longer cycle):</b> (a) open with <b>ICFRE</b> (GCP administrator — embed here and it pulls every registered PSU) + MoEFCC GCP, then biggest committed PSUs by hectares (IOCL 11,890 ha, POWERGRID 4,372, NTPC, NHPC, Coal India). Hook = the 5-yr-survival / 40%-canopy audit that gates credit issuance. (b) Carbon devs: Anaxee (closest peer/partner), Varaha, NABARD Carbon Fund.</li>
+</ol>
+<p class="tcell">Cadence per prospect: T1 hyper-specific cold email (their program + scale + the proof gap, CTA = pilot) → T2 (+3-4d) LinkedIn connect to the named title → T3 (+4d) live demo map / 1-page sample report → T4 (+1wk) value-add (BRSR-P6 for corporates; Green-Credit brief for PSUs; VVB-readiness for carbon) → T5 (+1wk) break-up. ~3 weeks, 5 touches. Warm accounts skip the cold opener.</p>
+
+<h2>Prospects by category</h2>
+<div class="filters">
+  <span class="tcell" style="align-self:center">Filter:</span>
+  <button class="fbtn on" data-f="all" onclick="filt(this)">All</button>
+  <button class="fbtn" data-f="Warm" onclick="filt(this)">🔥 Warm</button>
+  <button class="fbtn" data-f="High" onclick="filt(this)">High</button>
+  <button class="fbtn" data-f="Medium" onclick="filt(this)">Medium</button>
+  <button class="fbtn" data-f="Low" onclick="filt(this)">Low</button>
+</div>
+<div id="cats"></div>
+
+<h2>Cold-open templates (one per category)</h2>
+<div id="tpls"></div>
+
+<div class="foot">
+  Method: 8 parallel prospect agents (one per category) → adversarial fact-check of top prospects (ICICI tree-count corrected to ~2.6M; Temenos + Lenovo flagged verify-first — no named India env program confirmed) → analyst synthesis (deduped 117). Confidence: medium-high; scale signals are from CSR pages/news/annual reports, verify the specific program before each touch. Tracker CSV: <a href="OUTREACH-ENGINE.csv">OUTREACH-ENGINE.csv</a>. Next: enrich High/Warm rows with verified contact emails. · Internal prospecting sheet, 2026.
+</div>
+</div>
+
+<script>
+const CATS = {
+  IT:{label:"IT / Tech / GCC corporate CSR", tier:"Mid–High", target:"Head of CSR / Sustainability Lead (GCC: Country Head, Corporate Citizenship)", angle:"\"You already plant trees — can you prove each one is alive?\" Hook the verification + survival gap: per-tree GPS+QR+live status, branded certificates, a public living-proof map for ESG storytelling, and the survival-audit data the board/BRSR needs (Capgemini publicly reports only 92,448 of 222,117 survived).", subj:"You already QR-tag your trees — let's prove they're alive", opener:"You plant tens of thousands of trees a year through SayTrees/United Way and your board's ESG report still leans on a photo deck instead of survival data — Capgemini publicly admits only 92,448 of 222,117 survived, the exact gap we close. We bolt a per-tree GPS + QR + live-survival layer onto plantations you're already running — want a paid pilot on one existing site?"},
+  BFSI:{label:"Banks / NBFC / Insurance", tier:"Mid–High", target:"Head of CSR / ESG Head / Foundation CEO (secondary: Corp Comms, Company Secretary)", angle:"\"You fund tree plantation as CSR — but can your board, your BRSR auditor, and your customers actually SEE the trees?\" Per-tree GPS+QR, 360 tours, quarterly survival audits, CO2/O2 ledger for BRSR Principle 6. Bank hooks: plant-a-tree-per-policy, branch greening dashboards, green-loan tree gifting (IDFC already does this for 30k Madurai saplings).", subj:"Can your BRSR auditor actually SEE the trees you funded?", opener:"Your CSR report says you planted X lakh saplings, but BRSR Principle 6 and your board want audit-grade proof, not a press line — and green-loan/policy customers can't trace their tree. We turn an existing plantation into per-tree GPS + QR + quarterly survival audits + a CO2/oxygen ledger that drops straight into disclosures (IDFC FIRST already geotags 30,000 saplings this way) — open to a paid pilot?"},
+  IND:{label:"Manufacturing / Auto / Energy / FMCG / Pharma / Cement / Metals", tier:"High", target:"Head of CSR / Sustainability (or Foundation CEO); secondary: CSO / ESG Lead", angle:"\"You plant millions of trees a year — we make every sapling auditable.\" Per-tree GPS, survival %, oxygen/CO2, 360 tours, sponsor-facing dashboard + employee-volunteering, plus a path to monetize survival as carbon credits. Tie to their named program (Hariyali, Vasundhara, Mission Sunehra Kal) so it reads as an upgrade, not a replacement.", subj:"Make every tree in [program] auditable — and credit-ready", opener:"You're planting millions of trees under [Hariyali / Vasundhara / your program], and the one number your impact assessment and BRSR can't defend is survival per tree — yet survival is exactly what unlocks carbon credits later. We make each sapling auditable (GPS, survival %, oxygen/CO2, 360 tours) on a sponsor-facing dashboard — can we run a paid pilot on one site this quarter?"},
+  FND:{label:"Corporate foundations + philanthropic trusts", tier:"Mid–High", target:"Head of CSR / CSO / Head of Environment & NRM", angle:"\"You've pledged the trees — we make each one provable.\" Turnkey afforestation + MRV: geo-tagged per-tree tracking, survival verification, live public dashboards, audit-ready impact reports. Anchor on their named pledge (1t.org, Tree Mittra, CONSERW) and convert plantation into the carbon/oxygen + livelihood story the board and MCA filing want.", subj:"You pledged the trees — we make each one provable", opener:"Your foundation has committed [1t.org / million-tree] afforestation, and the whole pledge is judged on a survival number nobody can yet verify tree-by-tree. We add a turnkey MRV layer — geo-tagged tracking, survival audits, a live public dashboard, audit-ready impact report for your annual filing — so a paid pilot on one project converts your pledge into proof; interested?"},
+  PSU:{label:"PSU / Govt / CAMPA / Green Credit / Forest Depts / Smart Cities", tier:"High", target:"Director (CSR) / CGM Environment at PSUs; PCCF (Social Forestry); GCP cell at ICFRE/MoEFCC", angle:"\"Your Green Credits need 5 years of survival data + a 40% canopy audit before ICFRE issues one credit.\" Geotagged per-tree MRV, survival monitoring, audit-ready quarterly reporting that protects credit issuance and makes CSR spend defensible. For forest depts/Smart Cities: 'Ek Ped Maa Ke Naam' / urban-forest survival tracking.", subj:"Your Green Credits need 5 yrs of survival proof — we provide it", opener:"You've committed [X] hectares of degraded-forest restoration under the Green Credit Programme, and ICFRE won't issue a credit until you show 5 years of survival data and a 40% canopy-density audit — which manual sampling can't defend at your scale. We provide the geotagged per-tree MRV and audit-ready reporting that protects that credit issuance — can we pilot on one parcel?"},
+  NGO:{label:"Implementing / planting NGOs (white-label dMRV / SaaS)", tier:"Mid", target:"Founder / CEO / Managing Trustee; or Head of Tech / M&E", angle:"\"You plant millions of trees, but can your donors geo-locate and verify their specific trees three years later?\" White-label our dMRV (geo-tag, growth photos, survival audit, donor dashboard, verifiable reports) under YOUR brand, zero build cost. For tech-forward ones, reframe as augment/partner (carbon-grade MRV), not replacement.", subj:"Can your donors verify their specific trees in 3 years?", opener:"You plant millions of trees, but your CSR donors get a certificate, not a way to geo-locate and verify their actual trees three years on — and funders increasingly walk from plantations that can't prove 80-90% survival. White-label our dMRV under YOUR brand with zero build cost, and convert funders faster with proof they can audit — want to see it on a sample of your sites?"},
+  CHN:{label:"CSR consultancies / aggregators (channel partners)", tier:"Mid", target:"Head of Partnerships / CSR Advisory / Director, Environment Practice", angle:"\"White-label our geotagged tree-planting + live-proof + carbon-ready engine and resell it across your CSR portfolio.\" We become the fulfillment/tech layer behind your environment vertical — one integration, many corporate deals. Lead with the incumbent comparison (the exact service CGI/IDFC/Tata already buy) + co-branded reporting + revenue share.", subj:"White-label a geotagged tree-CSR engine for your portfolio", opener:"You place dozens of corporate CSR budgets a year and your environment vertical needs a credible tech-enabled afforestation product with per-tree geotagging, live proof and audit-ready reports — the exact service CGI, IDFC FIRST and Tata already buy from a tree-CSR vendor. White-label our engine, resell across your portfolio with co-branded reporting + revenue share — worth a partner call?"},
+  CARB:{label:"Carbon developers + agroforestry / FPO (carbon vertical)", tier:"High", target:"Head of MRV / Head of Carbon; Founder/CEO (early-stage); DGM-Climate at NABARD", angle:"\"Audit-grade per-tree MRV that survives a Verra/Gold Standard VVB review.\" Per-tree dMRV as (1) additionality/permanence evidence for ARR/agroforestry methodologies (VM0047, VM0042), (2) lower verification cost vs manual sampling across fragmented smallholder plots, (3) a buyer-facing transparency layer that commands premium pricing.", subj:"Per-tree MRV that survives a Verra/Gold Standard VVB", opener:"Your ARR/agroforestry credits live or die on whether every tree has a defensible geotag, species, DBH curve, survival rate and timestamped photo tied to your boundary — the exact data a VVB samples and a buyer's diligence demands, and the line blowing up your verification cost across fragmented plots. We provide audit-grade per-tree dMRV that lowers that cost and doubles as a buyer-facing transparency layer — can we scope it against one live project?"},
+};
+const ROWS = [
+ // IT
+ ["Warm","CGI India","High","IT","31,000+ QR-tagged trees since 2019; client-facing virtual plantations"],
+ ["Warm","HCLTech (HCL Foundation — Harit)","High","IT","3.2M+ saplings lifetime; 73,000 acres restored"],
+ ["Warm","Lenovo India","Medium","IT","Work For Humankind; verify India tree program"],
+ ["Warm","Temenos (Bengaluru GCC)","Mid","IT","Banking-software GCC; incumbent tree-CSR — verify-first"],
+ ["High","Infosys (Infosys Foundation)","High","IT","CSR ~₹300cr range; FY25-26 action plan published"],
+ ["High","Wipro (Wipro Foundation / GreenCo)","High","IT","₹247cr FY23-24 CSR; Eco Park + Miyawaki"],
+ ["High","Tata Consultancy Services (TCS)","High","IT","50,000+ employee-planted; 41,000+ across 18 campuses"],
+ ["High","Tech Mahindra (TM Foundation)","High","IT","100,000+ trees/8 yrs; 3 trees/employee/month pledge"],
+ ["High","Cognizant (Outreach)","High","IT","6,700+ volunteers / 20,000 env hours; pan-India Go Green"],
+ ["High","Capgemini India (Mission Million Trees)","High","IT","222,117 trees 2021-24 (only 92,448 survived — disclosed)"],
+ ["High","Dell Technologies India (Planet ERG)","High","IT","1M-tree India ambition with SayTrees"],
+ ["High","Mphasis (F1 Foundation)","High","IT","100,000 trees committed at Doddasaggere; lake project"],
+ ["Medium","Accenture India","Medium","IT","300k+ headcount; campus plantation drives"],
+ ["Medium","IBM India","Medium","IT","Recurring employee plantation drives, Pune/Bengaluru"],
+ ["Medium","SAP Labs India","Medium","IT","Bengaluru campus biodiversity + tree-planting"],
+ // BFSI
+ ["Warm","IDFC FIRST Bank (FIRST ENSURE)","High","BFSI","30,000 geotagged saplings Madurai; green-loan-tied"],
+ ["Warm","Punjab National Bank (PNB Palaash)","High","BFSI","200,000+ saplings; bank-wide Project Palaash"],
+ ["Warm","HSBC India","High","BFSI","USD 100M Climate Partnership; Sundarbans mangroves"],
+ ["High","HDFC Bank (Parivartan)","High","BFSI","₹1,068cr CSR FY24-25; 30 lakh-tree afforestation"],
+ ["High","ICICI Bank (ICICI Foundation)","High","BFSI","~2.6M trees cumulative (corrected from 4.9M claim)"],
+ ["High","SBI Foundation (CONSERW)","High","BFSI","CONSERW grants up to ₹4cr/project; active FY24-25 RFPs"],
+ ["High","Axis Bank (Axis Bank Foundation)","High","BFSI","8M-tree-by-2030; 3.27M saplings FY25"],
+ ["High","Kotak Mahindra Bank","High","BFSI","₹230.81cr CSR FY24; CERE urban-afforestation"],
+ ["High","Standard Chartered India","High","BFSI","Project Treedom 1M trees; ~447,023 tCO2/yr"],
+ ["Medium","Bajaj Finserv (Bajaj Foundation)","Medium","BFSI","₹335cr + ₹290cr CSR FY25; Bajaj Foundation programs"],
+ ["Medium","Bank of Baroda","Medium","BFSI","Urban+community forests; 7 lakh-tree green initiative"],
+ ["Medium","Yes Bank (YES Foundation)","Medium","BFSI","1M fruit-tree-by-2028; 300,000+ planted"],
+ ["Medium","IndusInd Bank","Medium","BFSI","56,000 urban trees (~90% survival) + watershed"],
+ ["Medium","Tata Capital","Medium","BFSI","77,500+ Miyawaki saplings, 3 cities"],
+ ["Medium","Tata AIA Life Insurance","Medium","BFSI","1,50,000-tree pledge; plant-per-policy"],
+ ["Medium","Future Generali India Insurance","Medium","BFSI","Responsible Roots: 1 lakh native trees / 4 yrs"],
+ // IND
+ ["High","Mahindra & Mahindra (Project Hariyali)","High","IND","25.13M trees cumulative; 5M/yr target by 2026"],
+ ["High","Adani Group / Adani Foundation","High","IND","100M-tree 2030 pledge; 37.1M mangroves target"],
+ ["High","ITC (Mission Sunehra Kal)","High","IND","~225,293 ha greened; FY25 impact assessment"],
+ ["High","Tata Motors (Vasundhara)","High","IND","1M+ trees (>90% survival); sapling-per-CV-sold"],
+ ["High","JSW Steel / JSW Foundation","High","IND","1,25,000 mangroves; 20 lakh+ trees group-wide"],
+ ["High","L&T (Project GreenHands)","High","IND","~13M saplings 2008-24; 2.5M in one 2023 drive"],
+ ["High","UltraTech Cement (Aditya Birla)","High","IND","Miyawaki at 3+ units; 14-unit biodiversity assess"],
+ ["High","Ambuja Cements (Adani)","High","IND","8.3M-tree 2030 (6.6M done); TNFD-adopter"],
+ ["High","Tata Steel","High","IND","1.1M+ saplings/165.5 ha Noamundi; BMP all sites"],
+ ["Medium","Hindalco (Aditya Birla)","Medium","IND","5,144+ acres greenbelt; 4.5 lakh trees/yr"],
+ ["Medium","Vedanta (Anil Agarwal Foundation)","Medium","IND","~4,000 acres greenbelt; ~800,000 saplings"],
+ ["Medium","Toyota Kirloskar (Green Wave)","Medium","IND","328,000+ trees/112 acres Miyawaki since 2009"],
+ ["Medium","Grasim (Aditya Birla)","Medium","IND","68,000+ Miyawaki trees toward 1,00,000"],
+ ["Medium","Bharat Forge (Mission Million Trees)","Medium","IND","4 Maharashtra districts; 2024 impact assessment"],
+ ["Medium","Dr. Reddy's Foundation","Medium","IND","Agroforestry NET program; tree-per-contact"],
+ ["Low","Sun Pharma","Low","IND","Plantation Project in FY26 board-approved CSR"],
+ ["Low","Maruti Suzuki","Low","IND","CSR ~₹168cr; water/sanitation focus — verify trees"],
+ // FND
+ ["Warm","Tata Group (Sustainability / Tree Mittra)","High","FND","Tree Mittra 1M+ trees/yr; Tata Engage volunteering"],
+ ["High","Reliance Industries / Foundation","High","FND","Total CSR ₹2,156cr FY25; 2M+ trees SGNP"],
+ ["High","Aditya Birla Group (foundations)","High","FND","Group CSR >₹500cr; Miyawaki + biodiversity"],
+ ["High","JSW Foundation","High","FND","20,00,000+ trees; 38 districts/17 states"],
+ ["High","Hero MotoCorp (Hero Green Drive)","High","FND","14 lakh+ trees since 2015 (90% survival KPI)"],
+ ["Medium","RPG Foundation","Medium","FND","1M trees by 2030 (1t.org); 7 states"],
+ ["Medium","Jamnalal Bajaj Foundation","Medium","FND","100+ villages across MH + Sikar (RJ)"],
+ ["Medium","Anandana — Coca-Cola India Foundation","Medium","FND","100+ projects; multi-state water + green"],
+ ["Medium","Godrej (Good & Green)","Medium","FND","19% biodiversity-index rise Vikhroli FY24-25"],
+ // PSU
+ ["High","NTPC Limited","High","PSU","1,853 ha Green Credit; 40M trees cumulative"],
+ ["High","Coal India (CIL)","High","PSU","13,400 ha greened FY20-25; 32 eco-parks; GCP-registered"],
+ ["High","Indian Oil (IOCL)","High","PSU","11,890 ha Green Credit — largest in India; ~40 lakh trees"],
+ ["High","POWERGRID","High","PSU","4,372 ha Green Credit; ₹360cr CSR FY25"],
+ ["High","NHPC Limited","High","PSU","₹781cr CSR FY15-24; CA obligations; GCP-registered"],
+ ["High","NMDC Limited","High","PSU","~₹112cr Hariyar Kosh fund; 3M+ trees"],
+ ["High","GAIL (India)","High","PSU","₹183cr CSR FY24-25; GAIL Harit green vertical"],
+ ["High","MoEFCC Green Credit Programme","High","PSU","40 PSUs + 384 entities; 9,000+ ha paid restoration"],
+ ["High","ICFRE Dehradun (GCP Administrator)","High","PSU","Controls credit issuance for all 40+ PSU programs — embed here"],
+ ["Medium","ONGC","Medium","PSU","Registered GCP participant; Maharatna CSR"],
+ ["Medium","Oil India (OIL)","Medium","PSU","Registered GCP; Navratna CSR; Assam env CSR"],
+ ["Medium","SAIL","Medium","PSU","5 lakh+ trees in townships; greenbelts 4+ plants"],
+ ["Medium","BPCL","Medium","PSU","100,000 seedballs; ~50 ha across 3 Bihar areas"],
+ ["Medium","Telangana Forest Dept (Haritha Haram)","Medium","PSU","2 billion-tree target; dedicated state CSR portal"],
+ ["Medium","FDCM (Maharashtra)","Medium","PSU","State forest PSU; Green Maharashtra 1-crore-tree"],
+ ["Medium","Smart Cities Mission SPVs (Indore/Pune)","Medium","PSU","₹1.51 lakh cr; urban micro-forest projects"],
+ // NGO
+ ["High","Green Yatra","High","NGO","~35M trees; broad corporate CSR roster"],
+ ["High","Grow-Trees.com","High","NGO","20M+ trees 2024 / 23 states; registered VM0047"],
+ ["High","SayTrees Environmental Trust","High","NGO","50+ drives/yr; implementer behind CGI/Capgemini/Dell"],
+ ["High","Forests by Heartfulness","High","NGO","3M+ trees, 10,000 acres; target 30M by 2030"],
+ ["High","Give Me Trees Trust (Peepal Baba)","High","NGO","20M+ trees / 202 districts; high brand recognition"],
+ ["Medium","Isha Outreach (Cauvery Calling)","Medium","NGO","122M saplings; 13.6M in 2024-25"],
+ ["Medium","EcoSikh (Sacred Forests)","Medium","NGO","303 micro-forests, 167,000+ trees; diaspora funding"],
+ ["Medium","Afforestt","Medium","NGO","Pioneer Miyawaki firm; corporate forests"],
+ ["Medium","Foundation for Ecological Security (FES)","Medium","NGO","Pan-India restoration; IUCN member"],
+ ["Medium","Nelda Foundation","Medium","NGO","Billion-tree-by-2041 goal; institutional partners"],
+ ["Medium","Vanam India Foundation","Medium","NGO","8 lakh+ trees; Tamil Nadu (your turf)"],
+ ["Low","NIZHAL","Low","NGO","20-yr Chennai urban-greening; indigenous species"],
+ ["Low","Vrikshawali","Low","NGO","Aftercare/survival positioning, arid Rajasthan"],
+ ["Low","Forest Creators","Low","NGO","Miyawaki + afforestation service provider"],
+ ["Low","SankalpTaru Foundation","Low","NGO","3.5M+ trees; already has blockchain+geo-tag — partner/benchmark"],
+ ["Low","Grow Billion Trees","Low","NGO","1B-tree goal; GeoTag standard — partner/benchmark"],
+ ["Low","Tree Tag","Low","NGO","Tree geo-tagging tech — partner/benchmark"],
+ // CHN
+ ["Warm","Goodera","High","CHN","400-500+ enterprise clients; 5,000+ events/yr"],
+ ["High","CSRBOX","High","CHN","Reaches 3M+ professionals; Impact Advisory + India CSR Summit"],
+ ["High","NGOBOX","High","CHN","Since 2012; CSR grants/RFP listings + CSR Summit"],
+ ["High","Sattva Consulting","High","CHN","Since 2009; CSR + ESG advisory at scale"],
+ ["High","SoulAce","High","CHN","3,000+ CSR projects, 28 states; M&E — proof strengthens them"],
+ ["High","United Way Mumbai","High","CHN","125,000+ trees/yr for many corporates"],
+ ["Medium","Samhita Social Ventures","Medium","CHN","17M+ lives; ~20,000-NGO network"],
+ ["Medium","GuideStar India","Medium","CHN","8,600+ NGOs; due-diligence portal"],
+ ["Medium","Give (Give.do)","Medium","CHN","Best-known donation platform; corporate giving"],
+ ["Medium","ConnectFor","Medium","CHN","500+ partner orgs; DBS/Godrej/Castrol corporate partners"],
+ ["Medium","LetsEndorse","Medium","CHN","Grants-discovery + NGO discovery platform"],
+ ["Medium","Dhwani Foundation","Medium","CHN","Runs TN CSR Summit (Trichy-base useful); cloud MIS"],
+ ["Medium","Grant Thornton Bharat","Medium","CHN","Multi-office CSR/ESG impact-evaluation advisory"],
+ // CARB
+ ["High","Varaha ClimateAg","High","CARB","~$50M raised; best-funded NbS developer"],
+ ["High","Anaxee Digital Runners","High","CARB","40,000+ field agents; full dMRV; closest peer/partner"],
+ ["High","NABARD Carbon Fund & FPO program","High","CARB","₹300cr Carbon Fund (Jan 2026); 6,215 FPOs"],
+ ["Medium","TraceX Technologies","Medium","CARB","30+ clients, ~230k farmers; partner (satellite+per-tree)"],
+ ["Medium","Boomitra","Medium","CARB","First Indian VM0042 issuance; soil-carbon"],
+ ["Medium","Grow Indigo (Mahyco x Indigo)","Medium","CARB","1M+ acres regenerative; first soil-carbon issuance"],
+ ["Medium","EKI Energy (EnKing)","Medium","CARB","BSE-listed; 3,500+ clients / 40+ countries"],
+ ["Medium","Farmonaut","Medium","CARB","Satellite agritech + carbon MRV"],
+ ["Medium","Nurture.farm (UPL)","Medium","CARB","25,000+ farmers / 420,000 acres CRM (~1M tCO2)"],
+ ["Medium","Creduce (Envarrior)","Medium","CARB","Carbon advisory + project development"],
+ ["Medium","Bayer Rice Carbon (India)","Medium","CARB","11 states; up to 250k Gold Standard credits"],
+ ["Low","Agoro Carbon (Yara)","Low","CARB","Reg-ag carbon; scaling — verify India agroforestry"],
+ ["Low","SatSure","Low","CARB","Satellite analytics; 630,000+ plots"],
+ ["Low","Mynzo Carbon","Low","CARB","Carbon accounting + tree-planting; VC-funded"],
+];
+const PRI={Warm:0,High:1,Medium:2,Low:3};
+const order=Object.keys(CATS);
+const catsEl=document.getElementById('cats');
+order.forEach(k=>{
+  const rows=ROWS.filter(r=>r[3]===k).sort((a,b)=>PRI[a[0]]-PRI[b[0]]);
+  const warm=rows.filter(r=>r[0]==='Warm').length;
+  const c=CATS[k];
+  const d=document.createElement('details'); if(k==='IT')d.open=true;
+  d.innerHTML=`<summary><h3>${c.label}</h3><span class="tierbadge">${rows.length} · ${c.tier}${warm?` · ${warm}🔥`:''}</span></summary>
+  <div class="cmeta"><div class="angle"><b>Angle:</b> ${c.angle}</div><div class="target"><b>Target:</b> ${c.target}</div>
+  <table><thead><tr><th>Pri</th><th>Org</th><th>Tier</th><th>Scale signal</th></tr></thead><tbody>
+  ${rows.map(r=>`<tr data-pri="${r[0]}"><td><span class="pri p-${r[0]}">${r[0]}</span></td><td><b>${r[1]}</b></td><td class="tcell">${r[2]}</td><td class="tcell">${r[4]}</td></tr>`).join('')}
+  </tbody></table></div>`;
+  catsEl.appendChild(d);
+});
+const tplsEl=document.getElementById('tpls');
+order.forEach(k=>{const c=CATS[k];const t=document.createElement('div');t.className='tpl';t.innerHTML=`<div class="t">${c.label}</div><div class="s">✉️ ${c.subj}</div><div class="o">${c.opener}</div>`;tplsEl.appendChild(t);});
+function filt(btn){
+  document.querySelectorAll('.fbtn').forEach(b=>b.classList.remove('on'));btn.classList.add('on');
+  const f=btn.dataset.f;
+  document.querySelectorAll('#cats tr[data-pri]').forEach(tr=>{tr.classList.toggle('hide', f!=='all'&&tr.dataset.pri!==f);});
+  document.querySelectorAll('#cats details').forEach(d=>d.open=true);
+}
+</script>
+</body>
+</html>
