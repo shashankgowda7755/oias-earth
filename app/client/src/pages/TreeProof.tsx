@@ -8,6 +8,7 @@ import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import QRCode from 'qrcode';
 import { HeartbeatMap } from '@/components/HeartbeatMap';
+import ShareBar from '@/components/ShareBar';
 import { fetchTreeProof, type TreeProof as TP } from '@/lib/publicApi';
 import '@/styles/earth.css';
 
@@ -114,6 +115,17 @@ export default function TreeProof() {
           <span style={{ width: 9, height: 9, borderRadius: '50%', background: badgeColor, boxShadow: alive ? '0 0 10px rgba(182,255,60,.8)' : 'none' }} />
           {alive ? 'Alive' : summary.survival === 'dead' ? 'Lost' : 'Unverified'}
         </div>
+      </div>
+
+      {/* Share */}
+      <div style={{ margin: '20px 0 4px' }}>
+        <ShareBar
+          tone="dark"
+          title={`${tree.species ?? 'My tree'} — living proof`}
+          text={tree.gifted_to
+            ? `${tree.gifted_to}'s tree (${tree.species ?? 'a tree'}) 🌳 — watch it grow, verified monthly:`
+            : `I'm growing ${tree.species ?? 'a tree'} 🌳 — watch it live, verified monthly:`}
+        />
       </div>
 
       {/* Stats */}

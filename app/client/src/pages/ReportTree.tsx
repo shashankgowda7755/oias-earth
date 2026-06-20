@@ -9,6 +9,7 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import QRCode from 'qrcode';
 import { fetchTreeProof, type TreeProof as TP } from '@/lib/publicApi';
+import ShareBar from '@/components/ShareBar';
 
 const PRINT_CSS = `@media print { .no-print { display:none !important; } body { background:#fff !important; } @page { margin: 14mm; } }`;
 
@@ -42,7 +43,12 @@ export default function ReportTree() {
   return (
     <div style={{ background: '#f4f6f4', color: ink, minHeight: '100vh', fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", padding: 'clamp(16px,4vw,40px)' }}>
       <style>{PRINT_CSS}</style>
-      <div className="no-print" style={{ maxWidth: 720, margin: '0 auto 14px', textAlign: 'right' }}>
+      <div className="no-print" style={{ maxWidth: 720, margin: '0 auto 14px', display: 'flex', gap: 12, alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap' }}>
+        <ShareBar
+          tone="light"
+          title={`${tree.species ?? 'Tree'} — certificate of living proof`}
+          text={tree.gifted_to ? `${tree.gifted_to}'s tree certificate (${tree.species ?? 'a tree'}) 🌳` : `My tree certificate (${tree.species ?? 'a tree'}) 🌳`}
+        />
         <button onClick={() => window.print()} style={{ background: pine, color: '#fff', border: 'none', borderRadius: 999, padding: '10px 20px', fontWeight: 700, fontSize: 14, cursor: 'pointer' }}>↓ Download certificate (PDF)</button>
       </div>
       <div style={{ maxWidth: 720, margin: '0 auto', background: '#fff', border: `2px solid ${pine}`, borderRadius: 16, padding: 'clamp(20px,4vw,36px)' }}>
