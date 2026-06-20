@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Field Operations & Costing — Geo-tagging at Scale</title>
+<style>
+  :root{
+    --paper:#0d1518;--card:#13242a;--card2:#16282e;--line:rgba(255,255,255,.12);
+    --lime:#b6ff3c;--muted:#8aa0a3;--amber:#e8a33d;--ink:#e7efea;--red:#f0792b
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:'Plus Jakarta Sans',system-ui,-apple-system,sans-serif;line-height:1.55;font-size:15px}
+  .wrap{max-width:1040px;margin:0 auto;padding:0 22px 70px}
+  header{border-bottom:1px solid var(--line);padding:30px 0 22px;margin-bottom:8px}
+  .klabel{color:var(--lime);font-size:12px;letter-spacing:.22em;text-transform:uppercase;font-weight:700}
+  h1{font-size:30px;margin:8px 0 6px;line-height:1.1}
+  .sub{color:var(--muted);font-size:14px}
+  .pill{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 11px;font-size:12px;color:#cdd;margin:4px 6px 0 0}
+  h2{font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--lime);margin:34px 0 12px;border-bottom:1px solid var(--line);padding-bottom:7px}
+  p{margin:8px 0}
+  .grid{display:grid;gap:12px}
+  .g3{grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+  .g4{grid-template-columns:repeat(auto-fit,minmax(170px,1fr))}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:15px 17px}
+  .card h3{margin:0 0 4px;font-size:15px}
+  .card .n{font-size:12px;color:var(--lime);font-weight:700;letter-spacing:.05em}
+  .card p{margin:4px 0 0;font-size:13.5px;color:#c7d3cf}
+  .flow{display:flex;flex-wrap:wrap;align-items:stretch;gap:8px;margin:6px 0}
+  .step{flex:1;min-width:150px;background:var(--card);border:1px solid var(--line);border-radius:11px;padding:12px 14px}
+  .step b{color:var(--lime);font-size:12px} .step div{font-size:13px;color:#c7d3cf;margin-top:3px}
+  .arrow{align-self:center;color:var(--muted);font-size:18px}
+  table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-top:6px;font-size:14px}
+  th,td{padding:11px 14px;text-align:left;border-bottom:1px solid var(--line)}
+  th{color:var(--muted);text-transform:uppercase;font-size:11px;letter-spacing:.06em;font-weight:700}
+  td.r,th.r{text-align:right;font-variant-numeric:tabular-nums}
+  tr:last-child td{border-bottom:none}
+  .hot{color:var(--lime);font-weight:700}
+  .big{display:flex;flex-wrap:wrap;gap:16px;align-items:center;background:linear-gradient(120deg,rgba(182,255,60,.08),rgba(182,255,60,0));border:1px solid var(--lime);border-radius:16px;padding:20px 22px;margin:8px 0}
+  .big .num{font-size:46px;font-weight:800;color:var(--lime);line-height:1}
+  .big .num small{font-size:16px;color:var(--muted);font-weight:600}
+  .big .txt{flex:1;min-width:240px;font-size:14px;color:#c7d3cf}
+  .note{background:rgba(232,163,61,.09);border:1px solid rgba(232,163,61,.4);border-radius:12px;padding:13px 16px;color:#e8c89a;font-size:13.5px;margin:12px 0}
+  .ok{color:var(--lime)} .warn{color:var(--amber)} .no{color:var(--red)}
+  ul{margin:8px 0;padding-left:20px} li{margin:5px 0;font-size:14px;color:#cdd9d5}
+  .foot{margin-top:34px;border-top:1px solid var(--line);padding-top:14px;color:var(--muted);font-size:12px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="klabel">Be The Tree Hugger · Operations Brief</div>
+    <h1>Field Operations &amp; Costing — Geo-tagging at Scale</h1>
+    <div class="sub">How we capture, stitch, and deliver — and what it actually costs per tree.</div>
+    <div style="margin-top:10px">
+      <span class="pill">~1 lakh trees</span><span class="pill">Chennai · Bangalore · Hyderabad</span>
+      <span class="pill">census — every tree</span><span class="pill">quarterly (4×/yr)</span>
+      <span class="pill">crews hired local per city</span>
+    </div>
+  </header>
+
+  <h2>The pipeline at a glance</h2>
+  <div class="flow">
+    <div class="step"><b>1 · CAPTURE</b><div>Phone photo + GPS per tree · Theta-X 360 sphere every ~100 m along the path</div></div>
+    <div class="arrow">→</div>
+    <div class="step"><b>2 · STITCH</b><div>360 auto-stitched in-camera · photos auto-ingested by GPS</div></div>
+    <div class="arrow">→</div>
+    <div class="step"><b>3 · HOTSPOTS</b><div>Computed from GPS (not clicked) · 1 drag-to-set-north / sphere</div></div>
+    <div class="arrow">→</div>
+    <div class="step"><b>4 · RENDER</b><div>Aerial hub → 360 walk → tree record. Live on the platform.</div></div>
+  </div>
+
+  <h2>1 · How the operation runs (per city)</h2>
+  <div class="grid g3">
+    <div class="card"><div class="n">STEP 1 — STAND UP</div><h3>Recruit + train local</h3><p>4–8 field staff per city via a manpower agency (they live there → no travel). Half-day training: app, GPS lock, framing, the waypoint walk.</p></div>
+    <div class="card"><div class="n">STEP 2 — CAPTURE</div><h3>2-role teams</h3><p><b>Tree photographer</b> — 1 GPS photo/tree (~250/day). <b>360 walker</b> — one sphere every ~100 m: a continuous "click → next point" chain (1 km ≈ 10 points).</p></div>
+    <div class="card"><div class="n">STEP 3 — DELIVER</div><h3>Upload → auto-process → publish</h3><p>End-of-day upload → auto-ingest + auto-hotspots → quick QA → live. Repeat every 3 months; old cycles kept = the growth timeline.</p></div>
+  </div>
+
+  <h2>2 · Capture kit</h2>
+  <div class="grid g3">
+    <div class="card"><div class="n">PER TREE (×100k)</div><h3>Android + GPS-stamp app</h3><p>~₹15k phone, dual-band GNSS, EXIF GPS in 2–3 s. The workhorse — 1 photo/tree.</p></div>
+    <div class="card"><div class="n">PER PATH (360)</div><h3>Ricoh Theta X · ~₹38k</h3><p>Only consumer 360 with <b>built-in GPS + in-camera auto-stitch</b>. One tap = geotagged, finished sphere. One camera, shared.</p></div>
+    <div class="card"><div class="n">AERIAL</div><h3>Drone — optional only</h3><p class="warn">Skip for the core deliverable (DGCA airport-zone permission in all 3 metros). Use only for the top-down "cloud" hero, outsourced per job.</p></div>
+  </div>
+  <p style="color:var(--muted);font-size:13px">Kit is one-time ~₹50–65k → amortizes to <b class="ok">&lt;₹0.30/tree</b>. Irrelevant vs labour.</p>
+
+  <h2>3 · How we stitch (nothing manual)</h2>
+  <ul>
+    <li><b>360 spheres:</b> Theta-X <b class="ok">auto-stitches in-camera</b> → finished equirectangular on capture. No PTGui/Hugin, no laptop.</li>
+    <li><b>Per-tree photos:</b> <code>exifr</code> reads each photo's GPS → matches it to the nearest tree; <code>sharp</code> compresses to &lt;100 KB.</li>
+    <li><b>The "pointer" is computed, not clicked:</b> every sphere + every tree know their GPS → hotspot direction = math (bearing + distance). The "→ next waypoint" arrow = bearing to the next sphere. One human action: <b>drag-to-set-north once per sphere.</b></li>
+    <li><b>Result:</b> whole-cycle editing ≈ <b class="ok">50 hours, not 250</b>. Re-shoots reuse the GPS → hotspots recompute <b class="ok">free</b>.</li>
+  </ul>
+
+  <h2>4 · What it costs — census · quarterly · hired crews</h2>
+  <p style="color:var(--muted);font-size:13px">Throughput 250 trees/day → ~440 person-days/cycle. No inter-city travel (crews hired local).</p>
+  <table>
+    <tr><th>Per 100k-tree cycle</th><th class="r">Year-1 ramp<br><span style="font-weight:500;text-transform:none">agency labour</span></th><th class="r">Steady-state<br><span style="font-weight:500;text-transform:none">direct hire</span></th></tr>
+    <tr><td>Field + 360 labour</td><td class="r">₹5.28 L</td><td class="r">₹3.52 L</td></tr>
+    <tr><td>Local transport + equipment + recruit/train</td><td class="r">₹1.16 L</td><td class="r">₹1.01 L</td></tr>
+    <tr><td>Edit / QA (automated)</td><td class="r">₹0.25 L</td><td class="r">₹0.25 L</td></tr>
+    <tr><td>+ spoilage 8% + management 15%</td><td class="r">incl.</td><td class="r">incl.</td></tr>
+    <tr><td><b>Total / cycle</b></td><td class="r"><b>~₹8.3 L</b></td><td class="r"><b>~₹5.9 L</b></td></tr>
+    <tr><td><b>₹ per tree / cycle</b></td><td class="r hot">~₹8</td><td class="r hot">~₹6</td></tr>
+    <tr><td><b>₹ per tree / YEAR (×4 quarterly)</b></td><td class="r hot">~₹33</td><td class="r hot">~₹24</td></tr>
+    <tr><td><b>100k trees / year</b></td><td class="r">~₹33 lakh</td><td class="r">~₹24 lakh</td></tr>
+  </table>
+  <p style="color:var(--muted);font-size:13px">Year-1 sits near ₹8 (agency ramp), settles toward ₹6 as crews go direct. Labour is ~70% of cost — the whole game.</p>
+
+  <h2>5 · The pitch number</h2>
+  <div class="big">
+    <div class="num">₹7<small> /tree/cycle</small></div>
+    <div class="txt"><b>= ₹28/tree/year (quarterly).</b> Top of the incumbent's per-cycle band, but delivering ~<b class="ok">5× the product</b>: continuous 360 walk + live interactive map + carbon + certificates + sharing they cannot match. Margin thin in ramp, healthy at steady-state (₹6 cost).</div>
+  </div>
+  <div class="note">⚠️ <b>₹3–5 is the incumbent's per-cycle rate for a LIGHTER job</b> (sample or annual, no 360, no live platform). Do <b>not</b> do census + quarterly + 360 at ₹3–5 — that loses money. If the client is hard-anchored there, sell the <b>lighter tier</b> at that price (semi-annual or 15–25% sample; 360 as a paid add-on) and keep ₹7 for the premium scope.</div>
+
+  <table>
+    <tr><th>Tier</th><th>Deliverable / cycle</th><th class="r">₹/tree/cycle</th></tr>
+    <tr><td><b>Basic</b></td><td>GPS + photo + live platform listing (annual)</td><td class="r">₹4</td></tr>
+    <tr><td><b>Standard</b></td><td>+ quarterly + dashboard + auto-carbon + certificate + sharing</td><td class="r">₹6</td></tr>
+    <tr><td><b>Premium ⭐</b></td><td>+ continuous 360 walk + aerial hub + audit-grade carbon + branded certs</td><td class="r hot">₹7</td></tr>
+  </table>
+
+  <h2>6 · Before you quote the EXACT number</h2>
+  <p>One thing rules every rupee: <b>real trees-photographed-per-day.</b> Run a <b class="ok">1-day pilot in one dense Chennai plot</b>, count it, and count <b>km of path per site</b> (→ number of 360 spheres). Then ₹/tree is exact, not estimated. Every figure here scales linearly off that single number.</p>
+
+  <div class="foot">
+    Planning assumptions (validate with the pilot): throughput 250 trees/person/day; loaded labour ₹800 direct / ₹1,200 agency per day; ~3,000 spheres/100k cycle; storage handled separately; platform marginal cost ≈ ₹0 (already built). Figures are estimates pending the field pilot. · Be The Tree Hugger — internal operations brief.
+  </div>
+</div>
+</body>
+</html>
