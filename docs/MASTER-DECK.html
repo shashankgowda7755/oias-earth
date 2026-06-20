@@ -1,0 +1,465 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Be The Tree Hugger — Master Deck</title>
+<style>
+  :root{
+    --paper:#0b1316;--card:#13242a;--card2:#0f1d22;--line:rgba(255,255,255,.12);
+    --lime:#b6ff3c;--amber:#e8a33d;--red:#f0792b;--cyan:#5ad7e0;--ink:#e7efea;--muted:#8aa0a3;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{background:#05090b;color:var(--ink);font-family:'Plus Jakarta Sans',system-ui,-apple-system,sans-serif;overflow:hidden}
+  .deck{height:100vh;width:100vw;position:relative}
+  .slide{position:absolute;inset:0;display:none;flex-direction:column;padding:46px 58px 58px;background:radial-gradient(1200px 700px at 80% -10%,rgba(182,255,60,.06),transparent),var(--paper);overflow:auto}
+  .slide.active{display:flex;animation:fade .35s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  /* top bar */
+  .top{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line);padding-bottom:12px;margin-bottom:22px;flex:0 0 auto}
+  .brand{font-weight:800;letter-spacing:.02em;font-size:14px}.brand b{color:var(--lime)}
+  .sec{color:var(--lime);font-size:11px;letter-spacing:.22em;text-transform:uppercase;font-weight:700}
+  .pgn{color:var(--muted);font-size:12px;font-variant-numeric:tabular-nums}
+  .internal{display:inline-block;margin-left:10px;padding:2px 8px;border:1px solid var(--amber);color:var(--amber);border-radius:20px;font-size:10px;font-weight:800;letter-spacing:.1em}
+  .body{flex:1 1 auto;min-height:0}
+  h1{font-size:46px;line-height:1.05;margin:0 0 14px;letter-spacing:-.02em}
+  h2{font-size:30px;line-height:1.1;margin:0 0 16px;letter-spacing:-.01em}
+  h2 .em{color:var(--lime)}
+  .lead{font-size:18px;color:#cdd9d5;max-width:1000px;line-height:1.5}
+  .small{font-size:12.5px;color:var(--muted)}
+  /* layout helpers */
+  .grid{display:grid;gap:16px}
+  .g2{grid-template-columns:1fr 1fr}.g3{grid-template-columns:1fr 1fr 1fr}.g4{grid-template-columns:repeat(4,1fr)}.g5{grid-template-columns:repeat(5,1fr)}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px}
+  .card h3{margin:0 0 8px;font-size:15px;color:var(--lime);letter-spacing:.02em}
+  .card p,.card li{font-size:13.5px;color:#cdd9d5;line-height:1.45}
+  .kpi{background:linear-gradient(135deg,rgba(182,255,60,.10),transparent);border:1px solid var(--lime);border-radius:14px;padding:16px 18px}
+  .kpi .n{font-size:30px;font-weight:800;color:var(--lime);line-height:1;font-variant-numeric:tabular-nums}
+  .kpi .l{font-size:12px;color:#c7d3cf;margin-top:7px;line-height:1.35}
+  ul{margin:6px 0;padding-left:20px}li{margin:6px 0}
+  table{width:100%;border-collapse:collapse;font-size:13px;background:var(--card2);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  th,td{padding:8px 11px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+  th{color:var(--muted);text-transform:uppercase;font-size:10px;letter-spacing:.05em;background:rgba(255,255,255,.02)}
+  td.r,th.r{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+  tr:last-child td{border-bottom:none}
+  .tot td{background:rgba(182,255,60,.09);font-weight:700;color:var(--lime)}
+  .matrix td,.matrix th{text-align:center;padding:7px 6px;font-size:12px}
+  .matrix td:first-child,.matrix th:first-child{text-align:left;font-size:12px;white-space:nowrap}
+  .matrix .uscol{background:rgba(182,255,60,.10);color:var(--lime);font-weight:700}
+  .yes{color:var(--lime);font-weight:800}.no{color:#6b7a7d}.mid{color:var(--amber)}
+  .pill{display:inline-block;padding:2px 8px;border-radius:20px;font-size:10.5px;font-weight:700}
+  .pv{background:rgba(232,163,61,.16);color:var(--amber)}.pi{background:rgba(240,121,43,.16);color:var(--red)}.pm{background:rgba(90,215,224,.14);color:var(--cyan)}
+  .note{border-radius:12px;padding:11px 15px;font-size:13px;line-height:1.45}
+  .lime-n{background:rgba(182,255,60,.08);border:1px solid rgba(182,255,60,.35);color:#cde8a8}
+  .amber-n{background:rgba(232,163,61,.09);border:1px solid rgba(232,163,61,.4);color:#e8c89a}
+  .red-n{background:rgba(240,121,43,.09);border:1px solid rgba(240,121,43,.4);color:#f0b48c}
+  .flow{display:flex;align-items:stretch;gap:0;flex-wrap:wrap}
+  .step{flex:1;min-width:120px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;margin:4px;position:relative}
+  .step .k{color:var(--lime);font-size:11px;font-weight:800;letter-spacing:.08em}.step .t{font-size:13px;margin-top:5px;color:#cdd9d5}
+  .arrow{color:var(--lime);align-self:center;font-size:20px;font-weight:800;padding:0 2px}
+  .xfee{display:inline-block;min-width:42px;padding:1px 12px;border:2px dashed var(--lime);border-radius:8px;color:var(--lime);font-weight:800;text-align:center;cursor:text;outline:none}
+  a{color:var(--cyan);text-decoration:none}a:hover{text-decoration:underline}
+  .live{display:inline-flex;gap:5px;align-items:center;background:rgba(90,215,224,.1);border:1px solid rgba(90,215,224,.35);color:var(--cyan);border-radius:8px;padding:5px 10px;font-size:12px;font-weight:700;margin:3px 6px 3px 0}
+  .cover{justify-content:center;align-items:flex-start;background:radial-gradient(900px 600px at 75% 20%,rgba(182,255,60,.12),transparent),var(--paper)}
+  .cover h1{font-size:62px;max-width:1100px}
+  .tagrow{display:flex;gap:10px;flex-wrap:wrap;margin:18px 0 26px}
+  .tag{border:1px solid var(--lime);color:var(--lime);border-radius:30px;padding:7px 15px;font-size:13px;font-weight:700}
+  /* controls */
+  .ctrl{position:fixed;bottom:14px;left:50%;transform:translateX(-50%);display:flex;gap:8px;align-items:center;z-index:50;background:rgba(8,16,18,.85);border:1px solid var(--line);border-radius:30px;padding:6px 10px;backdrop-filter:blur(8px)}
+  .ctrl button{background:transparent;border:none;color:var(--ink);font-size:16px;cursor:pointer;padding:4px 9px;border-radius:50%}
+  .ctrl button:hover{background:rgba(182,255,60,.15);color:var(--lime)}
+  .ctrl .c{color:var(--muted);font-size:12px;font-variant-numeric:tabular-nums;min-width:54px;text-align:center}
+  .foot{flex:0 0 auto;border-top:1px solid var(--line);margin-top:16px;padding-top:9px;color:var(--muted);font-size:10.5px;display:flex;justify-content:space-between}
+  .src{font-size:10px;color:var(--muted);margin-top:8px}
+  @media print{
+    body{overflow:visible;background:#fff}
+    .slide{display:flex !important;position:relative;inset:auto;height:100vh;page-break-after:always;break-after:page}
+    .ctrl{display:none}
+  }
+</style>
+</head>
+<body>
+<div class="deck" id="deck">
+
+<!-- 1 COVER -->
+<section class="slide active cover">
+  <div class="sec">OIAS Earth · Living Proof</div>
+  <h1>Be The Tree Hugger</h1>
+  <div class="lead" style="font-size:22px;max-width:900px">The living-proof tree platform — every sponsored tree geotagged, walkable in 360°, measured for real carbon, and provable to an auditor.</div>
+  <div class="tagrow">
+    <span class="tag">Per-tree GPS</span><span class="tag">Ground 360° walk</span><span class="tag">Scientific carbon</span><span class="tag">CSR / BRSR-ready proof</span>
+  </div>
+  <div><span class="live">🌐 communitree-rebuild.vercel.app</span><span class="live">📍 /map</span><span class="live">🔬 /carbon</span><span class="live">✅ /verify</span></div>
+  <div class="small" style="margin-top:24px">Master strategy + pitch deck · system · market · pricing · operating cost · go-to-market · June 2026 · ← → to navigate</div>
+</section>
+
+<!-- 2 PROBLEM -->
+<section class="slide">
+  <div class="top"><div class="brand">Be The <b>Tree Hugger</b></div><div><span class="sec">The problem</span></div><div class="pgn">02 / 15</div></div>
+  <div class="body">
+    <h2>CSR tree-planting today is a <span class="em">number you can't trust</span></h2>
+    <div class="grid g2" style="margin-top:6px">
+      <div class="card"><h3>What corporates get now</h3><ul>
+        <li>A logo on a map — 10,000 trees collapse into <b>one pin</b>.</li>
+        <li>A <b>certificate</b> and a "trees planted" count. No survival, no growth, no proof.</li>
+        <li>Carbon/oxygen numbers that are <b>linear and inflated</b> — indefensible to an auditor.</li>
+        <li>A static one-photo tree page. No way to verify the tree is even alive.</li>
+      </ul></div>
+      <div class="card"><h3>What the law now demands</h3><ul>
+        <li><b>Section 135 + Schedule VII(iv):</b> spend only counts if planting + survival are <b>proven</b>.</li>
+        <li><b>Rule 8(3):</b> independent impact assessment on every project ≥ ₹1 cr.</li>
+        <li><b>BRSR Core:</b> board-signed, externally <b>assured</b> ESG numbers — top 500 (FY25-26) → top 1,000 (FY26-27).</li>
+        <li><b>Green Credits:</b> only become a tradable asset once survival is verified.</li>
+      </ul></div>
+    </div>
+    <div class="note red-n" style="margin-top:16px">⚠️ The gap: "trees planted" is the #1 reporting failure. Nobody <b>shows the living tree over time</b> with audit-grade proof. That gap is the product.</div>
+  </div>
+  <div class="foot"><span>OIAS Earth</span><span>The problem</span></div>
+</section>
+
+<!-- 3 WHAT IS OUR SYSTEM -->
+<section class="slide">
+  <div class="top"><div class="brand">Be The <b>Tree Hugger</b></div><div><span class="sec">Our system</span></div><div class="pgn">03 / 15</div></div>
+  <div class="body">
+    <h2>A <span class="em">field-verified, per-tree</span> living-proof platform — live today</h2>
+    <div class="lead">Every tree is a public, geotagged, growing record: a photo trail, real measurements, scientific carbon, and a ground-level 360° walk — all on one platform a CSR auditor can trust.</div>
+    <div class="grid g5" style="margin-top:18px">
+      <div class="kpi"><div class="n">🌍</div><div class="l"><b>Per-tree GPS map</b><br>every tree a health-coloured pin, drill from map → forest → tree</div></div>
+      <div class="kpi"><div class="n">📄</div><div class="l"><b>Living proof page</b><br>growth chart + visit timeline + photos + QR, no login</div></div>
+      <div class="kpi"><div class="n">🧭</div><div class="l"><b>Ground 360° walk</b><br>walk the plot, click any tree hotspot → its proof</div></div>
+      <div class="kpi"><div class="n">🔬</div><div class="l"><b>Scientific carbon</b><br>Chave-2014 allometry from measured DBH/height + O₂</div></div>
+      <div class="kpi"><div class="n">🔒</div><div class="l"><b>Integrity layer</b><br>offline field app + photo-hash + blockchain anchor</div></div>
+    </div>
+    <div class="note lime-n" style="margin-top:18px"><b>Built and running</b> — React + Express + Postgres on Vercel. Not a mockup: 11,800+ trees, public map, carbon engine, 360 tours, certificates and sponsor portals are all live.</div>
+  </div>
+  <div class="foot"><span>OIAS Earth</span><span>Our system</span></div>
+</section>
+
+<!-- 4 HOW IT WORKS -->
+<section class="slide">
+  <div class="top"><div class="brand">Be The <b>Tree Hugger</b></div><div><span class="sec">How it works</span></div><div class="pgn">04 / 15</div></div>
+  <div class="body">
+    <h2>Plant → prove → report, <span class="em">one continuous trail</span></h2>
+    <div class="flow" style="margin-top:14px">
+      <div class="step"><div class="k">01 PLANT</div><div class="t">Sapling planted on partner / farmer / community land</div></div><div class="arrow">→</div>
+      <div class="step"><div class="k">02 GEOTAG</div><div class="t">cm-exact GPS per tree (grid from 4 corners or device capture)</div></div><div class="arrow">→</div>
+      <div class="step"><div class="k">03 360° CAPTURE</div><div class="t">Ricoh Theta X sphere per plot, auto-stitched + GPS</div></div><div class="arrow">→</div>
+      <div class="step"><div class="k">04 MEASURE</div><div class="t">quarterly visit: photo + height + DBH + status (offline app)</div></div>
+    </div>
+    <div class="flow" style="margin-top:4px">
+      <div class="step"><div class="k">05 CARBON</div><div class="t">Chave allometry → CO₂e + O₂, buffered + labelled "estimated"</div></div><div class="arrow">→</div>
+      <div class="step"><div class="k">06 CERTIFY</div><div class="t">per-tree certificate + share (WhatsApp / LinkedIn / email)</div></div><div class="arrow">→</div>
+      <div class="step"><div class="k">07 REPORT</div><div class="t">CSR / ESG audit-ready report + public verify registry</div></div>
+    </div>
+    <div class="grid g4" style="margin-top:18px">
+      <div class="card" style="padding:12px 14px"><div class="small">See it live</div><a href="https://communitree-rebuild.vercel.app/map">/map — heartbeat map</a></div>
+      <div class="card" style="padding:12px 14px"><div class="small">Carbon method</div><a href="https://communitree-rebuild.vercel.app/carbon">/carbon — transparency</a></div>
+      <div class="card" style="padding:12px 14px"><div class="small">Proof registry</div><a href="https://communitree-rebuild.vercel.app/verify">/verify — any tree</a></div>
+      <div class="card" style="padding:12px 14px"><div class="small">Honesty demo</div><a href="https://communitree-rebuild.vercel.app/audit/pnb">/audit/pnb — 312× contrast</a></div>
+    </div>
+  </div>
+  <div class="foot"><span>OIAS Earth</span><span>How it works</span></div>
+</section>
+
+<!-- 5 SYSTEM DEEP DIVE -->
+<section class="slide">
+  <div class="top"><div class="brand">Be The <b>Tree Hugger</b></div><div><span class="sec">System deep-dive</span></div><div class="pgn">05 / 15</div></div>
+  <div class="body">
+    <h2>Every module, <span class="em">already built</span></h2>
+    <div class="grid g3" style="margin-top:6px">
+      <div class="card"><h3>Public &amp; sponsor</h3><p>Clustered satellite map (per-tree health pins + boundary) · per-tree proof page (growth chart, visit timeline, photos, QR, verification badges) · sponsor portal with CSV export · public carbon-methodology page · public "verify any tree".</p></div>
+      <div class="card"><h3>Field capture</h3><p>Offline-first PWA: planter logs in, captures GPS + photo + status + height + DBH, queues to device, syncs on reconnect. <b>Planter role is capture-only</b> — locked out of every admin surface.</p></div>
+      <div class="card"><h3>Carbon &amp; O₂ engine</h3><p>Chave-2014: AGB = 0.0673·(WD·DBH²·H)^0.976 · per-species wood density (ICRAF/GWD) · −18% permanence buffer · −10% uncertainty · O₂ tied to CO₂ (0.727). Monitored vs planted-baseline separated.</p></div>
+      <div class="card"><h3>360° tours</h3><p>Photo Sphere Viewer walk-through per plot · tree hotspots (yaw/pitch) → open tree proof · Street-View scene links between capture points · graceful flat-image fallback.</p></div>
+      <div class="card"><h3>Reporting &amp; certificates</h3><p>Branded print-to-PDF sponsor / forest / tree reports · per-tree certificate + QR · gift recipient (name, email, message) · single + bulk certificate email via Resend.</p></div>
+      <div class="card"><h3>Integrity</h3><p>SHA-256 photo-hash dedup (recycled-photo fraud) · geo-plausibility flags · demo data flagged + excluded · carbon ledger Merkle-rooted + timestamped to <b>Bitcoin</b> (OpenTimestamps).</p></div>
+    </div>
+    <div class="src">Stack: React + Vite + TS · Express + TS · PostgreSQL (Neon) · Vercel · Leaflet + MarkerCluster · Photo Sphere Viewer · Resend · OpenTimestamps. Roles: SuperAdmin / Admin / Planter.</div>
+  </div>
+  <div class="foot"><span>OIAS Earth</span><span>System deep-dive</span></div>
+</section>
+
+<!-- 6 THE PLAYERS -->
+<section class="slide">
+  <div class="top"><div class="brand">Be The <b>Tree Hugger</b></div><div><span class="sec">The players</span></div><div class="pgn">06 / 15</div></div>
+  <div class="body">
+    <h2>Who's in the market — and <span class="em">who does their dirt</span></h2>
+    <div class="lead" style="font-size:15px">~12–15 notable players in India (30–50 active); ~25–30 well-funded global. The structural truth: <b>almost nobody owns planting crews</b> — they own the software/verification layer and outsource the field.</div>
+    <table style="margin-top:12px">
+      <tr><th>Player</th><th>Region</th><th>What they use (tech)</th><th>Who does the field work</th></tr>
+      <tr><td><b>Grow-Trees</b></td><td>India</td><td>"GeoTag" = map area view + satellite + audit cert</td><td><span class="pill pv">vendor</span> local NGOs + tribal/rural communities on govt land</td></tr>
+      <tr><td><b>Grow Billion Trees</b></td><td>India</td><td>GPS GeoTag + satellite + app growth alerts</td><td><span class="pill pv">farmers</span> agroforestry on farmer land + NGO programs</td></tr>
+      <tr><td><b>SankalpTaru</b></td><td>India</td><td>own app geotag + unique tree URL + IoT + blockchain</td><td><span class="pill pm">hybrid</span> farmers + leased panchayat land + own teams</td></tr>
+      <tr><td><b>SayTrees</b></td><td>India</td><td>Miyawaki + soil lab; geotag less productized</td><td><span class="pill pm">mixed</span> own teams + corporate volunteers + farmers</td></tr>
+      <tr><td><b>Treedom</b></td><td>Italy</td><td>geolocated + photo + online "diary"; manual human check</td><td><span class="pill pv">farmers</span> smallholder networks keep the fruit</td></tr>
+      <tr><td><b>EcoMatcher</b></td><td>HK</td><td>TreeCorder + TreeTracker 3D + TreeChain blockchain</td><td><span class="pill pv">vendor</span> plants nothing — instruments vetted partners</td></tr>
+      <tr><td><b>veritree</b></td><td>Canada</td><td>Collect app + drone/satellite + Cardano blockchain</td><td><span class="pill pv">vendor</span> partner planting orgs upload evidence</td></tr>
+      <tr><td><b>explorer.land</b></td><td>Germany</td><td>map SaaS + weekly satellite alerts; plants zero trees</td><td><span class="pill pv">none</span> project orgs upload their own data</td></tr>
+      <tr><td><b>EcoTree</b></td><td>France</td><td>per-tree ownership dashboard; asset model</td><td><span class="pill pi">in-house</span> own foresters on owned land (rare)</td></tr>
+      <tr><td><b>Land Life</b></td><td>NL</td><td>3D models + drones + seeding robots + satellite</td><td><span class="pill pi">in-house</span> own ops + robotics (owns the liability)</td></tr>
+    </table>
+    <div class="src">Census triangulated from curated industry lists (estimate). Field-vendor column verified per company. Full set incl. Isha, Ecologi, One Tree Planted, Pachama, Terraformation.</div>
+  </div>
+  <div class="foot"><span>OIAS Earth</span><span>The players</span></div>
+</section>
+
+<!-- 7 STAND CHART -->
+<section class="slide">
+  <div class="top"><div class="brand">Be The <b>Tree Hugger</b></div><div><span class="sec">The stand chart</span></div><div class="pgn">07 / 15</div></div>
+  <div class="body">
+    <h2>One chart — <span class="em">where we stand</span></h2>
+    <table class="matrix" style="margin-top:8px">
+      <tr><th>Capability</th><th class="uscol">US</th><th>Incumbent BTTH</th><th>Grow-Trees</th><th>Grow Billion</th><th>SankalpTaru</th><th>Treedom</th><th>EcoMatcher</th><th>veritree</th></tr>
+      <tr><td>Per-tree GPS (real / cm-exact)</td><td class="uscol yes">✓</td><td class="mid">~</td><td class="mid">~</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+      <tr><td>Per-tree living proof page</td><td class="uscol yes">✓</td><td class="no">✗</td><td class="mid">~</td><td class="mid">~</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td><td class="mid">~</td></tr>
+      <tr><td>Ground-level 360° walk + tree hotspots</td><td class="uscol yes">✓</td><td class="no">✗</td><td class="no">✗</td><td class="no">✗</td><td class="no">✗</td><td class="no">✗</td><td class="mid">~</td><td class="no">✗</td></tr>
+      <tr><td>Scientific carbon (Chave allometry)</td><td class="uscol yes">✓</td><td class="no">✗</td><td class="no">✗</td><td class="mid">~</td><td class="no">✗</td><td class="mid">~</td><td class="mid">~</td><td class="yes">✓</td></tr>
+      <tr><td>Survival timeline (multi-visit)</td><td class="uscol yes">✓</td><td class="no">✗</td><td class="mid">~</td><td class="mid">~</td><td class="mid">~</td><td class="mid">~</td><td class="mid">~</td><td class="yes">✓</td></tr>
+      <tr><td>Offline field-capture app</td><td class="uscol yes">✓</td><td class="no">✗</td><td class="no">✗</td><td class="no">✗</td><td class="no">✗</td><td class="mid">~</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+      <tr><td>Blockchain anchor</td><td class="uscol yes">✓</td><td class="no">✗</td><td class="no">✗</td><td class="mid">~</td><td class="yes">✓</td><td class="no">✗</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+      <tr><td>Certificates + social share</td><td class="uscol yes">✓</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td><td class="mid">~</td></tr>
+      <tr><td>CSR / ESG audit report</td><td class="uscol yes">✓</td><td class="mid">~</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+      <tr><td>Public "verify any tree"</td><td class="uscol yes">✓</td><td class="mid">~</td><td class="mid">~</td><td class="mid">~</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+    </table>
+    <div class="note lime-n" style="margin-top:14px"><b>The empty column is the story:</b> no one pairs a <b>ground-level 360° walk with per-tree proof + scientific carbon</b> in one platform. Others do pieces; we do the full stack — and we're the only all-✓ row.</div>
+    <div class="src">✓ has it · ~ partial / weaker · ✗ none. EcoMatcher "~" on 360 = satellite 3D fly-to, not a ground walk.</div>
+  </div>
+  <div class="foot"><span>OIAS Earth</span><span>The stand chart</span></div>
+</section>
+
+<!-- 8 PRICING -->
+<section class="slide">
+  <div class="top"><div class="brand">Be The <b>Tree Hugger</b></div><div><span class="sec">Pricing — open book</span></div><div class="pgn">08 / 15</div></div>
+  <div class="body">
+    <h2>We price <span class="em">open-book</span>: market → our cost → our fee → pick a plan</h2>
+    <div class="grid g3" style="margin-top:6px">
+      <div class="card"><h3>1 · This is the market</h3><p>What others charge (context):</p>
+        <table style="margin-top:4px"><tr><td>Grow-Trees</td><td class="r">₹85</td></tr><tr><td>Grow Billion</td><td class="r">₹299</td></tr><tr><td>SankalpTaru</td><td class="r">₹149–499</td></tr><tr><td>Treedom</td><td class="r">~₹1,400+</td></tr></table>
+        <div class="small" style="margin-top:6px">Market reference only — not how we bill.</div></div>
+      <div class="card"><h3>2 · This is our fixed cost</h3>
+        <table><tr><td>Gear (one-time)</td><td class="r">₹1.42 L</td></tr><tr><td>Cloud / platform / yr</td><td class="r">₹60 k</td></tr><tr><td>Travel / yr (qtrly)</td><td class="r">₹4.37 L</td></tr><tr><td>Software build</td><td class="r" style="color:var(--lime)">₹0</td></tr><tr class="tot"><td>Year-1 cost base</td><td class="r">₹6.39 L</td></tr></table>
+        <div class="small" style="margin-top:6px">Semi-annual cadence → ₹4.20 L. Detail on slides 12–13.</div></div>
+      <div class="card"><h3>3 · Our fee on top</h3>
+        <p>Transparent service margin added to the cost base:</p>
+        <div style="font-size:26px;font-weight:800;margin:10px 0;color:#cdd9d5">Fee = <span class="xfee" contenteditable="true">X</span></div>
+        <p style="font-size:13px"><b>Total to client = fixed cost + X.</b> You set X (your salary / margin). Click the box to type your number.</p>
+        <div class="small" style="margin-top:4px">Suggested: ₹8–10 L/yr as a service fee, or 30–40% on a project.</div></div>
+    </div>
+    <h3 style="color:var(--lime);font-size:14px;margin:18px 0 8px;letter-spacing:.04em">4 · PICK A PLAN — three ways to buy</h3>
+    <div class="grid g3">
+      <div class="card"><h3>A · Service contract</h3><p>We deliver the audit-ready proof end-to-end. Fixed project fee + 3-yr survival monitoring. <b>Best for: a CSR buyer who wants a deliverable.</b></p></div>
+      <div class="card"><h3>B · SaaS subscription</h3><p>License the platform; client/NGO self-captures. <b>~₹4,000–9,000/mo per project</b> + onboarding (explorer.land benchmark). <b>Best for: recurring revenue, scale.</b></p></div>
+      <div class="card"><h3>C · dMRV vertical</h3><p>Outcome pricing — per hectare, per tonne CO₂, or % of the verification cost we save. <b>Best for: carbon / agroforestry developers.</b></p></div>
+    </div>
+    <div class="src">No per-tree price of ours anywhere — we quote a plan, not a tree. Competitor figures shown only as market context.</div>
+  </div>
+  <div class="foot"><span>OIAS Earth</span><span>Pricing</span></div>
+</section>
+
+<!-- 9 INCUMBENT GAPS -->
+<section class="slide">
+  <div class="top"><div class="brand">Be The <b>Tree Hugger</b></div><div><span class="sec">Incumbent → gaps we fill</span></div><div class="pgn">09 / 15</div></div>
+  <div class="body">
+    <h2>The current "Be The Tree Hugger" system — <span class="em">and what we fix</span></h2>
+    <table style="margin-top:6px">
+      <tr><th>Dimension</th><th>Incumbent system today</th><th>What we fill</th></tr>
+      <tr><td><b>Map</b></td><td>10,800 trees collapse into one sponsor-logo blob</td><td class="yes">per-tree health pins + clusters + boundary + satellite</td></tr>
+      <tr><td><b>GPS</b></td><td>synthetic spread (auto-drift ~1 m from a single point)</td><td class="yes">real / grid cm-exact coords + geo-plausibility flags</td></tr>
+      <tr><td><b>Tree page</b></td><td>dead snapshot — one photo, static stats</td><td class="yes">growth chart + full visit timeline + photo grid + QR</td></tr>
+      <tr><td><b>Carbon</b></td><td>linear flat model (185 kg O₂/day, every tree, any age)</td><td class="yes">Chave allometry + wood density + buffer + uncertainty</td></tr>
+      <tr><td><b>Survival</b></td><td>100% "alive", never re-checked</td><td class="yes">measured per visit; dead trees shown honestly</td></tr>
+      <tr><td><b>Report</b></td><td>20-slide deck built by hand; workforce/growth are mock</td><td class="mid">auto-generated from real field data (in build)</td></tr>
+      <tr><td><b>Field</b></td><td>manual single-photo upload; no app</td><td class="yes">offline PWA + planter role + sealed GPS</td></tr>
+      <tr><td><b>Integrity</b></td><td>none — recycled photos + spoofed GPS undetected</td><td class="yes">SHA-256 dedup + geo flags + blockchain anchor</td></tr>
+    </table>
+    <div class="note red-n" style="margin-top:14px">🎯 <b>The audit weapon:</b> on a real 10,800-tree export the incumbent reports <b>931 t</b> CO₂e; our honest recompute on their own dimensions is <b>2.2 t — a 312× overstatement</b>, with zero trees ever marked lost. A bank's ESG report cannot rest on a number 312× too high. <span class="small">(live at /audit/pnb)</span></div>
+  </div>
+  <div class="foot"><span>OIAS Earth</span><span>Gaps we fill</span></div>
+</section>
+
+<!-- 10 WHAT CSR GETS -->
+<section class="slide">
+  <div class="top"><div class="brand">Be The <b>Tree Hugger</b></div><div><span class="sec">What CSR gets</span></div><div class="pgn">10 / 15</div></div>
+  <div class="body">
+    <h2>One proof layer, <span class="em">three compliance jobs done</span></h2>
+    <div class="grid g3" style="margin-top:6px">
+      <div class="kpi"><div class="n">₹34,909 cr</div><div class="l">Total India CSR spend, FY24 (~$4.2 bn, 59,633 projects)</div></div>
+      <div class="kpi"><div class="n">₹2,400–3,459 cr</div><div class="l">Directly addressable: the Schedule VII(iv) environment / afforestation slice, every year</div></div>
+      <div class="kpi"><div class="n">Top 1,000</div><div class="l">Listed companies pulled into assured BRSR by FY26-27 — audit demand is rising</div></div>
+    </div>
+    <div class="grid g2" style="margin-top:16px">
+      <div class="card"><h3>What the CSR / ESG buyer gets</h3><ul>
+        <li>One audit-ready dataset that satisfies <b>all three</b>: the Rule 8(3) impact assessor, the BRSR Core assurer, and the Green Credit registry.</li>
+        <li>Per-tree geotag + survival at <b>1/3/5 yrs</b> + species + timestamped photos = defensible MRV trail.</li>
+        <li>Converts soft CSR cash into <b>compliant, bookable 2% spend</b> that survives an impact assessment.</li>
+        <li>De-risks the board-signed BRSR filing — removes a greenwashing / restatement liability.</li>
+        <li>Opens <b>Green Credits</b> (tradable only once survival is proven).</li>
+      </ul></div>
+      <div class="card"><h3>The obligations driving demand</h3><ul>
+        <li><b>Section 135</b> — 2% CSR mandate (net worth ≥₹500 cr / turnover ≥₹1,000 cr / PAT ≥₹5 cr). Statutory, not optional.</li>
+        <li><b>Schedule VII(iv)</b> — the legal hook for trees; counts only if planting + survival proven.</li>
+        <li><b>Rule 8(3)</b> — independent impact assessment on every project ≥₹1 cr.</li>
+        <li><b>BRSR Core</b> — reasonable assurance, ~49 KPIs, phasing to top 1,000 by FY26-27.</li>
+        <li><b>Survival norms</b> — physical verification at 12–18 months; 40% canopy at 5 yrs.</li>
+      </ul></div>
+    </div>
+    <div class="note lime-n" style="margin-top:14px">💡 We don't sell trees — we sell <b>the proof that makes the spend legal and the brand safe.</b> That's why the buyer is the price-insensitive compliance budget, not a charity donor.</div>
+  </div>
+  <div class="foot"><span>OIAS Earth</span><span>What CSR gets</span></div>
+</section>
+
+<!-- 11 GO TO MARKET -->
+<section class="slide">
+  <div class="top"><div class="brand">Be The <b>Tree Hugger</b></div><div><span class="sec">Go-to-market</span></div><div class="pgn">11 / 15</div></div>
+  <div class="body">
+    <h2>Three paths — <span class="em">stage them, don't pick one</span></h2>
+    <div class="grid g3" style="margin-top:6px">
+      <div class="card"><h3>Phase 1 · Service</h3><p><b>Buys proof + cash.</b> Deliver one CSR/NGO site near-cost; platform is the invisible moat. Subcontract the planting — own only the capture + proof layer.</p><div class="small" style="margin-top:6px">→ first referenceable project + first revenue</div></div>
+      <div class="card"><h3>Phase 2 · White-label SaaS</h3><p><b>Buys recurring revenue without your name.</b> Sell the platform through ONE channel partner (CSR consultancy / FPO / developer); freemium on-ramp kills adoption risk. ~₹4–9k/mo/project.</p><div class="small" style="margin-top:6px">→ compounding, headcount-light revenue</div></div>
+      <div class="card"><h3>Phase 3 · dMRV vertical</h3><p><b>Buys the valuation.</b> Sharpen into carbon/agroforestry dMRV with outcome pricing once you hold audited projects. Highest ceiling + moat.</p><div class="small" style="margin-top:6px">→ per-ha / per-tonne / %-of-savings</div></div>
+    </div>
+    <div class="grid g2" style="margin-top:16px">
+      <div class="card"><h3>First-client motion (no track record)</h3><ul>
+        <li>Offer one funder a fixed 1,000–5,000-tree site at <b>near-cost</b> — the artifact becomes your portfolio.</li>
+        <li><b>Subcontract</b> planting/care to an existing NGO; never build field ops from zero.</li>
+        <li>Deliver under the NGO's / corporate's brand (<b>white-label</b>) to borrow their trust.</li>
+        <li>Convert the delivered site into a reference → raise price on deal two.</li>
+        <li>For the vertical leap, co-run one paid POC on a partner's existing carbon project — their name is your trust proxy.</li>
+      </ul></div>
+      <div class="card"><h3>Why timing favours a new entrant</h3><ul>
+        <li>NSE-listed CSR spend rose <b>23%</b> to ₹22,212 cr in FY24-25.</li>
+        <li>Environmental CSR heading past <b>₹25,000 cr</b> by FY26-27.</li>
+        <li>BRSR Core assurance reaching the <b>top 1,000</b> — audit-grade proof becomes mandatory, not nice-to-have.</li>
+        <li>Digital MRV is a clear cost-pain wedge (manual ₹380/ha/yr → digital ₹52). You don't have to invent demand.</li>
+      </ul></div>
+    </div>
+  </div>
+  <div class="foot"><span>OIAS Earth</span><span>Go-to-market</span></div>
+</section>
+
+<!-- 12 FIXED COST -->
+<section class="slide">
+  <div class="top"><div class="brand">Be The <b>Tree Hugger</b></div><div><span class="sec">Fixed operating cost</span><span class="internal">INTERNAL</span></div><div class="pgn">12 / 15</div></div>
+  <div class="body">
+    <h2>The cost to run — <span class="em">whether we have 1 client or 50</span></h2>
+    <div class="lead" style="font-size:15px">Fixed costs independent of tree count: gear (once) + cloud (per year) + travel (per year). Software build = ₹0 (already built).</div>
+    <div class="grid g2" style="margin-top:14px">
+      <div class="card"><h3>One-time gear</h3>
+        <table><tr><td>Ricoh Theta X — 360° camera (GPS + auto-stitch)</td><td class="r">70,000</td></tr><tr><td>2 × GPS phones (per-tree capture)</td><td class="r">56,000</td></tr><tr><td>Spares · microSD · monopod · power banks</td><td class="r">16,000</td></tr><tr class="tot"><td>One-time total</td><td class="r">₹1,42,000</td></tr></table></div>
+      <div class="card"><h3>Cloud / platform — per year</h3>
+        <table><tr><td>Vercel (hosting)</td><td class="r">20,000</td></tr><tr><td>Neon Postgres (database)</td><td class="r">18,000</td></tr><tr><td>Cloudflare R2 (storage)</td><td class="r">8,000</td></tr><tr><td>Resend (cert emails)</td><td class="r">6,000</td></tr><tr><td>Domain · monitoring · buffer</td><td class="r">8,000</td></tr><tr class="tot"><td>Cloud / year</td><td class="r">₹60,000</td></tr></table></div>
+    </div>
+    <div class="grid g4" style="margin-top:16px">
+      <div class="kpi"><div class="n">₹1.42 L</div><div class="l">One-time gear</div></div>
+      <div class="kpi"><div class="n">₹60 k</div><div class="l">Cloud / year</div></div>
+      <div class="kpi"><div class="n">₹4.37 L</div><div class="l">Travel / year (quarterly, 5 cities — slide 13)</div></div>
+      <div class="kpi"><div class="n">₹6.39 L</div><div class="l">Year-1 cost base (qtrly) · ₹4.20 L if semi-annual</div></div>
+    </div>
+    <div class="note amber-n" style="margin-top:14px"><b>Travel is the big lever</b> (~70% of yearly running). Drop to semi-annual or rail-swap Bengaluru + Hyderabad to cut it. Your service fee (X) sits on top of this base.</div>
+  </div>
+  <div class="foot"><span>OIAS Earth · internal</span><span>Fixed operating cost</span></div>
+</section>
+
+<!-- 13 TRAVEL TABLE -->
+<section class="slide">
+  <div class="top"><div class="brand">Be The <b>Tree Hugger</b></div><div><span class="sec">Detailed travel plan</span><span class="internal">INTERNAL</span></div><div class="pgn">13 / 15</div></div>
+  <div class="body">
+    <h2>Travel, <span class="em">line by line</span> — Chennai base → 5 states</h2>
+    <table style="margin-top:6px">
+      <tr><th>City</th><th>State</th><th class="r">Flight RT</th><th>Train (3A) option</th><th class="r">Hotel 2n</th><th class="r">Local</th><th class="r">Per-visit</th></tr>
+      <tr><td><b>Bengaluru</b></td><td>Karnataka</td><td class="r">7,000</td><td>₹1,350 RT · 4–7 h ✅ rail-swap</td><td class="r">3,600</td><td class="r">4,200</td><td class="r">18,300</td></tr>
+      <tr><td><b>Hyderabad</b></td><td>Telangana</td><td class="r">9,500</td><td>₹2,200 RT · 12 h overnight ✅</td><td class="r">2,600</td><td class="r">3,700</td><td class="r">20,300</td></tr>
+      <tr><td><b>Mumbai</b></td><td>Maharashtra</td><td class="r">11,000</td><td>₹3,190 RT · 21 h ⚠ borderline</td><td class="r">4,800</td><td class="r">3,500</td><td class="r">23,800</td></tr>
+      <tr><td><b>Jaipur</b></td><td>Rajasthan</td><td class="r">12,500</td><td>37 h ✗ fly instead</td><td class="r">2,480</td><td class="r">3,400</td><td class="r">22,880</td></tr>
+      <tr><td><b>Delhi</b></td><td>Delhi NCR</td><td class="r">13,300</td><td>28–35 h ✗ fly instead</td><td class="r">2,600</td><td class="r">3,500</td><td class="r">23,900</td></tr>
+      <tr class="tot"><td>One full round (all 5)</td><td></td><td class="r">53,300</td><td>—</td><td class="r">16,080</td><td class="r">18,300</td><td class="r">₹1,09,200</td></tr>
+    </table>
+    <div class="src" style="margin-top:8px">Per-visit = RT flight + 2-night 3-star hotel + airport transfer + 1 fieldwork-cab day + 3 × ₹1,500 food/per-diem. Scattered multi-site days can push the cab line to ₹2,800–4,000.</div>
+    <div class="grid g4" style="margin-top:14px">
+      <div class="kpi"><div class="n">₹21,800</div><div class="l">Avg per city visit</div></div>
+      <div class="kpi"><div class="n">₹4.37 L</div><div class="l">Per year — quarterly (×4)</div></div>
+      <div class="kpi"><div class="n">₹2.18 L</div><div class="l">Per year — semi-annual (×2)</div></div>
+      <div class="kpi"><div class="n">−₹52 k/yr</div><div class="l">Saved by rail-swapping BLR + HYD (quarterly)</div></div>
+    </div>
+    <div class="src">Fares = fact-checked June-2026 (confidence high; FX ₹94.4/USD). Hotels = Treebo/FabHotel 3-star floors. Dynamic-fare pages → treat single numbers as indicative bands.</div>
+  </div>
+  <div class="foot"><span>OIAS Earth · internal</span><span>Detailed travel plan</span></div>
+</section>
+
+<!-- 14 ROADMAP -->
+<section class="slide">
+  <div class="top"><div class="brand">Be The <b>Tree Hugger</b></div><div><span class="sec">Roadmap</span></div><div class="pgn">14 / 15</div></div>
+  <div class="body">
+    <h2>Honest build ledger — <span class="em">what's live, what's next</span></h2>
+    <div class="grid g2" style="margin-top:6px">
+      <div class="card"><h3>✅ Live today</h3><ul>
+        <li>Per-tree GPS map + boundary + clustering</li>
+        <li>Per-tree proof page (timeline, growth, photos, QR)</li>
+        <li>Ground 360° walk + tree hotspots</li>
+        <li>Chave carbon + O₂ engine + public methodology</li>
+        <li>Offline field-capture PWA + planter role lockdown</li>
+        <li>Sponsor portal + CSV export + branded PDF reports</li>
+        <li>Certificates + gifting + Resend email (single + bulk)</li>
+        <li>Blockchain anchor + photo-hash + geo flags</li>
+        <li>Public verify registry</li>
+      </ul></div>
+      <div class="card"><h3>🟠 In build / next</h3><ul>
+        <li><b>20-slide quarterly ESG report generator</b> — auto from platform data (replaces the incumbent's manual deck)</li>
+        <li>Forest-creation wizard (admin, no scripts)</li>
+        <li>Bulk visit import (quarterly field rounds → timelines)</li>
+        <li>Site Master Plan grid view</li>
+        <li>OG link previews + testimonials</li>
+        <li>Custom certificate poster PNG (Instagram)</li>
+      </ul>
+      <div class="note lime-n" style="margin-top:10px;font-size:12.5px">We publish what's built vs pending — integrity is the brand. We never fake a record.</div></div>
+    </div>
+  </div>
+  <div class="foot"><span>OIAS Earth</span><span>Roadmap</span></div>
+</section>
+
+<!-- 15 CLOSE -->
+<section class="slide cover">
+  <div class="sec">The ask</div>
+  <h1 style="font-size:48px">Sell the proof <span style="color:var(--lime)">nobody else can show.</span></h1>
+  <div class="lead" style="font-size:19px;max-width:920px">"Walk your sponsored forest in 360°, click any tree, see its photo, GPS and verified carbon — live, and audit-ready." That sentence is the moat. Built, live, and the only all-✓ platform on the chart.</div>
+  <div class="grid g3" style="margin-top:24px;width:100%">
+    <div class="card"><h3>Decide</h3><p>Pick the first path — a near-cost service pilot to manufacture the first referenceable, audit-passed project.</p></div>
+    <div class="card"><h3>Land</h3><p>One CSR funder / NGO, 1,000–5,000 trees, white-labelled. Subcontract the planting; we own the proof.</p></div>
+    <div class="card"><h3>Scale</h3><p>Convert to white-label SaaS through a channel, then sharpen into the dMRV carbon vertical.</p></div>
+  </div>
+  <div style="margin-top:22px"><span class="live">🌐 communitree-rebuild.vercel.app</span><span class="live">📍 /map</span><span class="live">🔬 /carbon</span><span class="live">🎯 /audit/pnb</span></div>
+</section>
+
+</div>
+
+<div class="ctrl">
+  <button onclick="go(-1)" aria-label="prev">‹</button>
+  <span class="c" id="counter">1 / 15</span>
+  <button onclick="go(1)" aria-label="next">›</button>
+</div>
+
+<script>
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var i = 0;
+  function show(n){
+    i = Math.max(0, Math.min(slides.length-1, n));
+    slides.forEach(function(s,k){ s.classList.toggle('active', k===i); });
+    document.getElementById('counter').textContent = (i+1)+' / '+slides.length;
+    document.querySelector('.slide.active').scrollTop = 0;
+  }
+  function go(d){ show(i+d); }
+  document.addEventListener('keydown', function(e){
+    if(e.key==='ArrowRight'||e.key==='PageDown'||e.key===' '){ e.preventDefault(); go(1); }
+    else if(e.key==='ArrowLeft'||e.key==='PageUp'){ e.preventDefault(); go(-1); }
+    else if(e.key==='Home'){ show(0); } else if(e.key==='End'){ show(slides.length-1); }
+  });
+  // click right/left third of screen to navigate (ignore links + editable)
+  document.getElementById('deck').addEventListener('click', function(e){
+    if(e.target.closest('a')||e.target.closest('.xfee')) return;
+    var x = e.clientX / window.innerWidth;
+    if(x > 0.66) go(1); else if(x < 0.34) go(-1);
+  });
+  show(0);
+</script>
+</body>
+</html>
