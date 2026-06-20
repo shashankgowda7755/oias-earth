@@ -78,7 +78,7 @@ export default function App() {
                 <Route
                   path="/dashboard"
                   element={
-                    <ProtectedRoute>
+                    <ProtectedRoute roles={['Admin', 'SuperAdmin']}>
                       <Dashboard />
                     </ProtectedRoute>
                   }

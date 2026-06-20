@@ -235,6 +235,9 @@ function startWidth(start: number | string | undefined): number {
 /* ------------------------------------------------------------------ */
 
 async function upsertForest(req: Request, res: Response): Promise<void> {
+  if (req.auth?.role !== 'SuperAdmin' && req.auth?.role !== 'Admin') {
+    throw forbidden('Only Admin/SuperAdmin can create or edit forests');
+  }
   const actor = req.auth?.profileId ?? null;
   const id = bodyId(req);
   const body = (req.body ?? {}) as Record<string, unknown>;
@@ -651,6 +654,9 @@ interface BulkRow {
  * Returns {inserted, updated, gifts, errors:[{row, message}]}.
  */
 async function bulkImportTrees(req: Request, res: Response): Promise<void> {
+  if (req.auth?.role !== 'SuperAdmin' && req.auth?.role !== 'Admin') {
+    throw forbidden('Only Admin/SuperAdmin can bulk-import trees');
+  }
   const actor = req.auth?.profileId ?? null;
   const body = req.body as unknown;
   const rows: BulkRow[] = Array.isArray(body)
@@ -852,12 +858,20 @@ async function recomputeForestTotals(client: DbClient, forestId: string): Promis
  *     user_role_forest_accesses.
  *   - any other role: rejected.
  */
-async function assertForestAccess(req: Request, forestId: string): Promise<void> {
+async function assertForestAccess(
+  req: Request,
+  forestId: string,
+  opts?: { allowPlanter?: boolean },
+): Promise<void> {
   const role = req.auth?.role;
   if (role === 'SuperAdmin') return;
   // Admin (sponsor) and Planter (field worker) are both scoped to assigned
-  // forests via user_role_forest_accesses.
+  // forests via user_role_forest_accesses. Planter is CAPTURE-ONLY: blocked from
+  // every non-capture endpoint — opts.allowPlanter is set ONLY on trees/list + visit.
   if (role === 'Admin' || role === 'Planter') {
+    if (role === 'Planter' && !opts?.allowPlanter) {
+      throw forbidden('Planter role is limited to field photo capture');
+    }
     const userRoleId = req.auth?.userRoleId;
     if (!userRoleId) throw forbidden('No forest access for this role');
     const r = await query(
@@ -1148,7 +1162,7 @@ async function tagTreeGeo(req: Request, res: Response): Promise<void> {
  */
 async function forestTreesList(req: Request, res: Response): Promise<void> {
   const forestId = String(req.params.id);
-  await assertForestAccess(req, forestId);
+  await assertForestAccess(req, forestId, { allowPlanter: true });
 
   const { limit, offset, page, search } = parsePageParams(req.body);
   const like = `%${search}%`;
@@ -1200,7 +1214,7 @@ async function forestTreesList(req: Request, res: Response): Promise<void> {
 async function logTreeVisit(req: Request, res: Response): Promise<void> {
   const forestId = String(req.params.id);
   const treeId = String(req.params.treeId);
-  await assertForestAccess(req, forestId);
+  await assertForestAccess(req, forestId, { allowPlanter: true });
 
   const tr = await query<{ id: string; species_id: number | null }>(
     `SELECT id, master_plant_species_id AS species_id
