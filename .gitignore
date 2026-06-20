@@ -16,3 +16,6 @@ app/client/*.local
 .vercel
 .env*
 .gstack/
+
+# gstack local activity logs (not product)
+**/.claude/session-log.jsonl

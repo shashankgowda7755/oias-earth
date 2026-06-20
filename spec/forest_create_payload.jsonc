@@ -52,7 +52,7 @@
                 "label": "Initiated By",
                 "value": "initiated_by"
             },
-            "name": "Kishore Forest",
+            "name": "Arun Forest",
             "logo": "https://bethetreehugger-staging.objectstore.e2enetworks.net/bth_files/forest/1781294003132_0_ChatGPT_Image_May_29,_2026,_04_10_37_PM.png"
         },
         {
@@ -60,7 +60,7 @@
                 "label": "Sponsored By",
                 "value": "sponsored_by"
             },
-            "name": "Kishore Forest",
+            "name": "Arun Forest",
             "logo": "https://bethetreehugger-staging.objectstore.e2enetworks.net/bth_files/forest/1781294027370_0_ChatGPT_Image_May_29,_2026,_04_10_37_PM.png"
         },
         {
@@ -68,7 +68,7 @@
                 "label": "Supported By",
                 "value": "supported_by"
             },
-            "name": "Kishore Forest",
+            "name": "Arun Forest",
             "logo": "https://bethetreehugger-staging.objectstore.e2enetworks.net/bth_files/forest/1781294027370_0_ChatGPT_Image_May_29,_2026,_04_10_37_PM.png"
         },
         {
@@ -76,12 +76,12 @@
                 "label": "In Collaboration With",
                 "value": "in_collaboration_with"
             },
-            "name": "Kishore Forest",
+            "name": "Arun Forest",
             "logo": "https://bethetreehugger-staging.objectstore.e2enetworks.net/bth_files/forest/1781294027370_0_ChatGPT_Image_May_29,_2026,_04_10_37_PM.png"
         }
     ],
     "land_ownership": {
-        "name": "Kishore",
+        "name": "Arun",
         "agreement_status": "agreement_confirmed" //agreement_confirmed | agreement_pending | no_agreement
     },
     "land_area": {
@@ -100,7 +100,7 @@
     "last_inspection_date": "2026-06-01T00:00:00.000Z",
     "permission_letter": "https://bethetreehugger-staging.objectstore.e2enetworks.net/bth_files/forest/1781294129078_0_ChatGPT_Image_May_29,_2026,_04_10_37_PM.png",
     "authorization_details": {
-        "authorized_by_name": "Kishore",
+        "authorized_by_name": "Arun",
         "authorized_by_designation": "Software Engineer",
         "authorized_date": "2023-06-01",
         "authorized_period": "3",

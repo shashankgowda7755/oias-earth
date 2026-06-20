@@ -7,8 +7,8 @@
 -- forest + its boxes/trees/joins/job use ON CONFLICT DO NOTHING (fixed UUIDs).
 --
 -- Placeholder-id resolution (the payload carried network-tab placeholder ids):
---   employee_id db746f3b-… -> seeded "Kishore Kumar" employee (002, exact match)
---   sponsor_id  f5786b29-… -> seeded here as "Kishore Forest" sponsor (exact id)
+--   employee_id db746f3b-… -> seeded "Arun Kumar" employee (002, exact match)
+--   sponsor_id  f5786b29-… -> seeded here as "Arun Forest" sponsor (exact id)
 --   user_role_id 4c2d39cd-… -> mapped to the seeded SuperAdmin user_roles row
 --                              (002 id 9e60326c-…); we also grant that user_role
 --                              forest access to Vandalur so the sponsor portal
@@ -139,9 +139,9 @@ INSERT INTO sponsors (
   id, sponsor_name, sponsor_logo, established_year, website_url, industry,
   headquarters, is_active, created_by, updated_by
 ) VALUES (
-  'f5786b29-cd96-40aa-abc4-3628cfd99f5e', 'Kishore Forest',
+  'f5786b29-cd96-40aa-abc4-3628cfd99f5e', 'Arun Forest',
   'https://bethetreehugger-staging.objectstore.e2enetworks.net/bth_files/forest/1781294003132_0_logo.png',
-  '2020', 'https://kishoreforest.example.com', 'Environmental', 'Chennai',
+  '2020', 'https://arunforest.example.com', 'Environmental', 'Chennai',
   TRUE, 'd21cabf2-c06c-4c1e-a9ea-d1ea928727d0', 'd21cabf2-c06c-4c1e-a9ea-d1ea928727d0'
 ) ON CONFLICT (id) DO NOTHING;
 
@@ -178,9 +178,9 @@ INSERT INTO forests (
   'https://bethetreehugger-staging.objectstore.e2enetworks.net/bth_files/forest/1781294125465_0_layout.png',
   1, 2.96, 1,
   243.45, 135.25,
-  '{"name":"Kishore","agreement_status":"agreement_confirmed"}'::jsonb,
+  '{"name":"Arun","agreement_status":"agreement_confirmed"}'::jsonb,
   '{"total_area":2000,"planted_area":1000}'::jsonb,
-  '{"authorized_by_name":"Kishore","authorized_by_designation":"Software Engineer","authorized_date":"2023-06-01","authorized_period":"3","project_context":"This is Vandalur Forest"}'::jsonb,
+  '{"authorized_by_name":"Arun","authorized_by_designation":"Software Engineer","authorized_date":"2023-06-01","authorized_period":"3","project_context":"This is Vandalur Forest"}'::jsonb,
   '{"total_jurisdiction_area":2000,"population":200000,"population_density":15000,"green_cover":"Green Cover","environmental_need":"Environmental Need","google_earth_image":[{"image":"https://bethetreehugger-staging.objectstore.e2enetworks.net/bth_files/forest/1781295708089_0.png","year":2010,"population":10000},{"image":"https://bethetreehugger-staging.objectstore.e2enetworks.net/bth_files/forest/1781295723198_0.png","year":2012,"population":14000},{"image":"https://bethetreehugger-staging.objectstore.e2enetworks.net/bth_files/forest/1781295739175_0.png","year":2016,"population":16000}]}'::jsonb,
   '{"site_supervisor":1,"watering_team":1,"de_weeding_crew":1,"plant_health_specialist":1,"people_visiting":"1","people_living_near":"1","schools_colleges":1}'::jsonb,
   '{"short_term":{"land_value":1,"tree_value":1,"oxygen_generated":1,"carbon_sequestration":1},"medium_term":{"land_value":1,"tree_value":1,"oxygen_generated":1,"carbon_sequestration":1},"long_term":{"land_value":1,"tree_value":1,"oxygen_generated":1,"carbon_sequestration":1}}'::jsonb,
@@ -192,7 +192,7 @@ INSERT INTO forests (
   '[{"heading":"Heading","description":"Description"}]'::jsonb,
   '{"description":"Security & Infrastructure Description","image_data":[{"name":"Security","description":"Security Description","image":"https://bethetreehugger-staging.objectstore.e2enetworks.net/bth_files/forest/1781294250450_0.png"}]}'::jsonb,
   '[{"year":2023,"quarter":2,"image":"https://bethetreehugger-staging.objectstore.e2enetworks.net/bth_files/forest/1781294439719_0.png"}]'::jsonb,
-  '[{"type":{"label":"Initiated By","value":"initiated_by"},"name":"Kishore Forest","logo":"https://bethetreehugger-staging.objectstore.e2enetworks.net/bth_files/forest/1781294003132_0.png"},{"type":{"label":"Sponsored By","value":"sponsored_by"},"name":"Kishore Forest","logo":"https://bethetreehugger-staging.objectstore.e2enetworks.net/bth_files/forest/1781294027370_0.png"}]'::jsonb,
+  '[{"type":{"label":"Initiated By","value":"initiated_by"},"name":"Arun Forest","logo":"https://bethetreehugger-staging.objectstore.e2enetworks.net/bth_files/forest/1781294003132_0.png"},{"type":{"label":"Sponsored By","value":"sponsored_by"},"name":"Arun Forest","logo":"https://bethetreehugger-staging.objectstore.e2enetworks.net/bth_files/forest/1781294027370_0.png"}]'::jsonb,
   '[{"name":"Dashboard Image 1","description":"Dashboard Image 1","image":"https://bethetreehugger-staging.objectstore.e2enetworks.net/bth_files/forest/1781294271079_0.png"}]'::jsonb,
   '[{"slide_type":"first_slide","image":"https://bethetreehugger-staging.objectstore.e2enetworks.net/bth_files/forest/1781294282059_0.png"},{"slide_type":"content_slide","image":"https://bethetreehugger-staging.objectstore.e2enetworks.net/bth_files/forest/1781294290630_0.png"},{"slide_type":"project_impact_slide","image":"https://bethetreehugger-staging.objectstore.e2enetworks.net/bth_files/forest/1781294298743_0.png"}]'::jsonb,
   TRUE, TRUE, 'd21cabf2-c06c-4c1e-a9ea-d1ea928727d0', 'd21cabf2-c06c-4c1e-a9ea-d1ea928727d0'

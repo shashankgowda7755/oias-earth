@@ -439,7 +439,7 @@
           "forest_country": "India",
           "forest_geo_lat": "12.891256",
           "land_ownership": {
-            "name": "Kishore",
+            "name": "Arun",
             "agreement_status": "agreement_confirmed"
           },
           "project_period": 3,
@@ -814,7 +814,7 @@
             "authorized_date": "2023-06-01",
             "project_context": "This is Vandalur Forest",
             "authorized_period": "3",
-            "authorized_by_name": "Kishore",
+            "authorized_by_name": "Arun",
             "authorized_by_designation": "Software Engineer"
           },
           "maintenance_workforce": [
@@ -955,7 +955,7 @@
           "additional_sponsor_logo": [
             {
               "logo": "https://bethetreehugger-staging.objectstore.e2enetworks.net/bth_files/forest/1781294003132_0_ChatGPT_Image_May_29,_2026,_04_10_37_PM.png",
-              "name": "Kishore Forest",
+              "name": "Arun Forest",
               "type": {
                 "label": "Initiated By",
                 "value": "initiated_by"
@@ -963,7 +963,7 @@
             },
             {
               "logo": "https://bethetreehugger-staging.objectstore.e2enetworks.net/bth_files/forest/1781294027370_0_ChatGPT_Image_May_29,_2026,_04_10_37_PM.png",
-              "name": "Kishore Forest",
+              "name": "Arun Forest",
               "type": {
                 "label": "Sponsored By",
                 "value": "sponsored_by"

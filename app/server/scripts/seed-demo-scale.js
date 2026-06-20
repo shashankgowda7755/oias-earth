@@ -13,7 +13,7 @@ const { Client } = require('pg');
 const SPONSORS = [
   'eaadc2ee-f4d3-49be-8892-e52bdfdaa64b', // IDFC First Bank
   '64904581-84c8-440c-a313-b14b167f480b', // Acuity
-  'f5786b29-cd96-40aa-abc4-3628cfd99f5e', // Kishore Forest
+  'f5786b29-cd96-40aa-abc4-3628cfd99f5e', // Arun Forest
 ];
 
 // Centres are inland and jitter is small so no forest lands in the sea.

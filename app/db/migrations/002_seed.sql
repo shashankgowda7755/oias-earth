@@ -136,9 +136,9 @@ INSERT INTO employees (
     TRUE, 'd21cabf2-c06c-4c1e-a9ea-d1ea928727d0', 'd21cabf2-c06c-4c1e-a9ea-d1ea928727d0'
   ),
   (
-    'db746f3b-646d-4929-a4ec-5561f389e83d', 'Kishore Kumar',
-    'https://example.com/employee/kishore.jpg',
-    'Site Manager', '9876543211', 'kishore@communitree.co.in',
+    'db746f3b-646d-4929-a4ec-5561f389e83d', 'Arun Kumar',
+    'https://example.com/employee/arun.jpg',
+    'Site Manager', '9876543211', 'arun@communitree.co.in',
     TRUE, 'd21cabf2-c06c-4c1e-a9ea-d1ea928727d0', 'd21cabf2-c06c-4c1e-a9ea-d1ea928727d0'
   )
 ON CONFLICT (id) DO NOTHING;
