@@ -54,7 +54,8 @@ import {
 } from '../lib/geo';
 import { agbKg, CARBON_FRACTION, CO2_PER_C, ROOT_SHOOT, CARBON_METHOD } from '../lib/carbon';
 import { isAllowedPanoUrl, providerOf, ALLOWED_TOUR_HOSTS } from '../lib/pano';
-import { put } from '@vercel/blob';
+import { putObject, storageReady } from '../lib/storage';
+import { resolveSpeciesId } from '../lib/species';
 import { sendGiftEmail, mailReady } from '../lib/mail';
 
 export const forestRouter = Router();
@@ -610,6 +611,14 @@ async function fetchForestRecord(forestId: string): Promise<unknown> {
 /* ------------------------------------------------------------------ */
 
 /** One row of the bulk_tree_gift_sheet.csv shape. */
+/** Parse a coordinate to a stored string, or null if absent/invalid/out-of-range. */
+function coordOrNull(v: unknown, min: number, max: number): string | null {
+  if (v === null || v === undefined || v === '') return null;
+  const n = Number(v);
+  if (!Number.isFinite(n) || n < min || n > max) return null;
+  return String(n);
+}
+
 interface BulkRow {
   forest_unique_id?: string;
   forestUniqueId?: string;
@@ -626,6 +635,9 @@ interface BulkRow {
   gift_recipient_name?: string;
   gift_recipient_email_id?: string;
   tree_url?: string;
+  lat?: number | string;
+  lng?: number | string;
+  status_id?: number | string;
 }
 
 /**
@@ -695,8 +707,13 @@ async function bulkImportTrees(req: Request, res: Response): Promise<void> {
         const forestId = await resolveForest(fuid);
         if (!forestId) throw new Error(`forest_unique_id ${fuid} not found`);
 
-        const sid = Number(row.species_id ?? row.speciesId);
-        const speciesId = Number.isFinite(sid) && sid > 0 ? sid : null;
+        const sidNum = Number(row.species_id ?? row.speciesId);
+        let speciesId = Number.isFinite(sidNum) && sidNum > 0 ? sidNum : null;
+        if (speciesId === null) {
+          // No numeric id given — resolve by common/botanical name (client CSVs use names).
+          const nm = (row.species_common_name ?? row.species_name ?? '').trim();
+          if (nm) speciesId = await resolveSpeciesId(nm);
+        }
         const plantedOn = row.planted_on ?? row.plantedOn ?? null;
         const days = ageDays(plantedOn, now);
         const { o2, co } = speciesId !== null ? await rateOf(speciesId) : { o2: 0, co: 0 };
@@ -706,6 +723,11 @@ async function bulkImportTrees(req: Request, res: Response): Promise<void> {
         const name = row.species_common_name ?? null;
         const height = row.height !== undefined ? String(row.height) : null;
         const dia = row.dia !== undefined ? String(row.dia) : null;
+        // Real per-tree GPS (when the client export carries it) + optional status.
+        const lat = coordOrNull(row.lat, -90, 90);
+        const lng = coordOrNull(row.lng, -180, 180);
+        const statusNum = Number(row.status_id);
+        const statusId = Number.isFinite(statusNum) && statusNum > 0 ? statusNum : null;
 
         // Upsert tree on (forest_id, tree_unique_id).
         const existing = await client.query<{ id: string }>(
@@ -719,10 +741,11 @@ async function bulkImportTrees(req: Request, res: Response): Promise<void> {
                (forest_id, master_plant_species_id, tree_unique_id, forest_tree_name,
                 forest_tree_height, forest_tree_dia, forest_tree_age,
                 forest_tree_oxygen, forest_tree_carbonoffset, planted_on, tree_url,
+                forest_tree_geo_lat, forest_tree_geo_long, tree_status_id,
                 is_display, is_active, created_by, updated_by)
-             VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,TRUE,TRUE,$12,$12)
+             VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,TRUE,TRUE,$15,$15)
              RETURNING id`,
-            [forestId, speciesId, tuid, name, height, dia, days, String(oxy), String(carb), plantedOn, certUrl, actor]
+            [forestId, speciesId, tuid, name, height, dia, days, String(oxy), String(carb), plantedOn, certUrl, lat, lng, statusId, actor]
           );
           treeId = ins.rows[0]!.id;
           inserted++;
@@ -739,9 +762,12 @@ async function bulkImportTrees(req: Request, res: Response): Promise<void> {
                     forest_tree_carbonoffset = $8,
                     planted_on = COALESCE($9, planted_on),
                     tree_url = $10,
+                    forest_tree_geo_lat = COALESCE($12, forest_tree_geo_lat),
+                    forest_tree_geo_long = COALESCE($13, forest_tree_geo_long),
+                    tree_status_id = COALESCE($14, tree_status_id),
                     updated_by = $11
               WHERE id = $1`,
-            [treeId, speciesId, name, height, dia, days, String(oxy), String(carb), plantedOn, certUrl, actor]
+            [treeId, speciesId, name, height, dia, days, String(oxy), String(carb), plantedOn, certUrl, actor, lat, lng, statusId]
           );
           updated++;
         }
@@ -1224,13 +1250,9 @@ async function logTreeVisit(req: Request, res: Response): Promise<void> {
       }
       const sha: string | null = buffer ? crypto.createHash('sha256').update(buffer).digest('hex') : null;
       let url = `/uploads/${f.filename}`; // fallback (ephemeral) if storage unset
-      if (buffer && process.env.BLOB_READ_WRITE_TOKEN) {
+      if (buffer && storageReady()) {
         try {
-          const blob = await put(`tree-visits/${tlId}-${order}-${f.filename}`, buffer, {
-            access: 'public',
-            contentType: f.mimetype || 'image/jpeg',
-          });
-          url = blob.url;
+          url = await putObject(`tree-visits/${tlId}-${order}-${f.filename}`, buffer, f.mimetype || 'image/jpeg');
         } catch {
           /* keep ephemeral fallback */
         }
@@ -1437,13 +1459,13 @@ async function uploadSceneImage(req: Request, res: Response): Promise<void> {
   const file = (req as unknown as { file?: { buffer: Buffer; originalname: string; mimetype: string } }).file;
   if (!file) throw badRequest('image file is required (field "image")');
   if (!/^image\//.test(file.mimetype)) throw badRequest('file must be an image');
-  if (!process.env.BLOB_READ_WRITE_TOKEN) {
-    throw badRequest('object storage not configured — set BLOB_READ_WRITE_TOKEN (Vercel Blob) or paste an external https equirect URL instead');
+  if (!storageReady()) {
+    throw badRequest('object storage not configured — set SUPABASE_* or BLOB_READ_WRITE_TOKEN, or paste an external https equirect URL instead');
   }
   const ext = (file.originalname.split('.').pop() || 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '');
   const key = `panoramas/${forestId}/${Date.now()}.${ext}`;
-  const blob = await put(key, file.buffer, { access: 'public', contentType: file.mimetype });
-  res.status(201).json({ data: { url: blob.url } });
+  const url = await putObject(key, file.buffer, file.mimetype);
+  res.status(201).json({ data: { url } });
 }
 
 async function listScenesAdmin(req: Request, res: Response): Promise<void> {
