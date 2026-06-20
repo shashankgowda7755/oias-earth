@@ -95,7 +95,11 @@ export default function TreeProof() {
         </div>
       )}
       <div className="mono" style={{ color: isDemo ? 'var(--amber)' : 'var(--alive)', fontSize: 12, letterSpacing: '.2em', textTransform: 'uppercase', marginBottom: 14 }}>
-        {isDemo ? 'Proof of life · demonstration record' : 'Proof of life · verified record'}
+        {isDemo
+          ? 'Proof of life · demonstration record'
+          : summary.baseline_only
+            ? 'Proof of life · planted record · first visit pending'
+            : 'Proof of life · verified record'}
       </div>
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 20, flexWrap: 'wrap' }}>
         <div>

@@ -63,6 +63,9 @@ export interface CarbonSummary {
   gross_tco2e: number;
   net_tco2e: number;
   oxygen_kg?: number;
+  planted_trees?: number;
+  estimated_planted_tco2e?: number;
+  estimated_planted_oxygen_kg?: number;
   buffer_pct: number;
   uncertainty_pct: number;
   method: string;
@@ -102,6 +105,7 @@ export interface TreeProof {
   summary: {
     survival: 'alive' | 'dead' | 'unknown';
     visit_count: number;
+    baseline_only?: boolean;
     latest_status: string | null;
     latest_height: number | null;
     growth_cm: number | null;

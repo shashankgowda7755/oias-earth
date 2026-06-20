@@ -57,7 +57,11 @@ export default function Carbon() {
           </div>
           <div style={{ background: 'var(--ink-2)', border: '1px solid var(--line)', borderRadius: 14, padding: '20px 22px' }}>
             <div className="mono" style={{ fontSize: 30, color: 'var(--alive)' }}>{s ? s.measured_trees.toLocaleString() : '…'}</div>
-            <div style={{ fontSize: 12, color: '#9fb0ad', textTransform: 'uppercase', letterSpacing: '.08em', marginTop: 6 }}>measured trees</div>
+            <div style={{ fontSize: 12, color: '#9fb0ad', textTransform: 'uppercase', letterSpacing: '.08em', marginTop: 6 }}>measured trees (monitored)</div>
+          </div>
+          <div style={{ background: 'var(--ink-2)', border: '1px solid var(--line)', borderRadius: 14, padding: '20px 22px' }}>
+            <div className="mono" style={{ fontSize: 30, color: 'var(--alive)' }}>{s?.estimated_planted_tco2e != null ? s.estimated_planted_tco2e.toLocaleString() : '…'}</div>
+            <div style={{ fontSize: 12, color: '#9fb0ad', textTransform: 'uppercase', letterSpacing: '.08em', marginTop: 6 }}>tCO₂e estimated · all {s?.planted_trees != null ? s.planted_trees.toLocaleString() : '…'} planted</div>
           </div>
         </div>
 

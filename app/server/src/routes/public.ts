@@ -213,6 +213,9 @@ async function treeProof(req: Request, res: Response): Promise<void> {
     planted_on: string | null;
     lat: string | null;
     lng: string | null;
+    forest_tree_height: string | null;
+    forest_tree_dia: string | null;
+    tree_status_id: number | null;
     status: string | null;
     wood_density: number | null;
     is_demo: boolean | null;
@@ -225,6 +228,7 @@ async function treeProof(req: Request, res: Response): Promise<void> {
             f.forest_city AS city, f.forest_state AS state,
             ft.planted_on,
             ft.forest_tree_geo_lat AS lat, ft.forest_tree_geo_long AS lng,
+            ft.forest_tree_height, ft.forest_tree_dia, ft.tree_status_id,
             st.status, sp.wood_density, f.is_demo,
             (SELECT name FROM gift_forest_plants g WHERE g.gift_tree_id = ft.id AND g.is_active = TRUE ORDER BY created_at DESC LIMIT 1) AS gifted_to
        FROM forest_trees ft
@@ -314,7 +318,19 @@ async function treeProof(req: Request, res: Response): Promise<void> {
     first?.height != null && latest?.height != null
       ? Math.round((latest.height - first.height) * 100)
       : null;
-  const stockKg = latest?.co2e_kg ?? 0;
+  // No monitoring visits yet (imported / day-zero trees): fall back to the tree row
+  // so the proof page matches the map/forest view instead of showing zeros. Honest —
+  // a planted baseline, explicitly NOT a verified-over-time record (baseline_only flag).
+  const hasVisits = visits.length > 0;
+  const rowH = tree.forest_tree_height != null ? Number(tree.forest_tree_height) : null;
+  const rowD = tree.forest_tree_dia != null ? Number(tree.forest_tree_dia) : null;
+  const rowDead = tree.tree_status_id === 4;
+  const baselineKg =
+    !rowDead && rowH != null && rowD != null && rowH > 0 && rowD > 0 ? treeCo2eKg(wd, rowD, rowH) : 0;
+  const stockKg = hasVisits ? (latest?.co2e_kg ?? 0) : baselineKg;
+  const effHeight = hasVisits ? (latest?.height ?? null) : rowH;
+  const effStatus = hasVisits ? (latest?.status ?? tree.status ?? null) : tree.status ?? null;
+  const effSurvival = hasVisits ? survival : rowDead ? 'dead' : rowH != null ? 'alive' : 'unknown';
 
   res.json({
     data: {
@@ -335,10 +351,11 @@ async function treeProof(req: Request, res: Response): Promise<void> {
         gifted_to: tree.gifted_to,
       },
       summary: {
-        survival,
+        survival: effSurvival,
         visit_count: visits.length,
-        latest_status: latest?.status ?? tree.status ?? null,
-        latest_height: latest?.height ?? null,
+        baseline_only: !hasVisits,
+        latest_status: effStatus,
+        latest_height: effHeight,
         growth_cm: growthCm,
         last_seen: latest?.date ?? null,
         // Carbon: estimated, verification-ready removal — NOT an issued credit.
@@ -398,6 +415,36 @@ async function carbonSummary(_req: Request, res: Response): Promise<void> {
       measured += 1;
     }
   }
+
+  // Estimated removals across ALL living, geo-tagged trees (latest known dimensions —
+  // the tree row when there is no monitoring visit). This is the planted-to-date
+  // estimate; kept SEPARATE from the verified/monitored figures above (integrity).
+  const planted = await query<{
+    height: number | null;
+    diameter: number | null;
+    wood_density: number | null;
+    status_id: number | null;
+  }>(
+    `SELECT ft.forest_tree_height AS height, ft.forest_tree_dia AS diameter,
+            sp.wood_density, ft.tree_status_id AS status_id
+       FROM forest_trees ft
+       LEFT JOIN master_plantspecies sp ON sp.id = ft.master_plant_species_id
+      WHERE ft.is_active = TRUE AND ft.is_display = TRUE
+        AND ft.forest_tree_geo_lat IS NOT NULL AND ft.forest_tree_geo_long IS NOT NULL`,
+  );
+  let plantedKg = 0;
+  let plantedTrees = 0;
+  for (const r of planted.rows) {
+    if (r.status_id === 4) continue; // dead excluded
+    const h = r.height != null ? Number(r.height) : null;
+    const d = r.diameter != null ? Number(r.diameter) : null;
+    const wd = r.wood_density != null ? Number(r.wood_density) : 0.6;
+    if (h != null && d != null && h > 0 && d > 0) {
+      plantedKg += treeCo2eKg(wd, d, h);
+      plantedTrees += 1;
+    }
+  }
+
   const a = await query<{
     root_hash: string;
     ledger_rows: number | null;
@@ -422,6 +469,9 @@ async function carbonSummary(_req: Request, res: Response): Promise<void> {
       gross_tco2e: Math.round((grossKg / 1000) * 1000) / 1000,
       net_tco2e: Math.round((netCo2eKg(grossKg) / 1000) * 1000) / 1000,
       oxygen_kg: Math.round(oxygenKg(grossKg)),
+      planted_trees: plantedTrees,
+      estimated_planted_tco2e: Math.round((plantedKg / 1000) * 1000) / 1000,
+      estimated_planted_oxygen_kg: Math.round(oxygenKg(plantedKg)),
       buffer_pct: BUFFER_PCT,
       uncertainty_pct: UNCERTAINTY_PCT,
       method: CARBON_METHOD,
@@ -735,6 +785,8 @@ async function leaderboard(_req: Request, res: Response): Promise<void> {
 /** GET /public/forest/:id/boundary — boundary polygon + area (ha) for map render. */
 async function forestBoundaryPublic(req: Request, res: Response): Promise<void> {
   const id = String(req.params.id);
+  // Malformed (non-uuid) id → empty boundary, never a 500 from the uuid cast.
+  if (!UUID_RE.test(id)) { res.json({ data: { boundary: [], area_ha: null } }); return; }
   const r = await query<{ forest_boundary: unknown }>(
     `SELECT forest_boundary FROM forests WHERE id = $1 AND is_active = TRUE LIMIT 1`,
     [id],
