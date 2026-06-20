@@ -22,3 +22,6 @@ app/client/*.local
 
 # build artifacts
 *.tsbuildinfo
+
+# access doc — live passwords, never commit
+docs/ACCESS.html
