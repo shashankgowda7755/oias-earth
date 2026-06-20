@@ -19,3 +19,12 @@ app/client/*.local
 
 # gstack local activity logs (not product)
 **/.claude/session-log.jsonl
+
+# build artifacts
+*.tsbuildinfo
+# internal — NOT for a public repo (PII / strategy / raw transcripts)
+docs/transcripts/
+docs/SCHEMA.html
+docs/BUSINESS-PLAN.html
+docs/REPORTING-SPEC.md
+docs/ENV.md
