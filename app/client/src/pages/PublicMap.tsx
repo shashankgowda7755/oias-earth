@@ -88,9 +88,27 @@ function esc(v: unknown): string {
 }
 const fmtDate = (v: string | null | undefined): string => (v ? String(v).slice(0, 10) : '');
 
+// Human age from age_days (fallback: derive from planted_on).
+function ageStr(t: PublicTree): string {
+  const days =
+    t.age_days != null
+      ? t.age_days
+      : t.planted_on
+        ? Math.floor((Date.now() - new Date(t.planted_on).getTime()) / 86400000)
+        : null;
+  if (days == null || days < 0) return '';
+  if (days < 31) return `${days}d old`;
+  if (days < 365) return `${Math.floor(days / 30.44)} mo old`;
+  return `${(days / 365.25).toFixed(1)} yr old`;
+}
+
 function treePopupHtml(t: PublicTree): string {
   const sid = t.status_id ?? 1;
   const color = STATUS_COLOR[sid] ?? '#b6ff3c';
+  // Latest field photo (proof the sapling is real). object-fit cover keeps it tidy.
+  const photo = t.photo_url
+    ? `<img src="${esc(t.photo_url)}" alt="" loading="lazy" style="width:100%;height:96px;object-fit:cover;border-radius:6px;margin-bottom:6px;display:block"/>`
+    : '';
   const head = t.pet_name
     ? `<strong style="color:${color}">${esc(t.pet_name)}</strong><br/><span style="color:#9ab;font-size:11px">${esc(t.tree_unique_id)}</span>`
     : `<strong style="color:${color}">${esc(t.tree_unique_id) || 'Tree'}</strong>`;
@@ -100,12 +118,15 @@ function treePopupHtml(t: PublicTree): string {
   if (t.height != null) stats.push(`${t.height} m`);
   if (t.dbh != null) stats.push(`⌀ ${t.dbh} cm`);
   if (t.co2e_kg != null && sid !== 4) stats.push(`${t.co2e_kg} kg CO₂e`);
+  if (t.oxygen_kg != null && sid !== 4) stats.push(`${t.oxygen_kg} kg O₂`);
+  const age = ageStr(t);
+  if (age) stats.push(age);
   const statLine = stats.length
     ? `<br/><span style="font-family:'JetBrains Mono',monospace;color:#9ab;font-size:11px">${stats.join('  ·  ')}</span>`
     : '';
   const seen = t.last_seen ? `<br/><span style="color:#7a8b91;font-size:10px">last measured ${fmtDate(t.last_seen)}</span>` : '';
   return (
-    `<div style="font-family:'Plus Jakarta Sans',sans-serif;min-width:150px">${head}${sp}<br/>${badge}${statLine}${seen}` +
+    `<div style="font-family:'Plus Jakarta Sans',sans-serif;min-width:170px;max-width:210px">${photo}${head}${sp}<br/>${badge}${statLine}${seen}` +
     `<br/><a href="/tree/${encodeURIComponent(t.id)}" style="color:#b6ff3c;font-weight:600;display:inline-block;margin-top:6px">View life record →</a></div>`
   );
 }

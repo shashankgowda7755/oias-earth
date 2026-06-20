@@ -118,6 +118,7 @@ export default function TreeProof() {
           { v: String(summary.visit_count), l: isDemo ? 'recorded visits' : 'verified visits' },
           { v: summary.latest_height != null ? `${summary.latest_height} m` : '—', l: 'current height' },
           { v: summary.co2e_kg != null ? `${summary.co2e_kg} kg` : '—', l: 'CO₂e captured · est.' },
+          { v: summary.oxygen_kg != null ? `${summary.oxygen_kg} kg` : '—', l: 'O₂ generated · est.' },
           { v: fmtDate(summary.last_seen), l: 'last seen' },
         ].map((s) => (
           <div key={s.l} style={{ background: 'var(--ink-2)', border: '1px solid var(--line)', borderRadius: 12, padding: '16px 18px' }}>

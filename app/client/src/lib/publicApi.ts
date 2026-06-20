@@ -35,6 +35,9 @@ export interface PublicTree {
   survival?: 'alive' | 'dead';
   co2e_kg?: number | null;
   oxygen_kg?: number | null;
+  age_days?: number | null;
+  planted_on?: string | null;
+  photo_url?: string | null;
   last_seen?: string | null;
 }
 

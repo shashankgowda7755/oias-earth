@@ -119,6 +119,9 @@ async function forestTreesPublic(req: Request, res: Response): Promise<void> {
     status_id: number | null;
     status: string | null;
     last_seen: string | null;
+    age_days: number | null;
+    planted_on: string | null;
+    photo_url: string | null;
   }>(
     `SELECT ft.id,
             ft.tree_unique_id,
@@ -131,8 +134,17 @@ async function forestTreesPublic(req: Request, res: Response): Promise<void> {
             sp.wood_density,
             COALESCE(ft.tree_status_id, 1) AS status_id,
             st.status,
+            ft.forest_tree_age AS age_days,
+            ft.planted_on,
             (SELECT MAX(tl.timeline_date) FROM forest_plant_timelines tl
-              WHERE tl.plant_id = ft.id AND tl.is_active = TRUE) AS last_seen
+              WHERE tl.plant_id = ft.id AND tl.is_active = TRUE) AS last_seen,
+            (SELECT a.url
+               FROM forest_plant_timeline_assets a
+               JOIN forest_plant_timelines tl2 ON tl2.id = a.timeline_id
+              WHERE tl2.plant_id = ft.id AND tl2.is_active = TRUE
+                AND a.is_active = TRUE AND a.url IS NOT NULL
+              ORDER BY tl2.timeline_date DESC NULLS LAST, a."order" ASC
+              LIMIT 1) AS photo_url
        FROM forest_trees ft
        LEFT JOIN master_plantspecies sp ON sp.id = ft.master_plant_species_id
        LEFT JOIN tree_status_master st ON st.id = ft.tree_status_id
@@ -166,6 +178,9 @@ async function forestTreesPublic(req: Request, res: Response): Promise<void> {
         survival: t.status_id === 4 ? 'dead' : 'alive',
         co2e_kg: co2e,
         oxygen_kg: co2e != null ? Math.round(oxygenKg(co2e) * 10) / 10 : null,
+        age_days: t.age_days != null ? Number(t.age_days) : null,
+        planted_on: t.planted_on,
+        photo_url: t.photo_url,
         last_seen: t.last_seen,
       };
     }),
