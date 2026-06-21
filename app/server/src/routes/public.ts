@@ -911,6 +911,19 @@ async function forestScenesPublic(req: Request, res: Response): Promise<void> {
   });
 }
 
+async function serveSceneImage(req: Request, res: Response): Promise<void> {
+  const id = parseInt(String(req.params.file).replace(/\.(jpe?g|png|webp)$/i, ''), 10);
+  if (!Number.isInteger(id) || id <= 0) throw notFound('image not found');
+  const r = await query<{ mime: string; bytes: Buffer }>(
+    `SELECT mime, bytes FROM scene_images WHERE id = $1`,
+    [id],
+  );
+  if (r.rowCount === 0) throw notFound('image not found');
+  res.setHeader('Content-Type', r.rows[0]!.mime || 'image/jpeg');
+  res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+  res.send(r.rows[0]!.bytes);
+}
+
 publicRouter.get('/public/sponsors', wrap(sponsorsPublic));
 publicRouter.get('/public/leaderboard', wrap(leaderboard));
 publicRouter.get('/public/forest/:id/boundary', wrap(forestBoundaryPublic));
@@ -964,6 +977,7 @@ async function lookup(req: Request, res: Response): Promise<void> {
   res.json({ data: null });
 }
 
+publicRouter.get('/public/scene-image/:file', wrap(serveSceneImage));
 publicRouter.get('/public/tree/:id', wrap(treeProof));
 publicRouter.get('/public/carbon', wrap(carbonSummary));
 publicRouter.get('/public/lookup', wrap(lookup));

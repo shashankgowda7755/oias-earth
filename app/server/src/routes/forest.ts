@@ -1483,6 +1483,22 @@ async function uploadSceneImage(req: Request, res: Response): Promise<void> {
   res.status(201).json({ data: { url } });
 }
 
+/** POST /forest/:id/scenes/upload-db — store an equirect image IN Postgres and
+ *  return a same-origin URL. Used when no object storage (Blob/Supabase) is set. */
+async function uploadSceneImageDb(req: Request, res: Response): Promise<void> {
+  const forestId = String(req.params.id);
+  await assertForestAccess(req, forestId);
+  const file = (req as unknown as { file?: { buffer: Buffer; mimetype: string } }).file;
+  if (!file) throw badRequest('image file is required (field "image")');
+  if (!/^image\//.test(file.mimetype)) throw badRequest('file must be an image');
+  const r = await query<{ id: number }>(
+    `INSERT INTO scene_images (forest_id, mime, bytes) VALUES ($1,$2,$3) RETURNING id`,
+    [forestId, file.mimetype, file.buffer],
+  );
+  const id = r.rows[0]!.id;
+  res.status(201).json({ data: { url: `/api/v1/public/scene-image/${id}.jpg` } });
+}
+
 async function listScenesAdmin(req: Request, res: Response): Promise<void> {
   const forestId = String(req.params.id);
   await assertForestAccess(req, forestId);
@@ -2080,6 +2096,7 @@ forestRouter.post('/forest/:id/panoramas/:pid/delete', wrap(deletePanorama));
 forestRouter.get('/forest/:id/scenes', wrap(listScenesAdmin));
 forestRouter.post('/forest/:id/scenes', wrap(createScene));
 forestRouter.post('/forest/:id/scenes/upload', sceneUpload.single('image'), wrap(uploadSceneImage));
+forestRouter.post('/forest/:id/scenes/upload-db', sceneUpload.single('image'), wrap(uploadSceneImageDb));
 forestRouter.post('/forest/:id/scenes/:sid/delete', wrap(deleteScene));
 forestRouter.post('/forest/:id/scenes/:sid/hotspots', wrap(addHotspot));
 forestRouter.post('/forest/:id/hotspots/:hid/delete', wrap(deleteHotspot));

@@ -16,6 +16,7 @@ import { useParams, Link } from 'react-router-dom';
 import { useToast } from '@/components';
 import {
   listScenes, tapTree, updateStudioTree, deleteStudioTree, addHotspot,
+  uploadSceneImageDb, createScene, getForestGeo,
   type SceneRow, type HotspotRow,
 } from './Forests/geoApi';
 
@@ -165,6 +166,24 @@ export default function Studio() {
     const last = pins[pins.length - 1]; if (!last) return;
     setBusy(true); try { await deleteStudioTree(forestId, last.treeId); setPins((arr) => arr.slice(0, -1)); } finally { setBusy(false); }
   }
+  async function onUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]; e.target.value = '';
+    if (!file) return;
+    setBusy(true);
+    try {
+      const url = await uploadSceneImageDb(forestId, file);
+      // camera = forest centre, so tapped trees get an indicative position.
+      let lat: number | undefined, lng: number | undefined;
+      try { const g = await getForestGeo(forestId); if (g.center.lat != null) lat = g.center.lat; if (g.center.lng != null) lng = g.center.lng; } catch { /* ok */ }
+      const label = file.name.replace(/\.[^.]+$/, '').slice(0, 60) || '360 scene';
+      const { id } = await createScene(forestId, { image_url: url, label, lat, lng });
+      await loadScenes();
+      setSceneId(id);
+      toast.show('360 uploaded — tap to tag saplings.', 'success');
+    } catch (err) {
+      toast.show(err instanceof Error ? err.message : 'Upload failed', 'error');
+    } finally { setBusy(false); }
+  }
 
   return (
     <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1fr) 280px', height: '100vh', background: '#0b1316', color: '#e7efea' }}>
@@ -180,11 +199,22 @@ export default function Studio() {
           <label style={lblStyle}>Species</label>
           <input value={species} onChange={(e) => setSpecies(e.target.value)} style={{ ...inStyle, width: 130 }} />
           <button onClick={undo} disabled={busy || !pins.length} style={btnStyle}>↩ Undo</button>
-          <select value={sceneId ?? ''} onChange={(e) => setSceneId(Number(e.target.value))} style={{ ...inStyle, marginLeft: 'auto' }}>
+          <label style={{ ...btnStyle, cursor: busy ? 'wait' : 'pointer', opacity: busy ? 0.6 : 1, marginLeft: 'auto' }}>
+            ⬆ Upload 360°
+            <input type="file" accept="image/*" onChange={onUpload} disabled={busy} style={{ display: 'none' }} />
+          </label>
+          <select value={sceneId ?? ''} onChange={(e) => setSceneId(Number(e.target.value))} style={inStyle}>
             {scenes.map((s) => <option key={s.id} value={s.id}>{s.label || `Scene ${s.id}`}</option>)}
           </select>
         </div>
-        <div ref={elRef} style={{ flex: 1, minHeight: 0, background: '#000', cursor: mode === 'tap' ? 'crosshair' : 'default' }} />
+        <div style={{ position: 'relative', flex: 1, minHeight: 0 }}>
+          <div ref={elRef} style={{ position: 'absolute', inset: 0, background: '#000', cursor: mode === 'tap' ? 'crosshair' : 'default' }} />
+          {!active && (
+            <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#8aa0a3', fontSize: 14, pointerEvents: 'none' }}>
+              No 360° yet — click <span style={{ color: '#5ad7e0', margin: '0 5px' }}>⬆ Upload 360°</span> to start tagging.
+            </div>
+          )}
+        </div>
         <div style={{ padding: '6px 12px', fontSize: 12.5, color: '#8aa0a3', borderTop: '1px solid rgba(255,255,255,.12)' }}>
           {pins.length} tagged · {mode === 'tap' ? 'tap a sapling → creates the next one' : (selected ? `selected ${selected.uid}` : 'click a pin to edit')}
           {pins.some((p) => p.modeled) ? ' · positions modeled (indicative, not surveyed)' : ''}

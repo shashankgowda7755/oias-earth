@@ -119,7 +119,14 @@ export async function uploadSceneImage(forestId: string, file: File): Promise<st
   const r = await api.post<{ data: { url: string } }>(`/forest/${forestId}/scenes/upload`, fd);
   return r.data.data.url;
 }
-export async function createScene(forestId: string, body: { image_url: string; label?: string; default_yaw?: number; default_pitch?: number; is_demo?: boolean }): Promise<{ id: number }> {
+/** Upload a 360 image stored IN the database (no external object storage needed). */
+export async function uploadSceneImageDb(forestId: string, file: File): Promise<string> {
+  const fd = new FormData();
+  fd.append('image', file);
+  const r = await api.post<{ data: { url: string } }>(`/forest/${forestId}/scenes/upload-db`, fd);
+  return r.data.data.url;
+}
+export async function createScene(forestId: string, body: { image_url: string; label?: string; lat?: number; lng?: number; default_yaw?: number; default_pitch?: number; is_demo?: boolean }): Promise<{ id: number }> {
   const r = await api.post<{ data: { id: number } }>(`/forest/${forestId}/scenes`, body);
   return r.data.data;
 }
