@@ -449,7 +449,7 @@ export function GeoTagSection({ forest }: GeoTagSectionProps) {
                       type="button"
                       onClick={() => selectTree(t)}
                       className={`flex w-full items-center gap-2 px-3 py-2 text-left text-sm transition-colors ${
-                        isSel ? 'bg-primary/10 text-primary' : 'hover:bg-black/5'
+                        isSel ? 'bg-primary/10 text-primary' : 'hover:bg-white/5'
                       }`}
                     >
                       <span

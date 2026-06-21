@@ -55,7 +55,7 @@ export default function Integrity() {
       ) : (
         <div className="overflow-hidden rounded-input border border-border">
           <table className="w-full text-sm">
-            <thead className="bg-black/5 text-left text-xs uppercase tracking-wide text-textSecondary">
+            <thead className="bg-white/5 text-left text-xs uppercase tracking-wide text-textSecondary">
               <tr>
                 <th className="px-4 py-2">Tree</th>
                 <th className="px-4 py-2">Forest</th>

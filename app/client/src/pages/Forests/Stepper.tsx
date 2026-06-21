@@ -33,7 +33,7 @@ export function Stepper({ steps, labels, current, onStepClick }: StepperProps) {
           const clickable = i < current && Boolean(onStepClick);
           const badgeClasses = isActive || isComplete
             ? 'bg-primary text-white'
-            : 'bg-black/10 text-textSecondary';
+            : 'bg-white/10 text-textSecondary';
           const labelClasses = isActive
             ? 'text-textPrimary font-medium'
             : isComplete
@@ -46,7 +46,7 @@ export function Stepper({ steps, labels, current, onStepClick }: StepperProps) {
                 disabled={!clickable}
                 aria-current={isActive ? 'step' : undefined}
                 onClick={clickable ? () => onStepClick?.(i) : undefined}
-                className={`flex items-center gap-2 rounded-button px-1 py-0.5 text-sm ${clickable ? 'cursor-pointer hover:bg-black/5' : 'cursor-default'}`}
+                className={`flex items-center gap-2 rounded-button px-1 py-0.5 text-sm ${clickable ? 'cursor-pointer hover:bg-white/5' : 'cursor-default'}`}
               >
                 <span
                   className={`flex h-6 w-6 flex-none items-center justify-center rounded-full text-xs font-semibold ${badgeClasses}`}
@@ -68,7 +68,7 @@ export function Stepper({ steps, labels, current, onStepClick }: StepperProps) {
 
       {/* Progress track */}
       <div
-        className="mt-3 h-1 w-full overflow-hidden rounded-pill bg-black/10"
+        className="mt-3 h-1 w-full overflow-hidden rounded-pill bg-white/10"
         role="progressbar"
         aria-valuemin={1}
         aria-valuemax={total}

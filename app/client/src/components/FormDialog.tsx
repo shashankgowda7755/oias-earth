@@ -110,7 +110,7 @@ export function FormDialog({
             onClick={onClose}
             disabled={submitting}
             aria-label="Close dialog"
-            className="rounded-full p-1 text-textSecondary hover:bg-black/5 hover:text-textPrimary disabled:opacity-50"
+            className="rounded-full p-1 text-textSecondary hover:bg-white/5 hover:text-textPrimary disabled:opacity-50"
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
               <line x1="18" y1="6" x2="6" y2="18" />

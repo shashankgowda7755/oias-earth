@@ -382,7 +382,7 @@ function PageButton({
       className={`flex h-8 min-w-8 items-center justify-center rounded-button px-2 text-sm transition-colors disabled:cursor-not-allowed disabled:opacity-40 ${
         active
           ? 'bg-primary text-white'
-          : 'text-textPrimary hover:bg-black/5'
+          : 'text-textPrimary hover:bg-white/5'
       }`}
     >
       {children}
@@ -466,7 +466,7 @@ function RowActionsMenu({
         aria-expanded={open}
         aria-label="Row actions"
         onClick={() => setOpen((v) => !v)}
-        className="inline-flex h-8 w-8 items-center justify-center rounded-full text-textSecondary transition-colors hover:bg-black/5 hover:text-textPrimary"
+        className="inline-flex h-8 w-8 items-center justify-center rounded-full text-textSecondary transition-colors hover:bg-white/5 hover:text-textPrimary"
       >
         <KebabIcon />
       </button>
@@ -506,7 +506,7 @@ function MenuItem({
       type="button"
       role="menuitem"
       onClick={onClick}
-      className={`block w-full px-3 py-2 text-left text-sm transition-colors hover:bg-black/5 ${
+      className={`block w-full px-3 py-2 text-left text-sm transition-colors hover:bg-white/5 ${
         danger ? 'text-danger' : 'text-textPrimary'
       }`}
     >

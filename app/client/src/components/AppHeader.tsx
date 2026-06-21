@@ -48,10 +48,10 @@ export function AppHeader() {
   };
 
   return (
-    <header className="flex h-16 items-center justify-between bg-surface px-6 shadow-appbar">
-      <div className="flex items-center gap-2">
-        <img src="/leaf.svg" alt="" aria-hidden="true" className="h-8 w-8" />
-        <span className="text-lg font-semibold text-primary">OIAS Earth</span>
+    <header className="flex h-16 items-center justify-between border-b border-border bg-surface px-6">
+      <div className="flex items-center gap-2.5">
+        <img src="/oias-mark.svg" alt="" aria-hidden="true" className="h-7 w-7" />
+        <span className="font-serif text-xl font-semibold tracking-tight text-textPrimary">OIAS Earth</span>
       </div>
 
       <div className="relative" ref={menuRef}>
@@ -61,7 +61,7 @@ export function AppHeader() {
           aria-haspopup="menu"
           aria-expanded={open}
           aria-label="Account menu"
-          className="flex items-center gap-1 rounded-full p-1 hover:bg-black/5"
+          className="flex items-center gap-1 rounded-full p-1 hover:bg-white/5"
         >
           {details?.['imageUrl'] && typeof details['imageUrl'] === 'string' ? (
             <img
@@ -70,7 +70,7 @@ export function AppHeader() {
               className="h-9 w-9 rounded-full object-cover"
             />
           ) : (
-            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-primary text-sm font-medium text-white">
+            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-primary text-sm font-semibold text-darkInk">
               {initials}
             </span>
           )}
@@ -97,7 +97,7 @@ export function AppHeader() {
               type="button"
               role="menuitem"
               onClick={handleLogout}
-              className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-textPrimary hover:bg-black/5"
+              className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-textPrimary hover:bg-white/5"
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
                 <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />

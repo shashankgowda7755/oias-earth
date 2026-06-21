@@ -17,11 +17,11 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const VARIANT_CLASSES: Record<ButtonVariant, string> = {
   primary:
-    'bg-primary text-white hover:bg-primary-hover disabled:bg-primary/50',
+    'bg-primary text-darkInk font-semibold hover:bg-primary-hover disabled:bg-primary/40',
   outlined:
-    'border border-border bg-surface text-textPrimary hover:bg-black/5 disabled:opacity-50',
-  text: 'bg-transparent text-textPrimary hover:bg-black/5 disabled:opacity-50',
-  danger: 'bg-danger text-white hover:bg-danger-hover disabled:bg-danger/50',
+    'border border-border bg-transparent text-textPrimary hover:bg-white/5 disabled:opacity-50',
+  text: 'bg-transparent text-textPrimary hover:bg-white/5 disabled:opacity-50',
+  danger: 'bg-danger text-darkInk font-semibold hover:bg-danger-hover disabled:bg-danger/50',
 };
 
 export function Button({
@@ -78,7 +78,7 @@ export function FilterButton({
       type="button"
       aria-label={ariaLabel}
       aria-pressed={active}
-      className={`inline-flex h-10 w-10 items-center justify-center rounded-button border bg-surface text-textSecondary transition-colors hover:bg-black/5 ${
+      className={`inline-flex h-10 w-10 items-center justify-center rounded-button border bg-surface text-textSecondary transition-colors hover:bg-white/5 ${
         active ? 'border-primary text-primary' : 'border-border'
       } ${className}`}
       {...rest}

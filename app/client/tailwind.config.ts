@@ -11,29 +11,34 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
+        // OIAS Earth "Living Instrument" system — dark ink canvas, bio-lime accent.
+        // Admin reuses the same tokens as the public theme (earth.css) so the
+        // whole platform is one identity (and clean-room vs the incumbent's MUI look).
         primary: {
-          DEFAULT: '#17970E',
-          hover: '#137a0b', // slightly darker for button :hover
+          DEFAULT: '#b6ff3c', // bio-lime accent (buttons use dark text on this)
+          hover: '#c8ff63',
         },
         navbar: {
-          DEFAULT: '#4d4d4d',
-          text: '#ffffff',
-          inactive: 'rgba(255,255,255,0.7)',
+          DEFAULT: '#0f1d22', // tab bar — darker panel
+          text: '#e7efea',
+          inactive: 'rgba(231,239,234,0.55)',
         },
-        appbg: '#f5f5f5',
-        surface: '#ffffff',
-        tableHeader: '#eef1f3',
-        textPrimary: 'rgba(0,0,0,0.87)',
-        textSecondary: 'rgba(0,0,0,0.54)',
-        border: 'rgba(0,0,0,0.12)',
+        appbg: '#16282e',     // gable near-black page canvas
+        surface: '#1b2f36',   // raised panels / cards / header
+        tableHeader: '#13242a',
+        textPrimary: '#e7efea',
+        textSecondary: '#9fb0ad',
+        border: 'rgba(255,255,255,0.12)',
         danger: {
-          DEFAULT: '#d32f2f',
-          hover: '#b71c1c',
+          DEFAULT: '#f0792b',
+          hover: '#f8995a',
         },
-        darkInk: 'rgb(2,17,26)',
+        darkInk: '#0b1316',   // dark text used ON the lime accent
       },
       fontFamily: {
-        sans: ["'Noto Sans'", 'NotoSans-Regular', 'Arial', 'sans-serif'],
+        sans: ["'Plus Jakarta Sans'", 'system-ui', 'sans-serif'],
+        serif: ["'Fraunces'", 'Georgia', 'serif'],
+        mono: ["'JetBrains Mono'", 'ui-monospace', 'monospace'],
       },
       fontSize: {
         // MUI-ish scale used across the admin

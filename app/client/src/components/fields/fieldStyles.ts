@@ -16,7 +16,7 @@ export function controlBase(hasError: boolean, disabled?: boolean): string {
     hasError
       ? 'border-danger focus:border-danger'
       : 'border-border focus:border-primary',
-    disabled ? 'cursor-not-allowed bg-black/5 text-textSecondary' : '',
+    disabled ? 'cursor-not-allowed bg-white/5 text-textSecondary' : '',
     // 2px focus border to match MUI's thickened outline
     hasError ? 'focus:ring-1 focus:ring-danger' : 'focus:ring-1 focus:ring-primary',
   ].join(' ');

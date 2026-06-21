@@ -190,7 +190,7 @@ export function TourEditor({ forestId, trees }: { forestId: string; trees: Regis
                     <input className={`${inp} mt-1 w-full`} value={treeQ} onChange={(e) => setTreeQ(e.target.value)} placeholder="Search tree id / species…" />
                     <div className="mt-1 flex flex-wrap gap-1">
                       {treeMatches.map((t) => (
-                        <button key={t.id} type="button" onClick={() => void placeTree(t)} className="rounded-full border border-border px-2 py-1 text-xs hover:bg-black/5">
+                        <button key={t.id} type="button" onClick={() => void placeTree(t)} className="rounded-full border border-border px-2 py-1 text-xs hover:bg-white/5">
                           {t.tree_unique_id} {t.species_common_name ? `· ${t.species_common_name}` : ''}
                         </button>
                       ))}
@@ -203,7 +203,7 @@ export function TourEditor({ forestId, trees }: { forestId: string; trees: Regis
                     <div className="text-xs text-textSecondary">Link this spot to which scene?</div>
                     <div className="mt-1 flex flex-wrap gap-1">
                       {scenes.filter((s) => s.id !== active.id).map((s) => (
-                        <button key={s.id} type="button" onClick={() => void placeLink(s.id)} className="rounded-full border border-border px-2 py-1 text-xs hover:bg-black/5">→ {s.label || `Scene ${s.id}`}</button>
+                        <button key={s.id} type="button" onClick={() => void placeLink(s.id)} className="rounded-full border border-border px-2 py-1 text-xs hover:bg-white/5">→ {s.label || `Scene ${s.id}`}</button>
                       ))}
                     </div>
                   </div>

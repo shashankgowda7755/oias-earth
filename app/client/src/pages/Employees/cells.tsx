@@ -102,7 +102,7 @@ export function RowActions({
         onClick={onEdit}
         aria-label={`Edit ${recordName}`}
         title="Edit"
-        className="rounded-full p-1.5 text-textSecondary transition-colors hover:bg-black/5 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+        className="rounded-full p-1.5 text-textSecondary transition-colors hover:bg-white/5 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
       >
         <EditIcon />
       </button>

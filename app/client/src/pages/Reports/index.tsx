@@ -374,7 +374,7 @@ function StatusPill({ active }: { active: boolean }) {
       className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${
         active
           ? 'bg-primary/10 text-primary'
-          : 'bg-black/5 text-textSecondary'
+          : 'bg-white/5 text-textSecondary'
       }`}
     >
       {active ? 'Active' : 'Inactive'}
@@ -411,7 +411,7 @@ function RowActions({
         aria-haspopup="menu"
         aria-expanded={open}
         onClick={() => setOpen((o) => !o)}
-        className="rounded-full p-1.5 text-textSecondary hover:bg-black/5 hover:text-textPrimary focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary"
+        className="rounded-full p-1.5 text-textSecondary hover:bg-white/5 hover:text-textPrimary focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary"
       >
         <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
           <circle cx="12" cy="5" r="1.6" />
@@ -431,7 +431,7 @@ function RowActions({
               setOpen(false);
               onEdit();
             }}
-            className="block w-full px-4 py-2 text-sm text-textPrimary hover:bg-black/5"
+            className="block w-full px-4 py-2 text-sm text-textPrimary hover:bg-white/5"
           >
             Edit
           </button>

@@ -50,8 +50,8 @@ export default function Login() {
     <main className="flex min-h-screen items-center justify-center bg-appbg px-4">
       <div className="w-full max-w-sm rounded-card bg-surface p-8 shadow-card">
         <div className="mb-6 flex flex-col items-center gap-2">
-          <img src="/leaf.svg" alt="" aria-hidden="true" className="h-12 w-12" />
-          <span className="text-lg font-semibold text-primary">OIAS Earth</span>
+          <img src="/oias-mark.svg" alt="" aria-hidden="true" className="h-12 w-12" />
+          <span className="font-serif text-2xl font-semibold tracking-tight text-textPrimary">OIAS Earth</span>
         </div>
 
         <h1 className="mb-6 text-center text-xl font-semibold text-textPrimary">

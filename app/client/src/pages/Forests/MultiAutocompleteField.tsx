@@ -77,7 +77,7 @@ export function MultiAutocompleteField({
                     type="button"
                     onClick={() => remove(id)}
                     aria-label={`Remove ${labels[id] ?? id}`}
-                    className="flex h-5 w-5 items-center justify-center rounded-full text-textSecondary hover:bg-black/10 hover:text-textPrimary"
+                    className="flex h-5 w-5 items-center justify-center rounded-full text-textSecondary hover:bg-white/10 hover:text-textPrimary"
                   >
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true">
                       <line x1="18" y1="6" x2="6" y2="18" />

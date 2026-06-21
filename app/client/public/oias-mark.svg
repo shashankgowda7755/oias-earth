@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
+  <title>OIAS Earth</title>
+  <circle cx="16" cy="13.5" r="9" stroke="#b6ff3c" stroke-width="2.4" />
+  <circle cx="16" cy="13.5" r="2.6" fill="#b6ff3c" />
+  <path d="M16 22.5 V29" stroke="#b6ff3c" stroke-width="2.4" stroke-linecap="round" />
+  <path d="M16 27 l3 2.4 M16 27 l-3 2.4" stroke="#b6ff3c" stroke-width="2.4" stroke-linecap="round" />
+</svg>
