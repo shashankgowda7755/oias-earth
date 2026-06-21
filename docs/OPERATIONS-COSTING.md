@@ -93,3 +93,72 @@ scales linearly off that. Then lock census-vs-sample + cadence.
 2. `scene.lat/lng/heading` + `cycle/captured_on` columns; cycle dropdown in the tour viewer.
 3. `exifr` ingest (photo→tree GPS match) + `sharp` compression.
 4. Migrate object storage → Cloudflare R2 (the storage helper already abstracts this).
+
+---
+
+## LOCKED CONFIG (client brief 2026-06-20): census · quarterly · hire crews
+User chose the rigorous setup: **every tree captured every cycle · every 3 months (4×/yr) · no
+existing field presence → recruit local crews per city** (storage handled by user). This is the
+*premium* tier — cost it honestly, then price.
+
+### The operation, end to end (per city)
+1. **Recruit + train (one-time per city, ~1 wk):** hire 4–8 local field staff via a manpower
+   agency (no inter-city travel — they live there). Half-day training: the capture app, GPS lock,
+   framing, the waypoint walk. Cost amortized over cycles.
+2. **Capture (the field cycle):** 2-role teams —
+   - **Tree photographer:** walks rows, 1 GPS-stamped photo/tree (~250 trees/day).
+   - **360 walker:** walks each site path, one Theta-X sphere every ~100 m → a continuous
+     waypoint chain (1 km ≈ 10 spheres). ~100–150 spheres/day. (~5–10% of total labour.)
+3. **Upload:** end of day over WiFi/4G → cloud (your storage).
+4. **Process (office, automated):** ingest → EXIF-GPS auto-matches each photo to its tree →
+   auto-place all hotspots from GPS → 1 person drags-to-set-north per sphere + spot-QA.
+5. **Publish:** new cycle goes live on the platform; previous cycle retained (the timeline).
+6. **Repeat** every 3 months. Re-shoots reuse the same GPS → hotspots recompute free.
+
+### Stitching / processing pipeline (what tool does what)
+- **Stitch:** NONE manually. Theta-X auto-stitches in-camera → finished equirectangular JPG. (No
+  PTGui/Hugin — those are only for DSLR rigs.)
+- **Per-tree photos:** `exifr` reads GPS from each photo → match to nearest tree; `sharp`
+  compresses to WebP (<100 KB).
+- **The "pointer" (hotspot):** computed, not clicked. `bearing(sphereGPS→treeGPS)→yaw`,
+  `atan2(Δheight,dist)→pitch` (reuse `grid-geo.js`). The "→ next waypoint" arrow = bearing to the
+  next sphere's GPS. One drag-to-set-north per sphere fixes orientation. → ~50 hrs/100k cycle, not 250.
+- **Render:** the platform (Leaflet aerial hub + Pannellum/PSV 360 walk + tree cards) — built.
+
+### Cost for THIS config (census 100k, quarterly, hired local crews)
+Throughput **250 trees/day** (validate first — see below) → **~400 field person-days + ~40 for
+360 = ~440 pd/cycle**.
+
+| Line / cycle | Ramp (agency labour ₹1,200/day) | Steady-state (direct ₹800/day) |
+|---|--:|--:|
+| Field + 360 labour | ₹5,28,000 | ₹3,52,000 |
+| Local transport to sites | ₹66,000 | ₹66,000 |
+| Equipment (amortized) | ₹20,000 | ₹20,000 |
+| Edit/QA (automated) | ₹25,000 | ₹25,000 |
+| Recruit/train (amortized) | ₹30,000 | ₹15,000 |
+| + spoilage 8% + management 15% | → | → |
+| **TOTAL / cycle** | **~₹8.3 L** | **~₹5.9 L** |
+| **₹ per tree per cycle** | **~₹8** | **~₹6** |
+| **× 4 (quarterly) = ₹/tree/YEAR** | **~₹33** | **~₹24** |
+
+- **No inter-city travel** because crews are hired local (the ₹11.82 travelling-crew model is
+  avoided even though there's no prior presence — you recruit, not commute).
+- Year-1 sits near the **agency (₹8)** end during ramp; converts toward **direct (₹6)** as you
+  stabilize crews. Plan **₹6–8/tree/cycle → ₹24–33/tree/yr**.
+
+### The pitch number
+- **₹3–7 is almost certainly the incumbent's PER-CYCLE rate for a LIGHTER job** (sample or
+  annual, no 360, no live platform). Your locked scope (census + quarterly + 360 + platform +
+  carbon) is a *premium* product, not the incumbent's commodity pass.
+- **Recommended pitch: ₹7/tree/cycle (= ₹28/tree/yr quarterly)** for the full premium. You're at
+  the top of the incumbent's per-cycle band but delivering ~5× (continuous 360 walk + live map +
+  carbon + certificates + sharing they cannot match). Margin: thin in year-1 ramp, healthy at
+  steady-state (₹6 cost).
+- If the client is hard-anchored to ₹3–5: **don't do census-quarterly at that price** (you'd lose
+  money). Offer the *lighter* tier at that price (semi-annual or 15–25% sample, GPS+photo+platform,
+  360 as paid add-on) and reserve census+quarterly+360 for ₹7.
+
+### Validate before quoting EXACT (one number rules all)
+Run a **1-day pilot in one dense Chennai plot**: measure real trees/photographed/day. Every rupee
+above scales linearly off it. Also count **km of path per site** → number of 360 spheres → confirm
+the 360 labour line. Then the ₹/tree is exact, not estimated.
