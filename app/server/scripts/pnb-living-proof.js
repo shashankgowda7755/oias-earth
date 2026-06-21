@@ -34,7 +34,7 @@ const lerp = (a, b, t) => ({ lat: a.lat + (b.lat - a.lat) * t, lng: a.lng + (b.l
 const PNB_UID = 'PNB-PNB36';
 const PREFIX = 'LP-';
 const SPECIES_ID = 35, SPECIES_NAME = 'Arjun'; // Terminalia Arjuna
-const ROWS = 6, COLS = 5;        // 30 saplings per block
+const ROWS = 20, COLS = 25;      // 500 saplings per block (2 blocks = 1000)
 const SPACING_FT = 1;            // "one-one feet" — 1 ft between plants
 const CAM_H = 1.6;               // camera height (m)
 

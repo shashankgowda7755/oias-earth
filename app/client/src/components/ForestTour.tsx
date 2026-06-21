@@ -48,11 +48,11 @@ export default function ForestTour({ scenes }: { scenes: ForestScene[] }) {
   const isDemo = scenes.some((s) => s.is_demo);
 
   function markerConfigs(scene: ForestScene) {
-    const trees = scene.hotspots.slice(0, 60).map((h, i) => ({
+    const trees = scene.hotspots.slice(0, 500).map((h, i) => ({
       id: `t${i}`,
       position: { yaw: `${h.yaw}deg`, pitch: `${h.pitch}deg` },
       html: `<div class="tour-pin s${h.status_id ?? 1}"></div>`,
-      size: { width: 22, height: 22 },
+      size: { width: 14, height: 14 },
       anchor: 'center center',
       tooltip: esc(`${h.tree_unique_id ?? 'Tree'}${h.species ? ` · ${h.species}` : ''}`),
       data: { kind: 'tree', hs: h },
