@@ -222,7 +222,7 @@ export default function TreeProof() {
             <HeartbeatMap forests={pin} interactive zoom={16} />
           </div>
           <p className="mono" style={{ fontSize: 12, color: '#9fb0ad', marginTop: 10 }}>
-            {tree.lat?.toFixed(6)}, {tree.lng?.toFixed(6)} · {isDemo ? 'simulated coordinates (demonstration data)' : 'GPS captured at planting and re-checked each visit'}
+            {tree.lat?.toFixed(6)}, {tree.lng?.toFixed(6)} · {isDemo ? 'simulated coordinates (demonstration data)' : tree.geo_is_modeled ? 'modeled position — indicative, from the 360° photo (awaiting field GPS)' : 'GPS captured at planting and re-checked each visit'}
           </p>
         </>
       )}

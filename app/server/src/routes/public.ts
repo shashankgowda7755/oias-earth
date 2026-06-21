@@ -229,6 +229,7 @@ async function treeProof(req: Request, res: Response): Promise<void> {
             ft.planted_on,
             ft.forest_tree_geo_lat AS lat, ft.forest_tree_geo_long AS lng,
             ft.forest_tree_height, ft.forest_tree_dia, ft.tree_status_id,
+            ft.geo_is_modeled,
             st.status, sp.wood_density, f.is_demo,
             (SELECT name FROM gift_forest_plants g WHERE g.gift_tree_id = ft.id AND g.is_active = TRUE ORDER BY created_at DESC LIMIT 1) AS gifted_to
        FROM forest_trees ft

@@ -100,6 +100,7 @@ export interface TreeProof {
     lat: number | null;
     lng: number | null;
     is_demo?: boolean;
+    geo_is_modeled?: boolean;
     gifted_to?: string | null;
   };
   summary: {

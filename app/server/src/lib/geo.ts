@@ -80,3 +80,52 @@ export function padTreeNumber(n: number, width: number): string {
 export function treeCertUrl(forestUniqueId: string, treeUniqueId: string): string {
   return `https://bethetreehugger.co/tree/${forestUniqueId}/${treeUniqueId}`;
 }
+
+/* ------------------------------------------------------------------ */
+/* Modeled position from a 360 tap (Tap-to-Tag Studio).               */
+/*                                                                    */
+/* IMPORTANT (council-reviewed): the lat/lng this produces is         */
+/* INDICATIVE only, never surveyed. The tap itself (yaw/pitch) is     */
+/* exact and is the stored source of truth; this projection assumes   */
+/* flat level ground at a known camera height and that the scene      */
+/* heading = true north. Always store with geo_is_modeled = TRUE and  */
+/* never feed it into the carbon/blockchain anchor.                   */
+/* ------------------------------------------------------------------ */
+
+const EARTH_R = 6378137; // metres
+const D2R = (d: number) => (d * Math.PI) / 180;
+const R2D = (r: number) => (r * 180) / Math.PI;
+
+/** Forward geodesic: from (lat,lng) travel `distM` metres on bearing `brgDeg`. */
+export function destPoint(lat: number, lng: number, brgDeg: number, distM: number): { lat: number; lng: number } {
+  const br = D2R(brgDeg), la1 = D2R(lat), lo1 = D2R(lng), dr = distM / EARTH_R;
+  const la2 = Math.asin(Math.sin(la1) * Math.cos(dr) + Math.cos(la1) * Math.sin(dr) * Math.cos(br));
+  const lo2 = lo1 + Math.atan2(Math.sin(br) * Math.sin(dr) * Math.cos(la1), Math.cos(dr) - Math.sin(la1) * Math.sin(la2));
+  return { lat: R2D(la2), lng: R2D(lo2) };
+}
+
+/**
+ * Estimate an INDICATIVE ground position for a tree tapped in a 360 scene.
+ * @param camLat,camLng  camera (scene) position
+ * @param yawDeg         tapped horizontal angle (0-360, scene heading assumed = N)
+ * @param pitchDeg       tapped vertical angle (negative = looking down)
+ * @param camH           camera eye height in metres (default 1.6)
+ * @param maxDistM       hard cap so a near-horizon tap can't project to infinity
+ * Returns null when the tap is at/above the horizon (no flat-ground intersection).
+ */
+export function projectFromCamera(
+  camLat: number,
+  camLng: number,
+  yawDeg: number,
+  pitchDeg: number,
+  camH = 1.6,
+  maxDistM = 60,
+): { lat: string; lng: string; distM: number } | null {
+  const down = -pitchDeg; // positive when looking down at the ground
+  if (down <= 1) return null; // at/above horizon -> no usable intersection
+  let d = camH / Math.tan(D2R(down));
+  if (!Number.isFinite(d) || d <= 0) return null;
+  d = Math.min(Math.max(d, 0.3), maxDistM); // clamp [0.3 m, cap]
+  const p = destPoint(camLat, camLng, ((yawDeg % 360) + 360) % 360, d);
+  return { lat: p.lat.toFixed(7), lng: p.lng.toFixed(7), distM: Math.round(d * 100) / 100 };
+}

@@ -141,6 +141,19 @@ export async function deleteLink(forestId: string, lid: number): Promise<void> {
   await api.post(`/forest/${forestId}/links/${lid}/delete`, {});
 }
 
+// ---- Tap-to-Tag Studio: tap creates next sapling + hotspot; edit / delete ----
+export interface TapResult { tree_id: string; tree_unique_id: string; hotspot_id: number; lat: string | null; lng: string | null; geo_is_modeled: boolean }
+export async function tapTree(forestId: string, sid: number, body: { prefix: string; species_name?: string; species_id?: number; yaw: number; pitch: number }): Promise<TapResult> {
+  const r = await api.post<{ data: TapResult }>(`/forest/${forestId}/scenes/${sid}/tap-tree`, body);
+  return r.data.data;
+}
+export async function updateStudioTree(forestId: string, treeId: string, body: { tree_unique_id?: string; species_name?: string; species_id?: number }): Promise<void> {
+  await api.post(`/forest/${forestId}/studio/tree/${treeId}`, body);
+}
+export async function deleteStudioTree(forestId: string, treeId: string): Promise<void> {
+  await api.post(`/forest/${forestId}/studio/tree/${treeId}/delete`, {});
+}
+
 // ---- Gifting: recipient per tree + email the certificate ----
 export interface GiftRow { id: string; gift_tree_id: string; name: string | null; email_id: string | null; message: string | null; is_email_sent: boolean; tree_unique_id: string | null }
 export async function listGifts(forestId: string): Promise<{ gifts: GiftRow[]; mailReady: boolean }> {

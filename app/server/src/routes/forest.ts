@@ -51,6 +51,7 @@ import {
   spreadTreeGeo,
   padTreeNumber,
   treeCertUrl,
+  projectFromCamera,
 } from '../lib/geo';
 import { agbKg, CARBON_FRACTION, CO2_PER_C, ROOT_SHOOT, CARBON_METHOD } from '../lib/carbon';
 import { isAllowedPanoUrl, providerOf, ALLOWED_TOUR_HOSTS } from '../lib/pano';
@@ -1593,6 +1594,140 @@ async function deleteHotspot(req: Request, res: Response): Promise<void> {
   res.json({ data: { id: hid, removed: true } });
 }
 
+/* ------------------------------------------------------------------ */
+/* Tap-to-Tag Studio: each tap creates the NEXT sapling + its hotspot. */
+/* GPS is an INDICATIVE estimate (geo_is_modeled = TRUE), never claimed */
+/* as surveyed; the tap (yaw/pitch) is the exact stored truth.         */
+/* ------------------------------------------------------------------ */
+async function tapTree(req: Request, res: Response): Promise<void> {
+  const forestId = String(req.params.id);
+  await assertForestAccess(req, forestId);
+  const sid = Number(req.params.sid);
+  if (!Number.isInteger(sid)) throw badRequest('invalid scene id');
+  await assertSceneInForest(sid, forestId);
+  const b = (req.body ?? {}) as Record<string, unknown>;
+  const yaw = pnum(b.yaw);
+  const pitch = pnum(b.pitch);
+  if (yaw < 0 || yaw > 360 || pitch < -90 || pitch > 90) throw badRequest('yaw 0-360, pitch -90..90');
+
+  const prefix = (typeof b.prefix === 'string' ? b.prefix.trim() : 'A').slice(0, 12) || 'A';
+  // species: numeric id wins, else resolve by name.
+  const sNum = Number(b.species_id);
+  let speciesId = Number.isFinite(sNum) && sNum > 0 ? sNum : null;
+  if (speciesId === null && typeof b.species_name === 'string' && b.species_name.trim()) {
+    speciesId = await resolveSpeciesId(b.species_name.trim());
+  }
+  if (speciesId === null) throw badRequest('species_id or a resolvable species_name is required');
+
+  const actor = req.auth?.profileId ?? null;
+  const client = await getClient();
+  try {
+    await client.query('BEGIN');
+
+    // forest unique id (for cert url) + scene camera position.
+    const meta = await client.query<{ forest_unique_id: string; lat: number | null; lng: number | null }>(
+      `SELECT f.forest_unique_id, s.lat, s.lng
+         FROM forest_scenes s JOIN forests f ON f.id = s.forest_id
+        WHERE s.id = $1`,
+      [sid],
+    );
+    const fuid = meta.rows[0]?.forest_unique_id ?? forestId;
+    const camLat = meta.rows[0]?.lat, camLng = meta.rows[0]?.lng;
+
+    // next sequence for this prefix in this forest: max trailing-number + 1.
+    const seqRow = await client.query<{ next: number }>(
+      `SELECT COALESCE(MAX( (NULLIF(regexp_replace(tree_unique_id, '^' || $2 || '(\\d+)$', '\\1'), tree_unique_id))::int ), 0) + 1 AS next
+         FROM forest_trees
+        WHERE forest_id = $1 AND tree_unique_id ~ ('^' || $2 || '\\d+$')`,
+      [forestId, prefix],
+    );
+    const seq = seqRow.rows[0]?.next ?? 1;
+    const tuid = `${prefix}${seq}`;
+
+    // indicative ground position from the tap (modeled).
+    let lat: string | null = null, lng: string | null = null, modeled = false;
+    if (camLat != null && camLng != null) {
+      const est = projectFromCamera(Number(camLat), Number(camLng), yaw, pitch);
+      if (est) { lat = est.lat; lng = est.lng; modeled = true; }
+    }
+
+    // per-day rates for day-0 carbon/oxygen baseline (consistent with bulk import).
+    const rate = await client.query<{ oxygen_per_day: number | null; carbon_offset_per_day: number | null }>(
+      `SELECT oxygen_per_day, carbon_offset_per_day FROM master_plantspecies WHERE id = $1`,
+      [speciesId],
+    );
+    const today = new Date().toISOString().slice(0, 10);
+    const days = 0;
+    const oxy = treeOxygen(Number(rate.rows[0]?.oxygen_per_day) || 0, days);
+    const carb = treeCarbon(Number(rate.rows[0]?.carbon_offset_per_day) || 0, days);
+
+    const ins = await client.query<{ id: string }>(
+      `INSERT INTO forest_trees
+         (forest_id, master_plant_species_id, tree_unique_id, forest_tree_name,
+          forest_tree_age, forest_tree_oxygen, forest_tree_carbonoffset, planted_on, tree_url,
+          forest_tree_geo_lat, forest_tree_geo_long, geo_is_modeled, tree_status_id,
+          is_display, is_active, created_by, updated_by)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,1,TRUE,TRUE,$13,$13)
+       RETURNING id`,
+      [forestId, speciesId, tuid, typeof b.species_name === 'string' ? b.species_name.trim() : null,
+       days, String(oxy), String(carb), today, treeCertUrl(fuid, tuid), lat, lng, modeled, actor],
+    );
+    const treeId = ins.rows[0]!.id;
+
+    const hs = await client.query<{ id: number }>(
+      `INSERT INTO scene_hotspots (scene_id, tree_id, yaw, pitch) VALUES ($1,$2,$3,$4)
+       ON CONFLICT (scene_id, tree_id) DO UPDATE SET yaw = EXCLUDED.yaw, pitch = EXCLUDED.pitch, is_active = TRUE
+       RETURNING id`,
+      [sid, treeId, yaw, pitch],
+    );
+
+    await client.query('COMMIT');
+    res.status(201).json({ data: { tree_id: treeId, tree_unique_id: tuid, hotspot_id: hs.rows[0]!.id, lat, lng, geo_is_modeled: modeled } });
+  } catch (e) {
+    await client.query('ROLLBACK');
+    throw e;
+  } finally {
+    client.release();
+  }
+}
+
+/** Edit a studio tree: rename (tree_unique_id) and/or change species. */
+async function updateStudioTree(req: Request, res: Response): Promise<void> {
+  const forestId = String(req.params.id);
+  await assertForestAccess(req, forestId);
+  const treeId = String(req.params.treeId);
+  const b = (req.body ?? {}) as Record<string, unknown>;
+  const owns = await query(`SELECT 1 FROM forest_trees WHERE id = $1 AND forest_id = $2 AND is_active = TRUE`, [treeId, forestId]);
+  if (owns.rowCount === 0) throw notFound('tree not found in this forest');
+  const newUid = typeof b.tree_unique_id === 'string' ? b.tree_unique_id.trim().slice(0, 60) : null;
+  let speciesId: number | null = null;
+  const sNum = Number(b.species_id);
+  if (Number.isFinite(sNum) && sNum > 0) speciesId = sNum;
+  else if (typeof b.species_name === 'string' && b.species_name.trim()) speciesId = await resolveSpeciesId(b.species_name.trim());
+  await query(
+    `UPDATE forest_trees
+        SET tree_unique_id = COALESCE($2, tree_unique_id),
+            master_plant_species_id = COALESCE($3, master_plant_species_id),
+            forest_tree_name = COALESCE($4, forest_tree_name),
+            updated_by = $5, updated_at = now()
+      WHERE id = $1`,
+    [treeId, newUid || null, speciesId, typeof b.species_name === 'string' ? b.species_name.trim() : null, req.auth?.profileId ?? null],
+  );
+  res.json({ data: { id: treeId, updated: true } });
+}
+
+/** Delete a studio tap: soft-delete the tree AND its hotspot(s). */
+async function deleteStudioTree(req: Request, res: Response): Promise<void> {
+  const forestId = String(req.params.id);
+  await assertForestAccess(req, forestId);
+  const treeId = String(req.params.treeId);
+  const owns = await query(`SELECT 1 FROM forest_trees WHERE id = $1 AND forest_id = $2`, [treeId, forestId]);
+  if (owns.rowCount === 0) throw notFound('tree not found in this forest');
+  await query(`UPDATE scene_hotspots SET is_active = FALSE WHERE tree_id = $1`, [treeId]);
+  await query(`UPDATE forest_trees SET is_active = FALSE, updated_by = $2, updated_at = now() WHERE id = $1`, [treeId, req.auth?.profileId ?? null]);
+  res.json({ data: { id: treeId, removed: true } });
+}
+
 async function addLink(req: Request, res: Response): Promise<void> {
   const forestId = String(req.params.id);
   await assertForestAccess(req, forestId);
@@ -1950,6 +2085,10 @@ forestRouter.post('/forest/:id/scenes/:sid/hotspots', wrap(addHotspot));
 forestRouter.post('/forest/:id/hotspots/:hid/delete', wrap(deleteHotspot));
 forestRouter.post('/forest/:id/scenes/:sid/links', wrap(addLink));
 forestRouter.post('/forest/:id/links/:lid/delete', wrap(deleteLink));
+// Tap-to-Tag Studio: tap creates next sapling + hotspot; edit / delete a tapped tree.
+forestRouter.post('/forest/:id/scenes/:sid/tap-tree', wrap(tapTree));
+forestRouter.post('/forest/:id/studio/tree/:treeId', wrap(updateStudioTree));
+forestRouter.post('/forest/:id/studio/tree/:treeId/delete', wrap(deleteStudioTree));
 // Gifting: recipient per tree + email the certificate
 forestRouter.get('/forest/:id/gifts', wrap(listGifts));
 forestRouter.post('/forest/:id/trees/:treeId/gift', wrap(setGift));

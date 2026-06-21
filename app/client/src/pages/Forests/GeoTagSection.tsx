@@ -571,6 +571,13 @@ export function GeoTagSection({ forest }: GeoTagSectionProps) {
               </div>
             )}
 
+            {editable && (
+              <div className="mb-2">
+                <a href={`/forest/${forestId}/studio`} className="text-sm" style={{ color: 'var(--alive,#1D9E75)' }}>
+                  ✋ Open Tap-to-Tag Studio — tap saplings in a 360° to auto-number + place them →
+                </a>
+              </div>
+            )}
             {editable && <TourEditor forestId={forestId} trees={trees} />}
 
             {editable && selected && !boundaryMode ? (
