@@ -39,6 +39,15 @@ export default function Dashboard() {
     <div className="flex min-h-screen flex-col bg-appbg">
       <AppHeader />
       <TabNav active={active} onChange={setActive} />
+      {/* TEMP: quick access to the 360 Upload + Tap-Tag Studio (remove later). */}
+      <a
+        href="/forest/9f6684c0-59ef-4fdb-ab34-0101178d3e43/studio"
+        className="mx-auto mt-3 flex w-full max-w-6xl items-center justify-between gap-3 rounded-lg border px-4 py-3 text-sm no-underline"
+        style={{ borderColor: 'rgba(182,255,60,.4)', background: 'rgba(182,255,60,.08)', color: '#1D9E75' }}
+      >
+        <span>⬆ <strong>Upload 360° &amp; Tap-Tag Studio</strong> — open a panorama, tap each sapling. <span style={{ opacity: 0.7 }}>(temporary shortcut)</span></span>
+        <span style={{ color: '#5ad7e0' }}>Open →</span>
+      </a>
       <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6">
         <div
           role="tabpanel"
