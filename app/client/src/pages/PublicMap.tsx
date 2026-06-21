@@ -153,7 +153,7 @@ export default function PublicMap() {
 
   useEffect(() => {
     if (mapRef.current || !elRef.current) return;
-    const map = L.map(elRef.current, { center: CENTER, zoom: 5 });
+    const map = L.map(elRef.current, { center: CENTER, zoom: 5, preferCanvas: true });
     L.tileLayer(SAT_URL, { maxZoom: 19, attribution: 'Imagery &copy; Esri' }).addTo(map);
     L.tileLayer(LABELS_URL, { maxZoom: 19, opacity: 0.85, attribution: '&copy; CARTO' }).addTo(map);
     forestLayer.current = L.markerClusterGroup({
@@ -169,8 +169,10 @@ export default function PublicMap() {
       iconCreateFunction: treeClusterIcon,
       maxClusterRadius: 40,
       showCoverageOnHover: false,
-      spiderfyOnMaxZoom: false,
-      disableClusteringAtZoom: 17, // flagship (sparse) shows individual pins; dense forests cluster
+      // Cluster at ALL zooms: sparse trees (meters apart) render as individual
+      // pins; dense trees (modeled grids, ~1ft apart) stay a count bubble instead
+      // of piling into an unreadable blob. Click a max-zoom cluster → spiderfy.
+      spiderfyOnMaxZoom: true,
       chunkedLoading: true,
     }).addTo(map);
     boundaryLayer.current = L.layerGroup().addTo(map);

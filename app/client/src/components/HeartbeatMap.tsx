@@ -80,6 +80,7 @@ export function HeartbeatMap({
     const map = L.map(elRef.current, {
       center: INDIA_CENTER,
       zoom,
+      preferCanvas: true,
       zoomControl: interactive,
       scrollWheelZoom: interactive,
       dragging: interactive,
@@ -96,8 +97,8 @@ export function HeartbeatMap({
       iconCreateFunction: clusterIcon,
       maxClusterRadius: 60,
       showCoverageOnHover: false,
-      spiderfyOnMaxZoom: false,
-      disableClusteringAtZoom: 16,
+      // Cluster at all zooms so dense pins never pile into a blob; click to fan out.
+      spiderfyOnMaxZoom: true,
       chunkedLoading: true,
     }).addTo(map);
     mapRef.current = map;
