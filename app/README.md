@@ -1,7 +1,7 @@
-# CommuniTREE Admin (Rebuild)
+# OIAS Earth Admin (Rebuild)
 
 A faithful, cleanly-restructured rebuild of the **"OIAS Earth" /
-CommuniTREE** admin panel. The original was a MUI + GraphQL admin; this rebuild
+OIAS Earth** admin panel. The original was a MUI + GraphQL admin; this rebuild
 reproduces its look and documented behaviour on a modern, self-contained stack
 and standardises every admin read/write on a single REST layer.
 

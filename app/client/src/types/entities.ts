@@ -1,5 +1,5 @@
 /**
- * Shared entity types for the CommuniTREE admin rebuild.
+ * Shared entity types for the OIAS Earth admin rebuild.
  *
  * Field shapes are taken from the LIVE REST list responses
  * (spec/rest_list_shapes.json) — these are snake_case as the REST layer

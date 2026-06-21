@@ -1,5 +1,5 @@
 -- =====================================================================
--- 002_seed.sql  —  demo data for the CommuniTREE admin rebuild
+-- 002_seed.sql  —  demo data for the OIAS Earth admin rebuild
 -- =====================================================================
 -- Idempotent where practical (ON CONFLICT DO NOTHING / guarded inserts) so it
 -- can be re-run safely during local dev.
@@ -27,7 +27,7 @@ INSERT INTO user_profiles (
   user_id, username, password_hash, is_active, is_verified, image_url
 ) VALUES (
   'd21cabf2-c06c-4c1e-a9ea-d1ea928727d0',
-  'CommuniTREE', 'Admin', 'admin@communitree.co.in', 8925834149, '+91',
+  'OIAS Earth', 'Admin', 'admin@communitree.co.in', 8925834149, '+91',
   1, 'communitree_admin',
   -- bcrypt hash of "communitree123"
   '$2a$10$ceAYDt3bwrQBCOTepXLqseNPHQnJ59S7J1blahNXbx0zYB5iM9FF6',

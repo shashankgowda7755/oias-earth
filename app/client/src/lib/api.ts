@@ -1,5 +1,5 @@
 /**
- * Single axios instance + typed helpers for the CommuniTREE admin REST layer.
+ * Single axios instance + typed helpers for the OIAS Earth admin REST layer.
  *
  * AUTH CONTRACT (CONFIRMED by live test, see spec/write_contracts.md):
  *   - Every /api/v1 call sends the RAW JWT in `Authorization` with NO

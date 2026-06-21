@@ -2,7 +2,7 @@
   "name": "communitree-admin-server",
   "version": "0.1.0",
   "private": true,
-  "description": "Express + pg backend for the CommuniTREE / OIAS Earth admin rebuild",
+  "description": "Express + pg backend for the OIAS Earth / OIAS Earth admin rebuild",
   "main": "dist/server/src/index.js",
   "scripts": {
     "migrate": "node scripts/migrate.js",

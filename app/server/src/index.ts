@@ -1,5 +1,5 @@
 /**
- * Express entry point for the CommuniTREE admin rebuild API.
+ * Express entry point for the OIAS Earth admin rebuild API.
  *
  * Surface:
  *   POST /api/v1/auth/login                         (public)
@@ -93,7 +93,7 @@ if (require.main === module) {
   app.listen(config.port, () => {
     // eslint-disable-next-line no-console
     console.log(
-      `[server] CommuniTREE admin API listening on :${config.port} (db backend: ${DB_BACKEND})`
+      `[server] OIAS Earth admin API listening on :${config.port} (db backend: ${DB_BACKEND})`
     );
   });
 }

@@ -17,7 +17,7 @@ Researched 2026 (6-agent swarm + synthesis). How a tree on our platform becomes 
 `carbon_offset_per_day × age_days` is **linear** while real sequestration is an **S-curve** — it over-credits saplings, under-credits mid-life trees, and throws away the measured DBH we already store. No registry certifies a flat daily rate. Replace with the measured-allometry, stock-change pipeline above. Keep the linear rate only as a labelled "pre-measurement estimate" before a tree's first DBH reading.
 
 ## Recommended path (two-track)
-- **Launch on Plan Vivo (PV Climate)** — lowest barrier, built for distributed smallholder/NGO plots, India precedent (Khasi Hills), ex-ante issuance (early cash), ≥60% community-revenue rule fits CommuniTREE. Lower price/liquidity.
+- **Launch on Plan Vivo (PV Climate)** — lowest barrier, built for distributed smallholder/NGO plots, India precedent (Khasi Hills), ex-ante issuance (early cash), ≥60% community-revenue rule fits OIAS Earth. Lower price/liquidity.
 - **Build the data product to Verra VM0047 (ARR, census-based) spec** — purpose-built for GPS-identified counted trees, ICVCM-approved (A-rated ~$24–40/t band). Our monthly DBH+photo+survival **exceeds** its monitoring minimum. Migrate/dual-list to Verra as volume grows.
 - **NOT** India CCTS as the foreign path — domestic only (~$2–6/t), foreign sale largely blocked, requires start ≥ 1 Jan 2025, exclusivity (can't also be in Verra). Future domestic-buyer channel only.
 - **Hard rule:** only **post-1-Jan-2025 plantings** are reliably creditable.

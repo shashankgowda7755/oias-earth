@@ -1,6 +1,6 @@
 # Employees module — notes
 
-Faithful rebuild of the CommuniTREE admin **Employees** section
+Faithful rebuild of the OIAS Earth admin **Employees** section
 (`spec/communitree_admin_spec.json` screens[Employees], dataModel[Employee],
 apis `/api/v1/employee/list`).
 
