@@ -1,6 +1,6 @@
 # OIAS Earth — Living Proof Venture (vision + build status)
 
-Working title: **OIAS Earth** · Brand: **Be The Tree Hugger** (https://bethetreehugger.co/)
+Working title: **OIAS Earth** · Brand: **OIAS Earth** (https://oiasearth.com/)
 Source: venture blueprint v1, 2026-06-11.
 
 ## Thesis

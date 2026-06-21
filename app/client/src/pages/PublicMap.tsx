@@ -291,7 +291,7 @@ export default function PublicMap() {
         <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none', color: 'var(--surface)' }}>
           <span style={{ width: 16, height: 16, borderRadius: '50%', background: 'var(--alive)', boxShadow: '0 0 12px rgba(182,255,60,.7)' }} />
           <div>
-            <div style={{ fontWeight: 700, fontSize: 15 }}>Be The Tree Hugger — Heartbeat Map</div>
+            <div style={{ fontWeight: 700, fontSize: 15 }}>OIAS Earth — Heartbeat Map</div>
             <div className="mono" style={{ fontSize: 11, color: 'var(--alive)' }}>every pulse is a monitored tree</div>
           </div>
         </Link>

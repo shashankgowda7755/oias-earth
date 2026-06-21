@@ -1,6 +1,6 @@
 # Geo-tagging / location-proof / dMRV — landscape mapped to our platform
 
-Source: the global geo-tagging/dMRV landscape brief. This maps its requirements + systemic gaps to what Be The Tree Hugger has, and what to build.
+Source: the global geo-tagging/dMRV landscape brief. This maps its requirements + systemic gaps to what OIAS Earth has, and what to build.
 
 ## Status against the doc's 5 systemic gaps
 | # | Systemic gap (doc) | Our status | Action |

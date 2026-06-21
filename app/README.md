@@ -1,6 +1,6 @@
 # CommuniTREE Admin (Rebuild)
 
-A faithful, cleanly-restructured rebuild of the **"Be The Tree Hugger" /
+A faithful, cleanly-restructured rebuild of the **"OIAS Earth" /
 CommuniTREE** admin panel. The original was a MUI + GraphQL admin; this rebuild
 reproduces its look and documented behaviour on a modern, self-contained stack
 and standardises every admin read/write on a single REST layer.
@@ -56,7 +56,7 @@ with Tailwind tokens defined in `client/tailwind.config.ts`. Brand: primary gree
 | Original | Rebuild |
 |---|---|
 | GraphQL (PostGraphile) reads/writes with `Bearer <token>` | A REST layer (`POST /<entity>/list`, REST CRUD) with the **raw JWT** in `Authorization` (no `Bearer`). The shell speaks only REST; the auth-header divergence is documented in `client/src/lib/api.ts` and `CONTRACTS.md`. *(Original GraphQL vs REST write path = spec openQuestions[3].)* |
-| Separate auth host (`dev-auth.bethetreehugger.co`) | `POST /api/v1/auth/login` on the same Express server, signing a JWT with the same secret the REST middleware verifies. Self-contained. |
+| Separate auth host (`dev-auth.oiasearth.com`) | `POST /api/v1/auth/login` on the same Express server, signing a JWT with the same secret the REST middleware verifies. Self-contained. |
 | 52-table PostGraphile schema | `db/migrations/001_init.sql` recreates the admin-relevant tables (+ lookups) faithfully as a superset; out-of-scope domains (sapling/whatsapp/donor/gift/nudge — openQuestions[9]) are stubbed/marked. snake_case columns match the live REST shapes 1:1. |
 | Mixed pagination (`employee/list` flat vs `{pagination}`) | `listEntity()` normalises both into one `Paginated<T>` (openQuestions[7]). |
 | MUI DataGrid / Dialog / TextField | Tailwind `DataTable` / `FormDialog` / field components with the same affordances and a11y. |

@@ -118,7 +118,7 @@ INSERT INTO sponsors (
     'https://www.idfcfirstbank.com/IDFC-logo-website.svg',
     'https://example.com/Idfc-logo.png',
     'https://example.com/Idfc-logo.png',
-    'https://example.com/Bethetreehugger-IDFC.png',
+    'https://example.com/Betheoiasearth-IDFC.png',
     '2015', 'https://www.idfcfirstbank.com/', 'Banking', 'Mumbai',
     TRUE, 'd21cabf2-c06c-4c1e-a9ea-d1ea928727d0', 'd21cabf2-c06c-4c1e-a9ea-d1ea928727d0'
   )

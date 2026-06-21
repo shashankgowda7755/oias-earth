@@ -51,7 +51,7 @@ export default function Login() {
       <div className="w-full max-w-sm rounded-card bg-surface p-8 shadow-card">
         <div className="mb-6 flex flex-col items-center gap-2">
           <img src="/leaf.svg" alt="" aria-hidden="true" className="h-12 w-12" />
-          <span className="text-lg font-semibold text-primary">Be The Tree Hugger</span>
+          <span className="text-lg font-semibold text-primary">OIAS Earth</span>
         </div>
 
         <h1 className="mb-6 text-center text-xl font-semibold text-textPrimary">

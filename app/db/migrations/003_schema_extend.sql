@@ -82,7 +82,7 @@ ALTER TABLE forest_trees ADD COLUMN IF NOT EXISTS planted_on               DATE;
 ALTER TABLE forest_trees ADD COLUMN IF NOT EXISTS assigned_to              UUID;
 ALTER TABLE forest_trees ADD COLUMN IF NOT EXISTS is_display               BOOLEAN NOT NULL DEFAULT TRUE;
 -- public certificate URL for gifted/sponsored trees
--- (https://bethetreehugger.co/tree/<forest_unique_id>/<tree_unique_id>).
+-- (https://oiasearth.com/tree/<forest_unique_id>/<tree_unique_id>).
 ALTER TABLE forest_trees ADD COLUMN IF NOT EXISTS tree_url                 TEXT;
 
 -- A tree is unique within its forest by tree_unique_id — the bulk importer

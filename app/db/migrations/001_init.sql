@@ -1,5 +1,5 @@
 -- =====================================================================
--- 001_init.sql  —  CommuniTREE / Be The Tree Hugger admin rebuild schema
+-- 001_init.sql  —  CommuniTREE / OIAS Earth admin rebuild schema
 -- =====================================================================
 -- Derived from spec/data_model_full.json (52 PostGraphile entities) and
 -- spec/rest_list_shapes.json (live REST snake_case shapes).

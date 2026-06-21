@@ -651,7 +651,7 @@ interface BulkRow {
  *   - upsert forest_trees on (forest_id, tree_unique_id) with species + height/
  *     dia/planted_on + computed age/oxygen/carbon + cert URL
  *   - if a gift recipient is present, upsert a gift_forest_plants row and set
- *     the tree cert URL https://bethetreehugger.co/tree/<fuid>/<tuid>
+ *     the tree cert URL https://oiasearth.com/tree/<fuid>/<tuid>
  * Returns {inserted, updated, gifts, errors:[{row, message}]}.
  */
 async function bulkImportTrees(req: Request, res: Response): Promise<void> {

@@ -78,7 +78,7 @@ export function padTreeNumber(n: number, width: number): string {
 
 /** Public certificate URL for a tree. */
 export function treeCertUrl(forestUniqueId: string, treeUniqueId: string): string {
-  return `https://bethetreehugger.co/tree/${forestUniqueId}/${treeUniqueId}`;
+  return `https://oiasearth.com/tree/${forestUniqueId}/${treeUniqueId}`;
 }
 
 /* ------------------------------------------------------------------ */

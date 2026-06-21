@@ -17,7 +17,7 @@ export default defineConfig({
       injectRegister: 'auto',
       includeAssets: ['leaf.svg'],
       manifest: {
-        name: 'Be The Tree Hugger — Field',
+        name: 'OIAS Earth — Field',
         short_name: 'BTTH Field',
         description: 'Offline field capture: GPS, photo and visit logging for planters.',
         theme_color: '#16282e',

@@ -1,6 +1,6 @@
 /**
  * Top app bar (spec AppHeader). White bar:
- *   - left: leaf logo + "Be The Tree Hugger" wordmark in primary green
+ *   - left: leaf logo + "OIAS Earth" wordmark in primary green
  *   - right: avatar button -> dropdown with "Log out" (clears session, -> "/")
  */
 import { useEffect, useRef, useState } from 'react';
@@ -51,7 +51,7 @@ export function AppHeader() {
     <header className="flex h-16 items-center justify-between bg-surface px-6 shadow-appbar">
       <div className="flex items-center gap-2">
         <img src="/leaf.svg" alt="" aria-hidden="true" className="h-8 w-8" />
-        <span className="text-lg font-semibold text-primary">Be The Tree Hugger</span>
+        <span className="text-lg font-semibold text-primary">OIAS Earth</span>
       </div>
 
       <div className="relative" ref={menuRef}>

@@ -100,7 +100,7 @@ export default function Landing() {
       <nav style={{ position: 'absolute', top: 0, left: 0, right: 0, zIndex: 20, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px clamp(20px,5vw,56px)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, fontWeight: 700, letterSpacing: '.01em' }}>
           <span style={{ display: 'inline-block', width: 26, height: 26, borderRadius: '50%', background: 'var(--alive)', boxShadow: '0 0 14px rgba(182,255,60,.7)' }} />
-          Be The Tree Hugger
+          OIAS Earth
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 'clamp(14px,2.5vw,30px)', fontSize: 14 }}>
           <a href="#proof" style={{ color: 'var(--surface)', textDecoration: 'none', opacity: .85 }}>The proof</a>
@@ -257,7 +257,7 @@ export default function Landing() {
       <footer style={{ padding: '40px clamp(20px,5vw,56px)', background: 'var(--ink)', color: '#7e8e8a', borderTop: '1px solid var(--line)', display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16, fontSize: 13 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <span style={{ width: 14, height: 14, borderRadius: '50%', background: 'var(--alive)' }} />
-          Be The Tree Hugger — living proof, verified monthly
+          OIAS Earth — living proof, verified monthly
         </div>
         <div style={{ display: 'flex', gap: 22 }}>
           <Link to="/map" style={{ color: '#9fb0ad', textDecoration: 'none' }}>Live map</Link>

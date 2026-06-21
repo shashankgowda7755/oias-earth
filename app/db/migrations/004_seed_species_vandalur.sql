@@ -140,7 +140,7 @@ INSERT INTO sponsors (
   headquarters, is_active, created_by, updated_by
 ) VALUES (
   'f5786b29-cd96-40aa-abc4-3628cfd99f5e', 'Arun Forest',
-  'https://bethetreehugger-staging.objectstore.e2enetworks.net/bth_files/forest/1781294003132_0_logo.png',
+  'https://betheoiasearth-staging.objectstore.e2enetworks.net/bth_files/forest/1781294003132_0_logo.png',
   '2020', 'https://arunforest.example.com', 'Environmental', 'Chennai',
   TRUE, 'd21cabf2-c06c-4c1e-a9ea-d1ea928727d0', 'd21cabf2-c06c-4c1e-a9ea-d1ea928727d0'
 ) ON CONFLICT (id) DO NOTHING;
@@ -174,27 +174,27 @@ INSERT INTO forests (
   'mixed_species', '', 'borewell', '',
   'summer', '', 'red_soil', '',
   'DIGIPIN12345', '2026-06-01T00:00:00.000Z',
-  'https://bethetreehugger-staging.objectstore.e2enetworks.net/bth_files/forest/1781294129078_0_permission.png',
-  'https://bethetreehugger-staging.objectstore.e2enetworks.net/bth_files/forest/1781294125465_0_layout.png',
+  'https://betheoiasearth-staging.objectstore.e2enetworks.net/bth_files/forest/1781294129078_0_permission.png',
+  'https://betheoiasearth-staging.objectstore.e2enetworks.net/bth_files/forest/1781294125465_0_layout.png',
   1, 2.96, 1,
   243.45, 135.25,
   '{"name":"Arun","agreement_status":"agreement_confirmed"}'::jsonb,
   '{"total_area":2000,"planted_area":1000}'::jsonb,
   '{"authorized_by_name":"Arun","authorized_by_designation":"Software Engineer","authorized_date":"2023-06-01","authorized_period":"3","project_context":"This is Vandalur Forest"}'::jsonb,
-  '{"total_jurisdiction_area":2000,"population":200000,"population_density":15000,"green_cover":"Green Cover","environmental_need":"Environmental Need","google_earth_image":[{"image":"https://bethetreehugger-staging.objectstore.e2enetworks.net/bth_files/forest/1781295708089_0.png","year":2010,"population":10000},{"image":"https://bethetreehugger-staging.objectstore.e2enetworks.net/bth_files/forest/1781295723198_0.png","year":2012,"population":14000},{"image":"https://bethetreehugger-staging.objectstore.e2enetworks.net/bth_files/forest/1781295739175_0.png","year":2016,"population":16000}]}'::jsonb,
+  '{"total_jurisdiction_area":2000,"population":200000,"population_density":15000,"green_cover":"Green Cover","environmental_need":"Environmental Need","google_earth_image":[{"image":"https://betheoiasearth-staging.objectstore.e2enetworks.net/bth_files/forest/1781295708089_0.png","year":2010,"population":10000},{"image":"https://betheoiasearth-staging.objectstore.e2enetworks.net/bth_files/forest/1781295723198_0.png","year":2012,"population":14000},{"image":"https://betheoiasearth-staging.objectstore.e2enetworks.net/bth_files/forest/1781295739175_0.png","year":2016,"population":16000}]}'::jsonb,
   '{"site_supervisor":1,"watering_team":1,"de_weeding_crew":1,"plant_health_specialist":1,"people_visiting":"1","people_living_near":"1","schools_colleges":1}'::jsonb,
   '{"short_term":{"land_value":1,"tree_value":1,"oxygen_generated":1,"carbon_sequestration":1},"medium_term":{"land_value":1,"tree_value":1,"oxygen_generated":1,"carbon_sequestration":1},"long_term":{"land_value":1,"tree_value":1,"oxygen_generated":1,"carbon_sequestration":1}}'::jsonb,
   '{"health":"good","health_other":"","mortality_rate":1,"other_issues":"Other Issues","additional_scope":"Additional Scope"}'::jsonb,
   '[{"year":2023,"quarter":2,"total_holidays_weekly_off":1,"total_holidays_festival":1,"total_watering_days":1,"total_raining_days":1,"full_time_gardeners":1,"part_time_gardeners":1,"total_part_time_labour_days":1}]'::jsonb,
   '{"target_height_range":[{"year":0,"min":1,"max":1.5},{"year":1,"min":1.5,"max":2},{"year":2,"min":2,"max":2.5},{"year":3,"min":2.5,"max":3}],"actual_height_range":[{"year":2023,"quarter":2,"min":1,"max":1.5}]}'::jsonb,
-  '[{"year":2023,"quarter":2,"reading_date":"2023-06-01","meter_image":"https://bethetreehugger-staging.objectstore.e2enetworks.net/bth_files/forest/1781294642269_0.png","meter_reading":0.1}]'::jsonb,
-  '[{"year":2023,"quarter":2,"reading_date":"2023-06-01","inside_plantation":{"image":"https://bethetreehugger-staging.objectstore.e2enetworks.net/bth_files/forest/1781294696393_0.png","humidity":1,"temperature":0.5},"outside_plantation":{"image":"https://bethetreehugger-staging.objectstore.e2enetworks.net/bth_files/forest/1781294698913_0.png","humidity":1,"temperature":0.5}}]'::jsonb,
+  '[{"year":2023,"quarter":2,"reading_date":"2023-06-01","meter_image":"https://betheoiasearth-staging.objectstore.e2enetworks.net/bth_files/forest/1781294642269_0.png","meter_reading":0.1}]'::jsonb,
+  '[{"year":2023,"quarter":2,"reading_date":"2023-06-01","inside_plantation":{"image":"https://betheoiasearth-staging.objectstore.e2enetworks.net/bth_files/forest/1781294696393_0.png","humidity":1,"temperature":0.5},"outside_plantation":{"image":"https://betheoiasearth-staging.objectstore.e2enetworks.net/bth_files/forest/1781294698913_0.png","humidity":1,"temperature":0.5}}]'::jsonb,
   '[{"heading":"Heading","description":"Description"}]'::jsonb,
-  '{"description":"Security & Infrastructure Description","image_data":[{"name":"Security","description":"Security Description","image":"https://bethetreehugger-staging.objectstore.e2enetworks.net/bth_files/forest/1781294250450_0.png"}]}'::jsonb,
-  '[{"year":2023,"quarter":2,"image":"https://bethetreehugger-staging.objectstore.e2enetworks.net/bth_files/forest/1781294439719_0.png"}]'::jsonb,
-  '[{"type":{"label":"Initiated By","value":"initiated_by"},"name":"Arun Forest","logo":"https://bethetreehugger-staging.objectstore.e2enetworks.net/bth_files/forest/1781294003132_0.png"},{"type":{"label":"Sponsored By","value":"sponsored_by"},"name":"Arun Forest","logo":"https://bethetreehugger-staging.objectstore.e2enetworks.net/bth_files/forest/1781294027370_0.png"}]'::jsonb,
-  '[{"name":"Dashboard Image 1","description":"Dashboard Image 1","image":"https://bethetreehugger-staging.objectstore.e2enetworks.net/bth_files/forest/1781294271079_0.png"}]'::jsonb,
-  '[{"slide_type":"first_slide","image":"https://bethetreehugger-staging.objectstore.e2enetworks.net/bth_files/forest/1781294282059_0.png"},{"slide_type":"content_slide","image":"https://bethetreehugger-staging.objectstore.e2enetworks.net/bth_files/forest/1781294290630_0.png"},{"slide_type":"project_impact_slide","image":"https://bethetreehugger-staging.objectstore.e2enetworks.net/bth_files/forest/1781294298743_0.png"}]'::jsonb,
+  '{"description":"Security & Infrastructure Description","image_data":[{"name":"Security","description":"Security Description","image":"https://betheoiasearth-staging.objectstore.e2enetworks.net/bth_files/forest/1781294250450_0.png"}]}'::jsonb,
+  '[{"year":2023,"quarter":2,"image":"https://betheoiasearth-staging.objectstore.e2enetworks.net/bth_files/forest/1781294439719_0.png"}]'::jsonb,
+  '[{"type":{"label":"Initiated By","value":"initiated_by"},"name":"Arun Forest","logo":"https://betheoiasearth-staging.objectstore.e2enetworks.net/bth_files/forest/1781294003132_0.png"},{"type":{"label":"Sponsored By","value":"sponsored_by"},"name":"Arun Forest","logo":"https://betheoiasearth-staging.objectstore.e2enetworks.net/bth_files/forest/1781294027370_0.png"}]'::jsonb,
+  '[{"name":"Dashboard Image 1","description":"Dashboard Image 1","image":"https://betheoiasearth-staging.objectstore.e2enetworks.net/bth_files/forest/1781294271079_0.png"}]'::jsonb,
+  '[{"slide_type":"first_slide","image":"https://betheoiasearth-staging.objectstore.e2enetworks.net/bth_files/forest/1781294282059_0.png"},{"slide_type":"content_slide","image":"https://betheoiasearth-staging.objectstore.e2enetworks.net/bth_files/forest/1781294290630_0.png"},{"slide_type":"project_impact_slide","image":"https://betheoiasearth-staging.objectstore.e2enetworks.net/bth_files/forest/1781294298743_0.png"}]'::jsonb,
   TRUE, TRUE, 'd21cabf2-c06c-4c1e-a9ea-d1ea928727d0', 'd21cabf2-c06c-4c1e-a9ea-d1ea928727d0'
 ) ON CONFLICT (id) DO NOTHING;
 
@@ -223,7 +223,7 @@ INSERT INTO forest_trees (
   31, 'AA1', 'Mango', '4', '1', 1082,
   '243.45', '135.25',
   '12.891256', '80.081001', '2023-06-30',
-  'https://bethetreehugger.co/tree/KISVAN63/AA1', TRUE, TRUE,
+  'https://oiasearth.com/tree/KISVAN63/AA1', TRUE, TRUE,
   'd21cabf2-c06c-4c1e-a9ea-d1ea928727d0', 'd21cabf2-c06c-4c1e-a9ea-d1ea928727d0'
 ) ON CONFLICT (id) DO NOTHING;
 

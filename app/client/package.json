@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "description": "Be The Tree Hugger / CommuniTREE admin panel — faithful rebuild (frontend).",
+  "description": "OIAS Earth / CommuniTREE admin panel — faithful rebuild (frontend).",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
