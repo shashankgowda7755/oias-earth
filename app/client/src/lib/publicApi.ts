@@ -145,6 +145,21 @@ export async function fetchTreeProof(id: string): Promise<TreeProof> {
   return j.data;
 }
 
+/** Quarterly forest report payload (the 21-slide renderer's data). */
+export async function fetchForestReport(
+  id: string,
+  year?: number,
+  quarter?: number,
+): Promise<import('@/pages/report/reportTypes').ForestReportData> {
+  const qs = new URLSearchParams();
+  if (year) qs.set('year', String(year));
+  if (quarter) qs.set('quarter', String(quarter));
+  const r = await fetch(`${BASE}/forest/${id}/report${qs.toString() ? `?${qs}` : ''}`);
+  if (!r.ok) throw new Error('Report not found');
+  const j = (await r.json()) as { data: import('@/pages/report/reportTypes').ForestReportData };
+  return j.data;
+}
+
 export interface Sponsor {
   name: string | null;
   logo: string | null;

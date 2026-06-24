@@ -97,6 +97,15 @@ export function ForestDetailView({ forest, onClose, onEdit }: ForestDetailViewPr
 
   const footer = (
     <footer className="flex items-center justify-end gap-2 border-t border-border px-6 py-4">
+      {forest.id ? (
+        <Button
+          type="button"
+          variant="outlined"
+          onClick={() => window.open(`/report/forest/${forest.id}`, '_blank', 'noopener')}
+        >
+          View quarterly report ↗
+        </Button>
+      ) : null}
       {onEdit ? (
         <Button type="button" variant="outlined" onClick={onEdit}>
           Edit

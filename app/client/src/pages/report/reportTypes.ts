@@ -104,7 +104,8 @@ export interface ComputedReport {
   total_saplings: number;
   species_count: number;
   species_inventory: SpeciesRow[];
-  /** Slide 8 net impact projection per horizon (₹, raw rupees). */
+  /** Slide 8 net impact projection per horizon. UNIT = ₹ Crore (the impact-report
+   * fields are stored in Cr, per the PDF method) — display appends " Cr", no rescale. */
   value_flow: { short: number | null; medium: number | null; long: number | null };
   /** Slide 9. */
   approx_value_100: ApproxValueBlock | null;

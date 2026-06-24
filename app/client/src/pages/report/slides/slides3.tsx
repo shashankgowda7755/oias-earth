@@ -18,6 +18,7 @@ const PH_COLORS = ['#e2231a', '#ee5a24', '#f39c12', '#f7c948', '#d4e157', '#a4d6
 export function S15SoilPh({ data }: SlideProps) {
   const { meta, forest } = data;
   const ph = pickQuarter(forest.soil_ph_level, meta.year, meta.quarter);
+  const phIdx = ph?.meter_reading != null ? Math.max(0, Math.min(14, Math.round(ph.meter_reading))) : null;
   const cards = [
     ['Acidic Land', 'Acidic soils often increase availability of toxic metals like aluminium & manganese, which can damage roots.', C.red],
     ['Neutral Land', 'pH ~6.5 to 7.5: saplings generally show better growth, survival, and resistance to diseases.', C.green],
@@ -29,9 +30,14 @@ export function S15SoilPh({ data }: SlideProps) {
       <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr', gap: 22, flex: 1, minHeight: 0 }}>
         <div style={{ border: `1px solid ${C.line}`, borderRadius: 14, padding: '16px 18px' }}>
           <strong style={{ fontSize: 14, color: C.ink }}>pH Improvement Trajectory</strong>
-          <div style={{ display: 'flex', gap: 2, margin: '18px 0 6px' }}>
+          <div style={{ display: 'flex', gap: 2, marginTop: 18 }}>
+            {PH_COLORS.map((_, i) => (
+              <div key={i} style={{ flex: 1, textAlign: 'center', fontSize: 12, color: C.ink, height: 16 }}>{phIdx === i ? '▼' : ''}</div>
+            ))}
+          </div>
+          <div style={{ display: 'flex', gap: 2, marginBottom: 6 }}>
             {PH_COLORS.map((c, i) => (
-              <div key={i} style={{ flex: 1, height: 34, background: c, borderRadius: 4, color: '#fff', fontSize: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700 }}>{i}</div>
+              <div key={i} style={{ flex: 1, height: 34, background: c, borderRadius: 4, color: '#fff', fontSize: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, outline: phIdx === i ? `2px solid ${C.ink}` : 'none' }}>{i}</div>
             ))}
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: C.muted, marginBottom: 16 }}>
@@ -97,7 +103,7 @@ export function S16Temperature({ data }: SlideProps) {
           <div style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '.05em', color: 'rgba(255,255,255,.6)' }}>The Difference</div>
           <div style={{ display: 'flex', gap: 22, marginTop: 12 }}>
             <div><div style={{ fontSize: 24, fontWeight: 800 }}>{tempDiff != null ? `${tempDiff.toFixed(1)}°c` : '—'}</div><div style={{ fontSize: 10, color: 'rgba(255,255,255,.6)' }}>TEMP</div></div>
-            <div><div style={{ fontSize: 24, fontWeight: 800 }}>{humDiff != null ? `${humDiff} RH` : '—'}</div><div style={{ fontSize: 10, color: 'rgba(255,255,255,.6)' }}>HUMID</div></div>
+            <div><div style={{ fontSize: 24, fontWeight: 800 }}>{humDiff != null ? `${humDiff.toFixed(1)} RH` : '—'}</div><div style={{ fontSize: 10, color: 'rgba(255,255,255,.6)' }}>HUMID</div></div>
           </div>
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
@@ -146,9 +152,15 @@ export function S18Species({ data }: SlideProps) {
   let acc = 0;
   const palette = [C.green, C.blue, C.amber, '#9b7fd4', C.red, '#26a69a', '#7cb342', '#5c6bc0', '#ec407a'];
   const segs = inv.map((s, i) => { const start = acc; acc += (s.saplings / total) * 360; return { from: start, to: acc, color: palette[i % palette.length] }; });
+  const saplingType = forest.plantation_strategy === 'mixed_species'
+    ? 'Mixed'
+    : forest.plantation_strategy === 'others'
+      ? enumLabel(forest.plantation_strategy_other)
+      : enumLabel(forest.plantation_strategy);
+  const showTraits = inv.some((s) => Object.values(s.traits).some(Boolean));
   const facts: [string, string][] = [
     ['Saplings Planted', numOrDash(computed.total_saplings)], ['Saplings Health', enumLabel(sd?.health === 'others' ? sd.health_other : sd?.health)],
-    ['Saplings Type', forest.plantation_strategy === 'mixed_species' ? 'Mixed' : enumLabel(forest.plantation_strategy)], ['Sapling Mortality', sd?.mortality_rate != null ? `${sd.mortality_rate}%` : '—'],
+    ['Saplings Type', saplingType], ['Sapling Mortality', sd?.mortality_rate != null ? `${sd.mortality_rate}%` : '—'],
     ['Saplings Spacing', forest.tree_to_tree_distance != null ? `${forest.tree_to_tree_distance} ft` : '—'], ['Other Issues', dash(sd?.other_issues)],
     ['Sapling Species', numOrDash(computed.species_count)], ['Additional Plantation Scope', dash(sd?.additional_scope)],
   ];
@@ -180,20 +192,25 @@ export function S18Species({ data }: SlideProps) {
           </svg>
         </div>
       </div>
-      <div style={{ fontSize: 11.5, textTransform: 'uppercase', letterSpacing: '.05em', color: C.muted, marginBottom: 8 }}>Detailed Species Inventory</div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+        <span style={{ fontSize: 11.5, textTransform: 'uppercase', letterSpacing: '.05em', color: C.muted }}>Detailed Species Inventory</span>
+        {inv.length > 5 && <span style={{ fontSize: 11.5, color: C.green, fontWeight: 600 }}>+{inv.length - 5} more species</span>}
+      </div>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5,1fr)', gap: 10, flex: 1, minHeight: 0, overflow: 'hidden' }}>
         {inv.slice(0, 5).map((s) => (
           <div key={s.common_name} style={{ border: `1px solid ${C.line}`, borderRadius: 12, padding: '12px 14px', display: 'flex', flexDirection: 'column' }}>
             <strong style={{ fontSize: 14, color: C.ink }}>{s.common_name}</strong>
-            <div style={{ fontSize: 11, color: C.muted, margin: '6px 0', flex: 1, overflow: 'hidden', lineHeight: 1.4 }}>{s.description ?? <span style={{ color: C.faint }}>Species notes from master data</span>}</div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: `1px solid ${C.line}`, paddingTop: 8 }}>
+            {s.description && <div style={{ fontSize: 11, color: C.muted, margin: '6px 0', flex: 1, overflow: 'hidden', lineHeight: 1.4 }}>{s.description}</div>}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: `1px solid ${C.line}`, paddingTop: 8, marginTop: 'auto' }}>
               <span style={{ fontSize: 11, color: C.muted }}>Saplings</span><strong style={{ color: C.green }}>{numOrDash(s.saplings)}</strong>
             </div>
-            <div style={{ display: 'flex', gap: 5, marginTop: 8 }}>
-              {TRAIT_ICONS.map(([key, label, col]) => (
-                <span key={key} title={label} style={{ width: 16, height: 16, borderRadius: 4, background: s.traits[key] ? col : C.line, opacity: s.traits[key] ? 1 : 0.35 }} />
-              ))}
-            </div>
+            {showTraits && (
+              <div style={{ display: 'flex', gap: 5, marginTop: 8 }}>
+                {TRAIT_ICONS.map(([key, label, col]) => (
+                  <span key={key} title={label} style={{ width: 16, height: 16, borderRadius: 4, background: s.traits[key] ? col : C.line, opacity: s.traits[key] ? 1 : 0.35 }} />
+                ))}
+              </div>
+            )}
           </div>
         ))}
       </div>

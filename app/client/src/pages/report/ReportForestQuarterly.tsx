@@ -11,6 +11,7 @@ import { buildPreviewReport } from './reportFixture';
 import { C, FONT, REPORT_PRINT_CSS } from './reportPrimitives';
 import { SLIDES } from './slides';
 import type { ForestReportData } from './reportTypes';
+import { fetchForestReport } from '@/lib/publicApi';
 
 export default function ReportForestQuarterly() {
   const { id = '' } = useParams();
@@ -21,18 +22,22 @@ export default function ReportForestQuarterly() {
   const [err, setErr] = useState<string | null>(null);
 
   const preview = useMemo(() => buildPreviewReport(), []);
+  const year = sp.get('year') ? Number(sp.get('year')) : undefined;
+  const quarter = sp.get('quarter') ? Number(sp.get('quarter')) : undefined;
 
   useEffect(() => {
     if (isPreview) {
       setData(preview);
       return;
     }
-    // Phase 2: fetchForestReport(id, year, quarter). Until then, fall back to the
-    // fixture so the route renders; mark it so it's never mistaken for live data.
-    setData(preview);
-    setErr('Live data wiring lands in Phase 2 — showing the Vandalur preview.');
-  }, [id, isPreview, preview]);
+    setData(null);
+    setErr(null);
+    fetchForestReport(id, year, quarter)
+      .then(setData)
+      .catch((e) => setErr(e instanceof Error ? e.message : 'Failed to load report'));
+  }, [id, isPreview, preview, year, quarter]);
 
+  if (err) return <div style={{ padding: 48, fontFamily: FONT, color: C.muted }}>{err}</div>;
   if (!data) return <div style={{ padding: 48, fontFamily: FONT, color: C.muted }}>Loading report…</div>;
 
   return (

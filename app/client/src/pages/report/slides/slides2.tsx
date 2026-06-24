@@ -84,7 +84,7 @@ export function S09ApproxValue({ data }: SlideProps) {
           <div style={{ border: `1px solid ${C.line}`, borderRadius: 12, overflow: 'hidden' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12.5 }}>
               <thead><tr style={{ background: '#f7faf8', color: C.muted, textAlign: 'left' }}>
-                {['Species', 'Saplings', 'Oxygen/yr', 'Carbon/yr', 'Est. value'].map((h) => <th key={h} style={{ padding: '8px 12px', fontWeight: 600 }}>{h}</th>)}
+                {['Species', 'Saplings', 'Oxygen/yr (25%)', 'Carbon/yr (25%)', 'Est. value'].map((h) => <th key={h} style={{ padding: '8px 12px', fontWeight: 600 }}>{h}</th>)}
               </tr></thead>
               <tbody>
                 {computed.species_inventory.length ? computed.species_inventory.map((s) => (
@@ -193,10 +193,10 @@ function WorkforceSlide({ data, w, periodTag }: SlideProps & { w: WorkforceRollu
               {w && <SplitBar segments={[{ pct: w.ft_share_pct, color: C.amber, label: `${w.ft_share_pct}%` }, { pct: w.pt_share_pct, color: C.green, label: `${w.pt_share_pct}%` }]} />}
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, padding: '6px 0' }}>
-              <span style={{ color: C.muted }}>Full-Time · {w ? `${w.ft_labour_days} × 8 × ${w.ft_gardeners}` : '—'}</span><strong>{w ? `${numOrDash(w.ft_hours)} hrs` : '—'}</strong>
+              <span style={{ color: C.muted }}>Full-Time · {w ? `${w.ft_labour_days} labour-days @ 8h` : '—'}</span><strong>{w ? `${numOrDash(w.ft_hours)} hrs` : '—'}</strong>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, padding: '6px 0', borderTop: `1px solid ${C.line}` }}>
-              <span style={{ color: C.muted }}>Part-Time · {w ? `${w.pt_labour_days} × 9 × ${w.pt_gardeners}` : '—'}</span><strong>{w ? `${numOrDash(w.pt_hours)} hrs` : '—'}</strong>
+              <span style={{ color: C.muted }}>Part-Time · {w ? `${w.pt_labour_days} labour-days @ 9h` : '—'}</span><strong>{w ? `${numOrDash(w.pt_hours)} hrs` : '—'}</strong>
             </div>
           </div>
         </div>
@@ -297,7 +297,7 @@ export function S14SiteMasterPlan({ data }: SlideProps) {
         <div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 18 }}>
             <StatCard label="Box Count" value={p ? numOrDash(p.box_count) : '—'} sub="Allocated plots" />
-            <StatCard label="Total Saplings" value={p ? numOrDash(p.total_saplings) : '—'} sub="Projected capacity" valueColor={C.green} />
+            <StatCard label="Projected Capacity" value={p ? numOrDash(p.total_saplings) : '—'} sub="Max saplings (grid)" valueColor={C.green} />
           </div>
           <div style={{ fontSize: 11.5, textTransform: 'uppercase', letterSpacing: '.06em', color: C.muted, marginBottom: 6 }}>Plantation Grid</div>
           <div style={{ border: `1px solid ${C.line}`, borderRadius: 12, padding: '4px 16px' }}>

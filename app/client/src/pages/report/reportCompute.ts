@@ -55,13 +55,12 @@ function quarterPeriodLabel(year: number, q: number): string {
   return `${MONTHS[startMonth]} – ${MONTHS[startMonth + 2]} ${yy}`;
 }
 
-/** Sum saplings across boxes; default 1 per species row missing a count. */
+/** Sum actual saplings across boxes. Missing/zero count = 0 (never inflate). */
 function totalSaplings(p: FullForestPayload): number {
   let n = 0;
   for (const b of p.box_data ?? []) {
     for (const s of b.species_data ?? []) {
-      const c = num(s.count);
-      n += c > 0 ? c : 1;
+      n += Math.max(0, num(s.count));
     }
   }
   return n;
@@ -73,7 +72,7 @@ function speciesInventory(p: FullForestPayload): SpeciesRow[] {
     for (const s of b.species_data ?? []) {
       const common = s.species_common_name?.trim() || s.species_name?.trim() || `Species ${s.species_id}`;
       const key = String(s.species_id ?? common);
-      const count = num(s.count) > 0 ? num(s.count) : 1;
+      const count = Math.max(0, num(s.count));
       const existing = byKey.get(key);
       if (existing) {
         existing.saplings += count;
@@ -174,11 +173,14 @@ function workforceRollup(entries: MaintenanceWorkforceQuarter[], year: number, q
 function growthMilestones(p: FullForestPayload): GrowthMilestone[] {
   const targets = (p.plant_growth_data?.target_height_range ?? []).slice().sort((a, b) => a.year - b.year);
   if (targets.length === 0) return [];
-  const plantYear = p.plantation_date ? new Date(p.plantation_date).getFullYear() : new Date().getFullYear();
+  // Milestone month is anchored to the plantation month (PDF shows "Apr – 25" etc.),
+  // not hardcoded December. No plantation date → date is blank, never guessed.
+  const plantD = p.plantation_date ? new Date(p.plantation_date) : null;
   return targets.map((t) => {
     const label = t.year === 0 ? 'Year 0' : `End of Year ${t.year}`;
     const range = t.min != null && t.max != null ? `${t.min}–${t.max} Feet` : '—';
-    return { label, range, date: `Dec- ${plantYear + t.year}`, current: t.year === 0 };
+    const date = plantD ? `${MONTHS[plantD.getMonth()]}- ${plantD.getFullYear() + t.year}` : '—';
+    return { label, range, date, current: t.year === 0 };
   });
 }
 
@@ -196,14 +198,32 @@ function siteMasterPlan(p: FullForestPayload): SiteMasterPlan | null {
   const boxCols = num(p.box_columns);
   const treeRows = num(p.tree_rows);
   const treeCols = num(p.tree_columns);
-  const boxCount = (p.box_data?.length ?? 0) || boxRows * boxCols;
+  const boxes = p.box_data ?? [];
+  const boxCount = boxes.length || boxRows * boxCols;
   if (!boxCount && !treeRows) return null;
-  const perMatrix = treeRows * treeCols;
+
+  // Projected capacity = sum of each box's own tree matrix (boxes can differ).
+  // Falls back to the forest-level tree matrix when a box omits its dims.
+  const fallbackMatrix = treeRows * treeCols;
+  const caps = boxes.length
+    ? boxes.map((b) => (num(b.row) * num(b.column)) || fallbackMatrix)
+    : [fallbackMatrix];
+  const first = caps[0] ?? 0;
+  const total = caps.reduce((s, c) => s + c, 0) * (boxes.length ? 1 : boxCount);
+  const uniform = caps.every((c) => c === first);
+  let perMatrixLabel = '—';
+  if (uniform && first > 0) {
+    const r = boxes[0] ? num(boxes[0].row) || treeRows : treeRows;
+    const c = boxes[0] ? num(boxes[0].column) || treeCols : treeCols;
+    perMatrixLabel = `${r} × ${c} = ${first} Nos`;
+  } else if (caps.length) {
+    perMatrixLabel = caps.join(' + ');
+  }
   return {
-    box_count: boxCount || boxRows * boxCols,
-    total_saplings: (boxCount || boxRows * boxCols) * perMatrix,
+    box_count: boxCount,
+    total_saplings: total,
     grid_label: boxRows && boxCols ? `${boxRows} × ${boxCols}` : '—',
-    per_matrix_label: treeRows && treeCols ? `${treeRows} × ${treeCols} = ${perMatrix} Nos` : '—',
+    per_matrix_label: perMatrixLabel,
     spacing_grids: p.box_to_box_distance,
     spacing_plants: p.tree_to_tree_distance,
     spacing_pathway: p.pathway_spacing,
@@ -221,7 +241,7 @@ export function computeReport(p: FullForestPayload, year: number, quarter: numbe
   const total = totalSaplings(p);
   const inv = speciesInventory(p);
   const vf = p.forest_value_flow_impact_report;
-  const survival75 = Math.round(total * 0.75 * 10) / 10;
+  const survival75 = Math.round(total * 0.75); // whole saplings — drives kg math
   return {
     total_saplings: total,
     species_count: inv.length,

@@ -58,7 +58,8 @@ export function S01Cover({ data }: SlideProps) {
 
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginTop: 22 }}>
             {pill(`${meta.quarter_label} Quarterly Report`)}
-            {pill(`${meta.period_label}${forest.forest_city ? ' ' + forest.forest_city : ''}`)}
+            {pill(meta.period_label)}
+            {forest.forest_city ? pill(dash(forest.forest_city)) : null}
           </div>
           <div style={{ marginTop: 12 }}>{pill(`${numOrDash(computed.total_saplings)} Saplings`, true)}</div>
 
@@ -150,7 +151,7 @@ export function S03OsrLand({ data }: SlideProps) {
       <div style={{ display: 'grid', gridTemplateColumns: '1.15fr 1fr', gap: 24, flex: 1, minHeight: 0 }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
-            <StatCard label="Site Location" value={dash(forest.forest_city)} sub={[forest.forest_city, forest.forest_state].filter(Boolean).join(', ') || '—'} />
+            <StatCard label="Site Location" value={dash(forest.forest_city)} sub={[forest.forest_state, forest.forest_country].filter(Boolean).join(', ') || '—'} />
             <StatCard label="Land Ownership" value={dash(o?.name)} sub={enumLabel(o?.agreement_status)} />
             <StatCard label="Total Land Area" value={a?.total_area != null ? numOrDash(a.total_area) : '—'} unit="ft²" sub={a?.planted_area != null ? `${numOrDash(a.planted_area)} ft² planted` : undefined} />
             <StatCard label="Project Status" value="Active" sub={`Maintenance · ${progress}%`} valueColor={C.green} />
@@ -199,7 +200,7 @@ export function S04Permission({ data }: SlideProps) {
             </div>
             {row('1', 'Authorized By', <>{dash(au?.authorized_by_name)}<div style={{ fontSize: 12.5, fontWeight: 500, color: C.muted }}>{dash(au?.authorized_by_designation)}</div></>)}
             {row('2', 'Authorized Date', fmtDate(au?.authorized_date))}
-            {row('3', 'Authorized Period', au?.authorized_period ? `${au.authorized_period} Years` : '—')}
+            {row('3', 'Authorized Period', au?.authorized_period != null && String(au.authorized_period).trim() !== '' ? `${au.authorized_period} Year${Number(au.authorized_period) === 1 ? '' : 's'}` : '—')}
           </div>
           <div style={{ marginTop: 14, background: C.greenSoft, borderRadius: 12, padding: '12px 16px' }}>
             <div style={{ fontSize: 11.5, textTransform: 'uppercase', letterSpacing: '.05em', color: C.greenDark, fontWeight: 700, marginBottom: 4 }}>Project Context</div>
@@ -297,16 +298,16 @@ export function S07Beneficiaries({ data }: SlideProps) {
   const b = forest.direct_and_indirect_beneficiaries;
   const pad2 = (v: unknown) => { const n = Number(v); return Number.isFinite(n) ? String(n).padStart(2, '0') : '—'; };
   const direct = [
-    ['Site Manager', 'Leadership oversight', '01'],
+    ['Site Manager', 'Leadership oversight', pad2(b ? (b as Record<string, unknown>)['site_manager'] : undefined)],
     ['Site Supervisor', 'On-ground coordination', pad2(b?.site_supervisor)],
     ['Watering Team', 'Full-time dedication', pad2(b?.watering_team)],
     ['De-weeding Crew', 'Part-time contribution', pad2(b?.de_weeding_crew)],
     ['Plant Health Specialist', 'Pest & disease management', pad2(b?.plant_health_specialist)],
   ];
   const indirect = [
-    ['People Visiting', dash(b?.people_visiting), 'Visitors & recreational users'],
-    ['People Living Near', dash(b?.people_living_near), 'Within 5km radius of the site'],
-    ['Educational Hubs', dash(b?.schools_colleges), 'Local schools & colleges'],
+    ['People Visiting', numOrDash(b?.people_visiting), 'Visitors & recreational users'],
+    ['People Living Near', numOrDash(b?.people_living_near), 'Within 5km radius of the site'],
+    ['Educational Hubs', numOrDash(b?.schools_colleges), 'Local schools & colleges'],
     ['Trees Planted', numOrDash(computed.total_saplings), 'Enhancing local biodiversity'],
   ];
   return (

@@ -15,6 +15,7 @@ import { query } from '../db';
 import { notFound } from '../errors';
 import { treeCo2eKg, netCo2eKg, oxygenKg, CARBON_METHOD, BUFFER_PCT, UNCERTAINTY_PCT } from '../lib/carbon';
 import { isAllowedPanoUrl } from '../lib/pano';
+import { buildForestReport } from '../lib/reportData';
 
 export const publicRouter = Router();
 
@@ -924,8 +925,25 @@ async function serveSceneImage(req: Request, res: Response): Promise<void> {
   res.send(r.rows[0]!.bytes);
 }
 
+/**
+ * GET /public/forest/:id/report?year=&quarter= — the full quarterly report
+ * payload (meta + forest + computed) for the 21-slide renderer. Defaults to the
+ * current calendar quarter when year/quarter are omitted.
+ */
+async function forestReport(req: Request, res: Response): Promise<void> {
+  const id = String(req.params.id);
+  if (!UUID_RE.test(id)) throw notFound('Forest not found');
+  const now = new Date();
+  const year = Number(req.query.year) || now.getFullYear();
+  const qParam = Number(req.query.quarter);
+  const quarter = qParam >= 1 && qParam <= 4 ? qParam : Math.floor(now.getMonth() / 3) + 1;
+  const data = await buildForestReport(id, year, quarter);
+  res.json({ data });
+}
+
 publicRouter.get('/public/sponsors', wrap(sponsorsPublic));
 publicRouter.get('/public/leaderboard', wrap(leaderboard));
+publicRouter.get('/public/forest/:id/report', wrap(forestReport));
 publicRouter.get('/public/forest/:id/boundary', wrap(forestBoundaryPublic));
 publicRouter.get('/public/sponsor/:id', wrap(sponsorMicrosite));
 publicRouter.get('/public/sponsor/:id/report.csv', wrap(sponsorReportCsv));
