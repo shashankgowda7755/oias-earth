@@ -107,7 +107,7 @@ export function S02Contents({ data }: SlideProps) {
       <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 22 }}>
         <Breadcrumb meta={meta} /><span style={{ flex: 1, height: 1, background: C.line }} /><ClientMark meta={meta} />
       </div>
-      <div style={{ display: 'grid', gridTemplateColumns: '0.7fr 1.3fr', gap: 34, flex: 1, minHeight: 0 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '0.7fr 1.3fr', gridTemplateRows: 'minmax(0, 1fr)', gap: 34, flex: 1, minHeight: 0 }}>
         <ReportImage src={hero} label="Contents image" style={{ height: '100%' }} />
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 18, marginBottom: 18 }}>
@@ -148,7 +148,7 @@ export function S03OsrLand({ data }: SlideProps) {
   return (
     <SlidePage meta={meta}>
       <SectionTitle>Description: OSR Land</SectionTitle>
-      <div style={{ display: 'grid', gridTemplateColumns: '1.15fr 1fr', gap: 24, flex: 1, minHeight: 0 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1.15fr 1fr', gridTemplateRows: 'minmax(0, 1fr)', gap: 24, flex: 1, minHeight: 0 }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
             <StatCard label="Site Location" value={dash(forest.forest_city)} sub={[forest.forest_state, forest.forest_country].filter(Boolean).join(', ') || '—'} />
@@ -189,7 +189,7 @@ export function S04Permission({ data }: SlideProps) {
   );
   return (
     <SlidePage meta={meta}>
-      <div style={{ display: 'grid', gridTemplateColumns: '0.9fr 1.1fr', gap: 34, flex: 1, minHeight: 0 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '0.9fr 1.1fr', gridTemplateRows: 'minmax(0, 1fr)', gap: 34, flex: 1, minHeight: 0 }}>
         <ReportImage src={forest.permission_letter} label="Permission letter" style={{ height: '100%' }} />
         <div>
           <SectionTitle>Permission Letter</SectionTitle>
@@ -270,7 +270,7 @@ export function S06ProjectImpact({ data }: SlideProps) {
           </div>
         ))}
       </div>
-      <div style={{ display: 'grid', gridTemplateColumns: '0.8fr 1.2fr', gap: 22, marginTop: 22, flex: 1, minHeight: 0 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '0.8fr 1.2fr', gridTemplateRows: 'minmax(0, 1fr)', gap: 22, marginTop: 22, flex: 1, minHeight: 0 }}>
         <ReportImage src={img} label="Impact image" style={{ height: '100%' }} />
         <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
           <div style={{ fontSize: 20, color: C.body, lineHeight: 1.5 }}>

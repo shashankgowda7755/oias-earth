@@ -292,7 +292,7 @@ export function S14SiteMasterPlan({ data }: SlideProps) {
       <div style={{ fontSize: 13, color: C.muted, marginTop: -12, marginBottom: 14 }}>
         Layout for the {dash(forest.forest_city)} site proposing the plantation of {numOrDash(computed.total_saplings)} saplings in a systematic matrix configuration.
       </div>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 22, flex: 1, minHeight: 0 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gridTemplateRows: 'minmax(0, 1fr)', gap: 22, flex: 1, minHeight: 0 }}>
         <ReportImage src={forest.site_layout} label="Site layout plan" style={{ height: '100%' }} />
         <div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 18 }}>
