@@ -98,7 +98,7 @@ export function S16Temperature({ data }: SlideProps) {
         {panel('Inside Plantation', inside)}
         {panel('Outside Plantation', outside)}
       </div>
-      <div style={{ display: 'grid', gridTemplateColumns: '0.6fr 1.4fr', gap: 18, marginTop: 18, flex: 1 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '0.6fr 1.4fr', gap: 18, marginTop: 18, flex: 1, alignItems: 'start' }}>
         <div style={{ background: C.dark, borderRadius: 14, padding: '16px 18px', color: '#fff' }}>
           <div style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '.05em', color: 'rgba(255,255,255,.6)' }}>The Difference</div>
           <div style={{ display: 'flex', gap: 22, marginTop: 12 }}>
@@ -261,16 +261,14 @@ export function S20Security({ data }: SlideProps) {
     <SlidePage meta={meta}>
       <SectionTitle>Site Security &amp; Infrastructure</SectionTitle>
       {si?.description && <div style={{ fontSize: 14, color: C.body, marginTop: -12, marginBottom: 16, lineHeight: 1.5 }}>{si.description}</div>}
-      {si?.image_data?.length ? (
-        <div style={{ display: 'grid', gridTemplateColumns: `repeat(${Math.min(3, si.image_data.length)},1fr)`, gap: 16, flex: 1, minHeight: 0 }}>
-          {si.image_data.map((im, i) => (
-            <div key={i} style={{ border: `1px solid ${C.line}`, borderRadius: 14, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-              <ReportImage src={im.image} label="Site photo" radius={0} style={{ flex: 1, minHeight: 140 }} />
-              <div style={{ padding: '12px 14px' }}><strong style={{ fontSize: 14, color: C.ink }}>{dash(im.name)}</strong><div style={{ fontSize: 12, color: C.muted, marginTop: 2 }}>{dash(im.description)}</div></div>
-            </div>
-          ))}
-        </div>
-      ) : <EmptyBlock label="No security & infrastructure entries" height={200} />}
+      <div style={{ display: 'grid', gridTemplateColumns: `repeat(${Math.min(3, Math.max(2, si?.image_data?.length ?? 0))},1fr)`, gap: 16, flex: 1, minHeight: 0 }}>
+        {(si?.image_data?.length ? si.image_data : [{}, {}]).map((im, i) => (
+          <div key={i} style={{ border: `1px solid ${C.line}`, borderRadius: 14, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+            <ReportImage src={im.image} label="Site photo" radius={0} style={{ flex: 1, minHeight: 140 }} />
+            <div style={{ padding: '12px 14px' }}><strong style={{ fontSize: 14, color: C.ink }}>{dash(im.name)}</strong><div style={{ fontSize: 12, color: C.muted, marginTop: 2 }}>{dash(im.description)}</div></div>
+          </div>
+        ))}
+      </div>
     </SlidePage>
   );
 }

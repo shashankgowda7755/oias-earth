@@ -115,7 +115,7 @@ export function S02Contents({ data }: SlideProps) {
             <span style={{ flex: 1, height: 3, borderRadius: 2, background: `linear-gradient(90deg, ${C.green}, ${C.greenSoft})` }} />
           </div>
           {TOC.map(([t, p]) => (
-            <div key={p} style={{ display: 'flex', justifyContent: 'space-between', padding: '9px 0', borderBottom: `1px solid ${C.line}`, fontSize: 14, color: C.body }}>
+            <div key={p} style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 0', borderBottom: `1px solid ${C.line}`, fontSize: 12.5, color: C.body }}>
               <span>{t}</span><span style={{ color: C.muted }}>{p}</span>
             </div>
           ))}
@@ -230,18 +230,16 @@ export function S05AreaPopulation({ data }: SlideProps) {
       </div>
       <div style={{ marginTop: 20, flex: 1, minHeight: 0 }}>
         <div style={{ fontSize: 11.5, textTransform: 'uppercase', letterSpacing: '.06em', color: C.muted, marginBottom: 10 }}>Timeline of urban change</div>
-        {ap?.google_earth_image?.length ? (
-          <div style={{ display: 'flex', gap: 14 }}>
-            {ap.google_earth_image.map((g, i) => (
-              <div key={i} style={{ flex: 1 }}>
-                <ReportImage src={g.image} height={150} label={`${g.year ?? ''}`} />
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, marginTop: 6 }}>
-                  <strong style={{ color: C.ink }}>{dash(g.year)}</strong><span style={{ color: C.muted }}>pop {numOrDash(g.population)}</span>
-                </div>
+        <div style={{ display: 'flex', gap: 14 }}>
+          {(ap?.google_earth_image?.length ? ap.google_earth_image : [{}, {}, {}]).map((g, i) => (
+            <div key={i} style={{ flex: 1 }}>
+              <ReportImage src={g.image} height={150} label="Earth image" />
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, marginTop: 6 }}>
+                <strong style={{ color: C.ink }}>{dash(g.year)}</strong><span style={{ color: C.muted }}>pop {numOrDash(g.population)}</span>
               </div>
-            ))}
-          </div>
-        ) : <EmptyBlock label="No timeline images" height={150} />}
+            </div>
+          ))}
+        </div>
       </div>
     </SlidePage>
   );

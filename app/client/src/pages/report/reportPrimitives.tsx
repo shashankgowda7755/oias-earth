@@ -206,17 +206,52 @@ export function SplitBar({ segments, height = 26 }: { segments: { pct: number; c
   );
 }
 
-/** Empty-state placeholder used where the PDF would show an image/content the data lacks. */
-export function EmptyBlock({ label, height = 120 }: { label: string; height?: number }) {
+const photoIcon = (size = 30) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="3" y="3" width="18" height="18" rx="2" /><circle cx="8.5" cy="8.5" r="1.6" /><path d="M21 15l-5-5L5 21" />
+  </svg>
+);
+
+/**
+ * Photo placeholder matching the PDF's image areas — a solid light-grey box with
+ * a centered image icon + caption. FILLS its parent by default (height 100%), so
+ * an empty image region occupies exactly the space a real photo would, instead
+ * of collapsing to a small box. `height` pins a fixed height when there's no
+ * flex parent to fill.
+ */
+export function PhotoPlaceholder({ label = 'Photo', height, radius = 12, fill = true }: { label?: string; height?: number; radius?: number; fill?: boolean }) {
   return (
-    <div style={{ height, border: `1px dashed ${C.line}`, borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', color: C.faint, fontSize: 12.5, background: '#fbfdfc' }}>
+    <div style={{
+      height: height ?? (fill ? '100%' : 140), minHeight: 96, width: '100%', borderRadius: radius,
+      background: '#eef2f0', border: `1px solid ${C.line}`, display: 'flex', flexDirection: 'column',
+      alignItems: 'center', justifyContent: 'center', gap: 8, color: '#aeb9b5',
+    }}>
+      {photoIcon()}
+      <span style={{ fontSize: 12, fontWeight: 600, color: '#9aa7a2' }}>{label}</span>
+    </div>
+  );
+}
+
+/** Non-photo empty box (e.g. the OSR map area) — solid grey, fills its parent. */
+export function EmptyBlock({ label, height }: { label: string; height?: number }) {
+  return (
+    <div style={{ height: height ?? '100%', minHeight: 96, width: '100%', border: `1px solid ${C.line}`, borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#9aa7a2', fontSize: 12.5, background: '#eef2f0' }}>
       {label}
     </div>
   );
 }
 
-/** Image with graceful empty fallback. */
-export function ReportImage({ src, alt = '', height, label = 'No image', radius = 12, style }: { src?: string; alt?: string; height?: number; label?: string; radius?: number; style?: CSSProperties }) {
-  if (!src) return <EmptyBlock label={label} height={height ?? 120} />;
-  return <img src={src} alt={alt} style={{ width: '100%', height, objectFit: 'cover', borderRadius: radius, display: 'block', ...style }} />;
+/**
+ * Image region. Real photo → object-cover; empty → PhotoPlaceholder filling the
+ * SAME box. Wrap in a div carrying the layout height/flex so both states size
+ * identically (the placeholder no longer collapses to a fixed small box).
+ */
+export function ReportImage({ src, alt = '', height, label = 'Photo', radius = 12, style }: { src?: string; alt?: string; height?: number; label?: string; radius?: number; style?: CSSProperties }) {
+  const wrap: CSSProperties = { width: '100%', height: height ?? '100%', minHeight: 96, ...style };
+  if (!src) return <div style={wrap}><PhotoPlaceholder label={label} radius={radius} /></div>;
+  return (
+    <div style={wrap}>
+      <img src={src} alt={alt} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: radius, display: 'block' }} />
+    </div>
+  );
 }
