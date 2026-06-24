@@ -1,7 +1,7 @@
 {
   "_note": "Pilot extraction of the CGI Anna Saheb School (Pune) Q3 Oct-Dec'25 PPT/PDF report → forest_create_payload. Fiscal Q3 (Oct-Dec) = year 2025 quarter 3. Blanks left where the report is silent. Species default = slide-13's 5 native species at stated 20 each (flagged: cover says 250/5 species; slide 14 lists 4 different species).",
-  "forest_name": "CGI – Anna Saheb School, Pune",
-  "forest_desc": "CGI Urban Afforestation Initiative — Anna Saheb School, Pune.",
+  "forest_name": "Anna Saheb School, Pune",
+  "forest_desc": "Urban Afforestation Initiative at Anna Saheb School (Maharshi Annasaheb Shala), Pune — sponsored by CGI.",
   "forest_city": "Pune",
   "forest_state": "Maharashtra",
   "forest_country": "India",
