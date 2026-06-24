@@ -1,0 +1,182 @@
+{
+  "forest_name": "Vandalur Forest",
+  "forest_desc": "This is Vandalur Forest",
+  "forest_internal_id": "702",
+  "forest_geo_lat": "12.891256",
+  "forest_geo_long": "80.081001",
+  "forest_address": "Vandalur, Tamil Nadu 600048, India",
+  "forest_city": "Chennai",
+  "forest_state": "Tamil Nadu",
+  "forest_country": "India",
+  "box_to_box_distance": 1,
+  "tree_rows": 1,
+  "tree_columns": 1,
+  "tree_to_tree_distance": 1,
+  "direction_angle": 90,
+  "boundary_gap": 1,
+  "pathway_spacing": 1,
+  "project_site": "Vandalur Forest Site",
+  "project_period": 3,
+  "plantation_date": "2023-06-30",
+  "box_rows": 1,
+  "box_columns": 1,
+  "box_data": [
+    {
+      "id": "",
+      "row": 1,
+      "column": 1,
+      "tree_to_tree_distance": 1,
+      "prefix": "AA",
+      "start": "1",
+      "row_position": 1,
+      "column_position": 1,
+      "species_data": [
+        {
+          "species_id": 31,
+          "planted_on": "2023-06-30",
+          "count": 1,
+          "height": 4,
+          "diameter": 1,
+          "species_common_name": "Mango",
+          "species_name": "Mangifera Indica"
+        }
+      ]
+    }
+  ],
+  "additional_sponsor_logo": [
+    { "type": { "label": "Initiated By", "value": "initiated_by" }, "name": "Kishore Forest", "logo": "" },
+    { "type": { "label": "Sponsored By", "value": "sponsored_by" }, "name": "Kishore Forest", "logo": "" },
+    { "type": { "label": "Supported By", "value": "supported_by" }, "name": "Kishore Forest", "logo": "" },
+    { "type": { "label": "In Collaboration With", "value": "in_collaboration_with" }, "name": "Kishore Forest", "logo": "" }
+  ],
+  "land_ownership": { "name": "Kishore", "agreement_status": "agreement_confirmed" },
+  "land_area": { "total_area": 2000, "planted_area": 1000 },
+  "plantation_strategy": "mixed_species",
+  "plantation_strategy_other": "",
+  "irrigation_method": "borewell",
+  "irrigation_method_other": "",
+  "climate": "summer",
+  "climate_other": "",
+  "soil_type": "red_soil",
+  "soil_type_other": "",
+  "digipin": "DIGIPIN12345",
+  "last_inspection_date": "2026-06-01T00:00:00.000Z",
+  "permission_letter": "",
+  "authorization_details": {
+    "authorized_by_name": "Kishore",
+    "authorized_by_designation": "Software Engineer",
+    "authorized_date": "2023-06-01",
+    "authorized_period": "3",
+    "project_context": "This is Vandalur Forest"
+  },
+  "area_population_statistics_details": {
+    "total_jurisdiction_area": 2000,
+    "population": 200000,
+    "population_density": 15000,
+    "green_cover": "Green Cover",
+    "environmental_need": "Environmental Need",
+    "google_earth_image": [
+      { "image": "", "year": 2010, "population": 10000 },
+      { "image": "", "year": 2012, "population": 14000 },
+      { "image": "", "year": 2016, "population": 16000 }
+    ]
+  },
+  "direct_and_indirect_beneficiaries": {
+    "site_supervisor": 1,
+    "watering_team": 1,
+    "de_weeding_crew": 1,
+    "plant_health_specialist": 1,
+    "people_visiting": "1",
+    "people_living_near": "1",
+    "schools_colleges": 1
+  },
+  "forest_value_flow_impact_report": {
+    "short_term": { "land_value": 1, "tree_value": 1, "oxygen_generated": 1, "carbon_sequestration": 1 },
+    "medium_term": { "land_value": 1, "tree_value": 1, "oxygen_generated": 1, "carbon_sequestration": 1 },
+    "long_term": { "land_value": 1, "tree_value": 1, "oxygen_generated": 1, "carbon_sequestration": 1 }
+  },
+  "species_details": {
+    "health": "good",
+    "health_other": "",
+    "mortality_rate": 1,
+    "other_issues": "Other Issues",
+    "additional_scope": "Additional Scope"
+  },
+  "maintenance_workforce": [
+    { "year": 2023, "quarter": 2, "total_holidays_weekly_off": 1, "total_holidays_festival": 1, "total_watering_days": 1, "total_raining_days": 1, "full_time_gardeners": 1, "part_time_gardeners": 1, "total_part_time_labour_days": 1 },
+    { "year": 2023, "quarter": 3, "total_holidays_weekly_off": 1, "total_holidays_festival": 1, "total_watering_days": 1, "total_raining_days": 1, "full_time_gardeners": 1, "part_time_gardeners": 1, "total_part_time_labour_days": 1 },
+    { "year": 2023, "quarter": 4, "total_holidays_weekly_off": 1, "total_holidays_festival": 1, "total_watering_days": 1, "total_raining_days": 1, "full_time_gardeners": 1, "part_time_gardeners": 1, "total_part_time_labour_days": 1 },
+    { "year": 2024, "quarter": 1, "total_holidays_weekly_off": 1, "total_holidays_festival": 1, "total_watering_days": 1, "total_raining_days": 1, "full_time_gardeners": 1, "part_time_gardeners": 1, "total_part_time_labour_days": 1 },
+    { "year": 2024, "quarter": 2, "total_holidays_weekly_off": 1, "total_holidays_festival": 1, "total_watering_days": 1, "total_raining_days": 1, "full_time_gardeners": 1, "part_time_gardeners": 1, "total_part_time_labour_days": 1 },
+    { "year": 2024, "quarter": 3, "total_holidays_weekly_off": 1, "total_holidays_festival": 1, "total_watering_days": 1, "total_raining_days": 1, "full_time_gardeners": 1, "part_time_gardeners": 1, "total_part_time_labour_days": 1 },
+    { "year": 2024, "quarter": 4, "total_holidays_weekly_off": 1, "total_holidays_festival": 1, "total_watering_days": 1, "total_raining_days": 1, "full_time_gardeners": 1, "part_time_gardeners": 1, "total_part_time_labour_days": 1 },
+    { "year": 2025, "quarter": 1, "total_holidays_weekly_off": 1, "total_holidays_festival": 1, "total_watering_days": 1, "total_raining_days": 1, "full_time_gardeners": 1, "part_time_gardeners": 1, "total_part_time_labour_days": 1 },
+    { "year": 2025, "quarter": 2, "total_holidays_weekly_off": 1, "total_holidays_festival": 1, "total_watering_days": 1, "total_raining_days": 1, "full_time_gardeners": 1, "part_time_gardeners": 1, "total_part_time_labour_days": 1 },
+    { "year": 2025, "quarter": 3, "total_holidays_weekly_off": 1, "total_holidays_festival": 1, "total_watering_days": 1, "total_raining_days": 1, "full_time_gardeners": 1, "part_time_gardeners": 1, "total_part_time_labour_days": 1 },
+    { "year": 2025, "quarter": 4, "total_holidays_weekly_off": 1, "total_holidays_festival": 1, "total_watering_days": 1, "total_raining_days": 1, "full_time_gardeners": 1, "part_time_gardeners": 1, "total_part_time_labour_days": 1 },
+    { "year": 2026, "quarter": 1, "total_holidays_weekly_off": 1, "total_holidays_festival": 1, "total_watering_days": 1, "total_raining_days": 1, "full_time_gardeners": 1, "part_time_gardeners": 1, "total_part_time_labour_days": 1 }
+  ],
+  "plant_growth_data": {
+    "target_height_range": [
+      { "year": 0, "min": 1, "max": 1.5 },
+      { "year": 1, "min": 1.5, "max": 2 },
+      { "year": 2, "min": 2, "max": 2.5 },
+      { "year": 3, "min": 2.5, "max": 3 }
+    ],
+    "actual_height_range": [
+      { "year": 2023, "quarter": 2, "min": 1, "max": 1.5 },
+      { "year": 2023, "quarter": 3, "min": 1.5, "max": 2 },
+      { "year": 2023, "quarter": 4, "min": 2, "max": 2.5 },
+      { "year": 2024, "quarter": 1, "min": 2.5, "max": 3 },
+      { "year": 2024, "quarter": 2, "min": 3, "max": 3.5 },
+      { "year": 2024, "quarter": 3, "min": 3.5, "max": 4 },
+      { "year": 2024, "quarter": 4, "min": 4, "max": 4.5 },
+      { "year": 2025, "quarter": 1, "min": 4.5, "max": 5 },
+      { "year": 2025, "quarter": 2, "min": 5, "max": 5.5 },
+      { "year": 2025, "quarter": 3, "min": 5.5, "max": 6 },
+      { "year": 2025, "quarter": 4, "min": 6, "max": 6.5 },
+      { "year": 2026, "quarter": 1, "min": 6.5, "max": 7 }
+    ]
+  },
+  "site_layout": "",
+  "soil_ph_level": [
+    { "year": 2023, "quarter": 2, "reading_date": "2023-06-01", "meter_image": "", "meter_reading": 0.1 },
+    { "year": 2023, "quarter": 3, "reading_date": "2023-09-01", "meter_image": "", "meter_reading": 0.1 },
+    { "year": 2023, "quarter": 4, "reading_date": "2023-12-01", "meter_image": "", "meter_reading": 0.1 },
+    { "year": 2024, "quarter": 1, "reading_date": "2024-03-01", "meter_image": "", "meter_reading": 0.1 },
+    { "year": 2024, "quarter": 2, "reading_date": "2024-06-01", "meter_image": "", "meter_reading": 0.1 },
+    { "year": 2024, "quarter": 3, "reading_date": "2024-09-01", "meter_image": "", "meter_reading": 0.1 },
+    { "year": 2024, "quarter": 4, "reading_date": "2024-12-01", "meter_image": "", "meter_reading": 0.1 },
+    { "year": 2025, "quarter": 1, "reading_date": "2025-03-01", "meter_image": "", "meter_reading": 0.1 },
+    { "year": 2025, "quarter": 2, "reading_date": "2025-06-01", "meter_image": "", "meter_reading": 0.1 },
+    { "year": 2025, "quarter": 3, "reading_date": "2025-09-01", "meter_image": "", "meter_reading": 0.1 },
+    { "year": 2025, "quarter": 4, "reading_date": "2025-12-01", "meter_image": "", "meter_reading": 0.1 },
+    { "year": 2026, "quarter": 1, "reading_date": "2026-03-01", "meter_image": "", "meter_reading": 0.1 }
+  ],
+  "temperature_humidity": [
+    { "year": 2026, "quarter": 1, "reading_date": "2026-03-01", "inside_plantation": { "image": "", "humidity": 1, "temperature": 0.5 }, "outside_plantation": { "image": "", "humidity": 1, "temperature": 0.5 } },
+    { "year": 2026, "quarter": 2, "reading_date": "2026-06-01", "inside_plantation": { "image": "", "humidity": 1, "temperature": 0.5 }, "outside_plantation": { "image": "", "humidity": 1, "temperature": 0.5 } }
+  ],
+  "environmental_need_indicators": [
+    { "heading": "Heading", "description": "Description" }
+  ],
+  "security_and_infrastructure": {
+    "description": "Security & Infrastructure Description",
+    "image_data": [
+      { "name": "Security", "description": "Security Description", "image": "" },
+      { "name": "Infrastructure Image", "description": "Infrastructure Image", "image": "" }
+    ]
+  },
+  "plantation_progress": [
+    { "year": 2026, "quarter": 1, "image": "" },
+    { "year": 2026, "quarter": 2, "image": "" }
+  ],
+  "dashboard_images": [
+    { "name": "Dashboard Image 1", "description": "Dashboard Image 1", "image": "" }
+  ],
+  "report_images": [
+    { "slide_type": "first_slide", "image": "" },
+    { "slide_type": "content_slide", "image": "" },
+    { "slide_type": "project_impact_slide", "image": "" }
+  ]
+}

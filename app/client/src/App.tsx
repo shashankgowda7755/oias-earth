@@ -32,6 +32,7 @@ const ForestTourPage = lazy(() => import('./pages/ForestTourPage'));
 const ForestPage = lazy(() => import('./pages/ForestPage'));
 const ReportSponsor = lazy(() => import('./pages/ReportSponsor'));
 const ReportTree = lazy(() => import('./pages/ReportTree'));
+const ReportForestQuarterly = lazy(() => import('./pages/report/ReportForestQuarterly'));
 const Studio = lazy(() => import('./pages/Studio'));
 
 const queryClient = new QueryClient({
@@ -76,6 +77,7 @@ export default function App() {
               <Route path="/forest/:id/tour" element={<ForestTourPage />} />
               <Route path="/report/sponsor/:id" element={<ReportSponsor />} />
               <Route path="/report/tree/:id" element={<ReportTree />} />
+              <Route path="/report/forest/:id" element={<ReportForestQuarterly />} />
                 <Route
                   path="/dashboard"
                   element={
