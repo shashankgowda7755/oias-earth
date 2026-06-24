@@ -21,7 +21,8 @@ export default function ReportForestQuarterly() {
   const [data, setData] = useState<ForestReportData | null>(null);
   const [err, setErr] = useState<string | null>(null);
 
-  const preview = useMemo(() => buildPreviewReport(), []);
+  const previewSrc = sp.get('src') || 'vandalur';
+  const preview = useMemo(() => buildPreviewReport(previewSrc), [previewSrc]);
   const year = sp.get('year') ? Number(sp.get('year')) : undefined;
   const quarter = sp.get('quarter') ? Number(sp.get('quarter')) : undefined;
 

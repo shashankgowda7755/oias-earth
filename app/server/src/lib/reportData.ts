@@ -27,16 +27,21 @@ function parseJson<T>(v: unknown): T | undefined {
   return v as T;
 }
 
+// FISCAL quarters (Indian FY, Apr-start): Q1 Apr–Jun … Q4 Jan–Mar (next cal year).
+const FQ_START_MONTH: Record<number, number> = { 1: 3, 2: 6, 3: 9, 4: 0 };
+const fqCalYear = (fy: number, q: number): number => (q === 4 ? fy + 1 : fy);
+
 function daysInQuarter(year: number, q: number): number {
-  const start = (q - 1) * 3;
+  const start = FQ_START_MONTH[q] ?? 0;
+  const calYear = fqCalYear(year, q);
   let d = 0;
-  for (let m = start; m < start + 3; m++) d += new Date(year, m + 1, 0).getDate();
+  for (let m = start; m < start + 3; m++) d += new Date(calYear, m + 1, 0).getDate();
   return d;
 }
 
 function quarterPeriodLabel(year: number, q: number): string {
-  const start = (q - 1) * 3;
-  return `${MONTHS[start]} – ${MONTHS[start + 2]} ${String(year).slice(-2)}`;
+  const start = FQ_START_MONTH[q] ?? 0;
+  return `${MONTHS[start]} – ${MONTHS[start + 2]} ${String(fqCalYear(year, q)).slice(-2)}`;
 }
 
 const FOREST_SCALARS = [

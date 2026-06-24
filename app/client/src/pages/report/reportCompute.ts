@@ -39,19 +39,27 @@ function num(v: unknown): number {
   return Number.isFinite(n) ? n : 0;
 }
 
+// FISCAL quarters (Indian FY, Apr-start): Q1 Apr–Jun, Q2 Jul–Sep, Q3 Oct–Dec,
+// Q4 Jan–Mar. `year` is the fiscal year (the Apr it starts in); Q4's months fall
+// in the next calendar year.
+const FQ_START_MONTH: Record<number, number> = { 1: 3, 2: 6, 3: 9, 4: 0 };
+function fqCalYear(fy: number, q: number): number {
+  return q === 4 ? fy + 1 : fy;
+}
+
 function daysInQuarter(year: number, q: number): number {
-  // q1..q4 → month ranges; count real calendar days (handles leap Feb).
-  const startMonth = (q - 1) * 3; // 0,3,6,9
+  const startMonth = FQ_START_MONTH[q] ?? 0;
+  const calYear = fqCalYear(year, q);
   let days = 0;
   for (let m = startMonth; m < startMonth + 3; m++) {
-    days += new Date(year, m + 1, 0).getDate();
+    days += new Date(calYear, m + 1, 0).getDate();
   }
   return days;
 }
 
 function quarterPeriodLabel(year: number, q: number): string {
-  const startMonth = (q - 1) * 3;
-  const yy = String(year).slice(-2);
+  const startMonth = FQ_START_MONTH[q] ?? 0;
+  const yy = String(fqCalYear(year, q)).slice(-2);
   return `${MONTHS[startMonth]} – ${MONTHS[startMonth + 2]} ${yy}`;
 }
 

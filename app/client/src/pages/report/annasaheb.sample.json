@@ -1,0 +1,111 @@
+{
+  "_note": "Pilot extraction of the CGI Anna Saheb School (Pune) Q3 Oct-Dec'25 PPT/PDF report → forest_create_payload. Fiscal Q3 (Oct-Dec) = year 2025 quarter 3. Blanks left where the report is silent. Species default = slide-13's 5 native species at stated 20 each (flagged: cover says 250/5 species; slide 14 lists 4 different species).",
+  "forest_name": "CGI – Anna Saheb School, Pune",
+  "forest_desc": "CGI Urban Afforestation Initiative — Anna Saheb School, Pune.",
+  "forest_city": "Pune",
+  "forest_state": "Maharashtra",
+  "forest_country": "India",
+  "forest_address": "Maharshi Annasaheb Shala, Pune",
+  "forest_geo_lat": "18.503110608363396",
+  "forest_geo_long": "73.86174376725789",
+  "plantation_date": "2024-11-01",
+  "project_period": 3,
+  "box_rows": 3,
+  "box_columns": 1,
+  "tree_rows": 250,
+  "tree_columns": 1,
+  "tree_to_tree_distance": 3,
+  "box_to_box_distance": 3,
+  "project_site": "Anna Saheb School",
+  "box_data": [
+    {
+      "row": 1, "column": 1, "prefix": "AS", "start": "1", "tree_to_tree_distance": 3,
+      "species_data": [
+        { "species_id": "", "count": 20, "species_common_name": "Portia Tree", "species_name": "Thespesia populnea", "planted_on": "2024-11-01" },
+        { "species_id": "", "count": 20, "species_common_name": "Custard Apple", "species_name": "Annona reticulata", "planted_on": "2024-11-01" },
+        { "species_id": "", "count": 20, "species_common_name": "Pungan", "species_name": "Pongamia pinnata", "planted_on": "2024-11-01" },
+        { "species_id": "", "count": 20, "species_common_name": "Badam", "species_name": "Terminalia catappa", "planted_on": "2024-11-01" },
+        { "species_id": "", "count": 20, "species_common_name": "Rain Tree", "species_name": "Samanea saman", "planted_on": "2024-11-01" }
+      ]
+    }
+  ],
+  "additional_sponsor_logo": [
+    { "type": { "label": "Initiated By", "value": "initiated_by" }, "name": "CommuniTREE", "logo": "" },
+    { "type": { "label": "Sponsored By", "value": "sponsored_by" }, "name": "CGI", "logo": "" }
+  ],
+  "land_ownership": { "name": "Maharshi Annasaheb Shala", "agreement_status": "" },
+  "land_area": { "total_area": 500, "planted_area": null },
+  "plantation_strategy": "mixed_species",
+  "plantation_strategy_other": "",
+  "irrigation_method": "",
+  "irrigation_method_other": "",
+  "climate": "others",
+  "climate_other": "Tropical wet and dry climate",
+  "soil_type": "others",
+  "soil_type_other": "Black soil and Loamy soil",
+  "digipin": "",
+  "last_inspection_date": "2025-12-10T00:00:00.000Z",
+  "permission_letter": "",
+  "site_layout": "",
+  "authorization_details": {
+    "authorized_by_name": "",
+    "authorized_by_designation": "",
+    "authorized_date": "",
+    "authorized_period": "3",
+    "project_context": ""
+  },
+  "area_population_statistics_details": {
+    "total_jurisdiction_area": 332,
+    "population": 3120000,
+    "population_density": null,
+    "green_cover": "Moderate green cover with urban forest",
+    "environmental_need": "Need for urban Afforestation",
+    "google_earth_image": []
+  },
+  "direct_and_indirect_beneficiaries": {
+    "site_supervisor": 1,
+    "watering_team": 1,
+    "de_weeding_crew": 1,
+    "plant_health_specialist": 1,
+    "people_visiting": "General Public",
+    "people_living_near": "Community People",
+    "schools_colleges": "Within 3km Radius"
+  },
+  "forest_value_flow_impact_report": {
+    "short_term": { "land_value": null, "tree_value": null, "oxygen_generated": 0.011025, "carbon_sequestration": 0.002385 },
+    "medium_term": { "land_value": null, "tree_value": null, "oxygen_generated": 0.018375, "carbon_sequestration": 0.003975 },
+    "long_term": { "land_value": null, "tree_value": null, "oxygen_generated": 0.03675, "carbon_sequestration": 0.00795 }
+  },
+  "species_details": { "health": "good", "health_other": "", "mortality_rate": 0, "other_issues": "No", "additional_scope": "Yes" },
+  "maintenance_workforce": [
+    { "year": 2025, "quarter": 3, "total_holidays_weekly_off": 13, "total_holidays_festival": 4, "total_watering_days": 38, "total_raining_days": 10, "full_time_gardeners": 1, "part_time_gardeners": 3, "total_part_time_labour_days": 1 }
+  ],
+  "plant_growth_data": {
+    "target_height_range": [
+      { "year": 0, "min": 2, "max": 3 },
+      { "year": 1, "min": 6, "max": 8 },
+      { "year": 2, "min": 9, "max": 10 },
+      { "year": 3, "min": 11, "max": 14 }
+    ],
+    "actual_height_range": [
+      { "year": 2025, "quarter": 3, "min": 3, "max": 4 }
+    ]
+  },
+  "soil_ph_level": [
+    { "year": 2025, "quarter": 3, "reading_date": "2025-12-10", "meter_image": "", "meter_reading": 6.5 }
+  ],
+  "temperature_humidity": [
+    { "year": 2025, "quarter": 3, "reading_date": "2025-12-10", "inside_plantation": { "image": "", "humidity": 62, "temperature": 29.6 }, "outside_plantation": { "image": "", "humidity": 60, "temperature": 29.9 } }
+  ],
+  "environmental_need_indicators": [
+    { "heading": "Declining Green Cover", "description": "Thousands of trees felled for infrastructure; canopy loss increasing." },
+    { "heading": "Heat Stress", "description": "Urban heat island effect; temperatures often touch ~40 °C in low-green zones." },
+    { "heading": "Groundwater Depletion", "description": "Levels falling to 600–800 ft in northern parts; summer shortages common." },
+    { "heading": "Waterbody Degradation", "description": "Lakes and canals silted/polluted." },
+    { "heading": "Open Space Pressure", "description": "Rapid growth and weak upkeep threaten sustainability despite relatively higher per-capita green space." }
+  ],
+  "security_and_infrastructure": { "description": "", "image_data": [] },
+  "plantation_progress": [],
+  "dashboard_images": [],
+  "report_images": []
+}
