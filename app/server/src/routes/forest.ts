@@ -2074,10 +2074,60 @@ async function adminCreatePlanter(req: Request, res: Response): Promise<void> {
   }
 }
 
+/**
+ * POST /forest/:id/report-data — update ONLY the report sections (rich jsonb +
+ * report scalars) on an existing forest. Deliberately does NOT touch
+ * forest_boxes / forest_trees (unlike /forest/upsert which DELETEs + regenerates
+ * trees from box_data) — so editing report data can never wipe geotagged trees.
+ * Sends only the keys present in the body; jsonb stringified, empty string → NULL.
+ */
+const REPORT_UPDATE_SCALARS = [
+  'forest_desc', 'forest_address', 'project_site', 'project_period', 'plantation_date',
+  'plantation_strategy', 'plantation_strategy_other', 'irrigation_method', 'irrigation_method_other',
+  'climate', 'climate_other', 'soil_type', 'soil_type_other', 'digipin', 'last_inspection_date',
+  'permission_letter', 'site_layout',
+];
+const REPORT_UPDATE_JSONB = [
+  'land_ownership', 'land_area', 'authorization_details', 'area_population_statistics_details',
+  'direct_and_indirect_beneficiaries', 'forest_value_flow_impact_report', 'species_details',
+  'maintenance_workforce', 'plant_growth_data', 'soil_ph_level', 'temperature_humidity',
+  'environmental_need_indicators', 'security_and_infrastructure', 'plantation_progress',
+  'additional_sponsor_logo', 'dashboard_images', 'report_images',
+];
+
+async function updateForestReportData(req: Request, res: Response): Promise<void> {
+  const forestId = String(req.params.id);
+  await assertForestAccess(req, forestId);
+  const b = (req.body ?? {}) as Record<string, unknown>;
+  const sets: string[] = [];
+  const vals: unknown[] = [forestId];
+  let i = 2;
+  for (const c of REPORT_UPDATE_SCALARS) {
+    if (Object.prototype.hasOwnProperty.call(b, c)) {
+      sets.push(`${c} = $${i++}`);
+      vals.push(b[c] === '' ? null : b[c]);
+    }
+  }
+  for (const c of REPORT_UPDATE_JSONB) {
+    if (Object.prototype.hasOwnProperty.call(b, c)) {
+      sets.push(`${c} = $${i++}::jsonb`);
+      vals.push(b[c] == null ? null : JSON.stringify(b[c]));
+    }
+  }
+  if (sets.length === 0) {
+    res.json({ data: { id: forestId, updated: 0 } });
+    return;
+  }
+  sets.push('is_updated = TRUE', 'updated_at = now()');
+  await query(`UPDATE forests SET ${sets.join(', ')} WHERE id = $1`, vals);
+  res.json({ data: { id: forestId, updated: sets.length - 2 } });
+}
+
 /* ------------------------------------------------------------------ */
 /* Route registration                                                  */
 /* ------------------------------------------------------------------ */
 
+forestRouter.post('/forest/:id/report-data', wrap(updateForestReportData));
 forestRouter.post('/forest/upsert', upload.any(), wrap(upsertForest));
 forestRouter.post('/forests/upsert', upload.any(), wrap(upsertForest));
 forestRouter.post('/forest/trees/bulk-import', wrap(bulkImportTrees));

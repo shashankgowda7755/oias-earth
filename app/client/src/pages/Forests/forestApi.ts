@@ -13,7 +13,7 @@
  * nested values are sent as JSON-string fields so the async `forest_upsert_v1`
  * job can parse them — mirroring how AddForestWizard already serialises `boxes`.
  */
-import { upsertEntity, type UpsertValues } from '@/lib/api';
+import { api, upsertEntity, type UpsertValues } from '@/lib/api';
 import type { FullForestPayload } from './fullTypes';
 
 /** Top-level keys that are scalars and can go on the wire as-is. */
@@ -87,6 +87,20 @@ export async function forestUpsertFull<TRecord = unknown>(
   payload: FullForestPayload,
 ): Promise<TRecord> {
   return upsertEntity<TRecord>('forest', flattenFullPayload(payload));
+}
+
+/**
+ * Update ONLY the report sections (rich jsonb + report scalars) of an existing
+ * forest — POST /forest/:id/report-data. Unlike forestUpsertFull this never
+ * regenerates forest_boxes/forest_trees, so editing report data cannot wipe
+ * geotagged trees. Send the report fields as plain JSON.
+ */
+export async function updateForestReportData(
+  forestId: string,
+  body: Partial<FullForestPayload>,
+): Promise<{ id: string; updated: number }> {
+  const res = await api.post(`/forest/${forestId}/report-data`, body);
+  return (res.data?.data ?? res.data) as { id: string; updated: number };
 }
 
 /** Result of attempting to parse pasted/uploaded forest JSON. */

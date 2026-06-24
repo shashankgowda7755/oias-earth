@@ -33,6 +33,7 @@ const ForestPage = lazy(() => import('./pages/ForestPage'));
 const ReportSponsor = lazy(() => import('./pages/ReportSponsor'));
 const ReportTree = lazy(() => import('./pages/ReportTree'));
 const ReportForestQuarterly = lazy(() => import('./pages/report/ReportForestQuarterly'));
+const ReportDataEditor = lazy(() => import('./pages/Forests/reportForm/ReportDataEditor'));
 const Studio = lazy(() => import('./pages/Studio'));
 
 const queryClient = new QueryClient({
@@ -91,6 +92,14 @@ export default function App() {
                   element={
                     <ProtectedRoute roles={['Admin', 'SuperAdmin']}>
                       <Studio />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/forest/:id/report-data"
+                  element={
+                    <ProtectedRoute roles={['Admin', 'SuperAdmin']}>
+                      <ReportDataEditor />
                     </ProtectedRoute>
                   }
                 />

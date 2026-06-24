@@ -101,6 +101,15 @@ export function ForestDetailView({ forest, onClose, onEdit }: ForestDetailViewPr
         <Button
           type="button"
           variant="outlined"
+          onClick={() => window.open(`/forest/${forest.id}/report-data`, '_blank', 'noopener')}
+        >
+          Edit report data
+        </Button>
+      ) : null}
+      {forest.id ? (
+        <Button
+          type="button"
+          variant="outlined"
           onClick={() => window.open(`/report/forest/${forest.id}`, '_blank', 'noopener')}
         >
           View quarterly report ↗
