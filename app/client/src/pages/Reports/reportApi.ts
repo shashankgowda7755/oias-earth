@@ -4,19 +4,18 @@
  * Reads use the shared `listEntity('reports', ...)` (POST /api/v1/reports/list)
  * which returns Paginated<ReportRow> plus the `filter_limit` metadata object.
  *
- * Writes need a small wrapper because of a route/segment mismatch in the
- * backend contract:
- *   - LIST  segment is `reports` (plural)  -> /api/v1/reports/list
- *   - CRUD  segment is `report`  (singular) -> /api/v1/report, /report/:id
- * (see server/src/routes/crud.ts ENTITIES key `report`). The shared
- * `EntityName` union only includes 'reports', so createEntity/updateEntity/
- * deleteEntity can't address the singular CRUD route in a type-safe way.
- *
- * SHARED-CONTRACT GAP (flagged in the return message): either add 'report' to
- * EntityName + have the server alias 'reports' for CRUD, or expose a reports
- * write helper in lib/api.ts. Until then we POST/PATCH/DELETE through the shared
- * `api` axios instance directly to `/report`, which still goes through the
- * raw-token interceptor and error normalisation. No new auth logic here.
+ * Writes use the backend's generic CRUD verbs, NOT REST:
+ *   - LIST   segment is `reports` (plural)   -> POST /api/v1/reports/list
+ *   - CREATE/UPDATE                          -> POST /api/v1/report/upsert
+ *     (no `id` => INSERT; `id` in body => UPDATE)
+ *   - DELETE                                 -> POST /api/v1/report/delete
+ *     body { id, report_id } (server sends BOTH keys; see crud.ts deleteEntity)
+ * (see server/src/routes/crud.ts: `crudRouter.post('/:entity/upsert')` +
+ * `/:entity/delete`, ENTITIES key `report`). There is NO REST `/report` or
+ * `/report/:id` route — the original wrapper posted to those and 404'd, so
+ * reports could never be created/edited/deleted. Fixed to the upsert/delete
+ * contract. All calls go through the shared `api` axios instance (raw-token
+ * interceptor + error normalisation); no new auth logic here.
  */
 import { api } from '../../lib/api';
 import { listEntity, type ListParams } from '../../lib/api';
@@ -35,8 +34,9 @@ export function listReports(
 export async function createReport(
   payload: ReportWritePayload,
 ): Promise<{ id: string }> {
+  // POST /api/v1/report/upsert with no id => INSERT.
   const { data } = await api.post<{ data: { id: string } }>(
-    `/${REPORT_CRUD_SEGMENT}`,
+    `/${REPORT_CRUD_SEGMENT}/upsert`,
     payload,
   );
   return data.data;
@@ -46,19 +46,18 @@ export async function updateReport(
   id: string,
   payload: ReportWritePayload,
 ): Promise<{ id: string }> {
-  const { data } = await api.patch<{ data: { id: string } }>(
-    `/${REPORT_CRUD_SEGMENT}/${id}`,
-    payload,
+  // POST /api/v1/report/upsert with id in body => UPDATE.
+  const { data } = await api.post<{ data: { id: string } }>(
+    `/${REPORT_CRUD_SEGMENT}/upsert`,
+    { id, ...payload },
   );
   return data.data;
 }
 
 export async function deleteReport(id: string): Promise<{ id: string }> {
-  // Soft delete (is_active=false) per server CRUD; openQuestions[4].
-  const { data } = await api.delete<{ data: { id: string } }>(
-    `/${REPORT_CRUD_SEGMENT}/${id}`,
-  );
-  return data.data;
+  // POST /api/v1/report/delete { id, report_id } — hard/soft per server CRUD.
+  await api.post(`/${REPORT_CRUD_SEGMENT}/delete`, { id, report_id: id });
+  return { id };
 }
 
 /**

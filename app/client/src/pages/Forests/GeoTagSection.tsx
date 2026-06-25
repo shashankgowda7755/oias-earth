@@ -17,6 +17,7 @@ import { Button, Spinner, TextField, useToast } from '@/components';
 import { useAuth } from '@/auth/AuthContext';
 import type { FullForestPayload } from './fullTypes';
 import { TreeMap, type MapTree } from './TreeMap';
+import { polygonAreaHa, perimeterM, areaLabel, parseBoundaryFile } from './geoMeasure';
 import { TourEditor } from './TourEditor';
 import {
   getForestGeo,
@@ -266,6 +267,27 @@ export function GeoTagSection({ forest }: GeoTagSectionProps) {
     }
   }, [forestId, boundaryPts, toast]);
 
+  const onImportBoundary = useCallback(
+    async (file: File | null) => {
+      if (!file) return;
+      try {
+        const text = await file.text();
+        const pts = parseBoundaryFile(text, file.name);
+        if (pts.length < 3) {
+          toast.show('No polygon found in that file (need a Polygon ring).', 'error');
+          return;
+        }
+        setBoundaryMode(true);
+        setSelectedId(null);
+        setBoundaryPts(pts);
+        toast.show(`Imported ${pts.length}-point boundary`, 'success');
+      } catch {
+        toast.show('Could not read that file', 'error');
+      }
+    },
+    [toast],
+  );
+
   const addPano = useCallback(async () => {
     if (!panoUrl.trim()) {
       toast.show('Paste a 360 tour link first.', 'error');
@@ -482,6 +504,8 @@ export function GeoTagSection({ forest }: GeoTagSectionProps) {
               selectedKey={selectedId}
               draft={draft}
               boundaryDraft={boundaryMode ? boundaryPts : []}
+              boundaryEdit={boundaryMode}
+              onBoundaryEdit={setBoundaryPts}
               editable={editable && (Boolean(selectedId) || boundaryMode)}
               onMapClick={onMapClick}
               onSelectTree={selectTree}
@@ -499,22 +523,33 @@ export function GeoTagSection({ forest }: GeoTagSectionProps) {
                     ) : null}
                   </span>
                   {!boundaryMode ? (
-                    <Button
-                      type="button"
-                      variant="outlined"
-                      onClick={() => {
-                        setBoundaryMode(true);
-                        setBoundaryPts(boundary);
-                        setSelectedId(null);
-                      }}
-                    >
-                      {boundary.length >= 3 ? 'Edit boundary' : 'Draw boundary'}
-                    </Button>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <Button
+                        type="button"
+                        variant="outlined"
+                        onClick={() => {
+                          setBoundaryMode(true);
+                          setBoundaryPts(boundary);
+                          setSelectedId(null);
+                        }}
+                      >
+                        {boundary.length >= 3 ? 'Edit boundary' : 'Draw boundary'}
+                      </Button>
+                      <label className="cursor-pointer rounded-button border border-border px-3 py-1.5 text-sm hover:bg-white/5">
+                        Import KML / GeoJSON
+                        <input
+                          type="file"
+                          accept=".kml,.geojson,.json,application/json,application/vnd.google-earth.kml+xml"
+                          className="hidden"
+                          onChange={(e) => {
+                            void onImportBoundary(e.target.files?.[0] ?? null);
+                            e.currentTarget.value = '';
+                          }}
+                        />
+                      </label>
+                    </div>
                   ) : (
                     <div className="flex flex-wrap items-center gap-2">
-                      <span className="text-xs text-textSecondary">
-                        Tap the map to add corners ({boundaryPts.length})
-                      </span>
                       <Button type="button" variant="outlined" onClick={() => setBoundaryPts((p) => p.slice(0, -1))} disabled={!boundaryPts.length}>
                         Undo
                       </Button>
@@ -527,6 +562,24 @@ export function GeoTagSection({ forest }: GeoTagSectionProps) {
                     </div>
                   )}
                 </div>
+
+                {/* Live readout + editing hint while drawing */}
+                {boundaryMode && (
+                  <div className="mt-2 border-t border-border pt-2">
+                    <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs">
+                      <span className="text-textPrimary">
+                        Area <strong className="text-primary">{areaLabel(polygonAreaHa(boundaryPts))}</strong>
+                      </span>
+                      <span className="text-textPrimary">
+                        Perimeter <strong className="text-primary">{boundaryPts.length >= 2 ? `${Math.round(perimeterM(boundaryPts))} m` : '—'}</strong>
+                      </span>
+                      <span className="text-textSecondary">{boundaryPts.length} points</span>
+                    </div>
+                    <p className="mt-1 text-xs text-textSecondary">
+                      Tap to add · drag a point to move · click an edge dot to insert · double-tap a point to delete.
+                    </p>
+                  </div>
+                )}
               </div>
             )}
 

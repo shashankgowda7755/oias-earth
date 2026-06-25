@@ -71,18 +71,27 @@ export default function ReportDataEditor() {
       <div className="flex flex-1 overflow-hidden">
         <nav className="w-56 shrink-0 overflow-y-auto border-r border-border p-3" aria-label="Report sections">
           <ul className="space-y-0.5">
-            {REPORT_SECTIONS.map((s) => (
-              <li key={s.key}>
-                <button
-                  type="button"
-                  onClick={() => setActive(s.key)}
-                  aria-current={s.key === active ? 'page' : undefined}
-                  className={`w-full rounded-card px-3 py-2 text-left text-sm transition-colors ${s.key === active ? 'bg-white/8 text-textPrimary' : 'text-textSecondary hover:bg-white/5 hover:text-textPrimary'}`}
-                >
-                  {s.label}
-                </button>
-              </li>
-            ))}
+            {REPORT_SECTIONS.map((s, i) => {
+              const prev = REPORT_SECTIONS[i - 1];
+              const showSetupHeader = s.group === 'setup' && prev?.group !== 'setup';
+              return (
+                <li key={s.key}>
+                  {showSetupHeader ? (
+                    <div className="px-3 pb-1 pt-3 text-[11px] font-semibold uppercase tracking-wide text-textSecondary/70">
+                      Setup · enter once
+                    </div>
+                  ) : null}
+                  <button
+                    type="button"
+                    onClick={() => setActive(s.key)}
+                    aria-current={s.key === active ? 'page' : undefined}
+                    className={`w-full rounded-card px-3 py-2 text-left text-sm transition-colors ${s.key === active ? 'bg-white/8 text-textPrimary' : 'text-textSecondary hover:bg-white/5 hover:text-textPrimary'}`}
+                  >
+                    {s.label}
+                  </button>
+                </li>
+              );
+            })}
           </ul>
         </nav>
         <main className="flex-1 overflow-y-auto">

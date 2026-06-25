@@ -2124,9 +2124,108 @@ async function updateForestReportData(req: Request, res: Response): Promise<void
 }
 
 /* ------------------------------------------------------------------ */
+/* Weather auto-fill (Open-Meteo) — removes manual weather entry        */
+/* ------------------------------------------------------------------ */
+
+const WX_UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+// Fiscal quarter (Apr-start): Q1 Apr-Jun, Q2 Jul-Sep, Q3 Oct-Dec, Q4 Jan-Mar (next cal year).
+const WX_FQ_START_MONTH: Record<number, number> = { 1: 3, 2: 6, 3: 9, 4: 0 };
+const wxRound1 = (n: number): number => Math.round(n * 10) / 10;
+
+/** Quarter -> [start,end] ISO dates, end capped at today-5 (archive lag). */
+function wxQuarterRange(year: number, q: number): { start: string; end: string; started: boolean } {
+  const sm = WX_FQ_START_MONTH[q] ?? 0;
+  const calYear = q === 4 ? year + 1 : year;
+  const startD = new Date(Date.UTC(calYear, sm, 1));
+  const endD = new Date(Date.UTC(calYear, sm + 3, 0));
+  const cap = new Date(Date.now() - 5 * 86400000);
+  const realEnd = endD.getTime() > cap.getTime() ? cap : endD;
+  const iso = (d: Date): string => d.toISOString().slice(0, 10);
+  return { start: iso(startD), end: iso(realEnd), started: startD.getTime() <= realEnd.getTime() };
+}
+
+/**
+ * GET /forest/:id/weather?year=&quarter= — derive the quarter's weather from
+ * Open-Meteo (free, no key) at the forest's lat/long, so the report's
+ * raining-days + OUTSIDE temperature/humidity auto-fill instead of being typed.
+ * Inside-plantation readings stay manual (they are the on-site differentiator).
+ */
+async function forestWeather(req: Request, res: Response): Promise<void> {
+  const id = String(req.params.id);
+  if (!WX_UUID_RE.test(id)) throw notFound('Forest not found');
+  const now = new Date();
+  const year = Number(req.query.year) || now.getFullYear();
+  const qp = Number(req.query.quarter);
+  const quarter = qp >= 1 && qp <= 4 ? qp : Math.floor(now.getMonth() / 3) + 1;
+
+  const fr = await query<{ forest_geo_lat: string | null; forest_geo_long: string | null }>(
+    `SELECT forest_geo_lat, forest_geo_long FROM forests WHERE id = $1`,
+    [id],
+  );
+  const row = fr.rows[0];
+  if (!row) throw notFound('Forest not found');
+  const lat = Number(row.forest_geo_lat);
+  const lon = Number(row.forest_geo_long);
+  if (!Number.isFinite(lat) || !Number.isFinite(lon)) {
+    res.status(422).json({ error: true, message: 'Forest has no latitude/longitude set.' });
+    return;
+  }
+
+  const { start, end, started } = wxQuarterRange(year, quarter);
+  if (!started) {
+    res.json({ data: { available: false, reason: 'Quarter has not started yet.', year, quarter } });
+    return;
+  }
+
+  const url =
+    `https://archive-api.open-meteo.com/v1/archive?latitude=${lat}&longitude=${lon}` +
+    `&start_date=${start}&end_date=${end}` +
+    `&daily=precipitation_sum,temperature_2m_mean,temperature_2m_max,temperature_2m_min` +
+    `&hourly=relative_humidity_2m&timezone=auto`;
+
+  const resp = await fetch(url);
+  if (!resp.ok) {
+    res.status(502).json({ error: true, message: `Weather provider error (${resp.status}).` });
+    return;
+  }
+  const j = (await resp.json()) as {
+    daily?: Record<string, (number | null)[]>;
+    hourly?: Record<string, (number | null)[]>;
+  };
+  const num = (a?: (number | null)[]): number[] => (a ?? []).filter((v): v is number => v != null);
+  const precip = num(j.daily?.precipitation_sum);
+  const tmean = num(j.daily?.temperature_2m_mean);
+  const tmax = num(j.daily?.temperature_2m_max);
+  const tmin = num(j.daily?.temperature_2m_min);
+  const hum = num(j.hourly?.relative_humidity_2m);
+
+  let dry = 0;
+  let cur = 0;
+  for (const v of precip) {
+    if (v < 1) { cur += 1; dry = Math.max(dry, cur); } else cur = 0;
+  }
+  const avg = (a: number[]): number | null => (a.length ? wxRound1(a.reduce((x, y) => x + y, 0) / a.length) : null);
+
+  res.json({
+    data: {
+      available: precip.length > 0 || tmean.length > 0,
+      year, quarter, period: { start, end }, source: 'open-meteo', days_sampled: precip.length,
+      raining_days: precip.filter((v) => v >= 1).length,
+      rainfall_mm: precip.length ? wxRound1(precip.reduce((x, y) => x + y, 0)) : null,
+      dry_spell_days: dry,
+      outside_temperature_avg: avg(tmean),
+      outside_temperature_max: tmax.length ? wxRound1(Math.max(...tmax)) : null,
+      outside_temperature_min: tmin.length ? wxRound1(Math.min(...tmin)) : null,
+      outside_humidity_avg: hum.length ? Math.round(hum.reduce((x, y) => x + y, 0) / hum.length) : null,
+    },
+  });
+}
+
+/* ------------------------------------------------------------------ */
 /* Route registration                                                  */
 /* ------------------------------------------------------------------ */
 
+forestRouter.get('/forest/:id/weather', wrap(forestWeather));
 forestRouter.post('/forest/:id/report-data', wrap(updateForestReportData));
 forestRouter.post('/forest/upsert', upload.any(), wrap(upsertForest));
 forestRouter.post('/forests/upsert', upload.any(), wrap(upsertForest));

@@ -1,4 +1,4 @@
-import { SectionShell, FieldGrid, Num, type SectionProps } from '../kit';
+import { SectionShell, FieldGrid, Num, Txt, type SectionProps } from '../kit';
 
 export function BeneficiariesValueSection({ draft, patch }: SectionProps) {
   const ben = draft.direct_and_indirect_beneficiaries;
@@ -46,23 +46,23 @@ export function BeneficiariesValueSection({ draft, patch }: SectionProps) {
               })
             }
           />
-          <Num
+          <Txt
             label="People Visiting"
-            value={num(ben?.people_visiting)}
+            value={(ben?.people_visiting as string) ?? ''}
             onChange={(v) =>
               patch({ direct_and_indirect_beneficiaries: { ...ben, people_visiting: v } })
             }
           />
-          <Num
+          <Txt
             label="People Living Near"
-            value={num(ben?.people_living_near)}
+            value={(ben?.people_living_near as string) ?? ''}
             onChange={(v) =>
               patch({ direct_and_indirect_beneficiaries: { ...ben, people_living_near: v } })
             }
           />
-          <Num
+          <Txt
             label="Schools & Colleges"
-            value={num(ben?.schools_colleges)}
+            value={(ben?.schools_colleges as string) ?? ''}
             onChange={(v) =>
               patch({ direct_and_indirect_beneficiaries: { ...ben, schools_colleges: v } })
             }

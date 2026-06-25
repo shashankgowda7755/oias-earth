@@ -303,9 +303,9 @@ export function S07Beneficiaries({ data }: SlideProps) {
     ['Plant Health Specialist', 'Pest & disease management', pad2(b?.plant_health_specialist)],
   ];
   const indirect = [
-    ['People Visiting', numOrDash(b?.people_visiting), 'Visitors & recreational users'],
-    ['People Living Near', numOrDash(b?.people_living_near), 'Within 5km radius of the site'],
-    ['Educational Hubs', numOrDash(b?.schools_colleges), 'Local schools & colleges'],
+    ['People Visiting', dash(b?.people_visiting), 'Visitors & recreational users'],
+    ['People Living Near', dash(b?.people_living_near), 'Within 5km radius of the site'],
+    ['Educational Hubs', dash(b?.schools_colleges), 'Local schools & colleges'],
     ['Trees Planted', numOrDash(computed.total_saplings), 'Enhancing local biodiversity'],
   ];
   return (

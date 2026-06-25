@@ -103,6 +103,32 @@ export async function updateForestReportData(
   return (res.data?.data ?? res.data) as { id: string; updated: number };
 }
 
+/** Auto-derived weather for a forest's fiscal quarter (Open-Meteo). */
+export interface ForestWeather {
+  available: boolean;
+  year: number;
+  quarter: number;
+  period?: { start: string; end: string };
+  raining_days?: number;
+  rainfall_mm?: number | null;
+  dry_spell_days?: number;
+  outside_temperature_avg?: number | null;
+  outside_temperature_max?: number | null;
+  outside_temperature_min?: number | null;
+  outside_humidity_avg?: number | null;
+  reason?: string;
+}
+
+/** GET /forest/:id/weather?year=&quarter= — derive weather from forest lat/long. */
+export async function fetchForestWeather(
+  forestId: string,
+  year: number,
+  quarter: number,
+): Promise<ForestWeather> {
+  const res = await api.get(`/forest/${forestId}/weather`, { params: { year, quarter } });
+  return (res.data?.data ?? res.data) as ForestWeather;
+}
+
 /** Result of attempting to parse pasted/uploaded forest JSON. */
 export type ParseResult =
   | { ok: true; payload: FullForestPayload }

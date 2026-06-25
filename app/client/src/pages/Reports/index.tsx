@@ -240,13 +240,20 @@ export default function Reports() {
         header: <span className="sr-only">Actions</span>,
         headerClassName: 'text-right',
         className: 'text-right whitespace-nowrap',
-        render: (r) => (
-          <RowActions
-            onEdit={() => setDialog({ kind: 'edit', row: r })}
-            onDelete={() => setPendingDelete(r)}
-            label={`report ${r.Forest?.forest_name ?? ''} ${r.year} Q${r.quarter}`}
-          />
-        ),
+        render: (r) => {
+          const forestId = r.forest_id ?? r.Forest?.id ?? '';
+          const viewUrl = forestId
+            ? `/report/forest/${forestId}?year=${r.year ?? ''}&quarter=${r.quarter ?? ''}`
+            : null;
+          return (
+            <RowActions
+              onView={viewUrl ? () => window.open(viewUrl, '_blank', 'noopener') : undefined}
+              onEdit={() => setDialog({ kind: 'edit', row: r })}
+              onDelete={() => setPendingDelete(r)}
+              label={`report ${r.Forest?.forest_name ?? ''} ${r.year} Q${r.quarter}`}
+            />
+          );
+        },
       },
     ],
     [],
@@ -388,10 +395,12 @@ function StatusPill({ active }: { active: boolean }) {
  * row-action affordance.
  */
 function RowActions({
+  onView,
   onEdit,
   onDelete,
   label,
 }: {
+  onView?: () => void;
   onEdit: () => void;
   onDelete: () => void;
   label: string;
@@ -422,8 +431,21 @@ function RowActions({
       {open ? (
         <div
           role="menu"
-          className="absolute right-0 z-40 mt-1 w-32 overflow-hidden rounded-card border border-border bg-surface py-1 text-left shadow-dialog"
+          className="absolute right-0 z-40 mt-1 w-40 overflow-hidden rounded-card border border-border bg-surface py-1 text-left shadow-dialog"
         >
+          {onView ? (
+            <button
+              type="button"
+              role="menuitem"
+              onClick={() => {
+                setOpen(false);
+                onView();
+              }}
+              className="block w-full px-4 py-2 text-sm text-textPrimary hover:bg-white/5"
+            >
+              View report ↗
+            </button>
+          ) : null}
           <button
             type="button"
             role="menuitem"

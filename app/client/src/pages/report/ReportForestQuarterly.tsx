@@ -8,6 +8,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { buildPreviewReport } from './reportFixture';
+import { downloadReportPdf } from './reportDownload';
 import { C, FONT, REPORT_PRINT_CSS } from './reportPrimitives';
 import { SLIDES } from './slides';
 import type { ForestReportData } from './reportTypes';
@@ -20,6 +21,20 @@ export default function ReportForestQuarterly() {
 
   const [data, setData] = useState<ForestReportData | null>(null);
   const [err, setErr] = useState<string | null>(null);
+  const [dl, setDl] = useState('');
+
+  const handleDownload = async () => {
+    if (dl) return;
+    try {
+      const fname = data
+        ? `${data.forest.forest_name} ${data.meta.quarter_label} ${data.meta.year} Report.pdf`.replace(/[\\/:*?"<>|]+/g, '-')
+        : 'Forest Report.pdf';
+      await downloadReportPdf(fname, setDl);
+    } catch (e) {
+      setDl('');
+      alert(e instanceof Error ? e.message : 'Could not generate the PDF. Try the Print button.');
+    }
+  };
 
   const previewSrc = sp.get('src') || 'vandalur';
   const preview = useMemo(() => buildPreviewReport(previewSrc), [previewSrc]);
@@ -50,9 +65,14 @@ export default function ReportForestQuarterly() {
           {data.meta.client_name ? `${data.meta.client_name} · ` : ''}{data.forest.forest_name} · {data.meta.quarter_label} {data.meta.year}
           {err && <span style={{ color: C.amber, marginLeft: 10 }}>· {err}</span>}
         </span>
-        <button onClick={() => window.print()} style={{ background: C.green, color: '#fff', border: 'none', borderRadius: 999, padding: '10px 22px', fontWeight: 700, fontSize: 14, cursor: 'pointer' }}>
-          ↓ Download PDF
-        </button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <button onClick={handleDownload} disabled={!!dl} style={{ background: C.green, color: '#fff', border: 'none', borderRadius: 999, padding: '10px 22px', fontWeight: 700, fontSize: 14, cursor: dl ? 'wait' : 'pointer', opacity: dl ? 0.7 : 1, minWidth: 150 }}>
+            {dl || '↓ Download PDF'}
+          </button>
+          <button onClick={() => window.print()} style={{ background: 'transparent', color: C.muted, border: `1px solid ${C.line}`, borderRadius: 999, padding: '10px 18px', fontWeight: 700, fontSize: 14, cursor: 'pointer' }}>
+            🖨 Print
+          </button>
+        </div>
       </div>
 
       <div style={{ padding: '22px 16px 60px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
