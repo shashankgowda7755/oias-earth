@@ -119,9 +119,11 @@ function growthMilestones(forest: Row) {
   const targets = (pg?.target_height_range ?? []).slice().sort((a, b) => a.year - b.year);
   if (targets.length === 0) return [];
   const pd = forest.plantation_date ? new Date(String(forest.plantation_date)) : null;
+  // Clamp heights to a sane ceiling so a data typo ("84" for "14") can't render.
+  const ft = (v: number): number => Math.max(0, Math.min(30, v));
   return targets.map((t) => ({
     label: t.year === 0 ? 'Year 0' : `End of Year ${t.year}`,
-    range: t.min != null && t.max != null ? `${t.min}–${t.max} Feet` : '—',
+    range: t.min != null && t.max != null ? `${ft(t.min)}–${ft(t.max)} Feet` : '—',
     date: pd ? `${MONTHS[pd.getMonth()]}- ${pd.getFullYear() + t.year}` : '—',
     current: t.year === 0,
   }));
@@ -131,17 +133,25 @@ function currentHeightLabel(forest: Row): string | null {
   const pg = forest.plant_growth_data as { actual_height_range?: { year: number; quarter: number; min?: number; max?: number }[] } | null;
   const a = (pg?.actual_height_range ?? []).slice().sort((x, y) => x.year - y.year || x.quarter - y.quarter);
   const last = a[a.length - 1];
-  return last && last.min != null && last.max != null ? `${last.min}–${last.max} Feet` : null;
+  const ft = (v: number): number => Math.max(0, Math.min(30, v));
+  return last && last.min != null && last.max != null ? `${ft(last.min)}–${ft(last.max)} Feet` : null;
 }
 
 function siteMasterPlan(forest: Row, plantedTotal: number) {
-  const boxRows = num(forest.box_rows), boxCols = num(forest.box_columns), treeRows = num(forest.tree_rows), treeCols = num(forest.tree_columns);
+  // DB columns are singular (box_column / tree_row / tree_column); accept the
+  // plural aliases too. Reading the wrong name left this slide blank for forests.
+  const boxRows = num(forest.box_rows);
+  const boxCols = num(forest.box_column ?? forest.box_columns);
+  const treeRows = num(forest.tree_row ?? forest.tree_rows);
+  const treeCols = num(forest.tree_column ?? forest.tree_columns);
   const boxCount = boxRows * boxCols;
   if (!boxCount && !treeRows) return null;
   const perMatrix = treeRows * treeCols;
   return {
     box_count: boxCount || 0,
-    total_saplings: (boxCount || 0) * perMatrix || plantedTotal,
+    // ACTUAL planted total first — projected grid capacity (boxCount × perMatrix)
+    // overcounts (e.g. 4,200 vs the real 670). Fall back to capacity only if 0.
+    total_saplings: plantedTotal || (boxCount || 0) * perMatrix,
     grid_label: boxRows && boxCols ? `${boxRows} × ${boxCols}` : '—',
     per_matrix_label: treeRows && treeCols ? `${treeRows} × ${treeCols} = ${perMatrix} Nos` : '—',
     spacing_grids: forest.box_to_box_distance as number | undefined,

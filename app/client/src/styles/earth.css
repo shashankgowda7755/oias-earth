@@ -62,29 +62,39 @@
 /* Sponsor-logo forest pin — a glowing white medallion holding the corporate
    logo. Glow is a CONTAINED box-shadow pulse (no expanding ring) so dense pins
    never crisscross into a green web. */
-.forest-logo-pin { position: relative; width: 38px; height: 38px; }
+.forest-logo-pin { position: relative; width: 46px; height: 58px; }
 .forest-logo-pin .badge {
-  position: absolute; inset: 0; border-radius: 50%;
-  background: #fff; border: 2px solid var(--alive); overflow: hidden;
+  position: absolute; top: 0; left: 0; width: 46px; height: 46px; border-radius: 50%;
+  background: #fff; border: 3px solid var(--alive); overflow: hidden;
   display: flex; align-items: center; justify-content: center;
-  box-shadow: 0 0 7px rgba(182,255,60,.55), 0 2px 6px rgba(0,0,0,.5);
+  box-shadow: 0 0 8px rgba(182,255,60,.5), 0 3px 8px rgba(0,0,0,.5);
   animation: pinGlow 2.8s ease-in-out infinite;
 }
-.forest-logo-pin .badge img { width: 26px; height: 26px; object-fit: contain; }
+.forest-logo-pin .badge img { width: 32px; height: 32px; object-fit: contain; border-radius: 7px; }
 .forest-logo-pin .badge.nologo { background: var(--alive); }
+/* Pointer stem so the holder reads as a map pin; tip anchors to the coord. */
+.forest-logo-pin::after {
+  content: ''; position: absolute; left: 50%; top: 40px; transform: translateX(-50%);
+  width: 0; height: 0;
+  border-left: 9px solid transparent; border-right: 9px solid transparent;
+  border-top: 14px solid var(--alive);
+  filter: drop-shadow(0 2px 2px rgba(0,0,0,.4));
+}
 @keyframes pinGlow {
-  0%, 100% { box-shadow: 0 0 6px rgba(182,255,60,.45), 0 2px 6px rgba(0,0,0,.5); }
-  50%      { box-shadow: 0 0 15px rgba(182,255,60,.85), 0 2px 6px rgba(0,0,0,.5); }
+  0%, 100% { box-shadow: 0 0 6px rgba(182,255,60,.45), 0 3px 8px rgba(0,0,0,.5); }
+  50%      { box-shadow: 0 0 16px rgba(182,255,60,.85), 0 3px 8px rgba(0,0,0,.5); }
 }
 /* Forest pin ring tinted by forest survival %: warn (75-90%), risk (<75%). */
 .forest-logo-pin.warn .badge {
   border-color: var(--amber);
-  box-shadow: 0 0 8px rgba(232,163,61,.6), 0 2px 6px rgba(0,0,0,.5);
+  box-shadow: 0 0 8px rgba(232,163,61,.6), 0 3px 8px rgba(0,0,0,.5);
   animation: none;
 }
+.forest-logo-pin.warn::after { border-top-color: var(--amber); }
+.forest-logo-pin.risk::after { border-top-color: #f0792b; }
 .forest-logo-pin.risk .badge {
   border-color: #f0792b;
-  box-shadow: 0 0 8px rgba(240,121,43,.65), 0 2px 6px rgba(0,0,0,.5);
+  box-shadow: 0 0 8px rgba(240,121,43,.65), 0 3px 8px rgba(0,0,0,.5);
   animation: none;
 }
 

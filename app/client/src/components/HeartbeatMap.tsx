@@ -49,8 +49,8 @@ function forestIcon(f: ForestPin): L.DivIcon {
   return L.divIcon({
     className: 'forest-logo-pin',
     html: inner,
-    iconSize: [38, 38],
-    iconAnchor: [19, 19],
+    iconSize: [46, 58],
+    iconAnchor: [23, 56],
   });
 }
 

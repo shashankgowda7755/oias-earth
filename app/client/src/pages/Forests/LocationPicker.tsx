@@ -1,26 +1,14 @@
 /**
- * MapLocationPicker (spec component) — faithful, dependency-free version.
+ * MapLocationPicker — real interactive Leaflet map (Esri satellite + labels).
  *
- * The original used an embedded Google Map ("Search location" box + draggable
- * pin, "Click to update coordinates"). Integrating the Google Maps JS SDK is
- * optional for this rebuild; instead we render:
- *   - a labelled placeholder map surface that, when clicked, focuses the lat
- *     input ("Click to set coordinates"), and
- *   - explicit Latitude / Longitude number inputs (the source of truth).
- *
- * This keeps the flow faithful (coordinates are required and user-set) while
- * remaining offline + keyless. To wire a real map later, replace the
- * placeholder <button> body with the Maps SDK and call `onChange` from the
- * pin's drag/click handler — the lat/long inputs stay as a manual fallback.
- *
- * TODO(spec components.MapLocationPicker): swap the placeholder for the Google
- * Maps JS SDK ("Search location" autocomplete + draggable pin). Keyless + no
- * external script in this build by design.
- *
- * Accessibility: the map surface is a real <button> with an aria-label; the
- * coordinate inputs use the shared TextField (labelled, error-wired).
+ * Click anywhere on the map (or drag the pin) to set the forest coordinates;
+ * the Latitude / Longitude inputs stay the source of truth and a typed value
+ * moves the pin + recentres. Keyless (Esri/OSM tiles, no Google SDK). Reuses
+ * the same tile sources as TreeMap.tsx.
  */
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 import { TextField } from '@/components';
 
 export interface LocationPickerProps {
@@ -33,6 +21,18 @@ export interface LocationPickerProps {
   disabled?: boolean;
 }
 
+const INDIA_CENTER: [number, number] = [22.0, 79.0];
+const fmt = (n: number): string => n.toFixed(6);
+
+/** Lime map pin (divIcon avoids Vite's broken default-marker-image path). */
+const pinIcon = L.divIcon({
+  className: '',
+  html:
+    '<div style="transform:translate(-50%,-100%)"><svg width="30" height="30" viewBox="0 0 24 24" fill="#17a673" stroke="#fff" stroke-width="1.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0Z"/><circle cx="12" cy="10" r="3" fill="#fff" stroke="none"/></svg></div>',
+  iconSize: [30, 30],
+  iconAnchor: [0, 0],
+});
+
 export function LocationPicker({
   lat,
   long,
@@ -42,12 +42,71 @@ export function LocationPicker({
   required,
   disabled,
 }: LocationPickerProps) {
-  const latInputRef = useRef<HTMLDivElement>(null);
+  const mapElRef = useRef<HTMLDivElement>(null);
+  const mapRef = useRef<L.Map | null>(null);
+  const markerRef = useRef<L.Marker | null>(null);
+  const onChangeRef = useRef(onChange);
+  onChangeRef.current = onChange;
 
-  const focusLat = () => {
-    // Move focus into the latitude input so keyboard users can type coordinates.
-    latInputRef.current?.querySelector('input')?.focus();
-  };
+  // Init the map once.
+  useEffect(() => {
+    if (!mapElRef.current || mapRef.current) return;
+    const map = L.map(mapElRef.current, { zoomControl: true, attributionControl: false });
+    const hasInit = lat !== '' && long !== '' && Number.isFinite(Number(lat)) && Number.isFinite(Number(long));
+    map.setView(hasInit ? [Number(lat), Number(long)] : INDIA_CENTER, hasInit ? 16 : 4);
+    L.tileLayer(
+      'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+      { maxZoom: 20 },
+    ).addTo(map);
+    L.tileLayer(
+      'https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}',
+      { maxZoom: 20 },
+    ).addTo(map);
+
+    if (hasInit) {
+      markerRef.current = L.marker([Number(lat), Number(long)], { icon: pinIcon, draggable: true })
+        .addTo(map)
+        .on('dragend', (e) => {
+          const p = (e.target as L.Marker).getLatLng();
+          onChangeRef.current({ lat: fmt(p.lat), long: fmt(p.lng) });
+        });
+    }
+
+    map.on('click', (e: L.LeafletMouseEvent) => {
+      onChangeRef.current({ lat: fmt(e.latlng.lat), long: fmt(e.latlng.lng) });
+    });
+
+    mapRef.current = map;
+    // Leaflet needs a size recalc once the container has real dimensions.
+    setTimeout(() => map.invalidateSize(), 80);
+    return () => {
+      map.remove();
+      mapRef.current = null;
+      markerRef.current = null;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Sync marker + view whenever lat/long change (typed or clicked).
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+    const la = Number(lat);
+    const lo = Number(long);
+    if (lat === '' || long === '' || !Number.isFinite(la) || !Number.isFinite(lo)) return;
+    if (markerRef.current) {
+      markerRef.current.setLatLng([la, lo]);
+    } else {
+      markerRef.current = L.marker([la, lo], { icon: pinIcon, draggable: true })
+        .addTo(map)
+        .on('dragend', (e) => {
+          const p = (e.target as L.Marker).getLatLng();
+          onChangeRef.current({ lat: fmt(p.lat), long: fmt(p.lng) });
+        });
+    }
+    if (map.getZoom() < 10) map.setView([la, lo], 16);
+    else map.panTo([la, lo]);
+  }, [lat, long]);
 
   return (
     <fieldset className="rounded-card border border-border p-3" disabled={disabled}>
@@ -55,47 +114,27 @@ export function LocationPicker({
         Pick Location on Map{required ? <span aria-hidden="true"> *</span> : null}
       </legend>
 
-      {/* Placeholder map surface */}
-      <button
-        type="button"
-        onClick={focusLat}
-        disabled={disabled}
-        aria-label="Set coordinates"
-        className="relative flex h-40 w-full items-center justify-center overflow-hidden rounded-input border border-dashed border-border bg-[#e8eef2] text-center transition-colors hover:bg-[#dfe7ed] focus:outline-none focus:ring-2 focus:ring-primary disabled:cursor-not-allowed disabled:opacity-60"
-      >
-        {/* faux map grid */}
-        <span
-          aria-hidden="true"
-          className="absolute inset-0 opacity-40"
-          style={{
-            backgroundImage:
-              'linear-gradient(rgba(0,0,0,.06) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,.06) 1px, transparent 1px)',
-            backgroundSize: '24px 24px',
-          }}
-        />
-        <span className="relative flex flex-col items-center gap-1 text-textSecondary">
-          <PinIcon />
-          <span className="text-sm">
-            {lat && long ? `${lat}, ${long}` : 'Click to set coordinates'}
-          </span>
-        </span>
-      </button>
-      <p className="mt-1 text-label text-textSecondary">Click to update coordinates</p>
+      <div
+        ref={mapElRef}
+        role="application"
+        aria-label="Interactive map — click to set the forest coordinates"
+        className="h-64 w-full overflow-hidden rounded-input border border-border"
+        style={{ background: '#0d1f17' }}
+      />
+      <p className="mt-1 text-label text-textSecondary">Click the map or drag the pin to set coordinates</p>
 
       <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
-        <div ref={latInputRef}>
-          <TextField
-            label="Latitude"
-            type="number"
-            inputMode="numeric"
-            value={lat}
-            onChange={(v) => onChange({ lat: v, long })}
-            required={required}
-            disabled={disabled}
-            {...(latError ? { error: latError } : {})}
-            placeholder="e.g. 9.9347"
-          />
-        </div>
+        <TextField
+          label="Latitude"
+          type="number"
+          inputMode="numeric"
+          value={lat}
+          onChange={(v) => onChange({ lat: v, long })}
+          required={required}
+          disabled={disabled}
+          {...(latError ? { error: latError } : {})}
+          placeholder="e.g. 12.94418"
+        />
         <TextField
           label="Longitude"
           type="number"
@@ -105,18 +144,9 @@ export function LocationPicker({
           required={required}
           disabled={disabled}
           {...(longError ? { error: longError } : {})}
-          placeholder="e.g. 78.0009"
+          placeholder="e.g. 77.50847"
         />
       </div>
     </fieldset>
-  );
-}
-
-function PinIcon() {
-  return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0Z" />
-      <circle cx="12" cy="10" r="3" />
-    </svg>
   );
 }
