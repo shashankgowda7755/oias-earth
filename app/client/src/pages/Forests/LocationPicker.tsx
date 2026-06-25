@@ -15,8 +15,8 @@ export interface LocationPickerProps {
   lat: string;
   long: string;
   onChange: (next: { lat: string; long: string }) => void;
-  /** Called with a reverse-geocoded address after the pin moves / search picks. */
-  onAddress?: (address: string) => void;
+  /** Called with the reverse-geocoded place (address + city/state/country) after the pin moves / search picks. */
+  onPlace?: (place: PlaceParts) => void;
   latError?: string;
   longError?: string;
   required?: boolean;
@@ -26,21 +26,42 @@ export interface LocationPickerProps {
 const INDIA_CENTER: [number, number] = [22.0, 79.0];
 const fmt = (n: number): string => n.toFixed(6);
 
-/** Keyless OSM Nominatim geocoding (admin-volume; browser sends Referer). */
-async function geocodeSearch(q: string): Promise<{ lat: string; long: string; address: string } | null> {
-  const url = `https://nominatim.openstreetmap.org/search?format=json&limit=1&addressdetails=0&q=${encodeURIComponent(q)}`;
-  const r = await fetch(url, { headers: { Accept: 'application/json' } });
-  if (!r.ok) return null;
-  const j = (await r.json()) as Array<{ lat: string; lon: string; display_name: string }>;
-  const top = j[0];
-  return top ? { lat: fmt(Number(top.lat)), long: fmt(Number(top.lon)), address: top.display_name } : null;
+/** Resolved place: full address line + parsed admin components. */
+export interface PlaceParts {
+  address: string;
+  city: string;
+  state: string;
+  country: string;
 }
-async function reverseGeocode(la: number, lo: number): Promise<string | null> {
-  const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${la}&lon=${lo}`;
+interface NomAddr {
+  city?: string; town?: string; village?: string; municipality?: string;
+  county?: string; state_district?: string; state?: string; country?: string;
+}
+function partsOf(displayName: string, a: NomAddr | undefined): PlaceParts {
+  const ad = a ?? {};
+  return {
+    address: displayName,
+    city: ad.city || ad.town || ad.village || ad.municipality || ad.county || ad.state_district || '',
+    state: ad.state || '',
+    country: ad.country || '',
+  };
+}
+
+/** Keyless OSM Nominatim geocoding (admin-volume; browser sends Referer). */
+async function geocodeSearch(q: string): Promise<({ lat: string; long: string } & PlaceParts) | null> {
+  const url = `https://nominatim.openstreetmap.org/search?format=json&limit=1&addressdetails=1&q=${encodeURIComponent(q)}`;
   const r = await fetch(url, { headers: { Accept: 'application/json' } });
   if (!r.ok) return null;
-  const j = (await r.json()) as { display_name?: string };
-  return j.display_name ?? null;
+  const j = (await r.json()) as Array<{ lat: string; lon: string; display_name: string; address?: NomAddr }>;
+  const top = j[0];
+  return top ? { lat: fmt(Number(top.lat)), long: fmt(Number(top.lon)), ...partsOf(top.display_name, top.address) } : null;
+}
+async function reverseGeocode(la: number, lo: number): Promise<PlaceParts | null> {
+  const url = `https://nominatim.openstreetmap.org/reverse?format=json&addressdetails=1&lat=${la}&lon=${lo}`;
+  const r = await fetch(url, { headers: { Accept: 'application/json' } });
+  if (!r.ok) return null;
+  const j = (await r.json()) as { display_name?: string; address?: NomAddr };
+  return j.display_name ? partsOf(j.display_name, j.address) : null;
 }
 
 /** Lime map pin (divIcon avoids Vite's broken default-marker-image path). */
@@ -56,7 +77,7 @@ export function LocationPicker({
   lat,
   long,
   onChange,
-  onAddress,
+  onPlace,
   latError,
   longError,
   required,
@@ -67,8 +88,8 @@ export function LocationPicker({
   const markerRef = useRef<L.Marker | null>(null);
   const onChangeRef = useRef(onChange);
   onChangeRef.current = onChange;
-  const onAddressRef = useRef(onAddress);
-  onAddressRef.current = onAddress;
+  const onPlaceRef = useRef(onPlace);
+  onPlaceRef.current = onPlace;
 
   const [search, setSearch] = useState('');
   const [searching, setSearching] = useState(false);
@@ -87,7 +108,7 @@ export function LocationPicker({
       if (!hit) { setSearchErr('No match found'); return; }
       didMountRef.current = true; // search counts as user-initiated
       onChangeRef.current({ lat: hit.lat, long: hit.long });
-      onAddressRef.current?.(hit.address);
+      onPlaceRef.current?.({ address: hit.address, city: hit.city, state: hit.state, country: hit.country });
     } catch {
       setSearchErr('Search failed');
     } finally {
@@ -98,13 +119,13 @@ export function LocationPicker({
   // Reverse-geocode the address whenever coords change (debounced). Fills the
   // editable Address field; skips the initial mount so existing data is kept.
   useEffect(() => {
-    if (!onAddressRef.current) return;
+    if (!onPlaceRef.current) return;
     const la = Number(lat);
     const lo = Number(long);
     if (lat === '' || long === '' || !Number.isFinite(la) || !Number.isFinite(lo)) return;
     if (!didMountRef.current) { didMountRef.current = true; return; }
     const t = setTimeout(() => {
-      reverseGeocode(la, lo).then((addr) => { if (addr) onAddressRef.current?.(addr); }).catch(() => undefined);
+      reverseGeocode(la, lo).then((p) => { if (p) onPlaceRef.current?.(p); }).catch(() => undefined);
     }, 800);
     return () => clearTimeout(t);
   }, [lat, long]);
