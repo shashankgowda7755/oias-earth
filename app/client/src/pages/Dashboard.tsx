@@ -9,6 +9,7 @@ import Employees from './Employees';
 import Forests from './Forests';
 import Reports from './Reports';
 import Jobs from './Jobs';
+import Logs from './Logs';
 import Integrity from './Integrity';
 import Planters from './Planters';
 
@@ -19,6 +20,7 @@ const SECTION_COMPONENTS: Partial<Record<SectionTab, ComponentType>> = {
   Forests,
   Reports,
   Jobs,
+  Logs,
   Integrity,
   Planters,
 };

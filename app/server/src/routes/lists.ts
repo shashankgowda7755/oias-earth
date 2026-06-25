@@ -34,6 +34,27 @@ const wrap =
     }
   };
 
+/* ----------------------------- audit/list ---------------------------- */
+// Most-recent-first activity log: logins + every data mutation.
+listRouter.post(
+  '/audit/list',
+  wrap(async (req, res) => {
+    const { limit, offset, page, search } = parsePageParams(req.body);
+    const like = `%${search}%`;
+    const where = `FROM audit_log
+      WHERE ($1 = '' OR action ILIKE $2 OR actor_name ILIKE $2 OR entity ILIKE $2 OR target_id ILIKE $2 OR ip ILIKE $2)`;
+    const params = [search, like];
+    const total = await countTotal(where, params);
+    const rows = await query(
+      `SELECT id, ts, actor_name AS "actorName", role, action, entity,
+              target_id AS "targetId", method, path, status, ip
+       ${where} ORDER BY ts DESC LIMIT $3 OFFSET $4`,
+      [...params, limit, offset],
+    );
+    res.json({ data: rows.rows, pagination: { total, page, limit } });
+  }),
+);
+
 /* ----------------------------- users/list ---------------------------- */
 // Joins user_profiles + user_roles + master_roles. Returns the observed mixed
 // camel/snake shape. user_id (legacy int) is surfaced as `id` to match sample.

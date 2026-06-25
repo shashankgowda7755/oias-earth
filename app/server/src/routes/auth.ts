@@ -17,6 +17,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { config } from '../config';
 import { query } from '../db';
+import { recordAudit, clientIp } from '../lib/audit';
 import { badRequest, unauthorized } from '../errors';
 import type {
   AuthUser,
@@ -73,15 +74,18 @@ authRouter.post(
         [username]
       );
 
+      const ip = clientIp(req);
       const row = result.rows[0];
       // Constant-ish failure: same error whether the user is missing or the
       // password is wrong, to avoid username enumeration.
       if (!row || !row.password_hash) {
+        recordAudit({ action: 'auth.login_failed', actorName: username, entity: 'auth', method: 'POST', path: '/auth/login', status: 401, ip, meta: { reason: 'no_user' } });
         throw unauthorized('Invalid username or password');
       }
 
       const ok = await bcrypt.compare(password, row.password_hash);
       if (!ok) {
+        recordAudit({ action: 'auth.login_failed', actorName: username, entity: 'auth', method: 'POST', path: '/auth/login', status: 401, ip, meta: { reason: 'bad_password' } });
         throw unauthorized('Invalid username or password');
       }
 
@@ -107,6 +111,18 @@ authRouter.post(
         role: row.role_name,
         roleId: row.role_id,
       };
+
+      recordAudit({
+        action: 'auth.login',
+        actorId: row.profile_id,
+        actorName: row.username,
+        role: row.role_name,
+        entity: 'auth',
+        method: 'POST',
+        path: '/auth/login',
+        status: 200,
+        ip,
+      });
 
       const response: LoginResponse = { token, user };
       res.json(response);

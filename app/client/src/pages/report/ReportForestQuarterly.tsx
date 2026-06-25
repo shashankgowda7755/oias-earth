@@ -10,7 +10,7 @@ import { useParams, useSearchParams } from 'react-router-dom';
 import { buildPreviewReport } from './reportFixture';
 import { downloadReportPdf } from './reportDownload';
 import { C, FONT, REPORT_PRINT_CSS } from './reportPrimitives';
-import { SLIDES } from './slides';
+import { SLIDES, SLIDE_TITLES } from './slides';
 import type { ForestReportData } from './reportTypes';
 import { fetchForestReport } from '@/lib/publicApi';
 

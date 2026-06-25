@@ -60,6 +60,15 @@ export async function deleteReport(id: string): Promise<{ id: string }> {
   return { id };
 }
 
+/** Email the rendered report to a recipient via Composio Gmail. */
+export async function sendReport(
+  id: string,
+  to: string,
+): Promise<{ ok: boolean; to: string; messageId?: string; url: string }> {
+  const { data } = await api.post(`/${REPORT_CRUD_SEGMENT}/${id}/send`, { to });
+  return (data?.data ?? data) as { ok: boolean; to: string; messageId?: string; url: string };
+}
+
 /**
  * Forest options for the Forest <select> in the report form.
  * Pulls a generous page of forests (the admin set is small) and maps to

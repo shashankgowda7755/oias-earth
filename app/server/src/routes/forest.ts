@@ -43,6 +43,7 @@ import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
 import { query, getClient, type DbClient } from '../db';
 import { badRequest, forbidden, notFound } from '../errors';
+import { sendGmail } from '../lib/composio';
 import { parsePageParams, countTotal } from './helpers';
 import {
   ageDays,
@@ -2222,9 +2223,85 @@ async function forestWeather(req: Request, res: Response): Promise<void> {
 }
 
 /* ------------------------------------------------------------------ */
+/* Send a report to the sponsor via Composio Gmail                     */
+/* ------------------------------------------------------------------ */
+
+const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+
+/** Sponsor display name from a forest's additional_sponsor_logo jsonb. */
+function sponsorNameFrom(raw: unknown): string {
+  let arr: unknown = raw;
+  if (typeof raw === 'string') { try { arr = JSON.parse(raw); } catch { arr = []; } }
+  if (!Array.isArray(arr)) return '';
+  const s = arr.find(
+    (e) => (e as { type?: { value?: string } })?.type?.value === 'sponsored_by',
+  ) as { name?: string } | undefined;
+  return s?.name ?? '';
+}
+
+/**
+ * POST /report/:id/send  { to } — email the rendered quarterly report to the
+ * sponsor. Resolves the report's forest, builds a branded email linking the
+ * live report, sends via Composio Gmail, and logs {to, message_id, sent_at}
+ * into the report's report_data.last_sent. Recipient is explicit (the client
+ * prefills the sponsor email and lets the user confirm) — never a silent send.
+ */
+async function sendReportEmail(req: Request, res: Response): Promise<void> {
+  const reportId = String(req.params.id);
+  if (!WX_UUID_RE.test(reportId)) throw notFound('Report not found');
+  const rr = await query<{
+    year: number; quarter: number; forest_id: string;
+    forest_name: string | null; additional_sponsor_logo: unknown;
+  }>(
+    `SELECT r.year, r.quarter, r.forest_id, f.forest_name, f.additional_sponsor_logo
+       FROM reports r JOIN forests f ON f.id = r.forest_id WHERE r.id = $1`,
+    [reportId],
+  );
+  const row = rr.rows[0];
+  if (!row) throw notFound('Report not found');
+
+  const to = String((req.body as { to?: unknown })?.to ?? '').trim();
+  if (!EMAIL_RE.test(to)) {
+    res.status(400).json({ error: true, message: 'A valid recipient email is required.' });
+    return;
+  }
+
+  const sponsor = sponsorNameFrom(row.additional_sponsor_logo);
+  const forestName = row.forest_name ?? 'Forest';
+  const base = process.env.APP_URL || `https://${req.get('host')}`;
+  const url = `${base}/report/forest/${row.forest_id}?year=${row.year}&quarter=${row.quarter}`;
+  const subject = `${sponsor ? `${sponsor} · ` : ''}${forestName} — Quarterly Forest Report (Q${row.quarter} ${row.year})`;
+  const html =
+    `<div style="font-family:Arial,Helvetica,sans-serif;max-width:600px;margin:0 auto;color:#16282e">` +
+    `<div style="background:#16282e;padding:24px 28px;border-radius:12px 12px 0 0">` +
+    `<div style="color:#a8e063;font-weight:800;font-size:13px;letter-spacing:.08em">${sponsor ? `${sponsor.toUpperCase()} · ` : ''}QUARTERLY FOREST REPORT</div>` +
+    `<div style="color:#fff;font-size:24px;font-weight:800;margin-top:6px">${forestName}</div>` +
+    `<div style="color:#cdd8d2;font-size:13px;margin-top:4px">Q${row.quarter} · ${row.year}</div></div>` +
+    `<div style="border:1px solid #e3e9e5;border-top:none;border-radius:0 0 12px 12px;padding:26px 28px">` +
+    `<p style="margin:0 0 16px;line-height:1.5">Your quarterly forest report is ready — maintenance, plant growth, soil &amp; climate, species health, and the estimated environmental impact for this quarter.</p>` +
+    `<a href="${url}" style="display:inline-block;background:#2f6b3f;color:#fff;text-decoration:none;padding:13px 28px;border-radius:999px;font-weight:700;font-size:15px">View full report &rarr;</a>` +
+    `<p style="margin:18px 0 0;font-size:12px;color:#888">Open the report to view all sections and download a PDF. Carbon/oxygen figures are estimates.</p>` +
+    `<p style="margin:12px 0 0;font-size:12px;color:#aaa">Initiated by CommuniTREE${sponsor ? ` · Sponsored by ${sponsor}` : ''} · Sent via OIAS Earth</p></div></div>`;
+
+  const result = await sendGmail({ to, subject, html });
+  if (!result.ok) {
+    res.status(502).json({ error: true, message: result.error ?? 'Send failed.' });
+    return;
+  }
+  await query(
+    `UPDATE reports SET report_data = COALESCE(report_data, '{}'::jsonb)
+       || jsonb_build_object('last_sent', jsonb_build_object('to', $2::text, 'message_id', $3::text, 'sent_at', now()::text))
+     WHERE id = $1`,
+    [reportId, to, result.messageId ?? ''],
+  );
+  res.json({ data: { ok: true, to, messageId: result.messageId, url } });
+}
+
+/* ------------------------------------------------------------------ */
 /* Route registration                                                  */
 /* ------------------------------------------------------------------ */
 
+forestRouter.post('/report/:id/send', wrap(sendReportEmail));
 forestRouter.get('/forest/:id/weather', wrap(forestWeather));
 forestRouter.post('/forest/:id/report-data', wrap(updateForestReportData));
 forestRouter.post('/forest/upsert', upload.any(), wrap(upsertForest));

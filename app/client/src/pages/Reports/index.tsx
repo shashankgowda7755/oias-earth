@@ -24,6 +24,7 @@
 import { useMemo, useState } from 'react';
 import {
   AddButton,
+  Button,
   ConfirmDialog,
   DataTable,
   FilterButton,
@@ -53,6 +54,7 @@ import {
   useReportsList,
   useUpdateReport,
 } from './useReports';
+import { sendReport } from './reportApi';
 
 type DialogState =
   | { kind: 'closed' }
@@ -87,6 +89,24 @@ export default function Reports() {
   const [dialog, setDialog] = useState<DialogState>({ kind: 'closed' });
   const [filterOpen, setFilterOpen] = useState(false);
   const [pendingDelete, setPendingDelete] = useState<ReportRow | null>(null);
+  const [pendingSend, setPendingSend] = useState<ReportRow | null>(null);
+  const [sendTo, setSendTo] = useState('');
+  const [sending, setSending] = useState(false);
+
+  const handleSend = async () => {
+    if (!pendingSend) return;
+    setSending(true);
+    try {
+      const r = await sendReport(pendingSend.id, sendTo.trim());
+      toast.success(`Report sent to ${r.to}.`);
+      setPendingSend(null);
+      setSendTo('');
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'Send failed.');
+    } finally {
+      setSending(false);
+    }
+  };
 
   const createMut = useCreateReport();
   const updateMut = useUpdateReport();
@@ -248,6 +268,7 @@ export default function Reports() {
           return (
             <RowActions
               onView={viewUrl ? () => window.open(viewUrl, '_blank', 'noopener') : undefined}
+              onSend={() => { setPendingSend(r); setSendTo(''); }}
               onEdit={() => setDialog({ kind: 'edit', row: r })}
               onDelete={() => setPendingDelete(r)}
               label={`report ${r.Forest?.forest_name ?? ''} ${r.year} Q${r.quarter}`}
@@ -357,6 +378,31 @@ export default function Reports() {
         onConfirm={handleConfirmDelete}
         onCancel={() => setPendingDelete(null)}
       />
+
+      {pendingSend !== null ? (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" role="dialog" aria-modal="true">
+          <div className="w-full max-w-md rounded-card border border-border bg-surface p-6 shadow-dialog">
+            <h3 className="text-lg font-semibold text-textPrimary">Send report</h3>
+            <p className="mt-1 text-sm text-textSecondary">
+              {pendingSend.Forest?.forest_name ?? 'Forest'} · Q{pendingSend.quarter} {pendingSend.year} — a branded email with the live report link is sent via Gmail.
+            </p>
+            <label className="mt-4 block text-sm text-textSecondary" htmlFor="send-to">Recipient email</label>
+            <input
+              id="send-to"
+              type="email"
+              value={sendTo}
+              onChange={(e) => setSendTo(e.target.value)}
+              placeholder="sponsor@example.com"
+              className="mt-1 w-full rounded-button border border-border bg-appbg px-3 py-2 text-sm text-textPrimary focus:border-primary focus:outline-none"
+              autoFocus
+            />
+            <div className="mt-6 flex justify-end gap-2">
+              <button type="button" onClick={() => setPendingSend(null)} className="rounded-button border border-border px-4 py-2 text-sm text-textPrimary hover:bg-white/5">Cancel</button>
+              <Button variant="primary" onClick={handleSend} loading={sending} disabled={!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(sendTo.trim())}>Send</Button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </section>
   );
 }
@@ -396,11 +442,13 @@ function StatusPill({ active }: { active: boolean }) {
  */
 function RowActions({
   onView,
+  onSend,
   onEdit,
   onDelete,
   label,
 }: {
   onView?: () => void;
+  onSend?: () => void;
   onEdit: () => void;
   onDelete: () => void;
   label: string;
@@ -444,6 +492,19 @@ function RowActions({
               className="block w-full px-4 py-2 text-sm text-textPrimary hover:bg-white/5"
             >
               View report ↗
+            </button>
+          ) : null}
+          {onSend ? (
+            <button
+              type="button"
+              role="menuitem"
+              onClick={() => {
+                setOpen(false);
+                onSend();
+              }}
+              className="block w-full px-4 py-2 text-sm text-textPrimary hover:bg-white/5"
+            >
+              Send report
             </button>
           ) : null}
           <button

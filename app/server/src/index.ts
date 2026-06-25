@@ -15,6 +15,7 @@ import path from 'path';
 import fs from 'fs';
 import { config } from './config';
 import { requireAuth } from './auth/middleware';
+import { auditWrites } from './lib/audit';
 import { authRouter } from './routes/auth';
 import { listRouter } from './routes/lists';
 import { crudRouter, UPLOADS_DIR } from './routes/crud';
@@ -55,9 +56,13 @@ app.use('/api/v1', publicRouter);
 // forestRouter is mounted FIRST so its full-payload /forest/upsert + the new
 // geo/dashboard/bulk-import routes take precedence over the legacy wizard
 // upsert that still lives (for reference) in crudRouter.
-app.use('/api/v1', requireAuth, listRouter);
-app.use('/api/v1', requireAuth, forestRouter);
-app.use('/api/v1', requireAuth, crudRouter);
+// Auth once for everything below, then audit every mutation (login is logged
+// in the auth router since it runs before this gate).
+app.use('/api/v1', requireAuth);
+app.use('/api/v1', auditWrites);
+app.use('/api/v1', listRouter);
+app.use('/api/v1', forestRouter);
+app.use('/api/v1', crudRouter);
 
 // 404 for unmatched API routes.
 app.use('/api', (_req: Request, res: Response) => {
