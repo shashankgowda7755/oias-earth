@@ -12,7 +12,8 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet.markercluster';
 import 'leaflet.markercluster/dist/MarkerCluster.css';
-import { fetchForestsMap, fetchForestTrees, fetchForestBoundary, type ForestPin, type PublicTree } from '@/lib/publicApi';
+import { fetchForestsMap, fetchForestTrees, fetchForestBoundary, fetchForestReport, type ForestPin, type PublicTree } from '@/lib/publicApi';
+import { buildPlantingLayout, allocateSpecies, SPECIES_PALETTE, type SpeciesShare } from './Forests/matrixLayout';
 import '@/styles/earth.css';
 
 function clusterIcon(cluster: L.MarkerCluster): L.DivIcon {
@@ -66,68 +67,10 @@ function forestIcon(f: ForestPin): L.DivIcon {
   });
 }
 
-// Tree pin coloured by health status (1 healthy, 2 drying, 3 damaged, 4 dead).
-function treePin(statusId: number): L.DivIcon {
-  return L.divIcon({
-    className: `tree-pin s${statusId}`,
-    html: '<span class="core" style="position:relative;display:block;width:11px;height:11px;border-radius:50%"></span>',
-    iconSize: [11, 11],
-    iconAnchor: [5.5, 5.5],
-  });
-}
-
-const STATUS_LABEL: Record<number, string> = { 1: 'Healthy', 2: 'Drying', 3: 'Damaged', 4: 'Dead' };
-const STATUS_COLOR: Record<number, string> = { 1: '#b6ff3c', 2: '#e8a33d', 3: '#f0792b', 4: '#6b7b82' };
-
-// Escape any value interpolated into popup innerHTML (pet names are user-supplied
-// on gift trees → stored-XSS vector without this).
+// Escape any value interpolated into popup innerHTML (sponsor/forest names).
 function esc(v: unknown): string {
   return String(v ?? '').replace(/[&<>"']/g, (c) =>
     ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!,
-  );
-}
-const fmtDate = (v: string | null | undefined): string => (v ? String(v).slice(0, 10) : '');
-
-// Human age from age_days (fallback: derive from planted_on).
-function ageStr(t: PublicTree): string {
-  const days =
-    t.age_days != null
-      ? t.age_days
-      : t.planted_on
-        ? Math.floor((Date.now() - new Date(t.planted_on).getTime()) / 86400000)
-        : null;
-  if (days == null || days < 0) return '';
-  if (days < 31) return `${days}d old`;
-  if (days < 365) return `${Math.floor(days / 30.44)} mo old`;
-  return `${(days / 365.25).toFixed(1)} yr old`;
-}
-
-function treePopupHtml(t: PublicTree): string {
-  const sid = t.status_id ?? 1;
-  const color = STATUS_COLOR[sid] ?? '#b6ff3c';
-  // Latest field photo (proof the sapling is real). object-fit cover keeps it tidy.
-  const photo = t.photo_url
-    ? `<img src="${esc(t.photo_url)}" alt="" loading="lazy" style="width:100%;height:96px;object-fit:cover;border-radius:6px;margin-bottom:6px;display:block"/>`
-    : '';
-  const head = t.pet_name
-    ? `<strong style="color:${color}">${esc(t.pet_name)}</strong><br/><span style="color:#9ab;font-size:11px">${esc(t.tree_unique_id)}</span>`
-    : `<strong style="color:${color}">${esc(t.tree_unique_id) || 'Tree'}</strong>`;
-  const sp = t.species ? `<br/><span style="color:#cdd">${esc(t.species)}</span>` : '';
-  const badge = `<span style="display:inline-block;margin-top:6px;padding:1px 8px;border-radius:999px;border:1px solid ${color};color:${color};font-size:11px">${STATUS_LABEL[sid] ?? 'Alive'}</span>`;
-  const stats: string[] = [];
-  if (t.height != null) stats.push(`${t.height} m`);
-  if (t.dbh != null) stats.push(`⌀ ${t.dbh} cm`);
-  if (t.co2e_kg != null && sid !== 4) stats.push(`${t.co2e_kg} kg CO₂e`);
-  if (t.oxygen_kg != null && sid !== 4) stats.push(`${t.oxygen_kg} kg O₂`);
-  const age = ageStr(t);
-  if (age) stats.push(age);
-  const statLine = stats.length
-    ? `<br/><span style="font-family:'JetBrains Mono',monospace;color:#9ab;font-size:11px">${stats.join('  ·  ')}</span>`
-    : '';
-  const seen = t.last_seen ? `<br/><span style="color:#7a8b91;font-size:10px">last measured ${fmtDate(t.last_seen)}</span>` : '';
-  return (
-    `<div style="font-family:'Plus Jakarta Sans',sans-serif;min-width:170px;max-width:210px">${photo}${head}${sp}<br/>${badge}${statLine}${seen}` +
-    `<br/><a href="/tree/${encodeURIComponent(t.id)}" style="color:#b6ff3c;font-weight:600;display:inline-block;margin-top:6px">View life record →</a></div>`
   );
 }
 
@@ -136,6 +79,7 @@ export default function PublicMap() {
   const mapRef = useRef<L.Map | null>(null);
   const forestLayer = useRef<L.MarkerClusterGroup | null>(null);
   const treeLayer = useRef<L.MarkerClusterGroup | null>(null);
+  const matrixLayer = useRef<L.LayerGroup | null>(null);
   const boundaryLayer = useRef<L.LayerGroup | null>(null);
 
   const [forests, setForests] = useState<ForestPin[]>([]);
@@ -145,6 +89,7 @@ export default function PublicMap() {
   const [treeLoading, setTreeLoading] = useState(false);
   const [areaHa, setAreaHa] = useState<number | null>(null);
   const [treeStats, setTreeStats] = useState<{ alive: number; total: number } | null>(null);
+  const [legendShares, setLegendShares] = useState<SpeciesShare[]>([]);
 
   const totals = forests.reduce(
     (a, f) => ({ alive: a.alive + (f.alive_trees ?? f.tagged_trees), total: a.total + f.total_trees }),
@@ -176,6 +121,7 @@ export default function PublicMap() {
       chunkedLoading: true,
     }).addTo(map);
     boundaryLayer.current = L.layerGroup().addTo(map);
+    matrixLayer.current = L.layerGroup().addTo(map);
     mapRef.current = map;
     setTimeout(() => map.invalidateSize(), 60);
     return () => {
@@ -226,39 +172,63 @@ export default function PublicMap() {
     setSelected(f);
     setTreeStats(null);
     const map = mapRef.current;
-    const layer = treeLayer.current;
-    if (!map || !layer) return;
-    layer.clearLayers();
+    if (!map) return;
+    treeLayer.current?.clearLayers();
+    matrixLayer.current?.clearLayers();
     boundaryLayer.current?.clearLayers();
     setAreaHa(null);
-    if (f.lat != null && f.lng != null) map.setView([f.lat, f.lng], 16);
-    // Boundary polygon (EUDR) + area.
-    fetchForestBoundary(f.id)
-      .then((b) => {
-        if (b.boundary.length >= 3 && boundaryLayer.current) {
-          L.polygon(b.boundary.map((p) => [p.lat, p.lng] as [number, number]), {
-            color: '#b6ff3c', weight: 2, fillColor: '#b6ff3c', fillOpacity: 0.06,
-          }).addTo(boundaryLayer.current);
-          setAreaHa(b.area_ha);
-        }
-      })
-      .catch(() => undefined);
+    if (f.lat != null && f.lng != null) map.setView([f.lat, f.lng], 17);
     setTreeLoading(true);
     try {
-      const trees = await fetchForestTrees(f.id);
-      const bounds: [number, number][] = [];
-      let alive = 0;
-      for (const t of trees) {
-        if (t.lat == null || t.lng == null) continue;
-        const sid = t.status_id ?? 1;
-        if (sid !== 4) alive++;
-        L.marker([t.lat, t.lng], { icon: treePin(sid) })
-          .addTo(layer)
-          .bindPopup(treePopupHtml(t));
-        bounds.push([t.lat, t.lng]);
+      // Unified per-forest view = species matrix (same engine as /forest/:id):
+      // boundary polygon → grid clipped inside; else a synthetic square around
+      // the centre. Coloured by species composition. No cluster/spider.
+      const [bnd, rep, trees] = await Promise.all([
+        fetchForestBoundary(f.id).catch(() => ({ boundary: [] as { lat: number; lng: number }[], area_ha: null })),
+        fetchForestReport(f.id).catch(() => null),
+        fetchForestTrees(f.id).catch(() => [] as PublicTree[]),
+      ]);
+
+      const boundary = bnd.boundary ?? [];
+      if (boundary.length >= 3 && boundaryLayer.current) {
+        L.polygon(boundary.map((p) => [p.lat, p.lng] as [number, number]), {
+          color: '#b6ff3c', weight: 3, fillColor: '#b6ff3c', fillOpacity: 0.05, lineJoin: 'round',
+        }).addTo(boundaryLayer.current);
+        setAreaHa(bnd.area_ha);
       }
-      setTreeStats({ alive, total: trees.length });
-      if (bounds.length > 1) map.fitBounds(L.latLngBounds(bounds), { padding: [40, 40], maxZoom: 18 });
+
+      const alive = trees.reduce((n, t) => n + ((t.status_id ?? 1) !== 4 ? 1 : 0), 0);
+      setTreeStats({ alive: alive || f.alive_trees || 0, total: trees.length || f.total_trees });
+
+      const total = Math.min(rep?.computed?.total_saplings || f.total_trees || trees.length || 0, 12000);
+      const shares: SpeciesShare[] = (rep?.computed?.species_inventory ?? [])
+        .filter((s) => (s.saplings ?? 0) > 0)
+        .map((s, i) => ({ name: s.species_name || `Species ${i + 1}`, count: s.saplings ?? 0, color: SPECIES_PALETTE[i % SPECIES_PALETTE.length]! }));
+      setLegendShares(shares);
+
+      const d = 0.0009; // ~100m half-span (matches /forest/:id)
+      const area =
+        boundary.length >= 3
+          ? boundary
+          : f.lat != null && f.lng != null
+            ? [
+                { lat: f.lat + d, lng: f.lng - d }, { lat: f.lat + d, lng: f.lng + d },
+                { lat: f.lat - d, lng: f.lng + d }, { lat: f.lat - d, lng: f.lng - d },
+              ]
+            : [];
+
+      if (area.length >= 3 && total > 0 && matrixLayer.current) {
+        const pts = buildPlantingLayout(area, { total, layout: 'aisle' }).points.slice(0, 12000);
+        const colored = allocateSpecies(pts.length, shares.length ? shares : [{ name: 'Saplings', count: 1, color: '#b6ff3c' }]);
+        const renderer = L.canvas({ padding: 0.5 });
+        const r = pts.length > 4000 ? 2 : pts.length > 1500 ? 2.6 : 3.4;
+        const mb: [number, number][] = [];
+        pts.forEach((p, i) => {
+          L.circleMarker([p.lat, p.lng], { renderer, radius: r, stroke: false, fillColor: colored[i]!.color, fillOpacity: 0.95 }).addTo(matrixLayer.current!);
+          mb.push([p.lat, p.lng]);
+        });
+        if (mb.length) map.fitBounds(L.latLngBounds(mb), { padding: [30, 30], maxZoom: 19 });
+      }
     } catch {
       /* keep forest view */
     } finally {
@@ -269,7 +239,9 @@ export default function PublicMap() {
   function showAll() {
     setSelected(null);
     setTreeStats(null);
+    setLegendShares([]);
     treeLayer.current?.clearLayers();
+    matrixLayer.current?.clearLayers();
     boundaryLayer.current?.clearLayers();
     setAreaHa(null);
   }
@@ -363,14 +335,15 @@ export default function PublicMap() {
               </div>
             </div>
           )}
-          {/* Health legend — only meaningful once a forest's trees are drawn. */}
-          {selected && (
-            <div style={{ position: 'absolute', top: 12, right: 12, zIndex: 1000, background: 'var(--ink)', color: 'var(--surface)', padding: '10px 12px', borderRadius: 8, fontSize: 11, border: '1px solid var(--line)' }}>
-              <div className="mono" style={{ color: '#9fb0ad', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '.08em' }}>tree health</div>
-              {([1, 2, 3, 4] as const).map((s) => (
-                <div key={s} style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 3 }}>
-                  <span style={{ width: 10, height: 10, borderRadius: '50%', background: STATUS_COLOR[s], display: 'inline-block', boxShadow: s === 1 ? '0 0 6px rgba(182,255,60,.8)' : 'none' }} />
-                  <span>{STATUS_LABEL[s]}</span>
+          {/* Species legend — the matrix is coloured by species. */}
+          {selected && legendShares.length > 0 && (
+            <div style={{ position: 'absolute', top: 12, right: 12, zIndex: 1000, background: 'var(--ink)', color: 'var(--surface)', padding: '10px 12px', borderRadius: 8, fontSize: 11, border: '1px solid var(--line)', maxWidth: 220 }}>
+              <div className="mono" style={{ color: '#9fb0ad', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '.08em' }}>species matrix</div>
+              {legendShares.map((s) => (
+                <div key={s.name} style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 3 }}>
+                  <span style={{ width: 10, height: 10, borderRadius: '50%', background: s.color, display: 'inline-block' }} />
+                  <span style={{ flex: 1 }}>{s.name}</span>
+                  <span style={{ color: '#9fb0ad' }}>{s.count.toLocaleString()}</span>
                 </div>
               ))}
             </div>
