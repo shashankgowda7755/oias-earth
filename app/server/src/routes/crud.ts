@@ -87,6 +87,7 @@ const SPONSOR: EntityConfig = {
   label: 'Sponsor',
   columns: [
     'sponsor_name',
+    'sponsor_email',
     'sponsor_logo',
     'sponsor_forest_logo',
     'sponsor_tree_logo',

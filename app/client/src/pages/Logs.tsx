@@ -42,6 +42,7 @@ export default function Logs() {
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState<string | null>(null);
   const [search, setSearch] = useState('');
+  const [cat, setCat] = useState('');
 
   useEffect(() => {
     let off = false;
@@ -49,19 +50,28 @@ export default function Logs() {
     setErr(null);
     const t = setTimeout(() => {
       api
-        .post('/audit/list', { page: 1, limit: 200, search })
+        .post('/audit/list', { page: 1, limit: 200, search, ...(cat ? { category: cat } : {}) })
         .then((r) => { if (!off) setRows(((r.data?.data ?? r.data) as AuditRow[]) ?? []); })
         .catch((e) => { if (!off) setErr(e instanceof Error ? e.message : 'Failed to load logs'); })
         .finally(() => { if (!off) setLoading(false); });
     }, search ? 300 : 0);
     return () => { off = true; clearTimeout(t); };
-  }, [search]);
+  }, [search, cat]);
+
+  const TABS: { key: string; label: string }[] = [
+    { key: '', label: 'All' },
+    { key: 'login', label: 'Logins' },
+    { key: 'forest', label: 'Forest' },
+    { key: 'report', label: 'Reports' },
+    { key: 'download', label: 'Downloads' },
+    { key: 'send', label: 'Sends' },
+  ];
 
   const cell = useMemo(() => 'px-3 py-2 align-top whitespace-nowrap', []);
 
   return (
     <div>
-      <div className="mb-4 flex items-center justify-between gap-3">
+      <div className="mb-3 flex items-center justify-between gap-3">
         <h1 className="text-xl font-medium text-textPrimary">Activity log</h1>
         <input
           type="text"
@@ -70,6 +80,23 @@ export default function Logs() {
           placeholder="Search actor / action / entity / IP…"
           className="w-72 rounded-input border border-border bg-transparent px-3 py-2 text-sm text-textPrimary placeholder:text-textSecondary focus:border-primary focus:outline-none"
         />
+      </div>
+
+      {/* Category views: All / Logins / Forest / Reports / Downloads / Sends */}
+      <div className="mb-4 flex flex-wrap gap-2">
+        {TABS.map((t) => (
+          <button
+            key={t.key}
+            onClick={() => setCat(t.key)}
+            className={`rounded-full border px-3 py-1.5 text-sm transition ${
+              cat === t.key
+                ? 'border-primary bg-primary/10 text-primary'
+                : 'border-border text-textSecondary hover:bg-white/5'
+            }`}
+          >
+            {t.label}
+          </button>
+        ))}
       </div>
 
       {err ? (

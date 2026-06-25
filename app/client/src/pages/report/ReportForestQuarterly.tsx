@@ -37,6 +37,16 @@ export default function ReportForestQuarterly() {
         ? `${data.forest.forest_name} ${data.meta.quarter_label} ${data.meta.year} Report.pdf`.replace(/[\\/:*?"<>|]+/g, '-')
         : 'Forest Report.pdf';
       await downloadReportPdf(fname, setDl);
+      // Log the download to the audit trail (fire-and-forget; public route).
+      if (id && id !== 'preview') {
+        let actor = '';
+        try { actor = (JSON.parse(localStorage.getItem('userDetailsData') || '{}') as { username?: string }).username || ''; } catch { /* anon */ }
+        fetch(`/api/v1/public/forest/${id}/report-download`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ year, quarter, actor }),
+        }).catch(() => undefined);
+      }
     } catch (e) {
       setDl('');
       alert(e instanceof Error ? e.message : 'Could not generate the PDF. Try the Print button.');

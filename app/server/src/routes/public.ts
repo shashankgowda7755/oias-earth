@@ -16,6 +16,7 @@ import { notFound } from '../errors';
 import { treeCo2eKg, netCo2eKg, oxygenKg, CARBON_METHOD, BUFFER_PCT, UNCERTAINTY_PCT } from '../lib/carbon';
 import { isAllowedPanoUrl } from '../lib/pano';
 import { buildForestReport } from '../lib/reportData';
+import { recordAudit, clientIp } from '../lib/audit';
 
 export const publicRouter = Router();
 
@@ -944,6 +945,27 @@ async function forestReport(req: Request, res: Response): Promise<void> {
 publicRouter.get('/public/sponsors', wrap(sponsorsPublic));
 publicRouter.get('/public/leaderboard', wrap(leaderboard));
 publicRouter.get('/public/forest/:id/report', wrap(forestReport));
+
+/** POST /public/forest/:id/report-download — log a PDF download to the audit
+ *  trail. Public (the report viewer is public); actor is whatever name the
+ *  client passes (admins send their username), else anonymous. */
+publicRouter.post('/public/forest/:id/report-download', wrap(async (req, res) => {
+  const id = String(req.params.id);
+  if (!UUID_RE.test(id)) { res.status(204).end(); return; }
+  const b = (req.body ?? {}) as { year?: unknown; quarter?: unknown; actor?: unknown };
+  recordAudit({
+    action: 'report.download',
+    entity: 'report',
+    targetId: id,
+    actorName: typeof b.actor === 'string' && b.actor ? b.actor : 'anonymous',
+    method: 'POST',
+    path: `/public/forest/${id}/report-download`,
+    status: 204,
+    ip: clientIp(req),
+    meta: { year: b.year ?? null, quarter: b.quarter ?? null },
+  });
+  res.status(204).end();
+}));
 publicRouter.get('/public/forest/:id/boundary', wrap(forestBoundaryPublic));
 publicRouter.get('/public/sponsor/:id', wrap(sponsorMicrosite));
 publicRouter.get('/public/sponsor/:id/report.csv', wrap(sponsorReportCsv));

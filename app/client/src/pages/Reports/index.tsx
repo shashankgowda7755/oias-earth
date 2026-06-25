@@ -54,7 +54,7 @@ import {
   useReportsList,
   useUpdateReport,
 } from './useReports';
-import { sendReport } from './reportApi';
+import { sendReport, getReportRecipient } from './reportApi';
 
 type DialogState =
   | { kind: 'closed' }
@@ -92,6 +92,14 @@ export default function Reports() {
   const [pendingSend, setPendingSend] = useState<ReportRow | null>(null);
   const [sendTo, setSendTo] = useState('');
   const [sending, setSending] = useState(false);
+
+  const openSend = (r: ReportRow) => {
+    setPendingSend(r);
+    setSendTo('');
+    getReportRecipient(r.id)
+      .then((res) => setSendTo(res.email || ''))
+      .catch(() => undefined);
+  };
 
   const handleSend = async () => {
     if (!pendingSend) return;
@@ -268,7 +276,7 @@ export default function Reports() {
           return (
             <RowActions
               onView={viewUrl ? () => window.open(viewUrl, '_blank', 'noopener') : undefined}
-              onSend={() => { setPendingSend(r); setSendTo(''); }}
+              onSend={() => openSend(r)}
               onEdit={() => setDialog({ kind: 'edit', row: r })}
               onDelete={() => setPendingDelete(r)}
               label={`report ${r.Forest?.forest_name ?? ''} ${r.year} Q${r.quarter}`}

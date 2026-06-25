@@ -135,6 +135,7 @@ const FOREST_SCALAR_COLUMNS = [
   'last_inspection_date',
   'permission_letter',
   'site_layout',
+  'forest_contact_email',
   'is_updated',
   'is_active',
 ];
@@ -2297,10 +2298,42 @@ async function sendReportEmail(req: Request, res: Response): Promise<void> {
   res.json({ data: { ok: true, to, messageId: result.messageId, url } });
 }
 
+/**
+ * GET /report/:id/recipient — resolve the report's send recipient:
+ * the tagged sponsor's email first, else the forest-level contact email.
+ * Used to PREFILL the Send dialog (still editable; never auto-sends).
+ */
+async function reportRecipient(req: Request, res: Response): Promise<void> {
+  const reportId = String(req.params.id);
+  if (!WX_UUID_RE.test(reportId)) throw notFound('Report not found');
+  const r = await query<{ email: string | null; source: string | null }>(
+    `SELECT
+       COALESCE(sp.sponsor_email, NULLIF(f.forest_contact_email, '')) AS email,
+       CASE WHEN sp.sponsor_email IS NOT NULL THEN 'sponsor'
+            WHEN NULLIF(f.forest_contact_email, '') IS NOT NULL THEN 'forest'
+            ELSE NULL END AS source
+     FROM reports r
+     JOIN forests f ON f.id = r.forest_id
+     LEFT JOIN LATERAL (
+       SELECT s.sponsor_email
+         FROM forest_sponsors fs JOIN sponsors s ON s.id = fs.sponsor_id
+        WHERE fs.forest_id = r.forest_id AND fs.is_active = TRUE
+          AND s.sponsor_email IS NOT NULL AND s.sponsor_email <> ''
+        ORDER BY fs.created_at LIMIT 1
+     ) sp ON TRUE
+     WHERE r.id = $1`,
+    [reportId],
+  );
+  const row = r.rows[0];
+  if (!row) throw notFound('Report not found');
+  res.json({ data: { email: row.email ?? '', source: row.source } });
+}
+
 /* ------------------------------------------------------------------ */
 /* Route registration                                                  */
 /* ------------------------------------------------------------------ */
 
+forestRouter.get('/report/:id/recipient', wrap(reportRecipient));
 forestRouter.post('/report/:id/send', wrap(sendReportEmail));
 forestRouter.get('/forest/:id/weather', wrap(forestWeather));
 forestRouter.post('/forest/:id/report-data', wrap(updateForestReportData));

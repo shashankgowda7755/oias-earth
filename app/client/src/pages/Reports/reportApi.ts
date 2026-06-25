@@ -60,6 +60,14 @@ export async function deleteReport(id: string): Promise<{ id: string }> {
   return { id };
 }
 
+/** Resolve a report's send recipient (sponsor email → forest contact email). */
+export async function getReportRecipient(
+  id: string,
+): Promise<{ email: string; source: string | null }> {
+  const { data } = await api.get(`/${REPORT_CRUD_SEGMENT}/${id}/recipient`);
+  return (data?.data ?? data) as { email: string; source: string | null };
+}
+
 /** Email the rendered report to a recipient via Composio Gmail. */
 export async function sendReport(
   id: string,

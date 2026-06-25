@@ -35,14 +35,24 @@ const wrap =
   };
 
 /* ----------------------------- audit/list ---------------------------- */
-// Most-recent-first activity log: logins + every data mutation.
+// Most-recent-first activity log: logins + every data mutation. Optional
+// `category` segregates the views: login | forest | report | download | send.
+const AUDIT_CATEGORY_SQL: Record<string, string> = {
+  login: `action ILIKE 'auth.%'`,
+  forest: `entity = 'forest'`,
+  download: `action ILIKE '%download%'`,
+  send: `action ILIKE '%send%'`,
+  report: `entity = 'report' AND action NOT ILIKE '%send%' AND action NOT ILIKE '%download%'`,
+};
 listRouter.post(
   '/audit/list',
   wrap(async (req, res) => {
     const { limit, offset, page, search } = parsePageParams(req.body);
     const like = `%${search}%`;
+    const category = typeof req.body?.category === 'string' ? req.body.category : '';
+    const catClause = AUDIT_CATEGORY_SQL[category] ? ` AND (${AUDIT_CATEGORY_SQL[category]})` : '';
     const where = `FROM audit_log
-      WHERE ($1 = '' OR action ILIKE $2 OR actor_name ILIKE $2 OR entity ILIKE $2 OR target_id ILIKE $2 OR ip ILIKE $2)`;
+      WHERE ($1 = '' OR action ILIKE $2 OR actor_name ILIKE $2 OR entity ILIKE $2 OR target_id ILIKE $2 OR ip ILIKE $2)${catClause}`;
     const params = [search, like];
     const total = await countTotal(where, params);
     const rows = await query(
@@ -125,7 +135,7 @@ listRouter.post(
     const total = await countTotal(where, params);
     const rows = await query(
       `SELECT
-         id, sponsor_name, sponsor_logo, is_active, sponsor_forest_logo,
+         id, sponsor_name, sponsor_email, sponsor_logo, is_active, sponsor_forest_logo,
          sponsor_tree_logo, sponsor_og_image_url, established_year, website_url,
          industry, headquarters, created_by, updated_by,
          created_at AS "createdAt", updated_at AS "updatedAt"
