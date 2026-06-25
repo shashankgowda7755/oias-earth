@@ -22,6 +22,13 @@ export default function ReportForestQuarterly() {
   const [data, setData] = useState<ForestReportData | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const [dl, setDl] = useState('');
+  const [cur, setCur] = useState(0);
+
+  const goTo = (i: number) => {
+    const n = Math.max(0, Math.min(SLIDES.length - 1, i));
+    setCur(n);
+    document.getElementById(`rpt-slide-${n}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
 
   const handleDownload = async () => {
     if (dl) return;
@@ -65,6 +72,16 @@ export default function ReportForestQuarterly() {
           {data.meta.client_name ? `${data.meta.client_name} · ` : ''}{data.forest.forest_name} · {data.meta.quarter_label} {data.meta.year}
           {err && <span style={{ color: C.amber, marginLeft: 10 }}>· {err}</span>}
         </span>
+
+        <div className="no-print" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <button onClick={() => goTo(cur - 1)} disabled={cur === 0} aria-label="Previous section" style={{ background: '#fff', border: `1px solid ${C.line}`, borderRadius: 8, width: 30, height: 30, cursor: cur === 0 ? 'default' : 'pointer', color: C.ink, opacity: cur === 0 ? 0.4 : 1 }}>◀</button>
+          <select value={cur} onChange={(e) => goTo(Number(e.target.value))} aria-label="Jump to section" style={{ border: `1px solid ${C.line}`, borderRadius: 8, padding: '6px 10px', fontSize: 13, color: C.ink, background: '#fff', maxWidth: 200 }}>
+            {SLIDE_TITLES.map((t, i) => <option key={i} value={i}>{i + 1}. {t}</option>)}
+          </select>
+          <button onClick={() => goTo(cur + 1)} disabled={cur === SLIDES.length - 1} aria-label="Next section" style={{ background: '#fff', border: `1px solid ${C.line}`, borderRadius: 8, width: 30, height: 30, cursor: cur === SLIDES.length - 1 ? 'default' : 'pointer', color: C.ink, opacity: cur === SLIDES.length - 1 ? 0.4 : 1 }}>▶</button>
+          <span style={{ fontSize: 12, color: C.faint, minWidth: 42, textAlign: 'center' }}>{cur + 1} / {SLIDES.length}</span>
+        </div>
+
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <button onClick={handleDownload} disabled={!!dl} style={{ background: C.green, color: '#fff', border: 'none', borderRadius: 999, padding: '10px 22px', fontWeight: 700, fontSize: 14, cursor: dl ? 'wait' : 'pointer', opacity: dl ? 0.7 : 1, minWidth: 150 }}>
             {dl || '↓ Download PDF'}
@@ -76,7 +93,11 @@ export default function ReportForestQuarterly() {
       </div>
 
       <div style={{ padding: '22px 16px 60px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-        {SLIDES.map((Slide, i) => <Slide key={i} data={data} />)}
+        {SLIDES.map((Slide, i) => (
+          <div key={i} id={`rpt-slide-${i}`} style={{ scrollMarginTop: 64, width: '100%', display: 'flex', justifyContent: 'center' }}>
+            <Slide data={data} />
+          </div>
+        ))}
       </div>
     </div>
   );
