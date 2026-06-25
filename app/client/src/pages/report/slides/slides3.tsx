@@ -13,12 +13,19 @@ import {
 const pickQuarter = <T extends { year: number; quarter: number }>(arr: T[] | undefined, year: number, q: number): T | undefined =>
   (arr ?? []).find((e) => e.year === year && e.quarter === q) ?? (arr ?? []).slice().sort((a, b) => b.year - a.year || b.quarter - a.quarter)[0];
 
+/* A reading of 0 (pH / °C / %RH) means "not measured", not a real value — a
+ * plantation is never 0°C / 0%RH and pH 0 is impossible. Treat ≤0 + non-finite
+ * as unset so the report shows "—" instead of a misleading zero. */
+const pos = (v?: number | null): number | null =>
+  typeof v === 'number' && Number.isFinite(v) && v > 0 ? v : null;
+
 /* --------------------- Slide 15: Soil pH Level --------------------- */
 const PH_COLORS = ['#e2231a', '#ee5a24', '#f39c12', '#f7c948', '#d4e157', '#a4d65e', '#7cb342', '#4caf50', '#26a69a', '#29b6d8', '#2196f3', '#5c6bc0', '#7e57c2', '#9c27b0', '#ab47bc'];
 export function S15SoilPh({ data }: SlideProps) {
   const { meta, forest } = data;
   const ph = pickQuarter(forest.soil_ph_level, meta.year, meta.quarter);
-  const phIdx = ph?.meter_reading != null ? Math.max(0, Math.min(14, Math.round(ph.meter_reading))) : null;
+  const phReading = pos(ph?.meter_reading);
+  const phIdx = phReading != null ? Math.max(0, Math.min(14, Math.round(phReading))) : null;
   const cards = [
     ['Acidic Land', 'Acidic soils often increase availability of toxic metals like aluminium & manganese, which can damage roots.', C.red],
     ['Neutral Land', 'pH ~6.5 to 7.5: saplings generally show better growth, survival, and resistance to diseases.', C.green],
@@ -61,7 +68,7 @@ export function S15SoilPh({ data }: SlideProps) {
           <ReportImage src={ph?.meter_image} label="Meter photo" style={{ flex: 1, minHeight: 120 }} />
           <div style={{ background: C.greenSoft, borderRadius: 10, padding: '10px 14px', marginTop: 12 }}>
             <div style={{ fontSize: 11, color: C.greenDark }}>● Active Measurement</div>
-            <div style={{ fontSize: 18, fontWeight: 800, color: C.ink }}>Current Reading: {ph?.meter_reading != null ? `${ph.meter_reading} pH` : '—'}</div>
+            <div style={{ fontSize: 18, fontWeight: 800, color: C.ink }}>Current Reading: {phReading != null ? `${phReading} pH` : '—'}</div>
           </div>
         </div>
       </div>
@@ -74,18 +81,20 @@ export function S16Temperature({ data }: SlideProps) {
   const { meta, forest } = data;
   const th = pickQuarter(forest.temperature_humidity, meta.year, meta.quarter);
   const inside = th?.inside_plantation, outside = th?.outside_plantation;
-  const tempDiff = inside?.temperature != null && outside?.temperature != null ? Math.abs(outside.temperature - inside.temperature) : null;
-  const humDiff = inside?.humidity != null && outside?.humidity != null ? Math.abs(outside.humidity - inside.humidity) : null;
+  const inT = pos(inside?.temperature), outT = pos(outside?.temperature);
+  const inH = pos(inside?.humidity), outH = pos(outside?.humidity);
+  const tempDiff = inT != null && outT != null ? Math.abs(outT - inT) : null;
+  const humDiff = inH != null && outH != null ? Math.abs(outH - inH) : null;
   const panel = (title: string, p?: { temperature?: number; humidity?: number; image?: string }) => (
     <div style={{ border: `1px solid ${C.line}`, borderRadius: 14, padding: '16px 18px' }}>
       <div style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: '.05em', color: C.muted, marginBottom: 14 }}>{title}</div>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, alignItems: 'center' }}>
         <div>
           <div style={{ width: 90, height: 90, borderRadius: '50%', border: `4px solid ${C.greenSoft}`, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-            <span style={{ fontSize: 22, fontWeight: 800, color: C.ink }}>{p?.temperature != null ? `${p.temperature}°c` : '—'}</span>
+            <span style={{ fontSize: 22, fontWeight: 800, color: C.ink }}>{pos(p?.temperature) != null ? `${pos(p?.temperature)}°c` : '—'}</span>
             <span style={{ fontSize: 9.5, color: C.muted }}>TEMPERATURE</span>
           </div>
-          <div style={{ marginTop: 10 }}><span style={{ fontSize: 18, fontWeight: 800, color: C.amber }}>{p?.humidity != null ? `${p.humidity} RH` : '—'}</span><div style={{ fontSize: 9.5, color: C.muted }}>HUMIDITY</div></div>
+          <div style={{ marginTop: 10 }}><span style={{ fontSize: 18, fontWeight: 800, color: C.amber }}>{pos(p?.humidity) != null ? `${pos(p?.humidity)} RH` : '—'}</span><div style={{ fontSize: 9.5, color: C.muted }}>HUMIDITY</div></div>
         </div>
         <ReportImage src={p?.image} label="Photo" height={120} />
       </div>

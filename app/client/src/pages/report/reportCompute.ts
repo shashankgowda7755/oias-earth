@@ -184,9 +184,12 @@ function growthMilestones(p: FullForestPayload): GrowthMilestone[] {
   // Milestone month is anchored to the plantation month (PDF shows "Apr – 25" etc.),
   // not hardcoded December. No plantation date → date is blank, never guessed.
   const plantD = p.plantation_date ? new Date(p.plantation_date) : null;
+  // Saplings won't exceed ~30 ft in the 3-yr project window; clamp so a data
+  // typo (e.g. "84" for "14") can never render an absurd height.
+  const ft = (v: number): number => Math.max(0, Math.min(30, v));
   return targets.map((t) => {
     const label = t.year === 0 ? 'Year 0' : `End of Year ${t.year}`;
-    const range = t.min != null && t.max != null ? `${t.min}–${t.max} Feet` : '—';
+    const range = t.min != null && t.max != null ? `${ft(t.min)}–${ft(t.max)} Feet` : '—';
     const date = plantD ? `${MONTHS[plantD.getMonth()]}- ${plantD.getFullYear() + t.year}` : '—';
     return { label, range, date, current: t.year === 0 };
   });
@@ -217,7 +220,14 @@ function siteMasterPlan(p: FullForestPayload): SiteMasterPlan | null {
     ? boxes.map((b) => (num(b.row) * num(b.column)) || fallbackMatrix)
     : [fallbackMatrix];
   const first = caps[0] ?? 0;
-  const total = caps.reduce((s, c) => s + c, 0) * (boxes.length ? 1 : boxCount);
+  // ACTUAL saplings = sum of every box's species counts (what was really planted).
+  // Prefer this over projected grid capacity so the slide total matches the cover
+  // (the old code showed 4,200 grid-capacity for a 670-sapling forest).
+  const actual = boxes.reduce(
+    (s, b) => s + (b.species_data ?? []).reduce((ss, sp) => ss + num(sp.count), 0),
+    0,
+  );
+  const total = actual || caps.reduce((s, c) => s + c, 0) * (boxes.length ? 1 : boxCount);
   const uniform = caps.every((c) => c === first);
   let perMatrixLabel = '—';
   if (uniform && first > 0) {

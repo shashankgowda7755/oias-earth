@@ -2,6 +2,7 @@ import { useState, type ComponentType } from 'react';
 import { Sidebar } from '../components/Sidebar';
 import { type SectionTab } from '../components/TabNav';
 
+import DashboardHome from './DashboardHome';
 import Users from './Users';
 import Sponsors from './Sponsors';
 import Employees from './Employees';
@@ -11,7 +12,7 @@ import Jobs from './Jobs';
 import Integrity from './Integrity';
 import Planters from './Planters';
 
-const SECTION_COMPONENTS: Record<SectionTab, ComponentType> = {
+const SECTION_COMPONENTS: Partial<Record<SectionTab, ComponentType>> = {
   Users,
   Sponsors,
   Employees,
@@ -23,7 +24,7 @@ const SECTION_COMPONENTS: Record<SectionTab, ComponentType> = {
 };
 
 export default function Dashboard() {
-  const [active, setActive] = useState<SectionTab>('Forests');
+  const [active, setActive] = useState<SectionTab>('Home');
   const ActiveSection = SECTION_COMPONENTS[active];
 
   return (
@@ -37,7 +38,11 @@ export default function Dashboard() {
             aria-labelledby={`tab-${active}`}
             tabIndex={0}
           >
-            <ActiveSection />
+            {active === 'Home' ? (
+              <DashboardHome onOpenTab={setActive} />
+            ) : ActiveSection ? (
+              <ActiveSection />
+            ) : null}
           </div>
         </div>
       </main>

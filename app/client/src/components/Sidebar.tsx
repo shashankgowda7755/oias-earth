@@ -11,6 +11,13 @@ function initialsOf(first?: string, last?: string, username?: string): string {
 }
 
 const NAV_ICONS: Record<SectionTab, JSX.Element> = {
+  Home: (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 shrink-0">
+      <path d="M3 9.5 12 3l9 6.5" />
+      <path d="M5 10v10h14V10" />
+      <rect x="9.5" y="13" width="5" height="7" />
+    </svg>
+  ),
   Users: (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 shrink-0">
       <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
