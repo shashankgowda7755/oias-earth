@@ -136,6 +136,7 @@ export function Step1Basic({
             update('forest_geo_lat', lat);
             update('forest_geo_long', long);
           }}
+          onAddress={(addr) => update('forest_address', addr)}
           {...(errors.forest_geo_lat ? { latError: errors.forest_geo_lat } : {})}
           {...(errors.forest_geo_long ? { longError: errors.forest_geo_long } : {})}
         />

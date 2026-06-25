@@ -61,14 +61,22 @@ export function FormDialog({
   const panelRef = useRef<HTMLDivElement>(null);
   const titleId = useRef(`dlg-${Math.random().toString(36).slice(2)}`).current;
 
+  // Focus the panel ONLY when the dialog opens. Keeping `onClose`/`submitting`
+  // out of these deps is critical: callers often pass an inline `onClose` (new
+  // identity every render), so including it here would re-run this effect on
+  // every keystroke and yank focus from the field back to the panel.
+  useEffect(() => {
+    if (open) panelRef.current?.focus();
+  }, [open]);
+
+  // Escape-to-close + background scroll lock. Re-running this on `onClose`
+  // identity only re-binds the key listener (harmless — it does NOT move focus).
   useEffect(() => {
     if (!open) return;
-    panelRef.current?.focus();
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && !submitting) onClose();
     };
     document.addEventListener('keydown', onKey);
-    // prevent background scroll while open
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
     return () => {
