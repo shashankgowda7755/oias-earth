@@ -1,0 +1,93 @@
+{
+  "_note": "CGI Bangalore University — plantation June 2024. Mock drill: the report we SEND NOW (today June 2026) = fiscal Year 3, Q1 (Apr-Jun 2026). Data from the Q3 PDF, carried into the current send-quarter (year 2026 q1). Species: 4 named in the value table, 700 split = 175 each (cover says 5; flagged).",
+  "forest_name": "Bangalore University",
+  "forest_desc": "Urban Afforestation Initiative at Bangalore University, Bangalore — sponsored by CGI.",
+  "forest_city": "Bangalore",
+  "forest_state": "Karnataka",
+  "forest_country": "India",
+  "forest_address": "Bangalore University, Bangalore",
+  "forest_geo_lat": "12.94418",
+  "forest_geo_long": "77.50847",
+  "plantation_date": "2024-06-01",
+  "project_period": 3,
+  "box_rows": 3,
+  "box_columns": 1,
+  "tree_rows": 175,
+  "tree_columns": 1,
+  "tree_to_tree_distance": 1,
+  "box_to_box_distance": 1,
+  "project_site": "Bangalore University",
+  "box_data": [
+    {
+      "row": 1, "column": 1, "prefix": "BU", "start": "1", "tree_to_tree_distance": 1,
+      "species_data": [
+        { "species_id": "", "count": 175, "species_common_name": "Golden Shower", "species_name": "Cassia fistula", "planted_on": "2024-06-01" },
+        { "species_id": "", "count": 175, "species_common_name": "Copper Pod", "species_name": "Peltophorum pterocarpum", "planted_on": "2024-06-01" },
+        { "species_id": "", "count": 175, "species_common_name": "Nochu", "species_name": "Vitex negundo", "planted_on": "2024-06-01" },
+        { "species_id": "", "count": 175, "species_common_name": "Terminalia Arjuna", "species_name": "Terminalia arjuna", "planted_on": "2024-06-01" }
+      ]
+    }
+  ],
+  "additional_sponsor_logo": [
+    { "type": { "label": "Initiated By", "value": "initiated_by" }, "name": "CommuniTREE", "logo": "" },
+    { "type": { "label": "Sponsored By", "value": "sponsored_by" }, "name": "CGI", "logo": "" }
+  ],
+  "land_ownership": { "name": "Bangalore University", "agreement_status": "" },
+  "land_area": { "total_area": 900, "planted_area": null },
+  "plantation_strategy": "mixed_species",
+  "irrigation_method": "",
+  "climate": "others",
+  "climate_other": "Moderate",
+  "soil_type": "others",
+  "soil_type_other": "Red loamy soil",
+  "digipin": "4PJ-754-LM6T",
+  "last_inspection_date": "2025-12-19T00:00:00.000Z",
+  "permission_letter": "",
+  "site_layout": "",
+  "authorization_details": { "authorized_by_name": "", "authorized_by_designation": "", "authorized_date": "", "authorized_period": "3", "project_context": "" },
+  "area_population_statistics_details": {
+    "total_jurisdiction_area": 6.5,
+    "population": 200000,
+    "population_density": null,
+    "green_cover": "High green cover area",
+    "environmental_need": "Need to increase major green cover",
+    "google_earth_image": []
+  },
+  "direct_and_indirect_beneficiaries": {
+    "site_supervisor": 1, "watering_team": 1, "de_weeding_crew": 1, "plant_health_specialist": 1,
+    "people_visiting": "General Public", "people_living_near": "Community People", "schools_colleges": "Within 3km Radius"
+  },
+  "forest_value_flow_impact_report": {
+    "short_term": { "land_value": null, "tree_value": null, "oxygen_generated": 0.03, "carbon_sequestration": 0.048 },
+    "medium_term": { "land_value": null, "tree_value": null, "oxygen_generated": 0.05, "carbon_sequestration": 0.08 },
+    "long_term": { "land_value": null, "tree_value": null, "oxygen_generated": 0.10, "carbon_sequestration": 0.16 }
+  },
+  "species_details": { "health": "good", "health_other": "", "mortality_rate": 0, "other_issues": "No", "additional_scope": "Yes" },
+  "maintenance_workforce": [
+    { "year": 2026, "quarter": 1, "total_holidays_weekly_off": 13, "total_holidays_festival": 4, "total_watering_days": 67, "total_raining_days": 6, "full_time_gardeners": 1, "part_time_gardeners": 3, "total_part_time_labour_days": 1 }
+  ],
+  "plant_growth_data": {
+    "target_height_range": [
+      { "year": 0, "min": 2, "max": 3 },
+      { "year": 1, "min": 6, "max": 8 },
+      { "year": 2, "min": 9, "max": 10 },
+      { "year": 3, "min": 11, "max": 14 }
+    ],
+    "actual_height_range": [ { "year": 2026, "quarter": 1, "min": 3, "max": 4 } ]
+  },
+  "soil_ph_level": [ { "year": 2026, "quarter": 1, "reading_date": "2025-12-19", "meter_image": "", "meter_reading": 6.5 } ],
+  "temperature_humidity": [
+    { "year": 2026, "quarter": 1, "reading_date": "2025-12-19", "inside_plantation": { "image": "", "humidity": 68, "temperature": 27.3 }, "outside_plantation": { "image": "", "humidity": 62, "temperature": 31.4 } }
+  ],
+  "environmental_need_indicators": [
+    { "heading": "Declining Green Cover", "description": "Thousands of trees felled for infrastructure; canopy loss increasing." },
+    { "heading": "Heat Stress", "description": "Urban heat island effect; temperatures often touch ~40 °C in low-green zones." },
+    { "heading": "Groundwater Depletion", "description": "Levels falling to 600–800 ft in northern parts; summer shortages common." },
+    { "heading": "Waterbody Degradation", "description": "Lakes and canals silted/polluted." },
+    { "heading": "Open Space Pressure", "description": "Rapid growth and weak upkeep threaten sustainability despite relatively higher per-capita green space." }
+  ],
+  "security_and_infrastructure": { "description": "", "image_data": [] },
+  "plantation_progress": [],
+  "dashboard_images": [],
+  "report_images": []
+}

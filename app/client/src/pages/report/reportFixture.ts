@@ -8,6 +8,7 @@
  */
 import vandalur from './vandalur.sample.json';
 import annasaheb from './annasaheb.sample.json';
+import cgiblr from './cgiblr.sample.json';
 import type { FullForestPayload } from '../Forests/fullTypes';
 import { buildMeta, computeReport } from './reportCompute';
 import type { ForestReportData } from './reportTypes';
@@ -26,6 +27,9 @@ const PREVIEWS: Record<string, PreviewDef> = {
   annasaheb: {
     payload: annasaheb, year: 2025, quarter: 3, report_date: 'December 2025',
     created_by_name: 'Mehafooz', created_by_phone: '9790968326',
+  },
+  cgiblr: {
+    payload: cgiblr, year: 2026, quarter: 1, report_date: 'June 2026',
   },
 };
 
