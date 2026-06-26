@@ -512,7 +512,7 @@ function RowActionsMenu({
       {open ? (
         <div
           role="menu"
-          className="absolute right-0 z-30 mt-1 w-36 overflow-hidden rounded-input border border-border bg-surface py-1 text-left shadow-dialog"
+          className="absolute left-0 z-30 mt-1 w-36 overflow-hidden rounded-input border border-border bg-surface py-1 text-left shadow-dialog"
         >
           {onView ? (
             <MenuItem onClick={() => run(onView)}>View</MenuItem>

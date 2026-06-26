@@ -490,7 +490,7 @@ function RowActions({
       {open ? (
         <div
           role="menu"
-          className="absolute right-0 z-40 mt-1 w-40 overflow-hidden rounded-card border border-border bg-surface py-1 text-left shadow-dialog"
+          className="absolute left-0 z-40 mt-1 w-40 overflow-hidden rounded-card border border-border bg-surface py-1 text-left shadow-dialog"
         >
           {onView ? (
             <button
