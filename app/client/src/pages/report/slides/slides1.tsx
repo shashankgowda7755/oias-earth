@@ -42,7 +42,13 @@ export function S01Cover({ data }: SlideProps) {
   const { meta, forest, computed } = data;
   const hero = forest.report_images?.find((r) => r.slide_type === 'first_slide')?.image;
   const initiated = findLogo(data, 'initiated_by');
-  const sponsored = findLogo(data, 'sponsored_by');
+  const sponsors = (forest.additional_sponsor_logo ?? []).filter((l) => l.type?.value !== 'initiated_by');
+  const logoCards: { caption: string; name?: string; logo?: string }[] = [
+    { caption: initiated?.type?.label || 'Initiated by', name: initiated?.name, logo: initiated?.logo },
+    ...(sponsors.length
+      ? sponsors.map((s) => ({ caption: s.type?.label || 'Sponsored by', name: s.name, logo: s.logo }))
+      : [{ caption: 'Sponsored by', name: meta.client_name ?? undefined, logo: meta.client_logo ?? undefined }]),
+  ];
   return (
     <SlidePage meta={meta} bare>
       <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 22 }}>
@@ -79,9 +85,8 @@ export function S01Cover({ data }: SlideProps) {
         </div>
       </div>
 
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 18 }}>
-        <LogoCard caption="Initiated by" name={initiated?.name} logo={initiated?.logo} />
-        <LogoCard caption="Sponsored by" name={sponsored?.name ?? meta.client_name} logo={sponsored?.logo ?? meta.client_logo} />
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 14, justifyContent: logoCards.length > 2 ? 'flex-start' : 'space-between', alignItems: 'center', marginTop: 18 }}>
+        {logoCards.map((c, i) => <LogoCard key={i} caption={c.caption} name={c.name} logo={c.logo} />)}
       </div>
     </SlidePage>
   );
@@ -98,6 +103,7 @@ const TOC = [
   ['Environmental Need Indicators of Chennai', '17'], ['Saplings Planted & Species Inventory', '18'],
   ['Score Card With GRI Framework Integration', '19'], ['Site Security & Infrastructure', '20'],
   ['Transforming Landscapes: Plantation Progress', '21'],
+  ['Photo Gallery', '22'],
 ];
 export function S02Contents({ data }: SlideProps) {
   const { meta, forest } = data;

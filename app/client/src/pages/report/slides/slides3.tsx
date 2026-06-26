@@ -282,6 +282,31 @@ export function S20Security({ data }: SlideProps) {
   );
 }
 
+/* --------------------- Slide 22: Photo Gallery (one per quarter) --------------------- */
+export function S21bGallery({ data }: SlideProps) {
+  const { meta, forest } = data;
+  const all = (forest.gallery_images ?? []).filter((g) => g && g.image);
+  const sorted = [...all].sort((a, b) => (Number(a.year) - Number(b.year)) || (Number(a.quarter) - Number(b.quarter)));
+  // Empty-safe: show 4 placeholders when there are no gallery photos yet.
+  const cells = sorted.length ? sorted : [{}, {}, {}, {}];
+  const cols = Math.min(4, Math.max(2, Math.ceil(Math.sqrt(cells.length))));
+  return (
+    <SlidePage meta={meta}>
+      <SectionTitle eyebrow="One photo per quarter">Photo Gallery</SectionTitle>
+      <div style={{ display: 'grid', gridTemplateColumns: `repeat(${cols}, 1fr)`, gap: 14, flex: 1, minHeight: 0 }}>
+        {cells.map((g, i) => (
+          <div key={i} style={{ display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+            <ReportImage src={g.image} label={g.year && g.quarter ? `Q${g.quarter} ${g.year}` : 'Gallery photo'} style={{ flex: 1, minHeight: 0 }} />
+            <div style={{ fontSize: 12.5, color: C.muted, marginTop: 6, textAlign: 'center' }}>
+              {g.year && g.quarter ? `Q${g.quarter} ${g.year}` : '—'}{g.caption ? ` · ${g.caption}` : ''}
+            </div>
+          </div>
+        ))}
+      </div>
+    </SlidePage>
+  );
+}
+
 /* --------------------- Slide 21: Plantation Progress --------------------- */
 export function S21Progress({ data }: SlideProps) {
   const { meta, forest } = data;
@@ -304,7 +329,13 @@ export function S21Progress({ data }: SlideProps) {
 export function S22Thanks({ data }: SlideProps) {
   const { meta, forest } = data;
   const initiated = (forest.additional_sponsor_logo ?? []).find((l) => l.type?.value === 'initiated_by');
-  const sponsored = (forest.additional_sponsor_logo ?? []).find((l) => l.type?.value === 'sponsored_by');
+  const sponsors = (forest.additional_sponsor_logo ?? []).filter((l) => l.type?.value !== 'initiated_by');
+  const cards: { caption: string; name?: string; logo?: string }[] = [
+    { caption: initiated?.type?.label || 'Initiated by', name: initiated?.name, logo: initiated?.logo },
+    ...(sponsors.length
+      ? sponsors.map((s) => ({ caption: s.type?.label || 'Sponsored by', name: s.name, logo: s.logo }))
+      : [{ caption: 'Sponsored by', name: meta.client_name ?? undefined, logo: meta.client_logo ?? undefined }]),
+  ];
   const logoCard = (caption: string, name?: string, logo?: string) => (
     <div style={{ border: `1px solid ${C.line}`, borderRadius: 16, padding: '18px 28px', textAlign: 'center', minWidth: 200 }}>
       <div style={{ fontSize: 13, color: C.muted, marginBottom: 10 }}>{caption}</div>
@@ -323,9 +354,8 @@ export function S22Thanks({ data }: SlideProps) {
         </div>
         <h1 style={{ fontSize: 40, fontWeight: 800, margin: 0 }}>Thank You!</h1>
       </div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 24 }}>
-        {logoCard('Initiated by', initiated?.name, initiated?.logo)}
-        {logoCard('Sponsored by', sponsored?.name ?? meta.client_name, sponsored?.logo ?? meta.client_logo)}
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 16, justifyContent: cards.length > 2 ? 'center' : 'space-between', marginTop: 24 }}>
+        {cards.map((c, i) => <div key={i}>{logoCard(c.caption, c.name, c.logo)}</div>)}
       </div>
       <div style={{ display: 'flex', gap: 12, justifyContent: 'center', marginTop: 22 }}>
         <span style={{ border: `1px solid ${C.line}`, borderRadius: 999, padding: '8px 18px', fontSize: 14 }}>{meta.quarter_label} Report</span>

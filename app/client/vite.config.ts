@@ -32,7 +32,16 @@ export default defineConfig({
         ],
       },
       workbox: {
+        // Take control immediately on update so a new deploy's assets win on the
+        // next load — no "one reload behind" stale-shell window.
+        skipWaiting: true,
+        clientsClaim: true,
         navigateFallback: '/index.html',
+        // Only the field PWA (/field*) is served the precached offline shell.
+        // Every admin route is denied the fallback so it always fetches a fresh
+        // index.html from the network — this is what stops admin users running a
+        // stale JS bundle (and the resulting crashes) after each deploy.
+        navigateFallbackDenylist: [/^\/(?!field)/],
         // App shell precached. Runtime-cache the satellite/map tiles + GET APIs
         // so a planter who loaded a forest online can still see it offline.
         runtimeCaching: [

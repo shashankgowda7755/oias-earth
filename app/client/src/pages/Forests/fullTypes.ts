@@ -237,6 +237,14 @@ export interface NamedImage {
   image?: string;
 }
 
+/** One gallery photo per quarter (the Photo Gallery slide). */
+export interface GalleryImage {
+  year?: number;
+  quarter?: number;
+  image?: string;
+  caption?: string;
+}
+
 export interface ReportImage {
   slide_type?: ReportSlideType | string;
   image?: string;
@@ -330,6 +338,7 @@ export interface FullForestPayload {
   plantation_progress?: PlantationProgressQuarter[];
   dashboard_images?: NamedImage[];
   report_images?: ReportImage[];
+  gallery_images?: GalleryImage[];
 }
 
 /* ------------------------------ helpers ------------------------------ */

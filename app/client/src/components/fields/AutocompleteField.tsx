@@ -261,7 +261,7 @@ export function AutocompleteField({
         >
           {loading ? (
             <li className="flex items-center justify-center gap-2 px-3 py-3 text-sm text-textSecondary">
-              <Spinner size={16} /> Searching…
+              <Spinner size={16} /> <span>Searching…</span>
             </li>
           ) : options.length === 0 ? (
             <li className="px-3 py-3 text-sm text-textSecondary">

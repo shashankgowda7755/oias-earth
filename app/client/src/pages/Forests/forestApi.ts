@@ -137,6 +137,26 @@ export async function uploadReportImage(
   return (data?.data ?? data) as { url: string; slot: string };
 }
 
+/** PFA: upsert a sponsor/initiator logo entry (multipart: logo file + meta). */
+export async function uploadSponsorLogo(
+  forestId: string,
+  opts: { title: string; name?: string; value: 'sponsored_by' | 'initiated_by'; index?: number; file?: File | null },
+): Promise<{ index: number; logo?: string; entries: unknown[] }> {
+  const fd = new FormData();
+  fd.append('title', opts.title);
+  fd.append('name', opts.name ?? '');
+  fd.append('value', opts.value);
+  if (opts.index != null && opts.index >= 0) fd.append('index', String(opts.index));
+  if (opts.file) fd.append('logo', opts.file);
+  const { data } = await api.post(`/forest/${forestId}/sponsor-logo`, fd, { headers: { 'Content-Type': 'multipart/form-data' } });
+  return (data?.data ?? data) as { index: number; logo?: string; entries: unknown[] };
+}
+
+/** PFA: delete a sponsor logo entry by index. */
+export async function deleteSponsorLogo(forestId: string, index: number): Promise<void> {
+  await api.post(`/forest/${forestId}/sponsor-logo/delete`, { index });
+}
+
 /** GET /forest/:id/weather?year=&quarter= — derive weather from forest lat/long. */
 export async function fetchForestWeather(
   forestId: string,

@@ -162,6 +162,7 @@ const FOREST_JSONB_COLUMNS = new Set([
   'additional_sponsor_logo',
   'dashboard_images',
   'report_images',
+  'gallery_images',
 ]);
 
 const FOREST_ALL_COLUMNS = new Set([...FOREST_SCALAR_COLUMNS, ...FOREST_JSONB_COLUMNS]);
@@ -2531,7 +2532,7 @@ const photoUpload = multer({ storage: multer.memoryStorage(), limits: { fileSize
 /** Image slots the PFA uploader can target → where each writes on the forest. */
 const REPORT_IMAGE_SLOTS = [
   'cover', 'content', 'impact', 'permission', 'layout',
-  'security', 'progress', 'soil_meter', 'temp_inside', 'temp_outside', 'earth', 'dashboard',
+  'security', 'progress', 'soil_meter', 'temp_inside', 'temp_outside', 'earth', 'dashboard', 'gallery',
 ] as const;
 type ImgSlot = (typeof REPORT_IMAGE_SLOTS)[number];
 const SLIDE_TYPE: Record<string, string> = { cover: 'first_slide', content: 'content_slide', impact: 'project_impact_slide' };
@@ -2599,6 +2600,57 @@ async function applyImageSlot(id: string, slot: ImgSlot, url: string, year?: num
     const arr = await loadJsonb(id, 'temperature_humidity');
     return saveJsonb(id, 'temperature_humidity', upsertQ(arr, y, q, (r: Record<string, unknown>) => ({ ...r, [side]: { ...(r[side] as object), image: url } })));
   }
+  if (slot === 'gallery') {
+    const arr = await loadJsonb(id, 'gallery_images');
+    return saveJsonb(id, 'gallery_images', upsertQ(arr, y, q, (r: Record<string, unknown>) => ({ ...r, image: url })));
+  }
+}
+
+/**
+ * POST /forest/:id/sponsor-logo (multipart: logo + title + name + value + index?)
+ * — upload a sponsor/initiator logo and upsert the additional_sponsor_logo entry.
+ * `value` = 'initiated_by' | 'sponsored_by'; `title` = the per-sponsor caption.
+ */
+async function uploadSponsorLogo(req: Request, res: Response): Promise<void> {
+  const id = String(req.params.id);
+  if (!WX_UUID_RE.test(id)) throw notFound('Forest not found');
+  if (!storageReady()) { res.status(503).json({ error: true, message: 'Photo storage not configured.' }); return; }
+  const file = (req as Request & { file?: { buffer: Buffer; mimetype: string; originalname: string } }).file;
+  const body = (req.body ?? {}) as { title?: string; name?: string; value?: string; index?: string };
+  const value = body.value === 'initiated_by' ? 'initiated_by' : 'sponsored_by';
+  const title = String(body.title ?? (value === 'initiated_by' ? 'Initiated By' : 'Sponsored By')).slice(0, 80);
+  const name = String(body.name ?? '').slice(0, 120);
+  const idx = body.index != null && body.index !== '' ? Number(body.index) : -1;
+
+  let logoUrl: string | undefined;
+  if (file) {
+    const ext = (file.originalname.split('.').pop() || 'png').toLowerCase().replace(/[^a-z0-9]/g, '') || 'png';
+    logoUrl = await putObject(`forests/${id}/logo-${Date.now()}.${ext}`, file.buffer, file.mimetype || 'image/png');
+  }
+  const exists = await query(`SELECT 1 FROM forests WHERE id = $1`, [id]);
+  if (exists.rowCount === 0) throw notFound('Forest not found');
+
+  const arr = (await loadJsonb(id, 'additional_sponsor_logo')) as { type?: { label?: string; value?: string }; name?: string; logo?: string }[] | null;
+  const list = Array.isArray(arr) ? [...arr] : [];
+  const entry = { type: { label: title, value }, name, ...(logoUrl ? { logo: logoUrl } : {}) };
+  if (idx >= 0 && idx < list.length) {
+    const cur = list[idx]!;
+    list[idx] = { ...cur, ...entry, logo: logoUrl ?? cur.logo };
+  } else list.push(entry);
+  await saveJsonb(id, 'additional_sponsor_logo', list);
+  res.json({ data: { ok: true, logo: logoUrl, index: idx >= 0 ? idx : list.length - 1, entries: list } });
+}
+
+/** POST /forest/:id/sponsor-logo/delete { index } — remove one logo entry. */
+async function deleteSponsorLogo(req: Request, res: Response): Promise<void> {
+  const id = String(req.params.id);
+  if (!WX_UUID_RE.test(id)) throw notFound('Forest not found');
+  const idx = Number((req.body as { index?: unknown })?.index);
+  const arr = (await loadJsonb(id, 'additional_sponsor_logo')) as unknown[] | null;
+  const list = Array.isArray(arr) ? [...arr] : [];
+  if (Number.isInteger(idx) && idx >= 0 && idx < list.length) list.splice(idx, 1);
+  await saveJsonb(id, 'additional_sponsor_logo', list);
+  res.json({ data: { ok: true, entries: list } });
 }
 
 /**
@@ -2635,6 +2687,8 @@ async function uploadReportImage(req: Request, res: Response): Promise<void> {
 /* ------------------------------------------------------------------ */
 
 forestRouter.post('/forest/:id/report-image', photoUpload.single('photo'), wrap(uploadReportImage));
+forestRouter.post('/forest/:id/sponsor-logo', photoUpload.single('logo'), wrap(uploadSponsorLogo));
+forestRouter.post('/forest/:id/sponsor-logo/delete', wrap(deleteSponsorLogo));
 forestRouter.post('/email-log/list', wrap(emailLogList));
 forestRouter.get('/email-templates', wrap(listEmailTemplates));
 forestRouter.put('/email-templates/:key', wrap(upsertEmailTemplate));

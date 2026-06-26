@@ -41,8 +41,16 @@ export function Button({
       className={`inline-flex items-center justify-center gap-2 rounded-button px-4 py-2 text-sm font-medium transition-colors disabled:cursor-not-allowed ${VARIANT_CLASSES[variant]} ${className}`}
       {...rest}
     >
-      {loading ? <Spinner size={16} className="border-white/40 border-t-white" /> : startIcon}
-      {children}
+      {/* Both slots are wrapped in stable <span> elements so React's
+          insertBefore anchor is always an element it owns — never a bare text
+          node. Browser extensions (Google Translate, Grammarly, etc.) wrap
+          loose text nodes in <font> tags, which detaches React's saved
+          reference and crashes the toggle with
+          "insertBefore: node is not a child of this node" on every save. */}
+      <span className="contents">
+        {loading ? <Spinner size={16} className="border-white/40 border-t-white" /> : startIcon}
+      </span>
+      <span className="contents">{children}</span>
     </button>
   );
 }

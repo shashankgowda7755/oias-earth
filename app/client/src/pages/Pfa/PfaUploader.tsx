@@ -10,10 +10,11 @@ import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useToast } from '@/components/Toast';
 import { fetchForestReport } from '@/lib/publicApi';
-import { uploadReportImage } from '../Forests/forestApi';
+import { uploadReportImage, uploadSponsorLogo, deleteSponsorLogo } from '../Forests/forestApi';
 import { fetchForestOptions, type ForestOption } from '../Reports/reportApi';
 
 interface Slot { key: string; label: string; perQuarter?: boolean }
+interface LogoRow { title: string; name: string; value: 'sponsored_by' | 'initiated_by'; logo?: string; serverIndex: number }
 const SITE_SLOTS: Slot[] = [
   { key: 'cover', label: 'Cover' },
   { key: 'content', label: 'Contents' },
@@ -29,6 +30,7 @@ const QUARTER_SLOTS: Slot[] = [
   { key: 'temp_inside', label: 'Inside', perQuarter: true },
   { key: 'temp_outside', label: 'Outside', perQuarter: true },
   { key: 'progress', label: 'Progress', perQuarter: true },
+  { key: 'gallery', label: 'Gallery', perQuarter: true },
 ];
 const ALL = [...SITE_SLOTS, ...QUARTER_SLOTS];
 
@@ -67,6 +69,8 @@ function seedFromForest(forest: Rec, y: number, q: number): Record<string, strin
   if ((th?.outside_plantation as Rec)?.image) out.temp_outside = String((th!.outside_plantation as Rec).image);
   const prog = pickQ(forest.plantation_progress, y, q);
   if (prog?.image) out.progress = String(prog.image);
+  const gal = pickQ(forest.gallery_images, y, q);
+  if (gal?.image) out.gallery = String(gal.image);
   return out;
 }
 
@@ -81,11 +85,14 @@ export default function PfaUploader() {
   const [pending, setPending] = useState<{ slot: Slot; url: string; file: File } | null>(null);
   const [sheet, setSheet] = useState<Slot | null>(null);
   const [lightbox, setLightbox] = useState<string | null>(null);
+  const [logos, setLogos] = useState<LogoRow[]>([]);
   // camera
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const fileInput = useRef<HTMLInputElement | null>(null);
   const fileSlot = useRef<Slot | null>(null);
+  const logoInput = useRef<HTMLInputElement | null>(null);
+  const logoIdx = useRef<number>(-1);
   const [camSlot, setCamSlot] = useState<Slot | null>(null);
   const [facing, setFacing] = useState<'environment' | 'user'>('environment');
   const [camErr, setCamErr] = useState<string | null>(null);
@@ -94,10 +101,22 @@ export default function PfaUploader() {
 
   // Seed which slots already have photos (for this forest + quarter).
   useEffect(() => {
-    if (!forestId) { setStatus({}); return; }
+    if (!forestId) { setStatus({}); setLogos([]); return; }
     let alive = true;
     fetchForestReport(forestId, year, quarter)
-      .then((r) => { if (alive) setStatus(seedFromForest((r.forest as Rec) ?? {}, year, quarter)); })
+      .then((r) => {
+        if (!alive) return;
+        const f = (r.forest as Rec) ?? {};
+        setStatus(seedFromForest(f, year, quarter));
+        const raw = (f.additional_sponsor_logo as { type?: { label?: string; value?: string }; name?: string; logo?: string }[]) ?? [];
+        setLogos(raw.map((l, i) => ({
+          title: l.type?.label || (l.type?.value === 'initiated_by' ? 'Initiated By' : 'Sponsored By'),
+          name: l.name ?? '',
+          value: l.type?.value === 'initiated_by' ? 'initiated_by' : 'sponsored_by',
+          logo: l.logo,
+          serverIndex: i,
+        })));
+      })
       .catch(() => undefined);
     return () => { alive = false; };
   }, [forestId, year, quarter]);
@@ -157,6 +176,25 @@ export default function PfaUploader() {
     }
   };
 
+  const patchLogo = (i: number, p: Partial<LogoRow>) => setLogos((ls) => ls.map((r, j) => (j === i ? { ...r, ...p } : r)));
+  const addSponsor = () => setLogos((ls) => [...ls, { title: 'Sponsored By', name: '', value: 'sponsored_by', serverIndex: -1 }]);
+  const persistLogo = async (i: number, file?: File | null) => {
+    if (!forestId) { toast.error('Pick a forest first.'); return; }
+    const row = logos[i];
+    if (!row) return;
+    try {
+      const res = await uploadSponsorLogo(forestId, { title: row.title, name: row.name, value: row.value, index: row.serverIndex, file });
+      setLogos((ls) => ls.map((r, j) => (j === i ? { ...r, serverIndex: res.index, logo: res.logo ?? r.logo } : r)));
+      if (file) toast.success('Logo uploaded.');
+    } catch (e) { toast.error(e instanceof Error ? e.message : 'Logo save failed.'); }
+  };
+  const removeSponsor = async (i: number) => {
+    const row = logos[i];
+    if (!row) return;
+    try { if (row.serverIndex >= 0) await deleteSponsorLogo(forestId, row.serverIndex); } catch { /* ignore */ }
+    setLogos((ls) => ls.filter((_, j) => j !== i).map((r) => (row.serverIndex >= 0 && r.serverIndex > row.serverIndex ? { ...r, serverIndex: r.serverIndex - 1 } : r)));
+  };
+
   const captureNext = () => {
     const next = ALL.find((s) => !isUrl(status[s.key]));
     if (next) setCamSlot(next); else toast.success('All photos added.');
@@ -184,6 +222,7 @@ export default function PfaUploader() {
   return (
     <div className="min-h-screen bg-appbg text-textPrimary">
       <input ref={fileInput} type="file" accept="image/*" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (fileSlot.current) stage(fileSlot.current, f); e.target.value = ''; }} />
+      <input ref={logoInput} type="file" accept="image/*" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f && logoIdx.current >= 0) persistLogo(logoIdx.current, f); e.target.value = ''; }} />
 
       {/* sticky header */}
       <header className="sticky top-0 z-20 border-b border-border bg-appbg/95 backdrop-blur">
@@ -225,6 +264,34 @@ export default function PfaUploader() {
             <div className="mb-5 grid grid-cols-3 gap-2.5">{SITE_SLOTS.map((s) => <Tile key={s.key} slot={s} />)}</div>
             <div className="mb-1.5 text-xs uppercase tracking-wide text-textSecondary/70">This quarter · Q{quarter}</div>
             <div className="grid grid-cols-3 gap-2.5">{QUARTER_SLOTS.map((s) => <Tile key={s.key} slot={s} />)}</div>
+
+            <div className="mb-1.5 mt-6 flex items-center justify-between text-xs uppercase tracking-wide text-textSecondary/70">
+              <span>Sponsors &amp; logos</span>
+              <button type="button" onClick={addSponsor} className="rounded-button border border-border px-2.5 py-1 text-[11px] normal-case text-textPrimary"><i className="ti ti-plus" aria-hidden="true" /> Add</button>
+            </div>
+            <div className="space-y-2.5">
+              {logos.length === 0 ? <p className="text-xs text-textSecondary">No logos yet. Add a sponsor or initiator.</p> : null}
+              {logos.map((row, i) => (
+                <div key={i} className="flex items-center gap-2.5 rounded-card border border-border p-2.5">
+                  <button
+                    type="button"
+                    aria-label="Upload logo"
+                    onClick={() => { logoIdx.current = i; logoInput.current?.click(); }}
+                    className="relative flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-card border border-border bg-surface"
+                  >
+                    {row.logo ? <img src={row.logo} alt="" className="h-full w-full object-contain" /> : <i className="ti ti-photo text-lg text-textSecondary" aria-hidden="true" />}
+                  </button>
+                  <div className="min-w-0 flex-1 space-y-1.5">
+                    <input value={row.title} placeholder="Title (e.g. Sponsored by)" onChange={(e) => patchLogo(i, { title: e.target.value })} onBlur={() => persistLogo(i)} className="w-full rounded-button border border-border bg-surface px-2.5 py-1.5 text-sm" />
+                    <input value={row.name} placeholder="Sponsor name" onChange={(e) => patchLogo(i, { name: e.target.value })} onBlur={() => persistLogo(i)} className="w-full rounded-button border border-border bg-surface px-2.5 py-1.5 text-sm" />
+                  </div>
+                  <div className="flex shrink-0 flex-col items-center gap-1.5">
+                    <button type="button" onClick={() => patchLogo(i, { value: row.value === 'initiated_by' ? 'sponsored_by' : 'initiated_by' })} title="Toggle initiated/sponsor" className={`rounded px-1.5 py-0.5 text-[10px] ${row.value === 'initiated_by' ? 'bg-primary/15 text-primary' : 'text-textSecondary'}`}>{row.value === 'initiated_by' ? 'init' : 'spon'}</button>
+                    <button type="button" aria-label="Remove" onClick={() => removeSponsor(i)} className="text-textSecondary hover:text-danger"><i className="ti ti-trash text-base" aria-hidden="true" /></button>
+                  </div>
+                </div>
+              ))}
+            </div>
           </>
         )}
       </main>

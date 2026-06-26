@@ -58,7 +58,7 @@ const FOREST_JSONB = [
   'direct_and_indirect_beneficiaries', 'forest_value_flow_impact_report', 'species_details',
   'maintenance_workforce', 'plant_growth_data', 'soil_ph_level', 'temperature_humidity',
   'environmental_need_indicators', 'security_and_infrastructure', 'plantation_progress',
-  'additional_sponsor_logo', 'dashboard_images', 'report_images',
+  'additional_sponsor_logo', 'dashboard_images', 'report_images', 'gallery_images',
 ];
 
 /** Map a forests row → the FullForestPayload field names the slides read. */
