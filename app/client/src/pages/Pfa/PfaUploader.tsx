@@ -12,6 +12,31 @@ import { useToast } from '@/components/Toast';
 import { fetchForestReport } from '@/lib/publicApi';
 import { uploadReportImage, uploadSponsorLogo, deleteSponsorLogo } from '../Forests/forestApi';
 import { fetchForestOptions, type ForestOption } from '../Reports/reportApi';
+import PwaInstallPrompt from './PwaInstallPrompt';
+
+/**
+ * Point the browser's install assessment at the PFA manifest while on /pfa, so
+ * installing here creates the standalone "OIAS PFA" app (start_url /pfa) instead
+ * of the default Field app. Restore the original manifest on unmount.
+ */
+function usePfaManifest() {
+  useEffect(() => {
+    const link = document.querySelector<HTMLLinkElement>('link[rel="manifest"]');
+    const prev = link?.getAttribute('href') ?? null;
+    let created: HTMLLinkElement | null = null;
+    if (link) link.setAttribute('href', '/pfa.webmanifest');
+    else {
+      created = document.createElement('link');
+      created.rel = 'manifest';
+      created.href = '/pfa.webmanifest';
+      document.head.appendChild(created);
+    }
+    return () => {
+      if (created) created.remove();
+      else if (link && prev) link.setAttribute('href', prev);
+    };
+  }, []);
+}
 
 interface Slot { key: string; label: string; perQuarter?: boolean }
 interface LogoRow { title: string; name: string; value: 'sponsored_by' | 'initiated_by'; logo?: string; serverIndex: number }
@@ -76,6 +101,7 @@ function seedFromForest(forest: Rec, y: number, q: number): Record<string, strin
 
 export default function PfaUploader() {
   const toast = useToast();
+  usePfaManifest();
   const fiscal = defaultFiscal();
   const [forests, setForests] = useState<ForestOption[]>([]);
   const [forestId, setForestId] = useState('');
@@ -360,6 +386,8 @@ export default function PfaUploader() {
           <img src={lightbox} alt="preview" className="max-h-full max-w-full rounded-card object-contain" />
         </div>
       ) : null}
+
+      <PwaInstallPrompt />
     </div>
   );
 }

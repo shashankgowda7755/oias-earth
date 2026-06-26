@@ -109,7 +109,7 @@ export default function App() {
                 <Route
                   path="/pfa"
                   element={
-                    <ProtectedRoute roles={['Admin', 'SuperAdmin']}>
+                    <ProtectedRoute>
                       <PfaUploader />
                     </ProtectedRoute>
                   }

@@ -1,0 +1,16 @@
+{
+  "name": "OIAS PFA — Photo Upload",
+  "short_name": "OIAS PFA",
+  "description": "Capture and upload forest report photos: select a forest, snap or pick photos per slot, they attach to that forest's report.",
+  "id": "/pfa",
+  "start_url": "/pfa",
+  "scope": "/pfa",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#0d1f17",
+  "background_color": "#0d1f17",
+  "icons": [
+    { "src": "/pfa-icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "/pfa-icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "maskable" }
+  ]
+}

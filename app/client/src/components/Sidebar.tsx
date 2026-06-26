@@ -171,6 +171,24 @@ export function Sidebar({ active, onTabChange }: SidebarProps) {
             );
           })}
         </ul>
+
+        {/* PFA photo app — a standalone full-screen route, not an in-dashboard tab. */}
+        <div className="mt-2 border-t border-white/10 px-2 pt-2">
+          <button
+            type="button"
+            onClick={() => navigate('/pfa')}
+            className="group relative flex w-full items-center gap-3 rounded-card px-3 py-2.5 text-sm font-medium text-navbar-inactive transition-colors hover:bg-white/5 hover:text-textPrimary"
+          >
+            <span className="text-current">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 shrink-0">
+                <path d="M4 8h3l1.5-2h7L17 8h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z" />
+                <circle cx="12" cy="13" r="3.5" />
+              </svg>
+            </span>
+            PFA Photo App
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="ml-auto h-3.5 w-3.5 opacity-60" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8" /></svg>
+          </button>
+        </div>
       </nav>
 
       {/* User zone */}
