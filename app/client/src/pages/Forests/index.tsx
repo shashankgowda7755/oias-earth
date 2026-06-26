@@ -93,9 +93,10 @@ function SponsorCell({ sponsors }: { sponsors: ForestSponsorSummary[] }) {
  * return them). Wire that fetch when the read-one endpoint shape is confirmed.
  */
 function rowToForm(row: ForestRow): ForestFormState {
-  const sponsorIds = row.sponsors.map((s) => s.id);
+  const sponsors = row.sponsors ?? [];
+  const sponsorIds = sponsors.map((s) => s.id);
   const sponsorLabels: Record<string, string> = {};
-  for (const s of row.sponsors) sponsorLabels[s.id] = s.sponsor_name;
+  for (const s of sponsors) sponsorLabels[s.id] = s.sponsor_name;
 
   return {
     ...emptyForestForm(),

@@ -90,6 +90,9 @@ export interface DataTableProps<T> {
    * When provided, onView/onEdit/onDelete are ignored.
    */
   renderRowActions?: (row: T, rowIndex: number) => ReactNode;
+  /** Place the actions (⋮) column on the LEFT, pinned sticky so it's always
+   *  reachable without horizontal-scrolling a wide table. Default true. */
+  actionsLeft?: boolean;
 }
 
 const DEFAULT_ROWS_PER_PAGE = [10, 25, 50, 100];
@@ -119,6 +122,7 @@ export function DataTable<T>({
   actionsHeader = '',
   renderRowActions,
   onRowClick,
+  actionsLeft = true,
 }: DataTableProps<T>) {
   const searchId = useId();
   // An actions column is shown when a custom renderer or any handler is given.
@@ -188,6 +192,14 @@ export function DataTable<T>({
           {caption ? <caption className="sr-only">{caption}</caption> : null}
           <thead>
             <tr className="bg-tableHeader">
+              {hasActions && actionsLeft ? (
+                <th
+                  scope="col"
+                  className="sticky left-0 z-20 bg-tableHeader px-4 py-3 text-left text-tableHeader font-semibold text-textPrimary"
+                >
+                  {actionsHeader === '' ? <span className="sr-only">Actions</span> : actionsHeader}
+                </th>
+              ) : null}
               {columns.map((col) => (
                 <th
                   key={col.key}
@@ -197,7 +209,7 @@ export function DataTable<T>({
                   {col.header}
                 </th>
               ))}
-              {hasActions ? (
+              {hasActions && !actionsLeft ? (
                 <th
                   scope="col"
                   className="px-4 py-3 text-right text-tableHeader font-semibold text-textPrimary"
