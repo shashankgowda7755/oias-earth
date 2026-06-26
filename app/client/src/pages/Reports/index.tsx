@@ -265,30 +265,26 @@ export default function Reports() {
         render: (r) => <StatusPill active={r.is_active} />,
         className: 'whitespace-nowrap',
       },
-      {
-        key: 'actions',
-        header: <span className="sr-only">Actions</span>,
-        headerClassName: 'text-right',
-        className: 'text-right whitespace-nowrap',
-        render: (r) => {
-          const forestId = r.forest_id ?? r.Forest?.id ?? '';
-          const viewUrl = forestId
-            ? `/report/forest/${forestId}?year=${r.year ?? ''}&quarter=${r.quarter ?? ''}`
-            : null;
-          return (
-            <RowActions
-              onView={viewUrl ? () => window.open(viewUrl, '_blank', 'noopener') : undefined}
-              onSend={() => openSend(r)}
-              onEdit={() => setDialog({ kind: 'edit', row: r })}
-              onDelete={() => setPendingDelete(r)}
-              label={`report ${r.Forest?.forest_name ?? ''} ${r.year} Q${r.quarter}`}
-            />
-          );
-        },
-      },
     ],
     [],
   );
+
+  // Row actions render in DataTable's LEFT sticky column (consistent site-wide).
+  const renderRowActions = (r: ReportRow) => {
+    const forestId = r.forest_id ?? r.Forest?.id ?? '';
+    const viewUrl = forestId
+      ? `/report/forest/${forestId}?year=${r.year ?? ''}&quarter=${r.quarter ?? ''}`
+      : null;
+    return (
+      <RowActions
+        onView={viewUrl ? () => window.open(viewUrl, '_blank', 'noopener') : undefined}
+        onSend={() => openSend(r)}
+        onEdit={() => setDialog({ kind: 'edit', row: r })}
+        onDelete={() => setPendingDelete(r)}
+        label={`report ${r.Forest?.forest_name ?? ''} ${r.year} Q${r.quarter}`}
+      />
+    );
+  };
 
   const submitting = createMut.isPending || updateMut.isPending;
 
@@ -297,6 +293,7 @@ export default function Reports() {
       <DataTable<ReportRow>
         columns={columns}
         rows={rows}
+        renderRowActions={renderRowActions}
         getRowId={(r) => r.id}
         loading={isLoading}
         error={error ? error.message : null}
