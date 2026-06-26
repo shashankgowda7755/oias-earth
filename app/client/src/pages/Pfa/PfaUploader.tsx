@@ -86,6 +86,7 @@ export default function PfaUploader() {
   const [pending, setPending] = useState<{ slot: Slot; url: string; file: File } | null>(null);
   const [sheet, setSheet] = useState<Slot | null>(null);
   const [view, setView] = useState<Slot | null>(null); // filled-photo preview
+  const [navOpen, setNavOpen] = useState(false);
   // camera
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -219,11 +220,18 @@ export default function PfaUploader() {
     );
   };
 
+  const go = (p: Page) => {
+    setNavOpen(false);
+    if (p !== 'pick' && !forestId) { setPage('pick'); return; }
+    setPage(p);
+  };
+
   const TopBar = ({ title, onBack }: { title: string; onBack?: () => void }) => (
     <header className="sticky top-0 z-20 flex h-14 items-center gap-3 border-b border-border bg-appbg/95 px-4 backdrop-blur">
       {onBack ? <button type="button" aria-label="Back" onClick={onBack} className="text-textSecondary hover:text-textPrimary"><i className="ti ti-chevron-left text-xl" aria-hidden="true" /></button>
         : <Link to="/dashboard" aria-label="Dashboard" className="text-textSecondary hover:text-textPrimary"><i className="ti ti-chevron-left text-xl" aria-hidden="true" /></Link>}
       <span className="min-w-0 flex-1 truncate font-serif text-base font-semibold">{title}</span>
+      <button type="button" aria-label="Menu" onClick={() => setNavOpen(true)} className="text-primary hover:opacity-80"><i className="ti ti-menu-2 text-xl" aria-hidden="true" /></button>
     </header>
   );
 
@@ -386,6 +394,33 @@ export default function PfaUploader() {
               </div>
             </>
           )}
+        </div>
+      ) : null}
+
+      {/* hamburger nav drawer (left) */}
+      {navOpen ? (
+        <div className="fixed inset-0 z-40 flex" onClick={() => setNavOpen(false)}>
+          <nav className="h-full w-[78%] max-w-xs bg-appbg" onClick={(e) => e.stopPropagation()}>
+            <div className="border-b border-border px-4 py-4">
+              <div className="truncate font-serif text-base font-semibold">{forestId ? forestName : 'Photo uploader'}</div>
+              {forestId ? <div className="text-xs text-textSecondary">Q{quarter} {year} · {filled}/{total} · {Math.round((filled / total) * 100)}%</div> : null}
+            </div>
+            {([
+              { p: 'menu' as Page, icon: 'ti-home', label: 'Home', ct: '' },
+              { p: 'site' as Page, icon: 'ti-building-community', label: 'Site photos', ct: `${count(SITE_SLOTS)}/${SITE_SLOTS.length}` },
+              { p: 'quarter' as Page, icon: 'ti-calendar', label: 'This quarter', ct: `${count(QUARTER_SLOTS)}/${QUARTER_SLOTS.length}` },
+              { p: 'sponsors' as Page, icon: 'ti-building-store', label: 'Sponsors & logos', ct: `${logos.filter((l) => l.logo).length}/${logos.length}` },
+            ]).map((r) => (
+              <button key={r.p} type="button" onClick={() => go(r.p)} className={`flex w-full items-center gap-3 px-4 py-3.5 text-left text-sm ${page === r.p ? 'bg-primary/15 text-primary' : 'text-textPrimary hover:bg-white/5'}`}>
+                <i className={`ti ${r.icon} text-xl`} aria-hidden="true" /><span className="flex-1">{r.label}</span><span className="text-xs text-textSecondary">{r.ct}</span>
+              </button>
+            ))}
+            <div className="my-1 border-t border-border" />
+            <a href={forestId ? `/report/forest/${forestId}?year=${year}&quarter=${quarter}` : '#'} target="_blank" rel="noopener" onClick={() => setNavOpen(false)} className="flex w-full items-center gap-3 px-4 py-3.5 text-left text-sm text-textPrimary hover:bg-white/5"><i className="ti ti-external-link text-xl" aria-hidden="true" /> View report</a>
+            <button type="button" onClick={() => go('pick')} className="flex w-full items-center gap-3 px-4 py-3.5 text-left text-sm text-textPrimary hover:bg-white/5"><i className="ti ti-switch-horizontal text-xl" aria-hidden="true" /> Switch forest</button>
+            <Link to="/dashboard" className="flex w-full items-center gap-3 px-4 py-3.5 text-left text-sm text-textPrimary hover:bg-white/5"><i className="ti ti-layout-dashboard text-xl" aria-hidden="true" /> Dashboard</Link>
+          </nav>
+          <div className="h-full flex-1 bg-black/55" />
         </div>
       ) : null}
 
