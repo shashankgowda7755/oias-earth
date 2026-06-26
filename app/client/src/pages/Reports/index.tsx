@@ -94,24 +94,48 @@ export default function Reports() {
   const [pendingDelete, setPendingDelete] = useState<ReportRow | null>(null);
   const [pendingSend, setPendingSend] = useState<ReportRow | null>(null);
   const [sendTo, setSendTo] = useState('');
+  const [sendCc, setSendCc] = useState<string[]>([]);
+  const [sendCcInput, setSendCcInput] = useState('');
   const [sending, setSending] = useState(false);
+
+  const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 
   const openSend = (r: ReportRow) => {
     setPendingSend(r);
     setSendTo('');
+    setSendCc([]);
+    setSendCcInput('');
     getReportRecipient(r.id)
-      .then((res) => setSendTo(res.email || ''))
+      .then((res) => {
+        setSendTo(res.email || '');
+        setSendCc(res.config_cc ?? []);
+      })
       .catch(() => undefined);
   };
+
+  const addCc = (raw: string) => {
+    const v = raw.trim();
+    if (!v) return;
+    const emails = v.split(/[,;\s]+/).map((e) => e.trim()).filter((e) => EMAIL_RE.test(e));
+    setSendCc((prev) => {
+      const seen = new Set(prev.map((e) => e.toLowerCase()));
+      return [...prev, ...emails.filter((e) => !seen.has(e.toLowerCase()))];
+    });
+    setSendCcInput('');
+  };
+
+  const removeCc = (email: string) => setSendCc((prev) => prev.filter((e) => e !== email));
 
   const handleSend = async () => {
     if (!pendingSend) return;
     setSending(true);
     try {
-      const r = await sendReport(pendingSend.id, sendTo.trim());
-      toast.success(`Report sent to ${r.to}.`);
+      const r = await sendReport(pendingSend.id, sendTo.trim(), sendCc);
+      const ccNote = r.cc?.length ? ` + ${r.cc.length} CC` : '';
+      toast.success(`Report sent to ${r.to}${ccNote}.`);
       setPendingSend(null);
       setSendTo('');
+      setSendCc([]);
     } catch (e) {
       toast.error(e instanceof Error ? e.message : 'Send failed.');
     } finally {
@@ -396,9 +420,10 @@ export default function Reports() {
           <div className="w-full max-w-md rounded-card border border-border bg-surface p-6 shadow-dialog">
             <h3 className="text-lg font-semibold text-textPrimary">Send report</h3>
             <p className="mt-1 text-sm text-textSecondary">
-              {pendingSend.Forest?.forest_name ?? 'Forest'} · Q{pendingSend.quarter} {pendingSend.year} — a branded email with the live report link is sent via Gmail.
+              {pendingSend.Forest?.forest_name ?? 'Forest'} · Q{pendingSend.quarter} {pendingSend.year}
             </p>
-            <label className="mt-4 block text-sm text-textSecondary" htmlFor="send-to">Recipient email</label>
+
+            <label className="mt-4 block text-sm text-textSecondary" htmlFor="send-to">To</label>
             <input
               id="send-to"
               type="email"
@@ -408,9 +433,33 @@ export default function Reports() {
               className="mt-1 w-full rounded-button border border-border bg-appbg px-3 py-2 text-sm text-textPrimary focus:border-primary focus:outline-none"
               autoFocus
             />
+
+            <label className="mt-4 block text-sm text-textSecondary" htmlFor="send-cc">CC</label>
+            {sendCc.length > 0 && (
+              <div className="mt-1 flex flex-wrap gap-1 mb-1">
+                {sendCc.map((email) => (
+                  <span key={email} className="inline-flex items-center gap-1 rounded-full border border-border bg-appbg px-2 py-0.5 text-xs text-textSecondary">
+                    {email}
+                    <button type="button" onClick={() => removeCc(email)} className="ml-0.5 text-textSecondary hover:text-textPrimary leading-none">×</button>
+                  </span>
+                ))}
+              </div>
+            )}
+            <input
+              id="send-cc"
+              type="text"
+              value={sendCcInput}
+              onChange={(e) => setSendCcInput(e.target.value)}
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ',') { e.preventDefault(); addCc(sendCcInput); } }}
+              onBlur={() => { if (sendCcInput.trim()) addCc(sendCcInput); }}
+              placeholder="cc@example.com — press Enter to add"
+              className="mt-1 w-full rounded-button border border-border bg-appbg px-3 py-2 text-sm text-textPrimary focus:border-primary focus:outline-none"
+            />
+            <p className="mt-1 text-xs text-textSecondary">Type an address and press Enter. Separate multiple with commas.</p>
+
             <div className="mt-6 flex justify-end gap-2">
-              <button type="button" onClick={() => setPendingSend(null)} className="rounded-button border border-border px-4 py-2 text-sm text-textPrimary hover:bg-white/5">Cancel</button>
-              <Button variant="primary" onClick={handleSend} loading={sending} disabled={!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(sendTo.trim())}>Send</Button>
+              <button type="button" onClick={() => { setPendingSend(null); setSendCc([]); setSendCcInput(''); }} className="rounded-button border border-border px-4 py-2 text-sm text-textPrimary hover:bg-white/5">Cancel</button>
+              <Button variant="primary" onClick={handleSend} loading={sending} disabled={!EMAIL_RE.test(sendTo.trim())}>Send</Button>
             </div>
           </div>
         </div>

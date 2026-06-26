@@ -188,6 +188,22 @@ export function Sidebar({ active, onTabChange }: SidebarProps) {
             PFA Photo App
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="ml-auto h-3.5 w-3.5 opacity-60" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8" /></svg>
           </button>
+          {session?.role === 'SuperAdmin' && (
+            <button
+              type="button"
+              onClick={() => navigate('/settings/email')}
+              className="group relative flex w-full items-center gap-3 rounded-card px-3 py-2.5 text-sm font-medium text-navbar-inactive transition-colors hover:bg-white/5 hover:text-textPrimary"
+            >
+              <span className="text-current">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 shrink-0">
+                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                  <polyline points="22,6 12,13 2,6" />
+                </svg>
+              </span>
+              Email config
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="ml-auto h-3.5 w-3.5 opacity-60" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8" /></svg>
+            </button>
+          )}
         </div>
       </nav>
 

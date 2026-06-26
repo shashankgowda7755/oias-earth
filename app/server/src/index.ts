@@ -21,6 +21,7 @@ import { listRouter } from './routes/lists';
 import { crudRouter, UPLOADS_DIR } from './routes/crud';
 import { forestRouter } from './routes/forest';
 import { publicRouter } from './routes/public';
+import { emailConfigRouter } from './routes/emailConfig';
 import { DB_BACKEND } from './db';
 import { HttpError } from './errors';
 
@@ -62,6 +63,7 @@ app.use('/api/v1', requireAuth);
 app.use('/api/v1', auditWrites);
 app.use('/api/v1', listRouter);
 app.use('/api/v1', forestRouter);
+app.use('/api/v1', emailConfigRouter);
 app.use('/api/v1', crudRouter);
 
 // 404 for unmatched API routes.

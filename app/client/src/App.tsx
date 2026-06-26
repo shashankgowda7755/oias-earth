@@ -37,6 +37,7 @@ const ReportForestQuarterly = lazy(() => import('./pages/report/ReportForestQuar
 const ReportDataEditor = lazy(() => import('./pages/Forests/reportForm/ReportDataEditor'));
 const PfaUploader = lazy(() => import('./pages/Pfa/PfaUploader'));
 const Studio = lazy(() => import('./pages/Studio'));
+const EmailSettings = lazy(() => import('./pages/Settings/EmailSettings'));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -111,6 +112,14 @@ export default function App() {
                   element={
                     <ProtectedRoute>
                       <PfaUploader />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/settings/email"
+                  element={
+                    <ProtectedRoute roles={['SuperAdmin']}>
+                      <EmailSettings />
                     </ProtectedRoute>
                   }
                 />

@@ -2292,27 +2292,88 @@ async function buildReportEmail(opts: {
   return { subject: renderText(tpl.subject, vars), html: renderHtml(tpl.html, vars), cc: tpl.cc ?? [] };
 }
 
+/** Load global + per-forest email config from DB. Returns empty defaults when not set. */
+async function loadEmailConfig(forestId: string): Promise<{
+  fromAddress: string; displayName: string; replyTo: string | null;
+  globalTo: string[]; globalCc: string[]; forestTo: string[]; forestCc: string[];
+}> {
+  const [gc, fc] = await Promise.all([
+    query<{ display_name: string; from_address: string; reply_to: string | null; to_emails: string[]; cc_emails: string[] }>(
+      `SELECT display_name, from_address, reply_to, to_emails, cc_emails FROM system_email_config WHERE key = 'global'`,
+    ),
+    query<{ to_emails: string[]; cc_emails: string[] }>(
+      `SELECT to_emails, cc_emails FROM forest_email_config WHERE forest_id = $1`,
+      [forestId],
+    ),
+  ]);
+  const g = gc.rows[0];
+  const f = fc.rows[0];
+  return {
+    fromAddress: g?.from_address || '',
+    displayName: g?.display_name || 'OIAS Earth',
+    replyTo: g?.reply_to ?? null,
+    globalTo: g?.to_emails ?? [],
+    globalCc: g?.cc_emails ?? [],
+    forestTo: f?.to_emails ?? [],
+    forestCc: f?.cc_emails ?? [],
+  };
+}
+
 /**
- * Build the CC list: manual (body.cc, string or string[]) + template static cc
- * + any other available addresses (sponsor / forest contact). Drops the TO and
- * dupes (case-insensitive), keeps only valid addresses.
+ * Resolve the full To list for a report send:
+ *   [explicit body.to] + [global To from DB] + [per-forest To from DB] + [sponsor auto] + [forest contact auto]
+ * Deduped, valid emails only.
  */
-function resolveCc(opts: {
-  to: string; manual?: unknown; templateCc?: string[]; extra?: (string | null | undefined)[];
+function resolveToList(opts: {
+  bodyTo: string; globalTo: string[]; forestTo: string[];
+  sponsorEmail: string | null; forestContactEmail: string | null;
 }): string[] {
+  const seen = new Set<string>();
+  const out: string[] = [];
+  const add = (e: string | null | undefined) => {
+    const v = (e ?? '').trim();
+    if (!v || !EMAIL_RE.test(v)) return;
+    const lc = v.toLowerCase();
+    if (seen.has(lc)) return;
+    seen.add(lc); out.push(v);
+  };
+  add(opts.bodyTo);
+  opts.globalTo.forEach(add);
+  opts.forestTo.forEach(add);
+  add(opts.sponsorEmail);
+  add(opts.forestContactEmail);
+  return out;
+}
+
+/**
+ * Resolve the full CC list for a report send.
+ * Per-forest CC replaces global CC when non-empty.
+ * All To addresses are excluded from CC.
+ */
+function resolveFullCc(opts: {
+  toAddresses: string[]; manual?: unknown; templateCc?: string[];
+  globalCc: string[]; forestCc: string[];
+  sponsorEmail: string | null; forestContactEmail: string | null;
+}): string[] {
+  const baseCc = opts.forestCc.length > 0 ? opts.forestCc : opts.globalCc;
   const manual = Array.isArray(opts.manual)
-    ? opts.manual.map((x) => String(x ?? ''))
+    ? (opts.manual as unknown[]).map((x) => String(x ?? ''))
     : String(opts.manual ?? '').split(',');
-  const all = [...manual, ...(opts.templateCc ?? []), ...(opts.extra ?? []).map((x) => String(x ?? ''))];
-  const seen = new Set<string>([opts.to.trim().toLowerCase()]);
+  const all = [
+    ...manual,
+    ...(opts.templateCc ?? []),
+    ...baseCc,
+    opts.sponsorEmail ?? '',
+    opts.forestContactEmail ?? '',
+  ];
+  const seen = new Set<string>(opts.toAddresses.map((e) => e.trim().toLowerCase()));
   const out: string[] = [];
   for (const raw of all) {
     const v = raw.trim();
     if (!v || !EMAIL_RE.test(v)) continue;
     const lc = v.toLowerCase();
     if (seen.has(lc)) continue;
-    seen.add(lc);
-    out.push(v);
+    seen.add(lc); out.push(v);
   }
   return out;
 }
@@ -2416,12 +2477,13 @@ async function sendReportEmail(req: Request, res: Response): Promise<void> {
   const row = rr.rows[0];
   if (!row) throw notFound('Report not found');
 
-  const to = String((req.body as { to?: unknown })?.to ?? '').trim();
-  if (!EMAIL_RE.test(to)) {
+  const bodyTo = String((req.body as { to?: unknown })?.to ?? '').trim();
+  if (!EMAIL_RE.test(bodyTo)) {
     res.status(400).json({ error: true, message: 'A valid recipient email is required.' });
     return;
   }
 
+  const emailCfg = await loadEmailConfig(row.forest_id);
   const sponsor = sponsorNameFrom(row.additional_sponsor_logo);
   const forestName = row.forest_name ?? 'Forest';
   const base = process.env.APP_URL || `https://${req.get('host')}`;
@@ -2429,9 +2491,15 @@ async function sendReportEmail(req: Request, res: Response): Promise<void> {
   const { subject, html, cc: templateCc } = await buildReportEmail({
     forestName, sponsor, quarter: row.quarter, year: row.year, url,
   });
-  const cc = resolveCc({
-    to, manual: (req.body as { cc?: unknown })?.cc, templateCc,
-    extra: [row.sponsor_email, row.forest_contact_email],
+  const toAddresses = resolveToList({
+    bodyTo, globalTo: emailCfg.globalTo, forestTo: emailCfg.forestTo,
+    sponsorEmail: row.sponsor_email, forestContactEmail: row.forest_contact_email,
+  });
+  const to = toAddresses[0] ?? bodyTo;
+  const cc = resolveFullCc({
+    toAddresses, manual: (req.body as { cc?: unknown })?.cc, templateCc,
+    globalCc: emailCfg.globalCc, forestCc: emailCfg.forestCc,
+    sponsorEmail: row.sponsor_email, forestContactEmail: row.forest_contact_email,
   });
 
   const result = await sendReportMail({
@@ -2479,7 +2547,17 @@ async function reportRecipient(req: Request, res: Response): Promise<void> {
   );
   const row = r.rows[0];
   if (!row) throw notFound('Report not found');
-  res.json({ data: { email: row.email ?? '', source: row.source } });
+
+  // Also return config-resolved To/CC so the send dialog can prefill them.
+  const forestRow = await query<{ forest_id: string }>(
+    `SELECT forest_id FROM reports WHERE id = $1`, [reportId],
+  );
+  const forestId = forestRow.rows[0]?.forest_id ?? '';
+  const emailCfg = forestId ? await loadEmailConfig(forestId) : { globalTo: [], forestTo: [], globalCc: [], forestCc: [] };
+  const configTo = [...emailCfg.globalTo, ...emailCfg.forestTo];
+  const configCc = emailCfg.forestCc.length > 0 ? emailCfg.forestCc : emailCfg.globalCc;
+
+  res.json({ data: { email: row.email ?? '', source: row.source, config_to: configTo, config_cc: configCc } });
 }
 
 /**
@@ -2514,13 +2592,14 @@ async function sendForestReport(req: Request, res: Response): Promise<void> {
   const row = fr.rows[0];
   if (!row) throw notFound('Forest not found');
 
-  const to = String((req.body as { to?: unknown })?.to ?? '').trim()
+  const bodyTo = String((req.body as { to?: unknown })?.to ?? '').trim()
     || row.sponsor_email || row.forest_contact_email || '';
-  if (!EMAIL_RE.test(to)) {
+  if (!EMAIL_RE.test(bodyTo)) {
     res.status(400).json({ error: true, message: 'No recipient — set a sponsor/forest email or pass one.' });
     return;
   }
 
+  const emailCfg = await loadEmailConfig(id);
   const sponsor = sponsorNameFrom(row.additional_sponsor_logo);
   const forestName = row.forest_name ?? 'Forest';
   const base = process.env.APP_URL || `https://${req.get('host')}`;
@@ -2528,9 +2607,15 @@ async function sendForestReport(req: Request, res: Response): Promise<void> {
   const { subject, html, cc: templateCc } = await buildReportEmail({
     forestName, sponsor, quarter, year, url,
   });
-  const cc = resolveCc({
-    to, manual: (req.body as { cc?: unknown })?.cc, templateCc,
-    extra: [row.sponsor_email, row.forest_contact_email],
+  const toAddresses = resolveToList({
+    bodyTo, globalTo: emailCfg.globalTo, forestTo: emailCfg.forestTo,
+    sponsorEmail: row.sponsor_email, forestContactEmail: row.forest_contact_email,
+  });
+  const to = toAddresses[0] ?? bodyTo;
+  const cc = resolveFullCc({
+    toAddresses, manual: (req.body as { cc?: unknown })?.cc, templateCc,
+    globalCc: emailCfg.globalCc, forestCc: emailCfg.forestCc,
+    sponsorEmail: row.sponsor_email, forestContactEmail: row.forest_contact_email,
   });
 
   // Optional PDF (multipart 'pdf') — only the report viewer can render it, so

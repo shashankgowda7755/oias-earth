@@ -60,21 +60,23 @@ export async function deleteReport(id: string): Promise<{ id: string }> {
   return { id };
 }
 
-/** Resolve a report's send recipient (sponsor email → forest contact email). */
+/** Resolve a report's send recipient + config-based To/CC for prefill. */
 export async function getReportRecipient(
   id: string,
-): Promise<{ email: string; source: string | null }> {
+): Promise<{ email: string; source: string | null; config_to: string[]; config_cc: string[] }> {
   const { data } = await api.get(`/${REPORT_CRUD_SEGMENT}/${id}/recipient`);
-  return (data?.data ?? data) as { email: string; source: string | null };
+  const r = (data?.data ?? data) as { email: string; source: string | null; config_to?: string[]; config_cc?: string[] };
+  return { email: r.email, source: r.source, config_to: r.config_to ?? [], config_cc: r.config_cc ?? [] };
 }
 
-/** Email the rendered report to a recipient via Composio Gmail. */
+/** Email the rendered report — supports multiple To + CC. */
 export async function sendReport(
   id: string,
   to: string,
-): Promise<{ ok: boolean; to: string; messageId?: string; url: string }> {
-  const { data } = await api.post(`/${REPORT_CRUD_SEGMENT}/${id}/send`, { to });
-  return (data?.data ?? data) as { ok: boolean; to: string; messageId?: string; url: string };
+  cc?: string[],
+): Promise<{ ok: boolean; to: string; cc: string[]; messageId?: string; url: string }> {
+  const { data } = await api.post(`/${REPORT_CRUD_SEGMENT}/${id}/send`, { to, cc });
+  return (data?.data ?? data) as { ok: boolean; to: string; cc: string[]; messageId?: string; url: string };
 }
 
 /**

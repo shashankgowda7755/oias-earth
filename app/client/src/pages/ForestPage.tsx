@@ -19,6 +19,7 @@ import {
 import { buildPlantingLayout, allocateSpecies, SPECIES_PALETTE, type SpeciesShare, type LayoutStyle } from './Forests/matrixLayout';
 import '@/styles/earth.css';
 
+const OSM_URL = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
 const SAT_URL = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}';
 const LABELS_URL = 'https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.png';
 const STATUS_COLOR: Record<number, string> = { 1: '#b6ff3c', 2: '#e8a33d', 3: '#f0792b', 4: '#6b7b82' };
@@ -107,6 +108,7 @@ export default function ForestPage() {
     const map = L.map(mapEl.current, { zoomControl: true, attributionControl: false, preferCanvas: true });
     mapRef.current = map;
     revealedRef.current = false;
+    L.tileLayer(OSM_URL, { maxZoom: 19, opacity: 0.6 }).addTo(map);
     L.tileLayer(SAT_URL, { maxZoom: 21, maxNativeZoom: 19 }).addTo(map);
     L.tileLayer(LABELS_URL, { maxZoom: 21, maxNativeZoom: 19, opacity: 0.85 }).addTo(map);
 
