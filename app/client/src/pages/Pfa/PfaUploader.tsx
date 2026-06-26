@@ -1,50 +1,152 @@
 /**
- * PFA photo uploader (/pfa, admin) — the office surface for adding report
- * photos. Pick a forest, then drag-and-drop a photo onto a slot; it uploads to
- * object storage and attaches the URL to that forest's report field. Per-quarter
- * slots (soil meter, inside/outside temp, progress) use the chosen FY + quarter.
+ * PFA photo uploader (/pfa, admin) — mobile-first. Pick a forest, then fill the
+ * photo slots, grouped into "Site · once" + "This quarter". Tap a tile → action
+ * sheet (Take photo via live camera / Choose file) → preview → Upload (Vercel
+ * Blob) → attaches to the forest's report field. Sticky header shows progress;
+ * sticky bottom bar keeps "Capture next" thumb-reachable; a done summary appears
+ * when every slot is filled. Existing photos are seeded so progress is accurate.
  */
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useToast } from '@/components/Toast';
+import { fetchForestReport } from '@/lib/publicApi';
 import { uploadReportImage } from '../Forests/forestApi';
 import { fetchForestOptions, type ForestOption } from '../Reports/reportApi';
 
-interface Slot {
-  key: string;
-  label: string;
-  perQuarter?: boolean;
-}
-const SLOTS: Slot[] = [
-  { key: 'cover', label: 'Cover photo' },
-  { key: 'content', label: 'Contents photo' },
-  { key: 'impact', label: 'Project impact' },
-  { key: 'permission', label: 'Permission letter' },
+interface Slot { key: string; label: string; perQuarter?: boolean }
+const SITE_SLOTS: Slot[] = [
+  { key: 'cover', label: 'Cover' },
+  { key: 'content', label: 'Contents' },
+  { key: 'impact', label: 'Impact' },
+  { key: 'permission', label: 'Permission' },
   { key: 'layout', label: 'Site layout' },
-  { key: 'earth', label: 'Aerial / map (adds)' },
-  { key: 'security', label: 'Site security (adds)' },
-  { key: 'dashboard', label: 'Dashboard (adds)' },
-  { key: 'soil_meter', label: 'Soil pH meter', perQuarter: true },
-  { key: 'temp_inside', label: 'Inside plantation', perQuarter: true },
-  { key: 'temp_outside', label: 'Outside plantation', perQuarter: true },
-  { key: 'progress', label: 'Plantation progress', perQuarter: true },
+  { key: 'earth', label: 'Aerial / map' },
+  { key: 'security', label: 'Security' },
+  { key: 'dashboard', label: 'Dashboard' },
 ];
+const QUARTER_SLOTS: Slot[] = [
+  { key: 'soil_meter', label: 'Soil meter', perQuarter: true },
+  { key: 'temp_inside', label: 'Inside', perQuarter: true },
+  { key: 'temp_outside', label: 'Outside', perQuarter: true },
+  { key: 'progress', label: 'Progress', perQuarter: true },
+];
+const ALL = [...SITE_SLOTS, ...QUARTER_SLOTS];
+
+function defaultFiscal(): { year: number; quarter: number } {
+  const d = new Date(); const m = d.getMonth();
+  if (m >= 3 && m <= 5) return { year: d.getFullYear(), quarter: 1 };
+  if (m >= 6 && m <= 8) return { year: d.getFullYear(), quarter: 2 };
+  if (m >= 9) return { year: d.getFullYear(), quarter: 3 };
+  return { year: d.getFullYear() - 1, quarter: 4 };
+}
+
+type Rec = Record<string, unknown>;
+const pickQ = (arr: unknown, y: number, q: number): Rec | undefined =>
+  Array.isArray(arr) ? (arr as Rec[]).find((r) => Number(r.year) === y && Number(r.quarter) === q) : undefined;
+
+/** Map a forest's existing images back to slot → url so progress is accurate. */
+function seedFromForest(forest: Rec, y: number, q: number): Record<string, string> {
+  const out: Record<string, string> = {};
+  const ri = (forest.report_images as { slide_type?: string; image?: string }[]) ?? [];
+  const byType = (t: string) => ri.find((r) => r.slide_type === t)?.image;
+  if (byType('first_slide')) out.cover = byType('first_slide')!;
+  if (byType('content_slide')) out.content = byType('content_slide')!;
+  if (byType('project_impact_slide')) out.impact = byType('project_impact_slide')!;
+  if (forest.permission_letter) out.permission = String(forest.permission_letter);
+  if (forest.site_layout) out.layout = String(forest.site_layout);
+  const earth = (forest.area_population_statistics_details as Rec)?.google_earth_image as unknown[] | undefined;
+  if (Array.isArray(earth) && earth[0]) out.earth = String(earth[0]);
+  const sec = (forest.security_and_infrastructure as Rec)?.image_data as { image?: string }[] | undefined;
+  if (Array.isArray(sec) && sec[0]?.image) out.security = sec[0].image!;
+  const dash = forest.dashboard_images as { image?: string }[] | undefined;
+  if (Array.isArray(dash) && dash[0]?.image) out.dashboard = dash[0].image!;
+  const soil = pickQ(forest.soil_ph_level, y, q);
+  if (soil?.meter_image) out.soil_meter = String(soil.meter_image);
+  const th = pickQ(forest.temperature_humidity, y, q);
+  if ((th?.inside_plantation as Rec)?.image) out.temp_inside = String((th!.inside_plantation as Rec).image);
+  if ((th?.outside_plantation as Rec)?.image) out.temp_outside = String((th!.outside_plantation as Rec).image);
+  const prog = pickQ(forest.plantation_progress, y, q);
+  if (prog?.image) out.progress = String(prog.image);
+  return out;
+}
 
 export default function PfaUploader() {
   const toast = useToast();
+  const fiscal = defaultFiscal();
   const [forests, setForests] = useState<ForestOption[]>([]);
   const [forestId, setForestId] = useState('');
-  const [year, setYear] = useState(new Date().getFullYear());
-  const [quarter, setQuarter] = useState(Math.floor(new Date().getMonth() / 3) + 1);
-  const [status, setStatus] = useState<Record<string, string>>({});
-  const [over, setOver] = useState('');
+  const [year, setYear] = useState(fiscal.year);
+  const [quarter, setQuarter] = useState(fiscal.quarter);
+  const [status, setStatus] = useState<Record<string, string>>({}); // slot -> url | 'uploading' | 'error'
+  const [pending, setPending] = useState<{ slot: Slot; url: string; file: File } | null>(null);
+  const [sheet, setSheet] = useState<Slot | null>(null);
+  const [lightbox, setLightbox] = useState<string | null>(null);
+  // camera
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+  const fileInput = useRef<HTMLInputElement | null>(null);
+  const fileSlot = useRef<Slot | null>(null);
+  const [camSlot, setCamSlot] = useState<Slot | null>(null);
+  const [facing, setFacing] = useState<'environment' | 'user'>('environment');
+  const [camErr, setCamErr] = useState<string | null>(null);
 
   useEffect(() => { fetchForestOptions().then(setForests).catch(() => undefined); }, []);
 
-  const upload = async (slot: Slot, file?: File | null) => {
+  // Seed which slots already have photos (for this forest + quarter).
+  useEffect(() => {
+    if (!forestId) { setStatus({}); return; }
+    let alive = true;
+    fetchForestReport(forestId, year, quarter)
+      .then((r) => { if (alive) setStatus(seedFromForest((r.forest as Rec) ?? {}, year, quarter)); })
+      .catch(() => undefined);
+    return () => { alive = false; };
+  }, [forestId, year, quarter]);
+
+  const isUrl = (v?: string) => !!v && v !== 'uploading' && v !== 'error';
+  const filled = ALL.filter((s) => isUrl(status[s.key])).length;
+  const allDone = !!forestId && filled === ALL.length;
+
+  const stopStream = () => { streamRef.current?.getTracks().forEach((t) => t.stop()); streamRef.current = null; };
+  const closeCam = () => { stopStream(); setCamSlot(null); setCamErr(null); };
+
+  useEffect(() => {
+    if (!camSlot) return;
+    let cancelled = false; setCamErr(null);
+    (async () => {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: facing } }, audio: false });
+        if (cancelled) { stream.getTracks().forEach((t) => t.stop()); return; }
+        streamRef.current = stream;
+        if (videoRef.current) { videoRef.current.srcObject = stream; await videoRef.current.play().catch(() => undefined); }
+      } catch (e) { setCamErr(e instanceof Error ? e.message : 'Camera unavailable. Use a file instead.'); }
+    })();
+    return () => { cancelled = true; stopStream(); };
+  }, [camSlot, facing]);
+
+  const stage = (slot: Slot, file?: File | null) => {
     if (!file) return;
-    if (!forestId) { toast.error('Pick a forest first.'); return; }
+    setPending((p) => { if (p) URL.revokeObjectURL(p.url); return { slot, url: URL.createObjectURL(file), file }; });
+  };
+  const clearPending = () => setPending((p) => { if (p) URL.revokeObjectURL(p.url); return null; });
+
+  const snap = () => {
+    const v = videoRef.current; const slot = camSlot;
+    if (!v || !slot || !v.videoWidth) return;
+    const canvas = document.createElement('canvas');
+    canvas.width = v.videoWidth; canvas.height = v.videoHeight;
+    canvas.getContext('2d')?.drawImage(v, 0, 0);
+    canvas.toBlob((blob) => {
+      if (!blob) return;
+      stage(slot, new File([blob], `${slot.key}-${Date.now()}.jpg`, { type: 'image/jpeg' }));
+      closeCam();
+    }, 'image/jpeg', 0.92);
+  };
+
+  const commit = async () => {
+    if (!pending || !forestId) { if (!forestId) toast.error('Pick a forest first.'); return; }
+    const { slot, file } = pending;
     setStatus((s) => ({ ...s, [slot.key]: 'uploading' }));
+    clearPending();
     try {
       const r = await uploadReportImage(forestId, slot.key, file, slot.perQuarter ? { year, quarter } : undefined);
       setStatus((s) => ({ ...s, [slot.key]: r.url }));
@@ -55,71 +157,142 @@ export default function PfaUploader() {
     }
   };
 
+  const captureNext = () => {
+    const next = ALL.find((s) => !isUrl(status[s.key]));
+    if (next) setCamSlot(next); else toast.success('All photos added.');
+  };
+
+  const Tile = ({ slot }: { slot: Slot }) => {
+    const st = status[slot.key];
+    const url = isUrl(st) ? st : null;
+    const uploading = st === 'uploading';
+    return (
+      <button
+        type="button"
+        onClick={() => (url ? setLightbox(url) : setSheet(slot))}
+        className={`relative flex aspect-square flex-col items-center justify-center gap-1.5 overflow-hidden rounded-card border p-2 text-center transition-colors ${url ? 'border-transparent bg-primary/10' : 'border-border hover:border-primary/60'}`}
+      >
+        {url ? <img src={url} alt="" className="absolute inset-0 h-full w-full bg-surface object-cover opacity-90" /> : null}
+        <span className="relative z-10 flex flex-col items-center gap-1">
+          <i className={`ti ${uploading ? 'ti-loader-2' : url ? 'ti-circle-check' : 'ti-camera'} text-[22px] ${url ? 'text-primary' : 'text-textSecondary'}`} aria-hidden="true" />
+          <span className={`text-[11px] ${url ? 'rounded bg-black/55 px-1.5 py-0.5 text-white' : 'text-textSecondary'}`}>{slot.label}</span>
+        </span>
+      </button>
+    );
+  };
+
   return (
     <div className="min-h-screen bg-appbg text-textPrimary">
-      <header className="flex h-16 items-center justify-between border-b border-border px-6">
-        <div className="flex items-center gap-3">
-          <Link to="/dashboard" className="text-sm text-textSecondary hover:text-textPrimary">← Dashboard</Link>
-          <span className="text-textSecondary">/</span>
-          <span className="font-serif text-lg font-semibold">Photo uploader</span>
+      <input ref={fileInput} type="file" accept="image/*" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (fileSlot.current) stage(fileSlot.current, f); e.target.value = ''; }} />
+
+      {/* sticky header */}
+      <header className="sticky top-0 z-20 border-b border-border bg-appbg/95 backdrop-blur">
+        <div className="mx-auto flex max-w-xl items-center gap-3 px-4 py-3">
+          <Link to="/dashboard" aria-label="Back" className="text-textSecondary hover:text-textPrimary"><i className="ti ti-chevron-left text-xl" aria-hidden="true" /></Link>
+          <select value={forestId} onChange={(e) => setForestId(e.target.value)} className="min-w-0 flex-1 truncate rounded-button border border-border bg-surface px-3 py-2 text-sm">
+            <option value="">Select a forest…</option>
+            {forests.map((f) => <option key={f.value} value={f.value}>{f.label}</option>)}
+          </select>
+          <select value={year} onChange={(e) => setYear(Number(e.target.value))} className="rounded-button border border-border bg-surface px-2 py-2 text-sm">
+            {[fiscal.year - 1, fiscal.year, fiscal.year + 1].map((y) => <option key={y} value={y}>{y}</option>)}
+          </select>
+          <select value={quarter} onChange={(e) => setQuarter(Number(e.target.value))} className="rounded-button border border-border bg-surface px-2 py-2 text-sm">
+            {[1, 2, 3, 4].map((q) => <option key={q} value={q}>Q{q}</option>)}
+          </select>
         </div>
+        {forestId ? (
+          <div className="mx-auto max-w-xl px-4 pb-2">
+            <div className="mb-1 flex justify-between text-xs text-textSecondary"><span>Q{quarter} {year} · {filled} of {ALL.length} photos</span><span className="text-primary">{Math.round((filled / ALL.length) * 100)}%</span></div>
+            <div className="h-1.5 overflow-hidden rounded-full bg-surface"><div className="h-full rounded-full bg-primary transition-all" style={{ width: `${(filled / ALL.length) * 100}%` }} /></div>
+          </div>
+        ) : null}
       </header>
 
-      <div className="mx-auto max-w-4xl px-6 py-6">
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-[2fr_1fr_1fr]">
-          <label className="text-sm">
-            <span className="mb-1 block text-textSecondary">Forest</span>
-            <select value={forestId} onChange={(e) => setForestId(e.target.value)} className="w-full rounded-button border border-border bg-surface px-3 py-2 text-sm">
-              <option value="">Select a forest…</option>
-              {forests.map((f) => <option key={f.value} value={f.value}>{f.label}</option>)}
-            </select>
-          </label>
-          <label className="text-sm">
-            <span className="mb-1 block text-textSecondary">FY year</span>
-            <input type="number" value={year} onChange={(e) => setYear(Number(e.target.value) || year)} className="w-full rounded-button border border-border bg-surface px-3 py-2 text-sm" />
-          </label>
-          <label className="text-sm">
-            <span className="mb-1 block text-textSecondary">Quarter</span>
-            <select value={quarter} onChange={(e) => setQuarter(Number(e.target.value))} className="w-full rounded-button border border-border bg-surface px-3 py-2 text-sm">
-              {[1, 2, 3, 4].map((q) => <option key={q} value={q}>Q{q}</option>)}
-            </select>
-          </label>
-        </div>
-        <p className="mt-2 text-xs text-textSecondary">Per-quarter slots (soil meter, inside/outside, progress) use the FY + quarter above. Drag a photo onto a slot, or click it.</p>
+      <main className="mx-auto max-w-xl px-4 pb-28 pt-4">
+        {!forestId ? (
+          <div className="mt-16 text-center text-textSecondary"><i className="ti ti-photo text-3xl" aria-hidden="true" /><p className="mt-2 text-sm">Pick a forest above to add its report photos.</p></div>
+        ) : allDone ? (
+          <div className="mt-14 flex flex-col items-center text-center">
+            <i className="ti ti-circle-check text-5xl text-primary" aria-hidden="true" />
+            <p className="mt-3 text-lg font-semibold">{ALL.length} of {ALL.length} photos added</p>
+            <p className="mt-1 text-sm text-textSecondary">Q{quarter} {year} · all slots filled</p>
+            <a href={`/report/forest/${forestId}?year=${year}&quarter=${quarter}`} target="_blank" rel="noopener" className="mt-6 w-full rounded-button bg-primary py-3 text-center text-sm font-semibold text-black">View &amp; send report ↗</a>
+            <button type="button" onClick={() => setForestId('')} className="mt-2 w-full rounded-button border border-border py-3 text-sm">Add another forest</button>
+          </div>
+        ) : (
+          <>
+            <div className="mb-1.5 text-xs uppercase tracking-wide text-textSecondary/70">Site · enter once</div>
+            <div className="mb-5 grid grid-cols-3 gap-2.5">{SITE_SLOTS.map((s) => <Tile key={s.key} slot={s} />)}</div>
+            <div className="mb-1.5 text-xs uppercase tracking-wide text-textSecondary/70">This quarter · Q{quarter}</div>
+            <div className="grid grid-cols-3 gap-2.5">{QUARTER_SLOTS.map((s) => <Tile key={s.key} slot={s} />)}</div>
+          </>
+        )}
+      </main>
 
-        <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-          {SLOTS.map((slot) => {
-            const st = status[slot.key];
-            const isUrl = st && st !== 'uploading' && st !== 'error';
-            return (
-              <label
-                key={slot.key}
-                onDragOver={(e) => { e.preventDefault(); setOver(slot.key); }}
-                onDragLeave={() => setOver('')}
-                onDrop={(e) => { e.preventDefault(); setOver(''); upload(slot, e.dataTransfer.files?.[0]); }}
-                className={`relative flex aspect-[4/3] cursor-pointer flex-col items-center justify-center overflow-hidden rounded-card border-2 border-dashed p-2 text-center transition-colors ${over === slot.key ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/50'}`}
-              >
-                <input type="file" accept="image/*" className="hidden" onChange={(e) => upload(slot, e.target.files?.[0])} />
-                {isUrl ? (
-                  <img src={st} alt={slot.label} className="absolute inset-0 h-full w-full object-cover" />
-                ) : null}
-                <div className={`relative z-10 ${isUrl ? 'rounded bg-black/55 px-2 py-1' : ''}`}>
-                  <div className={`text-xs font-medium ${isUrl ? 'text-white' : 'text-textPrimary'}`}>{slot.label}</div>
-                  <div className={`mt-0.5 text-[11px] ${isUrl ? 'text-white/80' : 'text-textSecondary'}`}>
-                    {st === 'uploading' ? 'Uploading…' : st === 'error' ? 'Failed — retry' : isUrl ? '✓ uploaded · replace' : slot.perQuarter ? `drop · Q${quarter}` : 'drop or click'}
-                  </div>
-                </div>
-              </label>
-            );
-          })}
+      {/* sticky bottom bar */}
+      {forestId && !allDone ? (
+        <div className="fixed inset-x-0 bottom-0 z-20 border-t border-border bg-appbg/95 px-4 py-3 backdrop-blur">
+          <div className="mx-auto flex max-w-xl gap-2">
+            <button type="button" onClick={captureNext} className="flex-1 rounded-button bg-primary py-3 text-sm font-semibold text-black"><i className="ti ti-camera" aria-hidden="true" /> Capture next</button>
+            <a href={`/report/forest/${forestId}?year=${year}&quarter=${quarter}`} target="_blank" rel="noopener" aria-label="View report" className="flex w-12 items-center justify-center rounded-button border border-border"><i className="ti ti-external-link text-lg" aria-hidden="true" /></a>
+          </div>
         </div>
+      ) : null}
 
-        {forestId ? (
-          <a href={`/report/forest/${forestId}?year=${year}&quarter=${quarter}`} target="_blank" rel="noopener" className="mt-5 inline-block rounded-button border border-border px-4 py-2 text-sm hover:bg-white/5">
-            View report ↗
-          </a>
-        ) : null}
-      </div>
+      {/* action sheet */}
+      {sheet ? (
+        <div className="fixed inset-0 z-40 flex flex-col justify-end bg-black/50" onClick={() => setSheet(null)}>
+          <div className="rounded-t-2xl bg-surface p-2" onClick={(e) => e.stopPropagation()}>
+            <div className="px-3 py-2 text-sm font-medium">{sheet.label}{sheet.perQuarter ? ` · Q${quarter} ${year}` : ''}</div>
+            <button type="button" onClick={() => { const s = sheet; setSheet(null); setCamSlot(s); }} className="flex w-full items-center gap-3 rounded-button px-3 py-3.5 text-left text-sm hover:bg-white/5"><i className="ti ti-camera text-xl text-primary" aria-hidden="true" /> Take photo</button>
+            <button type="button" onClick={() => { fileSlot.current = sheet; setSheet(null); fileInput.current?.click(); }} className="flex w-full items-center gap-3 rounded-button px-3 py-3.5 text-left text-sm hover:bg-white/5"><i className="ti ti-folder text-xl" aria-hidden="true" /> Choose a file</button>
+            <button type="button" onClick={() => setSheet(null)} className="mt-1 w-full rounded-button border border-border py-3 text-sm">Cancel</button>
+          </div>
+        </div>
+      ) : null}
+
+      {/* live camera */}
+      {camSlot ? (
+        <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/95 p-4">
+          <div className="mb-2 text-sm text-white/90">{camSlot.label}{camSlot.perQuarter ? ` · Q${quarter} ${year}` : ''}</div>
+          {camErr ? (
+            <div className="max-w-sm rounded-card bg-white/10 p-4 text-center text-sm text-white">{camErr}
+              <div className="mt-3 flex justify-center gap-2">
+                <button type="button" onClick={() => { const s = camSlot; closeCam(); fileSlot.current = s; fileInput.current?.click(); }} className="rounded-button bg-primary px-3 py-1.5 text-xs font-medium text-black">Pick a file</button>
+                <button type="button" onClick={closeCam} className="rounded-button border border-white/40 px-3 py-1.5 text-xs text-white">Close</button>
+              </div>
+            </div>
+          ) : (
+            <>
+              <video ref={videoRef} autoPlay playsInline muted className="max-h-[68vh] w-auto max-w-full rounded-card bg-black" />
+              <div className="mt-5 flex items-center gap-8">
+                <button type="button" onClick={closeCam} className="text-sm text-white">Cancel</button>
+                <button type="button" onClick={snap} aria-label="Capture" className="flex h-[72px] w-[72px] items-center justify-center rounded-full border-4 border-white bg-primary"><i className="ti ti-camera text-2xl text-black" aria-hidden="true" /></button>
+                <button type="button" onClick={() => setFacing((f) => (f === 'environment' ? 'user' : 'environment'))} aria-label="Flip" className="text-white"><i className="ti ti-rotate text-xl" aria-hidden="true" /></button>
+              </div>
+            </>
+          )}
+        </div>
+      ) : null}
+
+      {/* preview before upload */}
+      {pending ? (
+        <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/90 p-4">
+          <div className="mb-2 text-sm text-white/90">{pending.slot.label}</div>
+          <img src={pending.url} alt="preview" className="max-h-[68vh] max-w-full rounded-card object-contain" />
+          <div className="mt-5 flex w-full max-w-sm gap-3">
+            <button type="button" onClick={() => { const s = pending.slot; clearPending(); setCamSlot(s); }} className="flex-1 rounded-button border border-white/40 py-3 text-sm text-white"><i className="ti ti-refresh" aria-hidden="true" /> Retake</button>
+            <button type="button" onClick={commit} className="flex-1 rounded-button bg-primary py-3 text-sm font-semibold text-black"><i className="ti ti-upload" aria-hidden="true" /> Upload</button>
+          </div>
+        </div>
+      ) : null}
+
+      {/* lightbox */}
+      {lightbox ? (
+        <div onClick={() => setLightbox(null)} className="fixed inset-0 z-50 flex cursor-zoom-out items-center justify-center bg-black/85 p-6">
+          <img src={lightbox} alt="preview" className="max-h-full max-w-full rounded-card object-contain" />
+        </div>
+      ) : null}
     </div>
   );
 }
