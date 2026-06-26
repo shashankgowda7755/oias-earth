@@ -297,7 +297,7 @@ export function S14SiteMasterPlan({ data }: SlideProps) {
         <div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 18 }}>
             <StatCard label="Box Count" value={p ? numOrDash(p.box_count) : '—'} sub="Allocated plots" />
-            <StatCard label="Projected Capacity" value={p ? numOrDash(p.total_saplings) : '—'} sub="Max saplings (grid)" valueColor={C.green} />
+            <StatCard label="Total Saplings" value={p ? numOrDash(p.total_saplings) : '—'} sub="Planted across all plots" valueColor={C.green} />
           </div>
           <div style={{ fontSize: 11.5, textTransform: 'uppercase', letterSpacing: '.06em', color: C.muted, marginBottom: 6 }}>Plantation Grid</div>
           <div style={{ border: `1px solid ${C.line}`, borderRadius: 12, padding: '4px 16px' }}>

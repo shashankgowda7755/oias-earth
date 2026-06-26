@@ -178,12 +178,17 @@ function workforceRollup(entries: MaintenanceWorkforceQuarter[], year: number, q
   };
 }
 
-function growthMilestones(p: FullForestPayload): GrowthMilestone[] {
+function growthMilestones(p: FullForestPayload, fy: number, q: number): GrowthMilestone[] {
   const targets = (p.plant_growth_data?.target_height_range ?? []).slice().sort((a, b) => a.year - b.year);
   if (targets.length === 0) return [];
   // Milestone month is anchored to the plantation month (PDF shows "Apr – 25" etc.),
   // not hardcoded December. No plantation date → date is blank, never guessed.
   const plantD = p.plantation_date ? new Date(p.plantation_date) : null;
+  // "Current" milestone = the forest's actual project year at the report period
+  // (calendar year of the quarter − plantation year), clamped to the target set.
+  // Not hardcoded Year 0 — an established forest shouldn't read as a fresh plant.
+  const maxYear = targets[targets.length - 1]!.year;
+  const projYear = plantD ? Math.max(0, Math.min(maxYear, fqCalYear(fy, q) - plantD.getFullYear())) : 0;
   // Saplings won't exceed ~30 ft in the 3-yr project window; clamp so a data
   // typo (e.g. "84" for "14") can never render an absurd height.
   const ft = (v: number): number => Math.max(0, Math.min(30, v));
@@ -191,7 +196,7 @@ function growthMilestones(p: FullForestPayload): GrowthMilestone[] {
     const label = t.year === 0 ? 'Year 0' : `End of Year ${t.year}`;
     const range = t.min != null && t.max != null ? `${ft(t.min)}–${ft(t.max)} Feet` : '—';
     const date = plantD ? `${MONTHS[plantD.getMonth()]}- ${plantD.getFullYear() + t.year}` : '—';
-    return { label, range, date, current: t.year === 0 };
+    return { label, range, date, current: t.year === projYear };
   });
 }
 
@@ -275,7 +280,7 @@ export function computeReport(p: FullForestPayload, year: number, quarter: numbe
     maintenance_tilldate: maintenanceRollup(p.maintenance_workforce ?? [], year, quarter, true),
     workforce_quarter: workforceRollup(p.maintenance_workforce ?? [], year, quarter, false),
     workforce_tilldate: workforceRollup(p.maintenance_workforce ?? [], year, quarter, true),
-    growth_milestones: growthMilestones(p),
+    growth_milestones: growthMilestones(p, year, quarter),
     current_height_label: currentHeightLabel(p),
     site_master_plan: siteMasterPlan(p),
   };
