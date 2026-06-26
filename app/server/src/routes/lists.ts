@@ -326,7 +326,16 @@ listRouter.post(
     const total = await countTotal(where, params);
     const rows = await query(
       `SELECT
-         id, job_id, job_type, job_description, status, payload, result,
+         id, job_id, job_type, job_description,
+         -- No async worker runs on serverless, so a job stuck in 'pending' past
+         -- a short grace window never completes — surface it as 'error' instead
+         -- of a forever-spinner. Real upsert jobs are written 'completed' inline.
+         CASE WHEN status = 'pending' AND created_at < now() - interval '15 minutes'
+              THEN 'error' ELSE status END AS status,
+         payload,
+         CASE WHEN status = 'pending' AND created_at < now() - interval '15 minutes'
+              THEN COALESCE(result, '{}'::jsonb) || '{"error":true,"message":"Job stalled with no result"}'::jsonb
+              ELSE result END AS result,
          created_by, updated_by, created_at, updated_at
        ${where}
        ORDER BY created_at DESC

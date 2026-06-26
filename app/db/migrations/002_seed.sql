@@ -242,9 +242,9 @@ INSERT INTO jobs (
     '6b31f692-8eb4-5d1f-b254-04cb22a37e9d',
     'JOB_20260613090000000_AB12CD34', 'report_generation_v1',
     '{"report_id":"0f602c89","forest":"Temenos"}'::jsonb,
-    'pending',
+    'completed',
     '{"url":"http://localhost:4000/api/v1/reports/generate","method":"POST"}'::jsonb,
-    NULL,
+    '{"success":true,"message":"Report generated"}'::jsonb,
     'd21cabf2-c06c-4c1e-a9ea-d1ea928727d0', 'd21cabf2-c06c-4c1e-a9ea-d1ea928727d0'
   )
 ON CONFLICT (id) DO NOTHING;
