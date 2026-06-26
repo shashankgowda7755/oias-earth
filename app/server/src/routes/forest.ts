@@ -44,6 +44,7 @@ import bcrypt from 'bcryptjs';
 import { query, getClient, type DbClient } from '../db';
 import { badRequest, forbidden, notFound } from '../errors';
 import { sendGmail } from '../lib/composio';
+import { putObject, storageReady } from '../lib/storage';
 import { parsePageParams, countTotal } from './helpers';
 import {
   ageDays,
@@ -56,7 +57,6 @@ import {
 } from '../lib/geo';
 import { agbKg, CARBON_FRACTION, CO2_PER_C, ROOT_SHOOT, CARBON_METHOD } from '../lib/carbon';
 import { isAllowedPanoUrl, providerOf, ALLOWED_TOUR_HOSTS } from '../lib/pano';
-import { putObject, storageReady } from '../lib/storage';
 import { resolveSpeciesId } from '../lib/species';
 import { sendGiftEmail, mailReady } from '../lib/mail';
 
@@ -2084,7 +2084,7 @@ async function adminCreatePlanter(req: Request, res: Response): Promise<void> {
  * Sends only the keys present in the body; jsonb stringified, empty string → NULL.
  */
 const REPORT_UPDATE_SCALARS = [
-  'forest_desc', 'forest_address', 'project_site', 'project_period', 'plantation_date',
+  'forest_desc', 'forest_address', 'forest_contact_email', 'project_site', 'project_period', 'plantation_date',
   'plantation_strategy', 'plantation_strategy_other', 'irrigation_method', 'irrigation_method_other',
   'climate', 'climate_other', 'soil_type', 'soil_type_other', 'digipin', 'last_inspection_date',
   'permission_letter', 'site_layout',
@@ -2329,12 +2329,183 @@ async function reportRecipient(req: Request, res: Response): Promise<void> {
   res.json({ data: { email: row.email ?? '', source: row.source } });
 }
 
+/**
+ * POST /forest/:id/send-report?year=&quarter=  { to? } — send the quarterly
+ * report straight from the viewer (which is keyed by forest, not report id).
+ * Recipient = body.to ?? sponsor email ?? forest contact email. Reuses the
+ * same Composio path + branded email as /report/:id/send.
+ */
+async function sendForestReport(req: Request, res: Response): Promise<void> {
+  const id = String(req.params.id);
+  if (!WX_UUID_RE.test(id)) throw notFound('Forest not found');
+  const now = new Date();
+  const year = Number(req.query.year) || now.getFullYear();
+  const qp = Number(req.query.quarter);
+  const quarter = qp >= 1 && qp <= 4 ? qp : Math.floor(now.getMonth() / 3) + 1;
+
+  const fr = await query<{
+    forest_name: string | null; additional_sponsor_logo: unknown;
+    forest_contact_email: string | null; sponsor_email: string | null;
+  }>(
+    `SELECT f.forest_name, f.additional_sponsor_logo, f.forest_contact_email, sp.sponsor_email
+       FROM forests f
+       LEFT JOIN LATERAL (
+         SELECT s.sponsor_email FROM forest_sponsors fs JOIN sponsors s ON s.id = fs.sponsor_id
+          WHERE fs.forest_id = f.id AND fs.is_active = TRUE
+            AND s.sponsor_email IS NOT NULL AND s.sponsor_email <> ''
+          ORDER BY fs.created_at LIMIT 1
+       ) sp ON TRUE
+      WHERE f.id = $1`,
+    [id],
+  );
+  const row = fr.rows[0];
+  if (!row) throw notFound('Forest not found');
+
+  const to = String((req.body as { to?: unknown })?.to ?? '').trim()
+    || row.sponsor_email || row.forest_contact_email || '';
+  if (!EMAIL_RE.test(to)) {
+    res.status(400).json({ error: true, message: 'No recipient — set a sponsor/forest email or pass one.' });
+    return;
+  }
+
+  const sponsor = sponsorNameFrom(row.additional_sponsor_logo);
+  const forestName = row.forest_name ?? 'Forest';
+  const base = process.env.APP_URL || `https://${req.get('host')}`;
+  const url = `${base}/report/forest/${id}?year=${year}&quarter=${quarter}`;
+  const subject = `${sponsor ? `${sponsor} · ` : ''}${forestName} — Quarterly Forest Report (Q${quarter} ${year})`;
+  const html =
+    `<div style="font-family:Arial,Helvetica,sans-serif;max-width:600px;margin:0 auto;color:#16282e">` +
+    `<div style="background:#16282e;padding:24px 28px;border-radius:12px 12px 0 0">` +
+    `<div style="color:#a8e063;font-weight:800;font-size:13px;letter-spacing:.08em">${sponsor ? `${sponsor.toUpperCase()} · ` : ''}QUARTERLY FOREST REPORT</div>` +
+    `<div style="color:#fff;font-size:24px;font-weight:800;margin-top:6px">${forestName}</div>` +
+    `<div style="color:#cdd8d2;font-size:13px;margin-top:4px">Q${quarter} · ${year}</div></div>` +
+    `<div style="border:1px solid #e3e9e5;border-top:none;border-radius:0 0 12px 12px;padding:26px 28px">` +
+    `<p style="margin:0 0 16px;line-height:1.5">Your quarterly forest report is ready — maintenance, plant growth, soil &amp; climate, species health, and the estimated environmental impact for this quarter.</p>` +
+    `<a href="${url}" style="display:inline-block;background:#2f6b3f;color:#fff;text-decoration:none;padding:13px 28px;border-radius:999px;font-weight:700;font-size:15px">View full report &rarr;</a>` +
+    `<p style="margin:18px 0 0;font-size:12px;color:#888">Open the report to view all sections and download a PDF. Carbon/oxygen figures are estimates.</p>` +
+    `<p style="margin:12px 0 0;font-size:12px;color:#aaa">Initiated by CommuniTREE${sponsor ? ` · Sponsored by ${sponsor}` : ''} · Sent via OIAS Earth</p></div></div>`;
+
+  const result = await sendGmail({ to, subject, html });
+  if (!result.ok) { res.status(502).json({ error: true, message: result.error ?? 'Send failed.' }); return; }
+  res.json({ data: { ok: true, to, messageId: result.messageId } });
+}
+
+/* ------------------------------------------------------------------ */
+/* PFA photo app — upload a report photo + attach it to a slot          */
+/* ------------------------------------------------------------------ */
+
+const photoUpload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 15 * 1024 * 1024 } });
+
+/** Image slots the PFA uploader can target → where each writes on the forest. */
+const REPORT_IMAGE_SLOTS = [
+  'cover', 'content', 'impact', 'permission', 'layout',
+  'security', 'progress', 'soil_meter', 'temp_inside', 'temp_outside', 'earth', 'dashboard',
+] as const;
+type ImgSlot = (typeof REPORT_IMAGE_SLOTS)[number];
+const SLIDE_TYPE: Record<string, string> = { cover: 'first_slide', content: 'content_slide', impact: 'project_impact_slide' };
+
+async function loadJsonb(id: string, col: string): Promise<unknown> {
+  const r = await query<{ v: unknown }>(`SELECT ${col} AS v FROM forests WHERE id = $1`, [id]);
+  let v = r.rows[0]?.v;
+  if (typeof v === 'string') { try { v = JSON.parse(v); } catch { v = null; } }
+  return v;
+}
+async function saveJsonb(id: string, col: string, val: unknown): Promise<void> {
+  await query(`UPDATE forests SET ${col} = $2::jsonb, is_updated = TRUE, updated_at = now() WHERE id = $1`, [id, JSON.stringify(val)]);
+}
+function upsertQ(
+  arr: unknown,
+  y: number,
+  q: number,
+  mut: (r: Record<string, unknown>) => Record<string, unknown>,
+): Record<string, unknown>[] {
+  const list = Array.isArray(arr) ? ([...arr] as Record<string, unknown>[]) : [];
+  const i = list.findIndex((r) => Number(r.year) === y && Number(r.quarter) === q);
+  if (i >= 0) list[i] = mut({ ...list[i] }); else list.push(mut({ year: y, quarter: q }));
+  return list;
+}
+
+async function applyImageSlot(id: string, slot: ImgSlot, url: string, year?: number, quarter?: number): Promise<void> {
+  if (slot === 'permission') return void (await query(`UPDATE forests SET permission_letter = $2, is_updated = TRUE, updated_at = now() WHERE id = $1`, [id, url]));
+  if (slot === 'layout') return void (await query(`UPDATE forests SET site_layout = $2, is_updated = TRUE, updated_at = now() WHERE id = $1`, [id, url]));
+  if (slot === 'cover' || slot === 'content' || slot === 'impact') {
+    const st = SLIDE_TYPE[slot]!;
+    const arr = (await loadJsonb(id, 'report_images')) as { slide_type?: string; image?: string }[] | null;
+    const list = Array.isArray(arr) ? [...arr] : [];
+    const i = list.findIndex((e) => e?.slide_type === st);
+    if (i >= 0) list[i] = { ...list[i], image: url }; else list.push({ slide_type: st, image: url });
+    return saveJsonb(id, 'report_images', list);
+  }
+  if (slot === 'security') {
+    const cur = ((await loadJsonb(id, 'security_and_infrastructure')) as { description?: string; image_data?: unknown[] } | null) ?? {};
+    const img = Array.isArray(cur.image_data) ? [...cur.image_data] : [];
+    img.push({ name: '', description: '', image: url });
+    return saveJsonb(id, 'security_and_infrastructure', { ...cur, image_data: img });
+  }
+  if (slot === 'dashboard') {
+    const arr = (await loadJsonb(id, 'dashboard_images')) as unknown[] | null;
+    return saveJsonb(id, 'dashboard_images', [...(Array.isArray(arr) ? arr : []), { name: '', description: '', image: url }]);
+  }
+  if (slot === 'earth') {
+    const cur = ((await loadJsonb(id, 'area_population_statistics_details')) as { google_earth_image?: unknown[] } | null) ?? {};
+    const img = Array.isArray(cur.google_earth_image) ? [...cur.google_earth_image] : [];
+    return saveJsonb(id, 'area_population_statistics_details', { ...cur, google_earth_image: [...img, url] });
+  }
+  // per-quarter slots
+  const y = year ?? new Date().getFullYear();
+  const q = quarter && quarter >= 1 && quarter <= 4 ? quarter : Math.floor(new Date().getMonth() / 3) + 1;
+  if (slot === 'progress') {
+    const arr = await loadJsonb(id, 'plantation_progress');
+    return saveJsonb(id, 'plantation_progress', upsertQ(arr, y, q, (r: Record<string, unknown>) => ({ ...r, image: url })));
+  }
+  if (slot === 'soil_meter') {
+    const arr = await loadJsonb(id, 'soil_ph_level');
+    return saveJsonb(id, 'soil_ph_level', upsertQ(arr, y, q, (r: Record<string, unknown>) => ({ ...r, meter_image: url })));
+  }
+  if (slot === 'temp_inside' || slot === 'temp_outside') {
+    const side = slot === 'temp_inside' ? 'inside_plantation' : 'outside_plantation';
+    const arr = await loadJsonb(id, 'temperature_humidity');
+    return saveJsonb(id, 'temperature_humidity', upsertQ(arr, y, q, (r: Record<string, unknown>) => ({ ...r, [side]: { ...(r[side] as object), image: url } })));
+  }
+}
+
+/**
+ * POST /forest/:id/report-image  (multipart: photo + slot[, year, quarter]) —
+ * the PFA uploader. Stores the photo in object storage and attaches its URL to
+ * the chosen report slot on the forest. Admin/role-gated by requireAuth.
+ */
+async function uploadReportImage(req: Request, res: Response): Promise<void> {
+  const id = String(req.params.id);
+  if (!WX_UUID_RE.test(id)) throw notFound('Forest not found');
+  if (!storageReady()) {
+    res.status(503).json({ error: true, message: 'Photo storage not configured (set SUPABASE_URL/SERVICE_KEY/BUCKET).' });
+    return;
+  }
+  const file = (req as Request & { file?: { buffer: Buffer; mimetype: string; originalname: string } }).file;
+  if (!file) { res.status(400).json({ error: true, message: 'No file (field "photo").' }); return; }
+  const slot = String((req.body as { slot?: unknown })?.slot ?? '').trim() as ImgSlot;
+  if (!REPORT_IMAGE_SLOTS.includes(slot)) { res.status(400).json({ error: true, message: `Unknown slot. One of: ${REPORT_IMAGE_SLOTS.join(', ')}` }); return; }
+  const year = Number((req.body as { year?: unknown })?.year) || undefined;
+  const quarter = Number((req.body as { quarter?: unknown })?.quarter) || undefined;
+
+  const exists = await query(`SELECT 1 FROM forests WHERE id = $1`, [id]);
+  if (exists.rowCount === 0) throw notFound('Forest not found');
+
+  const ext = (file.originalname.split('.').pop() || 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '') || 'jpg';
+  const key = `forests/${id}/${slot}-${Date.now()}.${ext}`;
+  const url = await putObject(key, file.buffer, file.mimetype || 'image/jpeg');
+  await applyImageSlot(id, slot, url, year, quarter);
+  res.json({ data: { ok: true, url, slot } });
+}
+
 /* ------------------------------------------------------------------ */
 /* Route registration                                                  */
 /* ------------------------------------------------------------------ */
 
+forestRouter.post('/forest/:id/report-image', photoUpload.single('photo'), wrap(uploadReportImage));
 forestRouter.get('/report/:id/recipient', wrap(reportRecipient));
 forestRouter.post('/report/:id/send', wrap(sendReportEmail));
+forestRouter.post('/forest/:id/send-report', wrap(sendForestReport));
 forestRouter.get('/forest/:id/weather', wrap(forestWeather));
 forestRouter.post('/forest/:id/report-data', wrap(updateForestReportData));
 forestRouter.post('/forest/upsert', upload.any(), wrap(upsertForest));

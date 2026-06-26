@@ -53,6 +53,19 @@ export function SponsorForm({
         />
       </div>
 
+      <div className="sm:col-span-2">
+        <TextField
+          label="Sponsor Email"
+          type="email"
+          value={values.sponsor_email}
+          onChange={(v) => onChange('sponsor_email', v)}
+          disabled={disabled}
+          error={errors.sponsor_email}
+          placeholder="reports@sponsor.com"
+          autoComplete="off"
+        />
+      </div>
+
       <TextField
         label="Sponsor Logo URL"
         type="url"

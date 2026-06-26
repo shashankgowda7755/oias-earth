@@ -27,6 +27,7 @@ import type { SponsorRow } from '../../types/entities';
 /** Controlled form state — every field is a string for the shared Field API. */
 export interface SponsorFormValues {
   sponsor_name: string;
+  sponsor_email: string;
   sponsor_logo: string;
   sponsor_forest_logo: string;
   sponsor_tree_logo: string;
@@ -46,6 +47,7 @@ export type SponsorFormErrors = Partial<
 
 export const EMPTY_SPONSOR_FORM: SponsorFormValues = {
   sponsor_name: '',
+  sponsor_email: '',
   sponsor_logo: '',
   sponsor_forest_logo: '',
   sponsor_tree_logo: '',
@@ -61,6 +63,7 @@ export const EMPTY_SPONSOR_FORM: SponsorFormValues = {
 export function sponsorRowToForm(row: SponsorRow): SponsorFormValues {
   return {
     sponsor_name: row.sponsor_name ?? '',
+    sponsor_email: row.sponsor_email ?? '',
     sponsor_logo: row.sponsor_logo ?? '',
     sponsor_forest_logo: row.sponsor_forest_logo ?? '',
     sponsor_tree_logo: row.sponsor_tree_logo ?? '',

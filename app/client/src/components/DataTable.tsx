@@ -68,6 +68,9 @@ export interface DataTableProps<T> {
   /** optional accessible caption for the table. */
   caption?: string;
 
+  /** when set, clicking a row (outside interactive cells) calls this. */
+  onRowClick?: (row: T) => void;
+
   /* --- row actions (kebab menu: View / Edit / Delete) ---
    * Providing ANY of these adds a trailing actions column with a kebab (⋮)
    * menu. Each item appears only when its handler is given. Per the live site
@@ -115,6 +118,7 @@ export function DataTable<T>({
   onDelete,
   actionsHeader = '',
   renderRowActions,
+  onRowClick,
 }: DataTableProps<T>) {
   const searchId = useId();
   // An actions column is shown when a custom renderer or any handler is given.
@@ -241,7 +245,17 @@ export function DataTable<T>({
                 return (
                   <tr
                     key={id}
-                    className="border-t border-border hover:bg-black/[0.02]"
+                    className={`border-t border-border hover:bg-black/[0.02] ${onRowClick ? 'cursor-pointer' : ''}`}
+                    onClick={
+                      onRowClick
+                        ? (e) => {
+                            // Ignore clicks that land on interactive controls
+                            // (kebab menu, buttons, links, inputs) — let those run.
+                            if ((e.target as HTMLElement).closest('button, a, input, select, [role="menu"], [role="menuitem"]')) return;
+                            onRowClick(row);
+                          }
+                        : undefined
+                    }
                   >
                     {columns.map((col) => (
                       <td

@@ -87,6 +87,7 @@ export interface RoleRow {
 export interface SponsorRow {
   id: string;
   sponsor_name: string;
+  sponsor_email: string | null;
   sponsor_logo: string | null;
   is_active: boolean;
   sponsor_forest_logo: string | null;

@@ -119,6 +119,24 @@ export interface ForestWeather {
   reason?: string;
 }
 
+/** PFA uploader: POST a report photo to a slot; returns the stored URL. */
+export async function uploadReportImage(
+  forestId: string,
+  slot: string,
+  file: File,
+  opts?: { year?: number; quarter?: number },
+): Promise<{ url: string; slot: string }> {
+  const fd = new FormData();
+  fd.append('photo', file);
+  fd.append('slot', slot);
+  if (opts?.year) fd.append('year', String(opts.year));
+  if (opts?.quarter) fd.append('quarter', String(opts.quarter));
+  const { data } = await api.post(`/forest/${forestId}/report-image`, fd, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
+  return (data?.data ?? data) as { url: string; slot: string };
+}
+
 /** GET /forest/:id/weather?year=&quarter= — derive weather from forest lat/long. */
 export async function fetchForestWeather(
   forestId: string,

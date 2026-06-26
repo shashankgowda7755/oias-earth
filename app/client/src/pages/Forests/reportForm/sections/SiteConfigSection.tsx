@@ -23,6 +23,11 @@ export function SiteConfigSection({ draft, patch }: SectionProps) {
             value={draft.project_site}
             onChange={(v) => patch({ project_site: v })}
           />
+          <Txt
+            label="Forest contact email (report fallback)"
+            value={draft.forest_contact_email}
+            onChange={(v) => patch({ forest_contact_email: v })}
+          />
           <Num
             label="Project period (years)"
             value={draft.project_period}

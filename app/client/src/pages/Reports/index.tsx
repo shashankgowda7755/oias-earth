@@ -22,6 +22,7 @@
  *    free-form validated JSON instead of inventing fields.
  */
 import { useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   AddButton,
   Button,
@@ -63,6 +64,7 @@ type DialogState =
 
 export default function Reports() {
   const toast = useToast();
+  const navigate = useNavigate();
 
   // --- table/query state ---
   const [page, setPage] = useState(1);
@@ -318,6 +320,10 @@ export default function Reports() {
         }}
         searchPlaceholder="Search reports..."
         caption="Reports list"
+        onRowClick={(r) => {
+          const fid = r.forest_id ?? r.Forest?.id;
+          if (fid) navigate(`/report/forest/${fid}?year=${r.year ?? ''}&quarter=${r.quarter ?? ''}`);
+        }}
         toolbar={
           <>
             <AddButton

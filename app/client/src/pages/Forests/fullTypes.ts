@@ -267,6 +267,7 @@ export interface FullForestPayload {
   forest_geo_lat?: string | number;
   forest_geo_long?: string | number;
   forest_address?: string;
+  forest_contact_email?: string;
   forest_city?: string;
   forest_state?: string;
   forest_country?: string;

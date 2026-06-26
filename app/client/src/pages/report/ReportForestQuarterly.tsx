@@ -6,7 +6,7 @@
  * ?year=&quarter=. Download = browser print (one landscape A4 page per slide).
  */
 import { useEffect, useMemo, useState } from 'react';
-import { useParams, useSearchParams } from 'react-router-dom';
+import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
 import { buildPreviewReport } from './reportFixture';
 import { downloadReportPdf } from './reportDownload';
 import { C, FONT, REPORT_PRINT_CSS } from './reportPrimitives';
@@ -17,7 +17,38 @@ import { fetchForestReport } from '@/lib/publicApi';
 export default function ReportForestQuarterly() {
   const { id = '' } = useParams();
   const [sp] = useSearchParams();
+  const navigate = useNavigate();
   const isPreview = id === 'preview' || sp.get('preview') === 'vandalur';
+
+  // Admin-only action menu (this page is a PUBLIC route — guard the actions).
+  const isAdmin = useMemo(() => {
+    try {
+      return Boolean(localStorage.getItem('token')) && ['Admin', 'SuperAdmin'].includes(localStorage.getItem('role') ?? '');
+    } catch { return false; }
+  }, []);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [sendMsg, setSendMsg] = useState('');
+
+  const sendFromViewer = async () => {
+    if (id === 'preview' || sendMsg === 'Sending…') return;
+    setSendMsg('Sending…');
+    try {
+      const token = localStorage.getItem('token') ?? '';
+      const r = await fetch(`/api/v1/forest/${id}/send-report?year=${year ?? ''}&quarter=${quarter ?? ''}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: token },
+        body: '{}',
+      });
+      const j = await r.json();
+      if (!r.ok || j.error) throw new Error(j.message || 'Send failed');
+      const d = j.data ?? j;
+      setSendMsg('');
+      alert(`Report sent to ${d.to}.`);
+    } catch (e) {
+      setSendMsg('');
+      alert(e instanceof Error ? e.message : 'Send failed.');
+    }
+  };
 
   const [data, setData] = useState<ForestReportData | null>(null);
   const [err, setErr] = useState<string | null>(null);
@@ -78,10 +109,24 @@ export default function ReportForestQuarterly() {
       <style>{REPORT_PRINT_CSS}</style>
 
       <div className="no-print" style={{ position: 'sticky', top: 0, zIndex: 10, background: 'rgba(238,241,239,.92)', backdropFilter: 'blur(6px)', borderBottom: `1px solid ${C.line}`, padding: '12px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
-        <span style={{ color: C.muted, fontSize: 13 }}>
-          {data.meta.client_name ? `${data.meta.client_name} · ` : ''}{data.forest.forest_name} · {data.meta.quarter_label} {data.meta.year}
-          {err && <span style={{ color: C.amber, marginLeft: 10 }}>· {err}</span>}
-        </span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          {isAdmin && !isPreview ? (
+            <div className="no-print" style={{ position: 'relative' }} onBlur={(e) => { if (!e.currentTarget.contains(e.relatedTarget as Node)) setMenuOpen(false); }}>
+              <button onClick={() => setMenuOpen((o) => !o)} aria-label="Report actions" aria-haspopup="menu" style={{ background: '#fff', border: `1px solid ${C.line}`, borderRadius: 8, width: 34, height: 34, cursor: 'pointer', color: C.ink, fontSize: 18, lineHeight: 1 }}>⋮</button>
+              {menuOpen ? (
+                <div role="menu" style={{ position: 'absolute', left: 0, top: '112%', background: '#fff', border: `1px solid ${C.line}`, borderRadius: 10, boxShadow: '0 8px 28px rgba(0,0,0,.12)', minWidth: 190, zIndex: 30, overflow: 'hidden' }}>
+                  <button role="menuitem" onClick={() => { setMenuOpen(false); navigate('/dashboard'); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '10px 14px', fontSize: 14, color: C.ink, background: 'none', border: 'none', cursor: 'pointer' }}>← Back to reports</button>
+                  <button role="menuitem" onClick={() => { setMenuOpen(false); navigate(`/forest/${id}/report-data`); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '10px 14px', fontSize: 14, color: C.ink, background: 'none', border: 'none', cursor: 'pointer' }}>Edit report data</button>
+                  <button role="menuitem" onClick={() => { setMenuOpen(false); sendFromViewer(); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '10px 14px', fontSize: 14, color: C.ink, background: 'none', border: 'none', cursor: 'pointer' }}>{sendMsg || 'Send report'}</button>
+                </div>
+              ) : null}
+            </div>
+          ) : null}
+          <span style={{ color: C.muted, fontSize: 13 }}>
+            {data.meta.client_name ? `${data.meta.client_name} · ` : ''}{data.forest.forest_name} · {data.meta.quarter_label} {data.meta.year}
+            {err && <span style={{ color: C.amber, marginLeft: 10 }}>· {err}</span>}
+          </span>
+        </div>
 
         <div className="no-print" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
           <button onClick={() => goTo(cur - 1)} disabled={cur === 0} aria-label="Previous section" style={{ background: '#fff', border: `1px solid ${C.line}`, borderRadius: 8, width: 30, height: 30, cursor: cur === 0 ? 'default' : 'pointer', color: C.ink, opacity: cur === 0 ? 0.4 : 1 }}>◀</button>

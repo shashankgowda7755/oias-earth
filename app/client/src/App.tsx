@@ -16,6 +16,7 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { AuthProvider } from './auth/AuthContext';
 import { ProtectedRoute } from './auth/ProtectedRoute';
 import { ToastProvider } from './components/Toast';
+import { ErrorBoundary } from './components/ErrorBoundary';
 
 const Login = lazy(() => import('./pages/Login'));
 const Dashboard = lazy(() => import('./pages/Dashboard'));
@@ -34,6 +35,7 @@ const ReportSponsor = lazy(() => import('./pages/ReportSponsor'));
 const ReportTree = lazy(() => import('./pages/ReportTree'));
 const ReportForestQuarterly = lazy(() => import('./pages/report/ReportForestQuarterly'));
 const ReportDataEditor = lazy(() => import('./pages/Forests/reportForm/ReportDataEditor'));
+const PfaUploader = lazy(() => import('./pages/Pfa/PfaUploader'));
 const Studio = lazy(() => import('./pages/Studio'));
 
 const queryClient = new QueryClient({
@@ -62,6 +64,7 @@ export default function App() {
       <AuthProvider>
         <ToastProvider>
           <BrowserRouter>
+            <ErrorBoundary scope="app">
             <Suspense fallback={<RouteFallback />}>
               <Routes>
                 <Route path="/" element={<Landing />} />
@@ -103,9 +106,18 @@ export default function App() {
                     </ProtectedRoute>
                   }
                 />
+                <Route
+                  path="/pfa"
+                  element={
+                    <ProtectedRoute roles={['Admin', 'SuperAdmin']}>
+                      <PfaUploader />
+                    </ProtectedRoute>
+                  }
+                />
                 <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
             </Suspense>
+            </ErrorBoundary>
           </BrowserRouter>
         </ToastProvider>
       </AuthProvider>
