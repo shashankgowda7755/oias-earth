@@ -115,9 +115,25 @@ export function HeartbeatMap({
     if (!map || !layer) return;
     layer.clearLayers();
     const pts: [number, number][] = [];
+    // Forests can share identical coordinates (e.g. two blocks at one campus).
+    // Fan duplicates out on a tiny golden-angle spiral (~40 m steps) so every
+    // forest is an individually visible / clickable pin instead of one stacked
+    // marker hiding the rest.
+    const seen = new Map<string, number>();
     for (const f of forests) {
       if (f.lat == null || f.lng == null) continue;
-      const m = L.marker([f.lat, f.lng], { icon: forestIcon(f) }).addTo(layer);
+      const key = `${f.lat.toFixed(5)},${f.lng.toFixed(5)}`;
+      const n = seen.get(key) ?? 0;
+      seen.set(key, n + 1);
+      let lat = f.lat;
+      let lng = f.lng;
+      if (n > 0) {
+        const ang = n * 2.399963; // golden angle (rad)
+        const rad = 0.0004 * Math.sqrt(n); // ~40 m × √n
+        lat += rad * Math.cos(ang);
+        lng += rad * Math.sin(ang);
+      }
+      const m = L.marker([lat, lng], { icon: forestIcon(f) }).addTo(layer);
       const place = [f.city, f.state].filter(Boolean).join(', ');
       const sponsor = f.sponsor_name
         ? `<span style="color:#9ab">sponsored by </span><span style="color:#b6ff3c">${esc(f.sponsor_name)}</span><br/>`
@@ -131,7 +147,7 @@ export function HeartbeatMap({
           `<span style="color:#9ab"> / ${f.total_trees} trees alive</span></div>`,
       );
       if (cb.current) m.on('click', () => cb.current?.(f));
-      pts.push([f.lat, f.lng]);
+      pts.push([lat, lng]);
     }
     if (pts.length === 1) map.setView(pts[0]!, interactive ? 9 : 6);
     else if (pts.length > 1)

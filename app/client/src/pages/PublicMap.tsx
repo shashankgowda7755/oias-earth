@@ -143,9 +143,23 @@ export default function PublicMap() {
     if (!map || !layer) return;
     layer.clearLayers();
     const bounds: [number, number][] = [];
+    // Fan out forests that share identical coordinates (golden-angle spiral,
+    // ~40 m steps) so each is an individually visible / clickable pin.
+    const seen = new Map<string, number>();
     for (const f of forests) {
       if (f.lat == null || f.lng == null) continue;
-      const m = L.marker([f.lat, f.lng], { icon: forestIcon(f) }).addTo(layer);
+      const key = `${f.lat.toFixed(5)},${f.lng.toFixed(5)}`;
+      const n = seen.get(key) ?? 0;
+      seen.set(key, n + 1);
+      let lat = f.lat;
+      let lng = f.lng;
+      if (n > 0) {
+        const ang = n * 2.399963;
+        const rad = 0.0004 * Math.sqrt(n);
+        lat += rad * Math.cos(ang);
+        lng += rad * Math.sin(ang);
+      }
+      const m = L.marker([lat, lng], { icon: forestIcon(f) }).addTo(layer);
       const place = [f.city, f.state].filter(Boolean).join(', ');
       const sponsor = f.sponsor_name
         ? `<span style="color:#9ab">sponsored by </span><span style="color:#b6ff3c">${esc(f.sponsor_name)}</span><br/>`
@@ -160,7 +174,7 @@ export default function PublicMap() {
           `<br/><a href="/forest/${encodeURIComponent(f.id)}" style="color:#b6ff3c;font-weight:600;font-size:12px;text-decoration:none">Open this forest →</a></div>`,
       );
       m.on('click', () => selectForest(f));
-      bounds.push([f.lat, f.lng]);
+      bounds.push([lat, lng]);
     }
     if (!selected && bounds.length === 1) map.setView(bounds[0]!, 9);
     else if (!selected && bounds.length > 1)

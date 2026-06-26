@@ -280,6 +280,31 @@ async function upsertForest(req: Request, res: Response): Promise<void> {
   const centerLat = Number(colMap.get('forest_geo_lat') ?? body.forest_geo_lat ?? 0);
   const centerLng = Number(colMap.get('forest_geo_long') ?? body.forest_geo_long ?? 0);
 
+  // Map guarantee: a forest can only appear on the map if it has a sane centre
+  // coordinate. Require one on create, and reject garbage (blank, 0/0, lat==lng,
+  // out-of-range) on any write that sets it — this is what stops invisible /
+  // mis-plotted forests going forward.
+  {
+    const hasLatKey = colMap.has('forest_geo_lat');
+    const hasLngKey = colMap.has('forest_geo_long');
+    const latStr = String(colMap.get('forest_geo_lat') ?? '').trim();
+    const lngStr = String(colMap.get('forest_geo_long') ?? '').trim();
+    if (!id && (!hasLatKey || !hasLngKey || latStr === '' || lngStr === '')) {
+      throw badRequest('Forest needs a map location — set latitude & longitude.');
+    }
+    if ((hasLatKey && latStr !== '') || (hasLngKey && lngStr !== '')) {
+      const la = Number(latStr);
+      const lo = Number(lngStr);
+      if (
+        !Number.isFinite(la) || !Number.isFinite(lo) ||
+        Math.abs(la) > 90 || Math.abs(lo) > 180 ||
+        (la === 0 && lo === 0) || la === lo
+      ) {
+        throw badRequest('Map location looks invalid — check latitude & longitude.');
+      }
+    }
+  }
+
   const client = await getClient();
   try {
     await client.query('BEGIN');
