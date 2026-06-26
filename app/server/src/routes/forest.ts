@@ -43,7 +43,8 @@ import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
 import { query, getClient, type DbClient } from '../db';
 import { badRequest, forbidden, notFound } from '../errors';
-import { sendGmail } from '../lib/composio';
+import { getTemplate, renderHtml, renderText, defaultTemplate, listDefaultTemplates } from '../lib/emailTemplates';
+import { listEmailLog } from '../lib/emailLog';
 import { putObject, storageReady } from '../lib/storage';
 import { parsePageParams, countTotal } from './helpers';
 import {
@@ -58,7 +59,7 @@ import {
 import { agbKg, CARBON_FRACTION, CO2_PER_C, ROOT_SHOOT, CARBON_METHOD } from '../lib/carbon';
 import { isAllowedPanoUrl, providerOf, ALLOWED_TOUR_HOSTS } from '../lib/pano';
 import { resolveSpeciesId } from '../lib/species';
-import { sendGiftEmail, mailReady } from '../lib/mail';
+import { sendGiftEmail, mailReady, sendReportMail } from '../lib/mail';
 
 export const forestRouter = Router();
 
@@ -1862,6 +1863,7 @@ async function sendGift(req: Request, res: Response): Promise<void> {
     forestName: tree.forest_name,
     message: g.rows[0]!.message,
     certUrl: `${appBase(req)}/report/tree/${treeId}`,
+    ctx: { forestId, actor: req.auth?.username ?? null },
   });
   await query(`UPDATE gift_forest_plants SET is_email_sent = TRUE, updated_at = now() WHERE id = $1`, [g.rows[0]!.id]);
   res.json({ data: { tree_id: treeId, sent_to: g.rows[0]!.email_id } });
@@ -1890,6 +1892,7 @@ async function sendAllGifts(req: Request, res: Response): Promise<void> {
       await sendGiftEmail({
         to: r.email_id, recipientName: r.name, species: r.species, treeUid: r.uid,
         forestName: r.forest_name, message: r.message, certUrl: `${appBase(req)}/report/tree/${r.tree_id}`,
+        ctx: { forestId, actor: req.auth?.username ?? null },
       });
       await query(`UPDATE gift_forest_plants SET is_email_sent = TRUE, updated_at = now() WHERE gift_tree_id = $1 AND is_active = TRUE`, [r.tree_id]);
       sent++;
@@ -2241,6 +2244,122 @@ function sponsorNameFrom(raw: unknown): string {
 }
 
 /**
+ * Compose the quarterly-report email from the tracked template (DB override >
+ * code default), HTML-escaping every value. Conditional sponsor copy is
+ * pre-composed into tokens so the editable body never shows a dangling "· ".
+ */
+async function buildReportEmail(opts: {
+  forestName: string; sponsor: string; quarter: number; year: number; url: string;
+}): Promise<{ subject: string; html: string; cc: string[] }> {
+  const tpl = (await getTemplate('report_quarterly'))!; // code default always exists
+  const { forestName, sponsor, quarter, year, url } = opts;
+  const vars = {
+    forest_name: forestName,
+    sponsor,
+    quarter,
+    year,
+    report_url: url,
+    sponsor_kicker: sponsor ? `${sponsor.toUpperCase()} · QUARTERLY FOREST REPORT` : 'QUARTERLY FOREST REPORT',
+    subject_prefix: sponsor ? `${sponsor} · ` : '',
+    footer_credit: `Initiated by CommuniTREE${sponsor ? ` · Sponsored by ${sponsor}` : ''} · Sent via OIAS Earth`,
+  };
+  return { subject: renderText(tpl.subject, vars), html: renderHtml(tpl.html, vars), cc: tpl.cc ?? [] };
+}
+
+/**
+ * Build the CC list: manual (body.cc, string or string[]) + template static cc
+ * + any other available addresses (sponsor / forest contact). Drops the TO and
+ * dupes (case-insensitive), keeps only valid addresses.
+ */
+function resolveCc(opts: {
+  to: string; manual?: unknown; templateCc?: string[]; extra?: (string | null | undefined)[];
+}): string[] {
+  const manual = Array.isArray(opts.manual)
+    ? opts.manual.map((x) => String(x ?? ''))
+    : String(opts.manual ?? '').split(',');
+  const all = [...manual, ...(opts.templateCc ?? []), ...(opts.extra ?? []).map((x) => String(x ?? ''))];
+  const seen = new Set<string>([opts.to.trim().toLowerCase()]);
+  const out: string[] = [];
+  for (const raw of all) {
+    const v = raw.trim();
+    if (!v || !EMAIL_RE.test(v)) continue;
+    const lc = v.toLowerCase();
+    if (seen.has(lc)) continue;
+    seen.add(lc);
+    out.push(v);
+  }
+  return out;
+}
+
+/* ------------------------------------------------------------------ */
+/* Email template editor (SuperAdmin)                                  */
+/* ------------------------------------------------------------------ */
+
+interface TplRow {
+  key: string; name: string; subject: string; html: string;
+  cc: string[] | null; placeholders: string[] | null;
+  updated_at?: string; updated_by?: string | null;
+}
+
+/** GET /email-templates — every code template with its DB override merged in. */
+async function listEmailTemplates(req: Request, res: Response): Promise<void> {
+  if (req.auth?.role !== 'SuperAdmin') throw forbidden('SuperAdmin only');
+  const rows = await query<TplRow>(
+    `SELECT key, name, subject, html, cc, placeholders, updated_at::text, updated_by FROM email_templates`,
+  );
+  const byKey = new Map(rows.rows.map((r) => [r.key, r]));
+  const data = listDefaultTemplates().map((def) => {
+    const r = byKey.get(def.key);
+    return r
+      ? { key: r.key, name: r.name, subject: r.subject, html: r.html, cc: r.cc ?? [], placeholders: def.placeholders, isCustom: true, updatedAt: r.updated_at, updatedBy: r.updated_by ?? null }
+      : { ...def, isCustom: false, updatedAt: null, updatedBy: null };
+  });
+  res.json({ data });
+}
+
+/** PUT /email-templates/:key { name?, subject, html, cc? } — save an override. */
+async function upsertEmailTemplate(req: Request, res: Response): Promise<void> {
+  if (req.auth?.role !== 'SuperAdmin') throw forbidden('SuperAdmin only');
+  const key = String(req.params.key);
+  const def = defaultTemplate(key);
+  if (!def) throw notFound('Unknown template');
+  const b = (req.body ?? {}) as { name?: unknown; subject?: unknown; html?: unknown; cc?: unknown };
+  const subject = String(b.subject ?? '').trim();
+  const html = String(b.html ?? '').trim();
+  if (!subject || !html) throw badRequest('subject and html are required');
+  const cc = (Array.isArray(b.cc) ? b.cc.map((x) => String(x ?? '')) : String(b.cc ?? '').split(','))
+    .map((s) => s.trim())
+    .filter((s) => EMAIL_RE.test(s));
+  const name = String(b.name ?? def.name).trim() || def.name;
+  await query(
+    `INSERT INTO email_templates (key, name, subject, html, cc, placeholders, updated_by)
+       VALUES ($1, $2, $3, $4, $5, $6, $7)
+     ON CONFLICT (key) DO UPDATE SET
+       name = EXCLUDED.name, subject = EXCLUDED.subject, html = EXCLUDED.html,
+       cc = EXCLUDED.cc, updated_at = now(), updated_by = EXCLUDED.updated_by`,
+    [key, name, subject, html, cc, def.placeholders, req.auth?.username ?? null],
+  );
+  res.json({ data: { ok: true, key } });
+}
+
+/** DELETE /email-templates/:key — drop the override, revert to the code default. */
+async function resetEmailTemplate(req: Request, res: Response): Promise<void> {
+  if (req.auth?.role !== 'SuperAdmin') throw forbidden('SuperAdmin only');
+  const key = String(req.params.key);
+  if (!defaultTemplate(key)) throw notFound('Unknown template');
+  await query(`DELETE FROM email_templates WHERE key = $1`, [key]);
+  res.json({ data: { ok: true, key, reverted: true } });
+}
+
+/** POST /email-log/list — the Sent inbox: every Resend send, paginated. */
+async function emailLogList(req: Request, res: Response): Promise<void> {
+  if (req.auth?.role !== 'SuperAdmin' && req.auth?.role !== 'Admin') throw forbidden('Admin only');
+  const b = (req.body ?? {}) as { page?: number; limit?: number; search?: string; kind?: string; status?: string };
+  const { rows, total } = await listEmailLog(b);
+  res.json({ data: rows, total });
+}
+
+/**
  * POST /report/:id/send  { to } — email the rendered quarterly report to the
  * sponsor. Resolves the report's forest, builds a branded email linking the
  * live report, sends via Composio Gmail, and logs {to, message_id, sent_at}
@@ -2253,9 +2372,19 @@ async function sendReportEmail(req: Request, res: Response): Promise<void> {
   const rr = await query<{
     year: number; quarter: number; forest_id: string;
     forest_name: string | null; additional_sponsor_logo: unknown;
+    forest_contact_email: string | null; sponsor_email: string | null;
   }>(
-    `SELECT r.year, r.quarter, r.forest_id, f.forest_name, f.additional_sponsor_logo
-       FROM reports r JOIN forests f ON f.id = r.forest_id WHERE r.id = $1`,
+    `SELECT r.year, r.quarter, r.forest_id, f.forest_name, f.additional_sponsor_logo,
+            f.forest_contact_email, sp.sponsor_email
+       FROM reports r
+       JOIN forests f ON f.id = r.forest_id
+       LEFT JOIN LATERAL (
+         SELECT s.sponsor_email FROM forest_sponsors fs JOIN sponsors s ON s.id = fs.sponsor_id
+          WHERE fs.forest_id = r.forest_id AND fs.is_active = TRUE
+            AND s.sponsor_email IS NOT NULL AND s.sponsor_email <> ''
+          ORDER BY fs.created_at LIMIT 1
+       ) sp ON TRUE
+      WHERE r.id = $1`,
     [reportId],
   );
   const row = rr.rows[0];
@@ -2271,31 +2400,29 @@ async function sendReportEmail(req: Request, res: Response): Promise<void> {
   const forestName = row.forest_name ?? 'Forest';
   const base = process.env.APP_URL || `https://${req.get('host')}`;
   const url = `${base}/report/forest/${row.forest_id}?year=${row.year}&quarter=${row.quarter}`;
-  const subject = `${sponsor ? `${sponsor} · ` : ''}${forestName} — Quarterly Forest Report (Q${row.quarter} ${row.year})`;
-  const html =
-    `<div style="font-family:Arial,Helvetica,sans-serif;max-width:600px;margin:0 auto;color:#16282e">` +
-    `<div style="background:#16282e;padding:24px 28px;border-radius:12px 12px 0 0">` +
-    `<div style="color:#a8e063;font-weight:800;font-size:13px;letter-spacing:.08em">${sponsor ? `${sponsor.toUpperCase()} · ` : ''}QUARTERLY FOREST REPORT</div>` +
-    `<div style="color:#fff;font-size:24px;font-weight:800;margin-top:6px">${forestName}</div>` +
-    `<div style="color:#cdd8d2;font-size:13px;margin-top:4px">Q${row.quarter} · ${row.year}</div></div>` +
-    `<div style="border:1px solid #e3e9e5;border-top:none;border-radius:0 0 12px 12px;padding:26px 28px">` +
-    `<p style="margin:0 0 16px;line-height:1.5">Your quarterly forest report is ready — maintenance, plant growth, soil &amp; climate, species health, and the estimated environmental impact for this quarter.</p>` +
-    `<a href="${url}" style="display:inline-block;background:#2f6b3f;color:#fff;text-decoration:none;padding:13px 28px;border-radius:999px;font-weight:700;font-size:15px">View full report &rarr;</a>` +
-    `<p style="margin:18px 0 0;font-size:12px;color:#888">Open the report to view all sections and download a PDF. Carbon/oxygen figures are estimates.</p>` +
-    `<p style="margin:12px 0 0;font-size:12px;color:#aaa">Initiated by CommuniTREE${sponsor ? ` · Sponsored by ${sponsor}` : ''} · Sent via OIAS Earth</p></div></div>`;
+  const { subject, html, cc: templateCc } = await buildReportEmail({
+    forestName, sponsor, quarter: row.quarter, year: row.year, url,
+  });
+  const cc = resolveCc({
+    to, manual: (req.body as { cc?: unknown })?.cc, templateCc,
+    extra: [row.sponsor_email, row.forest_contact_email],
+  });
 
-  const result = await sendGmail({ to, subject, html });
+  const result = await sendReportMail({
+    to, cc, subject, html,
+    ctx: { templateKey: 'report_quarterly', forestId: row.forest_id, actor: req.auth?.username ?? null },
+  });
   if (!result.ok) {
     res.status(502).json({ error: true, message: result.error ?? 'Send failed.' });
     return;
   }
   await query(
     `UPDATE reports SET report_data = COALESCE(report_data, '{}'::jsonb)
-       || jsonb_build_object('last_sent', jsonb_build_object('to', $2::text, 'message_id', $3::text, 'sent_at', now()::text))
+       || jsonb_build_object('last_sent', jsonb_build_object('to', $2::text, 'cc', $4::jsonb, 'message_id', $3::text, 'sent_at', now()::text))
      WHERE id = $1`,
-    [reportId, to, result.messageId ?? ''],
+    [reportId, to, result.messageId ?? '', JSON.stringify(cc)],
   );
-  res.json({ data: { ok: true, to, messageId: result.messageId, url } });
+  res.json({ data: { ok: true, to, cc, messageId: result.messageId, url } });
 }
 
 /**
@@ -2372,22 +2499,27 @@ async function sendForestReport(req: Request, res: Response): Promise<void> {
   const forestName = row.forest_name ?? 'Forest';
   const base = process.env.APP_URL || `https://${req.get('host')}`;
   const url = `${base}/report/forest/${id}?year=${year}&quarter=${quarter}`;
-  const subject = `${sponsor ? `${sponsor} · ` : ''}${forestName} — Quarterly Forest Report (Q${quarter} ${year})`;
-  const html =
-    `<div style="font-family:Arial,Helvetica,sans-serif;max-width:600px;margin:0 auto;color:#16282e">` +
-    `<div style="background:#16282e;padding:24px 28px;border-radius:12px 12px 0 0">` +
-    `<div style="color:#a8e063;font-weight:800;font-size:13px;letter-spacing:.08em">${sponsor ? `${sponsor.toUpperCase()} · ` : ''}QUARTERLY FOREST REPORT</div>` +
-    `<div style="color:#fff;font-size:24px;font-weight:800;margin-top:6px">${forestName}</div>` +
-    `<div style="color:#cdd8d2;font-size:13px;margin-top:4px">Q${quarter} · ${year}</div></div>` +
-    `<div style="border:1px solid #e3e9e5;border-top:none;border-radius:0 0 12px 12px;padding:26px 28px">` +
-    `<p style="margin:0 0 16px;line-height:1.5">Your quarterly forest report is ready — maintenance, plant growth, soil &amp; climate, species health, and the estimated environmental impact for this quarter.</p>` +
-    `<a href="${url}" style="display:inline-block;background:#2f6b3f;color:#fff;text-decoration:none;padding:13px 28px;border-radius:999px;font-weight:700;font-size:15px">View full report &rarr;</a>` +
-    `<p style="margin:18px 0 0;font-size:12px;color:#888">Open the report to view all sections and download a PDF. Carbon/oxygen figures are estimates.</p>` +
-    `<p style="margin:12px 0 0;font-size:12px;color:#aaa">Initiated by CommuniTREE${sponsor ? ` · Sponsored by ${sponsor}` : ''} · Sent via OIAS Earth</p></div></div>`;
+  const { subject, html, cc: templateCc } = await buildReportEmail({
+    forestName, sponsor, quarter, year, url,
+  });
+  const cc = resolveCc({
+    to, manual: (req.body as { cc?: unknown })?.cc, templateCc,
+    extra: [row.sponsor_email, row.forest_contact_email],
+  });
 
-  const result = await sendGmail({ to, subject, html });
+  // Optional PDF (multipart 'pdf') — only the report viewer can render it, so
+  // a send from there attaches the real document alongside the link.
+  const pdf = (req as Request & { file?: { buffer?: Buffer } }).file?.buffer;
+  const attachment = pdf
+    ? { filename: `${forestName} Q${quarter} ${year} Report.pdf`.replace(/[\\/:*?"<>|]+/g, '-'), content: pdf }
+    : undefined;
+
+  const result = await sendReportMail({
+    to, cc, subject, html, attachment,
+    ctx: { templateKey: 'report_quarterly', forestId: id, actor: req.auth?.username ?? null },
+  });
   if (!result.ok) { res.status(502).json({ error: true, message: result.error ?? 'Send failed.' }); return; }
-  res.json({ data: { ok: true, to, messageId: result.messageId } });
+  res.json({ data: { ok: true, to, cc, messageId: result.messageId, attached: Boolean(attachment) } });
 }
 
 /* ------------------------------------------------------------------ */
@@ -2503,9 +2635,13 @@ async function uploadReportImage(req: Request, res: Response): Promise<void> {
 /* ------------------------------------------------------------------ */
 
 forestRouter.post('/forest/:id/report-image', photoUpload.single('photo'), wrap(uploadReportImage));
+forestRouter.post('/email-log/list', wrap(emailLogList));
+forestRouter.get('/email-templates', wrap(listEmailTemplates));
+forestRouter.put('/email-templates/:key', wrap(upsertEmailTemplate));
+forestRouter.delete('/email-templates/:key', wrap(resetEmailTemplate));
 forestRouter.get('/report/:id/recipient', wrap(reportRecipient));
 forestRouter.post('/report/:id/send', wrap(sendReportEmail));
-forestRouter.post('/forest/:id/send-report', wrap(sendForestReport));
+forestRouter.post('/forest/:id/send-report', photoUpload.single('pdf'), wrap(sendForestReport));
 forestRouter.get('/forest/:id/weather', wrap(forestWeather));
 forestRouter.post('/forest/:id/report-data', wrap(updateForestReportData));
 forestRouter.post('/forest/upsert', upload.any(), wrap(upsertForest));

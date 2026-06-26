@@ -18,6 +18,7 @@ export const SECTION_TABS = [
   'Reports',
   'Jobs',
   'Logs',
+  'Emails',
   'Integrity',
   'Planters',
 ] as const;

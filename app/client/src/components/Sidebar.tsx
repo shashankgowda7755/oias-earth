@@ -75,6 +75,12 @@ const NAV_ICONS: Record<SectionTab, JSX.Element> = {
       <line x1="8" y1="17" x2="13" y2="17" />
     </svg>
   ),
+  Emails: (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 shrink-0">
+      <rect x="3" y="5" width="18" height="14" rx="2" />
+      <path d="m3 7 9 6 9-6" />
+    </svg>
+  ),
   Planters: (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 shrink-0">
       <path d="M12 22V12" />

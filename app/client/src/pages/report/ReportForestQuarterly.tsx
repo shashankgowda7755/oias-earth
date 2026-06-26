@@ -8,7 +8,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
 import { buildPreviewReport } from './reportFixture';
-import { downloadReportPdf } from './reportDownload';
+import { downloadReportPdf, renderReportPdfBlob } from './reportDownload';
 import { C, FONT, REPORT_PRINT_CSS } from './reportPrimitives';
 import { SLIDES, SLIDE_TITLES } from './slides';
 import type { ForestReportData } from './reportTypes';
@@ -30,20 +30,29 @@ export default function ReportForestQuarterly() {
   const [sendMsg, setSendMsg] = useState('');
 
   const sendFromViewer = async () => {
-    if (id === 'preview' || sendMsg === 'Sending…') return;
-    setSendMsg('Sending…');
+    if (id === 'preview' || sendMsg) return;
     try {
+      // Render the report to a PDF in the browser, then send it as a real
+      // attachment (the server can't regenerate it) alongside the live link.
+      const blob = await renderReportPdfBlob(setSendMsg);
+      const fname = (data
+        ? `${data.forest.forest_name} ${data.meta.quarter_label} ${data.meta.year} Report.pdf`
+        : 'Forest Report.pdf').replace(/[\\/:*?"<>|]+/g, '-');
+      const fd = new FormData();
+      fd.append('pdf', blob, fname);
+
+      setSendMsg('Sending…');
       const token = localStorage.getItem('token') ?? '';
       const r = await fetch(`/api/v1/forest/${id}/send-report?year=${year ?? ''}&quarter=${quarter ?? ''}`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: token },
-        body: '{}',
+        headers: { Authorization: token }, // no Content-Type — browser sets the multipart boundary
+        body: fd,
       });
       const j = await r.json();
       if (!r.ok || j.error) throw new Error(j.message || 'Send failed');
       const d = j.data ?? j;
       setSendMsg('');
-      alert(`Report sent to ${d.to}.`);
+      alert(`Report sent to ${d.to}${d.cc?.length ? ` (cc: ${d.cc.join(', ')})` : ''}${d.attached ? ' with PDF attached' : ''}.`);
     } catch (e) {
       setSendMsg('');
       alert(e instanceof Error ? e.message : 'Send failed.');

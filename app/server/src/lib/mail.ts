@@ -8,6 +8,7 @@
  * delivers to the account owner in test mode; verify a domain for real recipients.
  */
 import { Resend } from 'resend';
+import { logEmail } from './emailLog';
 
 export function mailReady(): boolean {
   return !!process.env.RESEND_API_KEY;
@@ -21,6 +22,8 @@ export interface GiftEmailInput {
   forestName: string | null;
   certUrl: string;
   message?: string | null;
+  /** Logging context for the Sent inbox. */
+  ctx?: { forestId?: string | null; actor?: string | null };
 }
 
 function esc(s: string): string {
@@ -50,12 +53,76 @@ export async function sendGiftEmail(input: GiftEmailInput): Promise<{ id?: strin
       <p style="font-size:12px;color:#5a6b72">Carbon + oxygen figures shown are estimated, verification-ready removals — not issued credits. Thank you for growing real proof.</p>
     </div>
   </div>`;
-  const { data, error } = await resend.emails.send({
-    from,
-    to: input.to,
-    subject: `🌳 Your tree is planted — ${species}${input.treeUid ? ` (${input.treeUid})` : ''}`,
-    html,
+  const subject = `🌳 Your tree is planted — ${species}${input.treeUid ? ` (${input.treeUid})` : ''}`;
+  const { data, error } = await resend.emails.send({ from, to: input.to, subject, html });
+  await logEmail({
+    kind: 'gift', to: input.to, subject,
+    status: error ? 'failed' : 'sent',
+    messageId: data?.id, error: error?.message ?? null,
+    forestId: input.ctx?.forestId, actor: input.ctx?.actor,
   });
   if (error) throw new Error(error.message || 'email send failed');
   return { id: data?.id };
+}
+
+/* ------------------------------------------------------------------ */
+/* Quarterly report email (Resend) — supports CC + a PDF attachment.   */
+/* Sends from the verified OIAS Earth domain (RESEND_FROM). Never       */
+/* throws on a send failure (returns {ok:false}) so a bad send can't    */
+/* 500 a route. Every attempt is written to the Sent inbox (email_log).        */
+/* ------------------------------------------------------------------ */
+
+export interface ReportMailInput {
+  to: string;
+  cc?: string[];
+  subject: string;
+  html: string;
+  attachment?: { filename: string; content: Buffer };
+  /** Logging context for the Sent inbox. */
+  ctx?: { templateKey?: string | null; forestId?: string | null; actor?: string | null };
+}
+
+export interface ReportMailResult {
+  ok: boolean;
+  messageId?: string;
+  error?: string;
+}
+
+export async function sendReportMail(input: ReportMailInput): Promise<ReportMailResult> {
+  let result: ReportMailResult;
+  if (!process.env.RESEND_API_KEY) {
+    result = { ok: false, error: 'Email not configured — set RESEND_API_KEY (resend.com).' };
+  } else {
+    try {
+      const resend = new Resend(process.env.RESEND_API_KEY);
+      const from = process.env.RESEND_FROM || 'OIAS Earth <onboarding@resend.dev>';
+      const { data, error } = await resend.emails.send({
+        from,
+        to: input.to,
+        ...(input.cc && input.cc.length ? { cc: input.cc } : {}),
+        subject: input.subject,
+        html: input.html,
+        ...(input.attachment
+          ? { attachments: [{ filename: input.attachment.filename, content: input.attachment.content }] }
+          : {}),
+      });
+      result = error ? { ok: false, error: error.message || 'send failed' } : { ok: true, messageId: data?.id };
+    } catch (e) {
+      result = { ok: false, error: e instanceof Error ? e.message : 'send failed' };
+    }
+  }
+  await logEmail({
+    kind: 'report',
+    templateKey: input.ctx?.templateKey ?? null,
+    to: input.to,
+    cc: input.cc,
+    subject: input.subject,
+    status: result.ok ? 'sent' : 'failed',
+    messageId: result.messageId,
+    error: result.error ?? null,
+    attached: Boolean(input.attachment),
+    forestId: input.ctx?.forestId,
+    actor: input.ctx?.actor,
+  });
+  return result;
 }

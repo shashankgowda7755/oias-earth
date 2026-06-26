@@ -9,10 +9,15 @@
  * issues). Both libs are dynamically imported so they don't bloat the main
  * bundle; they load only when the user clicks Download.
  */
-export async function downloadReportPdf(
-  filename: string,
+/**
+ * Render the live `.rpt-slide` DOM to a PDF and return it as a Blob. Shared by
+ * the Download button (saves the blob) and the Send flow (uploads the blob as an
+ * email attachment) — the report only exists as a PDF in the browser, so both
+ * paths must generate it here.
+ */
+export async function renderReportPdfBlob(
   onState?: (msg: string) => void,
-): Promise<void> {
+): Promise<Blob> {
   onState?.('Preparing…');
   const [{ default: html2canvas }, jsPdfMod] = await Promise.all([
     import('html2canvas'),
@@ -51,7 +56,20 @@ export async function downloadReportPdf(
     pdf.addImage(img, 'JPEG', 0, 0, pageW, pageH);
   }
 
+  return pdf.output('blob');
+}
+
+export async function downloadReportPdf(
+  filename: string,
+  onState?: (msg: string) => void,
+): Promise<void> {
+  const blob = await renderReportPdfBlob(onState);
   onState?.('Saving…');
-  pdf.save(filename);
+  const href = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = href;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(href);
   onState?.('');
 }
