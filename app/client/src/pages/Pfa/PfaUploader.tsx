@@ -87,6 +87,11 @@ export default function PfaUploader() {
   const [sheet, setSheet] = useState<Slot | null>(null);
   const [view, setView] = useState<Slot | null>(null); // filled-photo preview
   const [navOpen, setNavOpen] = useState(false);
+  // PWA install (always available)
+  const [deferredPrompt, setDeferredPrompt] = useState<{ prompt: () => Promise<void>; userChoice: Promise<unknown> } | null>(null);
+  const [bannerHidden, setBannerHidden] = useState(false);
+  const standalone = typeof window !== 'undefined' && (window.matchMedia?.('(display-mode: standalone)').matches || (window.navigator as unknown as { standalone?: boolean }).standalone === true);
+  const isIos = typeof navigator !== 'undefined' && /iphone|ipad|ipod/i.test(navigator.userAgent) && !/crios|fxios/i.test(navigator.userAgent);
   // camera
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -139,6 +144,29 @@ export default function PfaUploader() {
     })();
     return () => { cancelled = true; stopStream(); };
   }, [camSlot, facing]);
+
+  // PWA: point install at the PFA manifest while on /pfa + capture the prompt.
+  useEffect(() => {
+    const link = document.querySelector('link[rel="manifest"]') as HTMLLinkElement | null;
+    const prev = link?.getAttribute('href') ?? null;
+    if (link) link.setAttribute('href', '/pfa.webmanifest');
+    const onBip = (e: Event) => { e.preventDefault(); setDeferredPrompt(e as unknown as { prompt: () => Promise<void>; userChoice: Promise<unknown> }); };
+    const onInstalled = () => setDeferredPrompt(null);
+    window.addEventListener('beforeinstallprompt', onBip);
+    window.addEventListener('appinstalled', onInstalled);
+    return () => {
+      window.removeEventListener('beforeinstallprompt', onBip);
+      window.removeEventListener('appinstalled', onInstalled);
+      if (link && prev) link.setAttribute('href', prev);
+    };
+  }, []);
+
+  const installApp = async () => {
+    setNavOpen(false);
+    if (deferredPrompt) { await deferredPrompt.prompt(); try { await deferredPrompt.userChoice; } catch { /* ignore */ } setDeferredPrompt(null); }
+    else if (isIos) toast.success('Tap the Share icon, then “Add to Home Screen”.');
+    else toast.success('Open your browser menu → “Install app” / “Add to Home screen”.');
+  };
 
   const stage = (slot: Slot, file?: File | null) => {
     if (!file) return;
@@ -241,6 +269,16 @@ export default function PfaUploader() {
     <div className="min-h-screen bg-appbg text-textPrimary">
       <input ref={fileInput} type="file" accept="image/*" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (fileSlot.current) stage(fileSlot.current, f); e.target.value = ''; }} />
       <input ref={logoInput} type="file" accept="image/*" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f && logoIdx.current >= 0) persistLogo(logoIdx.current, f); e.target.value = ''; }} />
+
+      {/* always-available install notification */}
+      {!standalone && !bannerHidden ? (
+        <div className="flex items-center gap-3 border-b border-primary/30 bg-primary/10 px-4 py-2.5">
+          <i className="ti ti-download text-lg text-primary" aria-hidden="true" />
+          <span className="flex-1 text-xs text-textPrimary">Install the OIAS PFA app for quick full-screen uploads.</span>
+          <button type="button" onClick={installApp} className="rounded-button bg-primary px-3 py-1.5 text-xs font-semibold text-black">Install</button>
+          <button type="button" aria-label="Dismiss" onClick={() => setBannerHidden(true)} className="text-textSecondary"><i className="ti ti-x" aria-hidden="true" /></button>
+        </div>
+      ) : null}
 
       {/* PAGE: pick forest */}
       {page === 'pick' ? (
@@ -419,6 +457,7 @@ export default function PfaUploader() {
             <a href={forestId ? `/report/forest/${forestId}?year=${year}&quarter=${quarter}` : '#'} target="_blank" rel="noopener" onClick={() => setNavOpen(false)} className="flex w-full items-center gap-3 px-4 py-3.5 text-left text-sm text-textPrimary hover:bg-white/5"><i className="ti ti-external-link text-xl" aria-hidden="true" /> View report</a>
             <button type="button" onClick={() => go('pick')} className="flex w-full items-center gap-3 px-4 py-3.5 text-left text-sm text-textPrimary hover:bg-white/5"><i className="ti ti-switch-horizontal text-xl" aria-hidden="true" /> Switch forest</button>
             <Link to="/dashboard" className="flex w-full items-center gap-3 px-4 py-3.5 text-left text-sm text-textPrimary hover:bg-white/5"><i className="ti ti-layout-dashboard text-xl" aria-hidden="true" /> Dashboard</Link>
+            {!standalone ? <button type="button" onClick={installApp} className="flex w-full items-center gap-3 px-4 py-3.5 text-left text-sm text-primary hover:bg-white/5"><i className="ti ti-download text-xl" aria-hidden="true" /> Install app</button> : null}
           </nav>
           <div className="h-full flex-1 bg-black/55" />
         </div>
