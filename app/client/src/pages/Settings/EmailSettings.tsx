@@ -1,16 +1,26 @@
 /**
  * /settings/email — SuperAdmin only.
  * Global sender identity + default To/CC address lists.
- * Per-forest overrides TBD in forest edit screen.
+ * Per-forest overrides: pick a forest, set its To/CC.
  */
 import { useEffect, useState } from 'react';
 import { Button, useToast } from '../../components';
-import { api } from '../../lib/api';
+import { api, listEntity, type ListResult } from '../../lib/api';
 
 interface EmailConfig {
   display_name: string;
   from_address: string;
   reply_to: string;
+  to_emails: string[];
+  cc_emails: string[];
+}
+
+interface ForestRow {
+  id: string;
+  forest_name: string;
+}
+
+interface ForestEmailConfig {
   to_emails: string[];
   cc_emails: string[];
 }
@@ -63,6 +73,125 @@ function AddressList({
     </div>
   );
 }
+
+/* ------------------------------------------------------------------ */
+/* Per-forest overrides panel                                          */
+/* ------------------------------------------------------------------ */
+
+function ForestOverrides() {
+  const toast = useToast();
+  const [forests, setForests] = useState<ForestRow[]>([]);
+  const [selectedId, setSelectedId] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [cfg, setCfg] = useState<ForestEmailConfig>({ to_emails: [], cc_emails: [] });
+
+  useEffect(() => {
+    listEntity<ForestRow>('forest', { page: 1, limit: 500, search: '' })
+      .then((res: ListResult<ForestRow>) => {
+        setForests(res.rows ?? []);
+      })
+      .catch(() => {/* silently ignore */});
+  }, []);
+
+  const loadForest = (id: string) => {
+    if (!id) { setSelectedId(''); setCfg({ to_emails: [], cc_emails: [] }); return; }
+    setSelectedId(id);
+    setLoading(true);
+    api.get(`/forest/${id}/email-config`)
+      .then(({ data }) => {
+        const d = data?.data;
+        setCfg({ to_emails: d?.to_emails ?? [], cc_emails: d?.cc_emails ?? [] });
+      })
+      .catch(() => setCfg({ to_emails: [], cc_emails: [] }))
+      .finally(() => setLoading(false));
+  };
+
+  const addEmail = (field: keyof ForestEmailConfig) => (email: string) => {
+    setCfg((c) => {
+      const seen = new Set(c[field].map((e) => e.toLowerCase()));
+      if (seen.has(email.toLowerCase())) return c;
+      return { ...c, [field]: [...c[field], email] };
+    });
+  };
+
+  const removeEmail = (field: keyof ForestEmailConfig) => (email: string) => {
+    setCfg((c) => ({ ...c, [field]: c[field].filter((e) => e !== email) }));
+  };
+
+  const handleSave = async () => {
+    if (!selectedId) return;
+    setSaving(true);
+    try {
+      await api.put(`/forest/${selectedId}/email-config`, cfg);
+      toast.success('Forest email config saved.');
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'Save failed.');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div className="rounded-card border border-border bg-surface p-5 space-y-4">
+      <div>
+        <h2 className="text-sm font-medium uppercase tracking-wide text-textSecondary">Per-forest overrides</h2>
+        <p className="mt-1 text-xs text-textSecondary">
+          Extra To addresses added on top of global To. CC here replaces the global CC for this forest.
+        </p>
+      </div>
+
+      <div>
+        <label className="block text-sm text-textSecondary mb-1" htmlFor="fe-forest">Forest</label>
+        <select
+          id="fe-forest"
+          value={selectedId}
+          onChange={(e) => loadForest(e.target.value)}
+          className="w-full rounded-button border border-border bg-appbg px-3 py-2 text-sm text-textPrimary focus:border-primary focus:outline-none"
+        >
+          <option value="">— select a forest —</option>
+          {forests.map((f) => (
+            <option key={f.id} value={f.id}>{f.forest_name}</option>
+          ))}
+        </select>
+      </div>
+
+      {selectedId && (
+        loading ? (
+          <p className="text-xs text-textSecondary">Loading…</p>
+        ) : (
+          <>
+            <div className="space-y-1">
+              <label className="block text-sm text-textSecondary">Additional To addresses</label>
+              <AddressList
+                emails={cfg.to_emails}
+                onAdd={addEmail('to_emails')}
+                onRemove={removeEmail('to_emails')}
+                placeholder="extra@recipient.com"
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="block text-sm text-textSecondary">CC addresses <span className="text-xs">(overrides global CC for this forest)</span></label>
+              <AddressList
+                emails={cfg.cc_emails}
+                onAdd={addEmail('cc_emails')}
+                onRemove={removeEmail('cc_emails')}
+                placeholder="cc@recipient.com"
+              />
+            </div>
+            <div className="flex justify-end">
+              <Button variant="primary" onClick={handleSave} loading={saving}>Save forest overrides</Button>
+            </div>
+          </>
+        )
+      )}
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Main page                                                           */
+/* ------------------------------------------------------------------ */
 
 export default function EmailSettings() {
   const toast = useToast();
@@ -189,6 +318,9 @@ export default function EmailSettings() {
       <div className="flex justify-end gap-2 pt-2">
         <Button variant="primary" onClick={handleSave} loading={saving}>Save</Button>
       </div>
+
+      {/* Per-forest overrides */}
+      <ForestOverrides />
     </section>
   );
 }
