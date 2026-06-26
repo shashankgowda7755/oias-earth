@@ -269,6 +269,19 @@ export function DataTable<T>({
                         : undefined
                     }
                   >
+                    {hasActions && actionsLeft ? (
+                      <td className="sticky left-0 z-10 bg-surface px-4 py-3 align-middle text-left">
+                        {renderRowActions ? (
+                          renderRowActions(row, rowIndex)
+                        ) : (
+                          <RowActionsMenu
+                            onView={onView ? () => onView(row, rowIndex) : undefined}
+                            onEdit={onEdit ? () => onEdit(row, rowIndex) : undefined}
+                            onDelete={onDelete ? () => onDelete(row, rowIndex) : undefined}
+                          />
+                        )}
+                      </td>
+                    ) : null}
                     {columns.map((col) => (
                       <td
                         key={col.key}
@@ -279,7 +292,7 @@ export function DataTable<T>({
                           : renderDefaultCell(row, col.key)}
                       </td>
                     ))}
-                    {hasActions ? (
+                    {hasActions && !actionsLeft ? (
                       <td className="px-4 py-3 align-middle text-right">
                         {renderRowActions ? (
                           renderRowActions(row, rowIndex)
