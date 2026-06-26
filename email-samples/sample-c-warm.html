@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sample C — Warm Nature</title>
+<style>
+* { box-sizing:border-box;margin:0;padding:0; }
+body { background:#f2ede6;font-family:Georgia,'Times New Roman',serif;padding:40px 16px; }
+.wrap { max-width:580px;margin:0 auto;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 4px 30px rgba(80,50,20,.1); }
+/* logo */
+.logo-bar { background:#2d1f0e;padding:18px 32px;display:flex;align-items:center;justify-content:space-between; }
+.logo-name { font-size:16px;font-weight:700;color:#f5e6c8;font-family:Georgia,serif;letter-spacing:.02em; }
+.logo-mark { width:32px;height:32px;background:#c8813a;border-radius:50%;display:flex;align-items:center;justify-content:center; }
+.logo-mark svg { width:18px;height:18px; }
+/* hero banner */
+.hero-banner { background:linear-gradient(160deg,#3d5c1a 0%,#2d4412 40%,#1a2e08 100%);padding:36px 32px 32px;position:relative;overflow:hidden; }
+.hero-banner::before { content:'';position:absolute;top:0;right:0;bottom:0;width:200px;background:url("data:image/svg+xml,%3Csvg width='200' height='200' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='150' cy='60' r='80' fill='rgba(200,129,58,0.06)'/%3E%3C/svg%3E") no-repeat center; }
+.sponsor-tag { display:inline-block;background:rgba(200,129,58,.2);border:1px solid rgba(200,129,58,.4);color:#e8a55a;font-size:10px;font-family:Arial,sans-serif;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:4px 12px;border-radius:999px;margin-bottom:14px; }
+.forest-name { font-size:30px;font-weight:700;color:#fff;line-height:1.15;margin-bottom:6px; }
+.quarter-line { font-size:14px;color:#a8c078;font-style:italic;margin-bottom:20px; }
+.hero-quote { font-size:14px;color:#c8d8a8;font-style:italic;line-height:1.6;border-left:2px solid #c8813a;padding-left:14px; }
+/* body */
+.body { padding:28px 32px; }
+.greeting { font-size:15px;color:#2d1f0e;line-height:1.7;margin-bottom:24px; }
+.section-head { font-size:11px;font-family:Arial,sans-serif;font-weight:700;color:#c8813a;text-transform:uppercase;letter-spacing:.1em;margin-bottom:14px;display:flex;align-items:center;gap:8px; }
+.section-head::after { content:'';flex:1;height:1px;background:#f0e8d8; }
+.report-items { margin-bottom:24px; }
+.r-item { display:flex;gap:14px;padding:12px 0;border-bottom:1px solid #f5f0e8; }
+.r-item:last-child { border:none; }
+.r-num { width:24px;height:24px;background:#f2ede6;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#c8813a;font-family:Arial,sans-serif;flex-shrink:0;margin-top:2px; }
+.r-title { font-size:14px;font-weight:700;color:#2d1f0e;margin-bottom:3px; }
+.r-desc { font-size:12px;color:#8a7060;line-height:1.5;font-family:Arial,sans-serif; }
+/* impact strip */
+.impact { background:#f8f2e8;border-radius:10px;padding:18px 20px;margin-bottom:24px;border-left:4px solid #c8813a; }
+.impact-label { font-size:10px;font-family:Arial,sans-serif;font-weight:700;color:#c8813a;text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px; }
+.impact-text { font-size:16px;color:#2d1f0e;font-style:italic;line-height:1.5; }
+/* cta */
+.cta { background:#2d1f0e;border-radius:12px;padding:28px 24px;text-align:center;margin-bottom:24px; }
+.cta-pre { font-size:12px;color:#8a7060;font-style:italic;margin-bottom:8px;font-family:Arial,sans-serif; }
+.cta-h { font-size:22px;font-weight:700;color:#f5e6c8;margin-bottom:18px;line-height:1.2; }
+.cta-btn { display:inline-block;background:#c8813a;color:#fff;text-decoration:none;padding:13px 32px;border-radius:999px;font-size:14px;font-weight:700;font-family:Arial,sans-serif; }
+/* footer */
+.footer { background:#faf6f0;padding:18px 32px;border-top:1px solid #f0e8d8; }
+.sig-line { font-size:14px;color:#2d1f0e;font-style:italic;margin-bottom:10px; }
+.sig-sub { font-size:11px;color:#a89080;font-family:Arial,sans-serif;margin-bottom:14px; }
+.stats { display:flex;gap:0; }
+.st { flex:1;text-align:center;padding:10px 0; }
+.st + .st { border-left:1px solid #e8ddd0; }
+.st-n { font-size:18px;font-weight:700;color:#2d1f0e; }
+.st-l { font-size:10px;color:#b8a090;font-family:Arial,sans-serif;text-transform:uppercase;letter-spacing:.06em; }
+.foot-url { text-align:center;font-size:11px;color:#b8a090;font-family:Arial,sans-serif;margin-top:12px; }
+</style>
+</head>
+<body>
+<p style="text-align:center;font-size:11px;color:#a89080;margin-bottom:16px;letter-spacing:.06em;font-family:Arial,sans-serif;text-transform:uppercase;">Sample C — Warm Nature</p>
+<div class="wrap">
+  <div class="logo-bar">
+    <div class="logo-mark">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L8 8H4l4 4-2 6 6-3 6 3-2-6 4-4h-4z"/><line x1="12" y1="17" x2="12" y2="22"/></svg>
+    </div>
+    <span class="logo-name">OIAS Earth</span>
+  </div>
+  <div class="hero-banner">
+    <div class="sponsor-tag">Sponsor · Tata Consultancy Services</div>
+    <div class="forest-name">Kolle Reserve<br>Forest</div>
+    <div class="quarter-line">Quarterly Report · Q3 2025 · Jul–Sep</div>
+    <div class="hero-quote">"Your forest grew 8.4 cm on average this quarter — with 94% species survival across all zones."</div>
+  </div>
+  <div class="body">
+    <p class="greeting">Dear Tata Consultancy Services,<br><br>We're pleased to present your Q3 2025 forest report. Every section below is grounded in field-verified data from our on-ground team at Kolle Reserve Forest.</p>
+    <div class="section-head">Inside this report</div>
+    <div class="report-items">
+      <div class="r-item"><div class="r-num">01</div><div><div class="r-title">Maintenance &amp; Operations</div><div class="r-desc">Watering schedules, weeding, pest management, and site maintenance this quarter.</div></div></div>
+      <div class="r-item"><div class="r-num">02</div><div><div class="r-title">Plant Growth &amp; Survival</div><div class="r-desc">Species-wise survival rate, height progression, canopy cover across all zones.</div></div></div>
+      <div class="r-item"><div class="r-num">03</div><div><div class="r-title">Soil &amp; Climate</div><div class="r-desc">Soil health, moisture retention, temperature and rainfall for Q3 2025.</div></div></div>
+      <div class="r-item"><div class="r-num">04</div><div><div class="r-title">Environmental Impact</div><div class="r-desc">CO₂ sequestration estimate, oxygen generation, and biodiversity index.</div></div></div>
+    </div>
+    <div class="impact">
+      <div class="impact-label">The idea</div>
+      <div class="impact-text">"Every tree we plant is a measured, verified step toward a more resilient and biodiverse future."</div>
+    </div>
+    <div class="cta">
+      <div class="cta-pre">Your full report is ready</div>
+      <div class="cta-h">View Q3 2025<br>Kolle Reserve Forest Report</div>
+      <a class="cta-btn" href="#">Open Report →</a>
+    </div>
+  </div>
+  <div class="footer">
+    <div class="sig-line">For a greener future,</div>
+    <div class="sig-sub">OIAS Earth Team · reports@oiasearth.com · Sent on behalf of Tata Consultancy Services</div>
+    <div class="stats">
+      <div class="st"><div class="st-n">1.6M+</div><div class="st-l">Trees Planted</div></div>
+      <div class="st"><div class="st-n">12+</div><div class="st-l">Cities</div></div>
+      <div class="st"><div class="st-n">17</div><div class="st-l">SDG Goals</div></div>
+    </div>
+    <div class="foot-url">www.oiasearth.com · Chennai, Tamil Nadu, India</div>
+  </div>
+</div>
+</body></html>

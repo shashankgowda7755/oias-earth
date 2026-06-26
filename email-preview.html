@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Email Preview — OIAS Earth Quarterly Report</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #eef2ef; font-family: Arial, Helvetica, sans-serif; padding: 0; }
+
+  /* ── chrome UI ── */
+  .chrome { background: #1a1a2e; padding: 10px 20px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+  .chrome-title { color: #a8e063; font-size: 11px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+  .chrome-controls { display: flex; gap: 8px; align-items: center; }
+  .chrome-controls label { color: #9db8b0; font-size: 11px; }
+  .chrome-controls input, .chrome-controls select {
+    background: #2a2a3e; border: 1px solid #3a4a40; color: #eef2ef;
+    border-radius: 5px; padding: 4px 8px; font-size: 12px; width: 160px;
+  }
+  .chrome-controls select { width: 110px; }
+
+  /* ── gmail-like chrome ── */
+  .inbox-chrome { background: #fff; border-bottom: 1px solid #e0e0e0; padding: 8px 20px 8px 16px; display: flex; gap: 10px; align-items: center; font-size: 12px; color: #5f6368; }
+  .subject-line { font-size: 16px; font-weight: 600; color: #202124; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .from-line { font-size: 12px; color: #5f6368; padding: 6px 20px 12px; background: #fff; border-bottom: 1px solid #e8eaed; }
+  .from-line strong { color: #202124; }
+
+  /* ── email shell ── */
+  .email-wrap { max-width: 620px; margin: 0 auto; background: #fff; }
+
+  /* top logo bar */
+  .email-logobar {
+    background: #fff;
+    padding: 16px 28px;
+    display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 1px solid #e8edf0;
+  }
+  .email-logobar .logo { display: flex; align-items: center; gap: 8px; }
+  .email-logobar .logo-mark {
+    width: 28px; height: 28px; background: #16282e; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .email-logobar .logo-mark svg { width: 16px; height: 16px; }
+  .email-logobar .logo-name { font-size: 14px; font-weight: 800; color: #16282e; letter-spacing: -.01em; }
+  .email-logobar .tagline { font-size: 11px; color: #6b7c75; letter-spacing: .04em; }
+
+  /* hero */
+  .hero {
+    background: linear-gradient(145deg, #16282e 0%, #1e3d2f 60%, #2f6b3f 100%);
+    padding: 36px 28px 32px;
+    position: relative; overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute; top: -40px; right: -60px;
+    width: 260px; height: 260px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(168,224,99,.12) 0%, transparent 70%);
+  }
+  .hero-kicker {
+    display: inline-block;
+    background: rgba(168,224,99,.15);
+    border: 1px solid rgba(168,224,99,.35);
+    color: #a8e063; font-size: 10px; font-weight: 800;
+    letter-spacing: .12em; text-transform: uppercase;
+    padding: 4px 12px; border-radius: 999px; margin-bottom: 14px;
+  }
+  .hero-title { color: #fff; font-size: 28px; font-weight: 800; line-height: 1.2; margin-bottom: 8px; }
+  .hero-title em { color: #a8e063; font-style: normal; }
+  .hero-sub { color: #9db8b0; font-size: 14px; line-height: 1.55; max-width: 420px; }
+  .hero-meta { margin-top: 18px; display: flex; gap: 16px; }
+  .hero-chip {
+    background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.12);
+    color: #cdd8d2; font-size: 11px; padding: 4px 12px; border-radius: 999px;
+  }
+
+  /* body */
+  .email-body { padding: 28px 28px 0; }
+
+  .salutation { font-size: 15px; color: #16282e; margin-bottom: 14px; }
+  .intro { font-size: 15px; color: #3d5247; line-height: 1.65; margin-bottom: 24px; }
+  .intro strong { color: #16282e; }
+
+  /* section heading */
+  .section-label {
+    font-size: 10px; font-weight: 800; color: #2f6b3f;
+    letter-spacing: .12em; text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  /* report sections grid */
+  .sections-grid { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
+  .section-card {
+    display: flex; align-items: flex-start; gap: 14px;
+    border-radius: 10px; padding: 14px 16px;
+  }
+  .section-card.c1 { background: #f0f7f1; }
+  .section-card.c2 { background: #f5f3eb; }
+  .section-card.c3 { background: #edf4f8; }
+  .section-card.c4 { background: #f4edf8; }
+  .section-num {
+    min-width: 28px; height: 28px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 800; color: #fff; flex-shrink: 0;
+  }
+  .c1 .section-num { background: #2f6b3f; }
+  .c2 .section-num { background: #8b6914; }
+  .c3 .section-num { background: #1a6080; }
+  .c4 .section-num { background: #6b3a8b; }
+  .section-title { font-size: 13px; font-weight: 700; color: #16282e; margin-bottom: 3px; }
+  .section-desc { font-size: 12px; color: #5f7068; line-height: 1.5; }
+
+  /* quote block */
+  .quote-block {
+    border-left: 3px solid #a8e063;
+    background: #f8faf9;
+    padding: 16px 20px;
+    border-radius: 0 10px 10px 0;
+    margin-bottom: 24px;
+  }
+  .quote-label { font-size: 10px; font-weight: 800; color: #a8e063; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 6px; }
+  .quote-text { font-size: 16px; font-style: italic; color: #16282e; line-height: 1.5; font-weight: 600; margin-bottom: 6px; }
+  .quote-sub { font-size: 12px; color: #6b7c75; }
+
+  /* CTA section */
+  .cta-block {
+    background: linear-gradient(135deg, #16282e 0%, #1e3d2f 100%);
+    border-radius: 14px;
+    padding: 28px 28px 26px;
+    text-align: center;
+    margin-bottom: 28px;
+  }
+  .cta-label { font-size: 12px; color: #9db8b0; margin-bottom: 8px; font-style: italic; }
+  .cta-heading { font-size: 20px; font-weight: 800; color: #fff; line-height: 1.3; margin-bottom: 18px; }
+  .cta-btn {
+    display: inline-block;
+    background: #a8e063; color: #16282e;
+    text-decoration: none; padding: 13px 32px;
+    border-radius: 999px; font-weight: 800; font-size: 14px;
+    letter-spacing: .01em;
+  }
+
+  /* signature */
+  .sig-block { padding: 20px 0; border-top: 1px solid #e8edf0; margin: 0 28px; }
+  .sig-tagline { font-size: 14px; font-style: italic; color: #2f6b3f; font-weight: 600; margin-bottom: 12px; }
+  .sig-label { font-size: 10px; color: #9db8b0; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 8px; }
+  .sig-person { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .sig-avatar {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: #2f6b3f; color: #a8e063;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 800; flex-shrink: 0;
+  }
+  .sig-name { font-size: 13px; font-weight: 700; color: #16282e; }
+  .sig-role { font-size: 11px; color: #6b7c75; }
+  .sig-footer-credit { font-size: 11px; color: #9db8b0; margin-top: 6px; }
+
+  /* footer stats */
+  .email-footer {
+    background: #f8faf9;
+    border-top: 1px solid #e8edf0;
+    padding: 20px 28px;
+  }
+  .footer-logo-row { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+  .footer-desc { font-size: 12px; color: #6b7c75; line-height: 1.5; margin-bottom: 14px; }
+  .stats-row { display: flex; gap: 0; }
+  .stat-cell { flex: 1; text-align: center; }
+  .stat-cell + .stat-cell { border-left: 1px solid #dce6e0; }
+  .stat-num { font-size: 18px; font-weight: 800; color: #16282e; }
+  .stat-lbl { font-size: 10px; color: #9db8b0; text-transform: uppercase; letter-spacing: .06em; margin-top: 2px; }
+  .footer-url { text-align: center; margin-top: 14px; font-size: 11px; color: #9db8b0; }
+  .footer-url a { color: #2f6b3f; text-decoration: none; }
+  .unsubscribe { text-align: center; margin-top: 6px; font-size: 10px; color: #bbb; }
+</style>
+</head>
+<body>
+
+<!-- ── preview chrome ── -->
+<div class="chrome">
+  <span class="chrome-title">Email Preview · Quarterly Report</span>
+  <div class="chrome-controls">
+    <label>Forest</label>
+    <input id="ctl-forest" value="Kolle Reserve Forest">
+    <label>Sponsor</label>
+    <input id="ctl-sponsor" value="Tata Consultancy Services">
+    <label>Q</label>
+    <select id="ctl-q">
+      <option value="1">Q1</option><option value="2">Q2</option>
+      <option value="3" selected>Q3</option><option value="4">Q4</option>
+    </select>
+    <label>Year</label>
+    <input id="ctl-year" type="number" value="2025" style="width:70px">
+  </div>
+</div>
+
+<!-- ── gmail subject chrome ── -->
+<div style="max-width:660px;margin:0 auto;background:#fff;">
+  <div class="inbox-chrome">
+    <span style="font-size:18px;color:#5f6368">←</span>
+    <span class="subject-line" id="subject-preview">…</span>
+  </div>
+  <div class="from-line">
+    <strong>OIAS Earth</strong> &lt;reports@oiasearth.com&gt;&nbsp;&nbsp;
+    <span style="color:#9aa0a6">to me ▾</span>
+  </div>
+</div>
+
+<!-- ── email ── -->
+<div style="max-width:660px;margin:0 auto;padding:0 20px 40px;background:#eef2ef;">
+<div class="email-wrap" style="border-radius:0 0 14px 14px;overflow:hidden;box-shadow:0 4px 40px rgba(0,0,0,.10);">
+
+  <!-- logo bar -->
+  <div class="email-logobar">
+    <div class="logo">
+      <div class="logo-mark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#a8e063" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2L8 8H4l4 4-2 6 6-3 6 3-2-6 4-4h-4z"/>
+          <line x1="12" y1="17" x2="12" y2="22"/>
+        </svg>
+      </div>
+      <span class="logo-name">OIAS Earth</span>
+    </div>
+    <span class="tagline" id="logobar-label">Quarterly Forest Report · 2025</span>
+  </div>
+
+  <!-- hero -->
+  <div class="hero">
+    <div class="hero-kicker" id="hero-kicker">Forest Report</div>
+    <div class="hero-title" id="hero-title">Your forest is<br><em>growing stronger</em></div>
+    <div class="hero-sub" id="hero-sub">Your Q3 2025 quarterly report for Kolle Reserve Forest is ready — covering plant growth, soil health, species data and environmental impact.</div>
+    <div class="hero-meta">
+      <span class="hero-chip" id="chip-q">Q3 2025</span>
+      <span class="hero-chip" id="chip-forest">Kolle Reserve Forest</span>
+    </div>
+  </div>
+
+  <!-- body -->
+  <div class="email-body">
+    <p class="salutation" id="salutation">Dear Sponsor,</p>
+    <p class="intro" id="intro">
+      We're pleased to share your <strong>Q3 2025 quarterly forest report</strong> for <strong id="intro-forest">Kolle Reserve Forest</strong>.
+      This report covers all maintenance activities, biodiversity observations, plant growth metrics, and the estimated environmental impact your contribution has enabled this quarter.
+    </p>
+
+    <div class="section-label">What's inside this report</div>
+    <div class="sections-grid">
+      <div class="section-card c1">
+        <div class="section-num">01</div>
+        <div>
+          <div class="section-title">Maintenance &amp; Operations</div>
+          <div class="section-desc">Watering schedules, weeding, pest management, and site maintenance carried out this quarter.</div>
+        </div>
+      </div>
+      <div class="section-card c2">
+        <div class="section-num">02</div>
+        <div>
+          <div class="section-title">Plant Growth &amp; Survival</div>
+          <div class="section-desc">Species-wise survival rate, height progression, and canopy cover data tracked across all planted zones.</div>
+        </div>
+      </div>
+      <div class="section-card c3">
+        <div class="section-num">03</div>
+        <div>
+          <div class="section-title">Soil &amp; Climate Data</div>
+          <div class="section-desc">Soil health indicators, moisture retention, temperature trends, and rainfall data for the quarter.</div>
+        </div>
+      </div>
+      <div class="section-card c4">
+        <div class="section-num">04</div>
+        <div>
+          <div class="section-title">Environmental Impact</div>
+          <div class="section-desc">Estimated CO₂ sequestration, oxygen generation, and biodiversity index for this reporting period.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- quote -->
+    <div class="quote-block">
+      <div class="quote-label">The impact</div>
+      <div class="quote-text" id="quote-text">"Every tree planted is a measurable step toward a more resilient, biodiverse future."</div>
+      <div class="quote-sub">Your contribution is tracked, verified, and reported — every quarter.</div>
+    </div>
+
+    <!-- CTA -->
+    <div class="cta-block">
+      <div class="cta-label">Your report is ready</div>
+      <div class="cta-heading">View your full<br>Q3 2025 Forest Report →</div>
+      <a class="cta-btn" id="cta-link" href="#">Open Report</a>
+    </div>
+  </div>
+
+  <!-- signature -->
+  <div class="sig-block">
+    <div class="sig-tagline">For a Greener Future,</div>
+    <div class="sig-label">OIAS Earth · Urban Forest Creators</div>
+    <div class="sig-person">
+      <div class="sig-avatar">OE</div>
+      <div>
+        <div class="sig-name">OIAS Earth Team</div>
+        <div class="sig-role">Forest Reporting · reports@oiasearth.com</div>
+      </div>
+    </div>
+    <div class="sig-footer-credit" id="sig-credit">Sent on behalf of Tata Consultancy Services by OIAS Earth.</div>
+  </div>
+
+  <!-- footer -->
+  <div class="email-footer">
+    <div class="footer-logo-row">
+      <div class="logo-mark" style="width:22px;height:22px;background:#16282e;border-radius:50%;display:flex;align-items:center;justify-content:center;">
+        <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="#a8e063" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L8 8H4l4 4-2 6 6-3 6 3-2-6 4-4h-4z"/><line x1="12" y1="17" x2="12" y2="22"/></svg>
+      </div>
+      <span style="font-size:12px;font-weight:700;color:#16282e;">OIAS Earth</span>
+    </div>
+    <div class="footer-desc">Creating urban forests, restoring ecosystems, and tracking biodiversity through plantation drives and community conservation across India. Scalable, SDG-aligned, hands-on CSR engagements built for real impact.</div>
+    <div class="stats-row">
+      <div class="stat-cell"><div class="stat-num">1.6M+</div><div class="stat-lbl">Trees Planted</div></div>
+      <div class="stat-cell"><div class="stat-num">12+</div><div class="stat-lbl">Cities</div></div>
+      <div class="stat-cell"><div class="stat-num">17</div><div class="stat-lbl">SDG Goals</div></div>
+    </div>
+    <div class="footer-url"><a href="#">www.oiasearth.com</a></div>
+    <div class="unsubscribe">OIAS Earth · Chennai, Tamil Nadu, India · <a href="#" style="color:#bbb;">Unsubscribe</a></div>
+  </div>
+
+</div>
+</div>
+
+<script>
+  const $ = id => document.getElementById(id);
+  function render() {
+    const forest  = $('ctl-forest').value.trim()  || 'Forest';
+    const sponsor = $('ctl-sponsor').value.trim();
+    const q       = $('ctl-q').value;
+    const year    = $('ctl-year').value;
+
+    const qLabel    = ['Jan–Mar','Apr–Jun','Jul–Sep','Oct–Dec'][q-1];
+    const hasSponsor = !!sponsor;
+    const subjectPfx = hasSponsor ? `${sponsor} · ` : '';
+    const kicker     = hasSponsor ? `Sponsor · ${sponsor}`.toUpperCase() : 'QUARTERLY FOREST REPORT';
+
+    $('subject-preview').textContent   = `${subjectPfx}${forest} — Quarterly Forest Report (Q${q} ${year})`;
+    $('logobar-label').textContent     = `Quarterly Forest Report · ${year}`;
+    $('hero-kicker').textContent       = kicker;
+    $('hero-title').innerHTML          = `Your forest is<br><em>growing stronger</em>`;
+    $('hero-sub').textContent          = `Your Q${q} ${year} quarterly report for ${forest} is ready — covering plant growth, soil health, species data and environmental impact.`;
+    $('chip-q').textContent            = `Q${q} ${year} · ${qLabel}`;
+    $('chip-forest').textContent       = forest;
+    $('salutation').textContent        = hasSponsor ? `Dear ${sponsor},` : 'Dear Sponsor,';
+    $('intro').innerHTML               = `We're pleased to share your <strong>Q${q} ${year} quarterly forest report</strong> for <strong>${forest}</strong>. This report covers all maintenance activities, biodiversity observations, plant growth metrics, and the estimated environmental impact your contribution has enabled this quarter.`;
+    $('cta-link').textContent          = `Open Q${q} ${year} Report →`;
+    $('sig-credit').textContent        = hasSponsor ? `Sent on behalf of ${sponsor} by OIAS Earth.` : 'Sent by OIAS Earth.';
+    document.querySelector('.cta-heading').innerHTML = `View your full<br>Q${q} ${year} Forest Report`;
+  }
+
+  ['ctl-forest','ctl-sponsor','ctl-q','ctl-year'].forEach(id => $(id).addEventListener('input', render));
+  render();
+</script>
+</body>
+</html>

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sample B — Bold Impact</title>
+<style>
+* { box-sizing:border-box;margin:0;padding:0; }
+body { background:#0f1f14;font-family:Arial,Helvetica,sans-serif;padding:40px 16px; }
+.wrap { max-width:580px;margin:0 auto;overflow:hidden;border-radius:16px; }
+/* header */
+.hdr { background:#a8e063;padding:16px 28px;display:flex;align-items:center;justify-content:space-between; }
+.hdr-logo { font-size:15px;font-weight:900;color:#0f1f14;letter-spacing:-.02em; }
+.hdr-tag { font-size:10px;font-weight:800;color:#0f1f14;letter-spacing:.1em;text-transform:uppercase;background:rgba(0,0,0,.1);padding:3px 10px;border-radius:999px; }
+/* hero */
+.hero { background:#0f1f14;padding:40px 28px 36px;position:relative;overflow:hidden; }
+.hero::after { content:'';position:absolute;bottom:-60px;right:-60px;width:240px;height:240px;border-radius:50%;background:radial-gradient(circle,rgba(168,224,99,.08),transparent 70%); }
+.kicker { font-size:10px;color:#a8e063;font-weight:800;letter-spacing:.14em;text-transform:uppercase;margin-bottom:14px; }
+.hero-h { font-size:42px;font-weight:900;color:#fff;line-height:1;letter-spacing:-.03em;margin-bottom:6px; }
+.hero-h .accent { color:#a8e063; }
+.hero-sub { font-size:13px;color:#5a7a60;margin-bottom:24px;line-height:1.5; }
+.chips { display:flex;flex-wrap:wrap;gap:8px; }
+.chip { background:rgba(168,224,99,.1);border:1px solid rgba(168,224,99,.2);color:#a8e063;font-size:11px;padding:5px 14px;border-radius:999px;font-weight:700; }
+/* metrics bar */
+.metrics { background:#162b1a;display:flex; }
+.metric { flex:1;padding:16px 0;text-align:center;border-right:1px solid #1e3a22; }
+.metric:last-child { border:none; }
+.m-n { font-size:20px;font-weight:900;color:#a8e063; }
+.m-l { font-size:10px;color:#5a7a60;text-transform:uppercase;letter-spacing:.08em;margin-top:2px; }
+/* body */
+.body { background:#fff;padding:28px 28px 24px; }
+.intro { font-size:14px;color:#333;line-height:1.7;margin-bottom:24px; }
+.cards { display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:24px; }
+.card { border-radius:10px;padding:16px; }
+.card.c1 { background:#f0faf2; }
+.card.c2 { background:#fdf8ec; }
+.card.c3 { background:#edf6fb; }
+.card.c4 { background:#f6f0fb; }
+.card-icon { font-size:20px;margin-bottom:8px; }
+.card-t { font-size:13px;font-weight:700;color:#1a1a1a;margin-bottom:4px; }
+.card-d { font-size:11px;color:#888;line-height:1.5; }
+/* cta */
+.cta { background:#0f1f14;padding:32px 28px;text-align:center; }
+.cta-pre { font-size:12px;color:#5a7a60;margin-bottom:10px; }
+.cta-h { font-size:22px;font-weight:900;color:#fff;margin-bottom:18px;line-height:1.2; }
+.cta-btn { display:inline-block;background:#a8e063;color:#0f1f14;text-decoration:none;padding:14px 36px;border-radius:999px;font-weight:900;font-size:14px;letter-spacing:.02em; }
+/* footer */
+.foot { background:#162b1a;padding:18px 28px;display:flex;align-items:center;justify-content:space-between; }
+.foot-name { font-size:12px;font-weight:700;color:#a8e063; }
+.foot-sub { font-size:11px;color:#5a7a60;margin-top:2px; }
+.foot-link { font-size:11px;color:#5a7a60;text-decoration:none; }
+</style>
+</head>
+<body>
+<p style="text-align:center;font-size:11px;color:#5a7a60;margin-bottom:16px;letter-spacing:.06em;text-transform:uppercase;">Sample B — Bold Impact</p>
+<div class="wrap">
+  <div class="hdr">
+    <span class="hdr-logo">OIAS Earth</span>
+    <span class="hdr-tag">Quarterly Report</span>
+  </div>
+  <div class="hero">
+    <div class="kicker">Sponsor · Tata Consultancy Services</div>
+    <div class="hero-h">Kolle<br><span class="accent">Reserve</span><br>Forest</div>
+    <div class="hero-sub">Q3 2025 quarterly forest report — ready to view</div>
+    <div class="chips">
+      <span class="chip">Q3 2025</span>
+      <span class="chip">Jul–Sep</span>
+      <span class="chip">Chennai, TN</span>
+    </div>
+  </div>
+  <div class="metrics">
+    <div class="metric"><div class="m-n">94%</div><div class="m-l">Survival</div></div>
+    <div class="metric"><div class="m-n">1,240</div><div class="m-l">Trees</div></div>
+    <div class="metric"><div class="m-n">8.2t</div><div class="m-l">CO₂/yr</div></div>
+    <div class="metric"><div class="m-n">Q3</div><div class="m-l">2025</div></div>
+  </div>
+  <div class="body">
+    <p class="intro">Dear Tata Consultancy Services,<br><br>Your Kolle Reserve Forest Q3 2025 report is ready — covering every aspect of this quarter's activity, from field maintenance to measurable environmental outcomes.</p>
+    <div class="cards">
+      <div class="card c1"><div class="card-icon">🌱</div><div class="card-t">Maintenance</div><div class="card-d">Watering, weeding, pest management &amp; site care</div></div>
+      <div class="card c2"><div class="card-icon">📈</div><div class="card-t">Growth Data</div><div class="card-d">Survival rate, height tracking &amp; canopy cover</div></div>
+      <div class="card c3"><div class="card-icon">🌍</div><div class="card-t">Soil &amp; Climate</div><div class="card-d">Soil health, moisture, rainfall &amp; temperature</div></div>
+      <div class="card c4"><div class="card-icon">💨</div><div class="card-t">Impact</div><div class="card-d">CO₂ offset, oxygen output &amp; biodiversity index</div></div>
+    </div>
+  </div>
+  <div class="cta">
+    <div class="cta-pre">Your report is waiting</div>
+    <div class="cta-h">Open your Q3 2025<br>Forest Report</div>
+    <a class="cta-btn" href="#">View Full Report →</a>
+  </div>
+  <div class="foot">
+    <div><div class="foot-name">OIAS Earth</div><div class="foot-sub">Urban Forest Creators · Chennai</div></div>
+    <a class="foot-link" href="#">www.oiasearth.com</a>
+  </div>
+</div>
+</body></html>

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sample A — Minimal Clean</title>
+<style>
+* { box-sizing:border-box;margin:0;padding:0; }
+body { background:#f5f5f0;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;padding:40px 16px; }
+.wrap { max-width:580px;margin:0 auto;background:#fff;border-radius:4px;overflow:hidden;box-shadow:0 2px 20px rgba(0,0,0,.08); }
+.top-bar { height:4px;background:linear-gradient(90deg,#2f6b3f,#a8e063); }
+.logo-row { padding:24px 36px;border-bottom:1px solid #f0f0f0;display:flex;align-items:center;justify-content:space-between; }
+.logo-text { font-size:15px;font-weight:700;color:#1a1a1a;letter-spacing:-.02em; }
+.logo-sub { font-size:11px;color:#999;letter-spacing:.04em;text-transform:uppercase; }
+.hero { padding:40px 36px 32px; }
+.hero-eyebrow { font-size:11px;color:#2f6b3f;font-weight:700;text-transform:uppercase;letter-spacing:.12em;margin-bottom:10px; }
+.hero-h1 { font-size:32px;font-weight:300;color:#1a1a1a;line-height:1.2;margin-bottom:16px;letter-spacing:-.02em; }
+.hero-h1 strong { font-weight:700; }
+.hero-meta { font-size:13px;color:#888;border-top:1px solid #f0f0f0;padding-top:16px;display:flex;gap:20px; }
+.hero-meta span { display:flex;align-items:center;gap:6px; }
+.dot { width:6px;height:6px;border-radius:50%;background:#a8e063;display:inline-block; }
+.body { padding:0 36px 32px; }
+.intro { font-size:15px;color:#444;line-height:1.7;margin-bottom:28px; }
+.divider { height:1px;background:#f0f0f0;margin-bottom:24px; }
+.row-label { font-size:10px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:.1em;margin-bottom:12px; }
+.section-list { list-style:none;margin-bottom:28px; }
+.section-list li { display:flex;align-items:baseline;gap:12px;padding:10px 0;border-bottom:1px solid #f7f7f7;font-size:14px;color:#333; }
+.section-list li:last-child { border:none; }
+.num { font-size:11px;color:#ccc;font-weight:700;min-width:18px; }
+.li-title { font-weight:600;color:#1a1a1a; }
+.li-desc { font-size:12px;color:#888;margin-top:2px; }
+.cta-row { text-align:center;padding:28px 36px;background:#fafaf8;border-top:1px solid #f0f0f0; }
+.cta-text { font-size:13px;color:#888;margin-bottom:14px; }
+.cta-btn { display:inline-block;background:#1a1a1a;color:#fff;text-decoration:none;padding:13px 32px;border-radius:2px;font-size:13px;font-weight:700;letter-spacing:.04em; }
+.footer { padding:20px 36px;display:flex;align-items:center;justify-content:space-between; }
+.footer-left { font-size:11px;color:#bbb;line-height:1.6; }
+.stats { display:flex;gap:20px; }
+.stat { text-align:right; }
+.stat-n { font-size:15px;font-weight:700;color:#2f6b3f; }
+.stat-l { font-size:10px;color:#bbb;text-transform:uppercase;letter-spacing:.06em; }
+</style>
+</head>
+<body>
+<p style="text-align:center;font-size:11px;color:#999;margin-bottom:16px;letter-spacing:.06em;text-transform:uppercase;">Sample A — Minimal Clean</p>
+<div class="wrap">
+  <div class="top-bar"></div>
+  <div class="logo-row">
+    <div>
+      <div class="logo-text">OIAS Earth</div>
+      <div class="logo-sub">Urban Forest Creators</div>
+    </div>
+    <div style="font-size:11px;color:#bbb;">Q3 2025</div>
+  </div>
+  <div class="hero">
+    <div class="hero-eyebrow">Sponsor · Tata Consultancy Services</div>
+    <div class="hero-h1">Kolle Reserve Forest<br><strong>Quarterly Report</strong></div>
+    <div class="hero-meta">
+      <span><span class="dot"></span>Q3 2025 (Jul–Sep)</span>
+      <span><span class="dot"></span>Kolle Reserve Forest</span>
+      <span><span class="dot"></span>Chennai, TN</span>
+    </div>
+  </div>
+  <div class="body">
+    <p class="intro">Dear Tata Consultancy Services,<br><br>Your Q3 2025 quarterly forest report is ready. This quarter's report covers maintenance operations, plant growth tracking, soil &amp; climate data, and estimated environmental impact.</p>
+    <div class="divider"></div>
+    <div class="row-label">Report sections</div>
+    <ul class="section-list">
+      <li><span class="num">01</span><div><div class="li-title">Maintenance &amp; Operations</div><div class="li-desc">Watering, weeding, pest management, site care</div></div></li>
+      <li><span class="num">02</span><div><div class="li-title">Plant Growth &amp; Survival</div><div class="li-desc">Species survival rate, height progression, canopy cover</div></div></li>
+      <li><span class="num">03</span><div><div class="li-title">Soil &amp; Climate Data</div><div class="li-desc">Soil health, moisture, temperature, rainfall</div></div></li>
+      <li><span class="num">04</span><div><div class="li-title">Environmental Impact</div><div class="li-desc">CO₂ sequestration, oxygen generation, biodiversity index</div></div></li>
+    </ul>
+  </div>
+  <div class="cta-row">
+    <div class="cta-text">Your full report is ready to view</div>
+    <a class="cta-btn" href="#">View Q3 2025 Report →</a>
+  </div>
+  <div class="footer">
+    <div class="footer-left">OIAS Earth · reports@oiasearth.com<br>Chennai, Tamil Nadu, India</div>
+    <div class="stats">
+      <div class="stat"><div class="stat-n">1.6M+</div><div class="stat-l">Trees</div></div>
+      <div class="stat"><div class="stat-n">12+</div><div class="stat-l">Cities</div></div>
+    </div>
+  </div>
+</div>
+</body></html>
