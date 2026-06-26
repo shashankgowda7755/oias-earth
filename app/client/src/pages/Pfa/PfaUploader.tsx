@@ -1,45 +1,21 @@
 /**
- * PFA photo uploader (/pfa, admin) — mobile-first. Pick a forest, then fill the
- * photo slots, grouped into "Site · once" + "This quarter". Tap a tile → action
- * sheet (Take photo via live camera / Choose file) → preview → Upload (Vercel
- * Blob) → attaches to the forest's report field. Sticky header shows progress;
- * sticky bottom bar keeps "Capture next" thumb-reachable; a done summary appears
- * when every slot is filled. Existing photos are seeded so progress is accurate.
+ * PFA photo uploader (/pfa, admin) — mobile-first, multi-page. Pick a forest,
+ * then a simple menu routes to focused pages: Site photos (once), This quarter,
+ * Sponsors & logos. Tap an empty tile → action sheet (camera / file) → preview
+ * → upload (Vercel Blob). Tap a filled tile → preview with Replace / Delete.
+ * One screen at a time = uncluttered on a phone; reflows fine on desktop.
  */
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useToast } from '@/components/Toast';
 import { fetchForestReport } from '@/lib/publicApi';
-import { uploadReportImage, uploadSponsorLogo, deleteSponsorLogo } from '../Forests/forestApi';
+import { uploadReportImage, clearReportImage, uploadSponsorLogo, deleteSponsorLogo } from '../Forests/forestApi';
 import { fetchForestOptions, type ForestOption } from '../Reports/reportApi';
-import PwaInstallPrompt from './PwaInstallPrompt';
-
-/**
- * Point the browser's install assessment at the PFA manifest while on /pfa, so
- * installing here creates the standalone "OIAS PFA" app (start_url /pfa) instead
- * of the default Field app. Restore the original manifest on unmount.
- */
-function usePfaManifest() {
-  useEffect(() => {
-    const link = document.querySelector<HTMLLinkElement>('link[rel="manifest"]');
-    const prev = link?.getAttribute('href') ?? null;
-    let created: HTMLLinkElement | null = null;
-    if (link) link.setAttribute('href', '/pfa.webmanifest');
-    else {
-      created = document.createElement('link');
-      created.rel = 'manifest';
-      created.href = '/pfa.webmanifest';
-      document.head.appendChild(created);
-    }
-    return () => {
-      if (created) created.remove();
-      else if (link && prev) link.setAttribute('href', prev);
-    };
-  }, []);
-}
 
 interface Slot { key: string; label: string; perQuarter?: boolean }
 interface LogoRow { title: string; name: string; value: 'sponsored_by' | 'initiated_by'; logo?: string; serverIndex: number }
+type Page = 'pick' | 'menu' | 'site' | 'quarter' | 'sponsors';
+
 const SITE_SLOTS: Slot[] = [
   { key: 'cover', label: 'Cover' },
   { key: 'content', label: 'Contents' },
@@ -57,7 +33,6 @@ const QUARTER_SLOTS: Slot[] = [
   { key: 'progress', label: 'Progress', perQuarter: true },
   { key: 'gallery', label: 'Gallery', perQuarter: true },
 ];
-const ALL = [...SITE_SLOTS, ...QUARTER_SLOTS];
 
 function defaultFiscal(): { year: number; quarter: number } {
   const d = new Date(); const m = d.getMonth();
@@ -71,7 +46,6 @@ type Rec = Record<string, unknown>;
 const pickQ = (arr: unknown, y: number, q: number): Rec | undefined =>
   Array.isArray(arr) ? (arr as Rec[]).find((r) => Number(r.year) === y && Number(r.quarter) === q) : undefined;
 
-/** Map a forest's existing images back to slot → url so progress is accurate. */
 function seedFromForest(forest: Rec, y: number, q: number): Record<string, string> {
   const out: Record<string, string> = {};
   const ri = (forest.report_images as { slide_type?: string; image?: string }[]) ?? [];
@@ -101,17 +75,17 @@ function seedFromForest(forest: Rec, y: number, q: number): Record<string, strin
 
 export default function PfaUploader() {
   const toast = useToast();
-  usePfaManifest();
   const fiscal = defaultFiscal();
   const [forests, setForests] = useState<ForestOption[]>([]);
   const [forestId, setForestId] = useState('');
   const [year, setYear] = useState(fiscal.year);
   const [quarter, setQuarter] = useState(fiscal.quarter);
-  const [status, setStatus] = useState<Record<string, string>>({}); // slot -> url | 'uploading' | 'error'
+  const [page, setPage] = useState<Page>('pick');
+  const [status, setStatus] = useState<Record<string, string>>({});
+  const [logos, setLogos] = useState<LogoRow[]>([]);
   const [pending, setPending] = useState<{ slot: Slot; url: string; file: File } | null>(null);
   const [sheet, setSheet] = useState<Slot | null>(null);
-  const [lightbox, setLightbox] = useState<string | null>(null);
-  const [logos, setLogos] = useState<LogoRow[]>([]);
+  const [view, setView] = useState<Slot | null>(null); // filled-photo preview
   // camera
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -125,7 +99,6 @@ export default function PfaUploader() {
 
   useEffect(() => { fetchForestOptions().then(setForests).catch(() => undefined); }, []);
 
-  // Seed which slots already have photos (for this forest + quarter).
   useEffect(() => {
     if (!forestId) { setStatus({}); setLogos([]); return; }
     let alive = true;
@@ -137,10 +110,7 @@ export default function PfaUploader() {
         const raw = (f.additional_sponsor_logo as { type?: { label?: string; value?: string }; name?: string; logo?: string }[]) ?? [];
         setLogos(raw.map((l, i) => ({
           title: l.type?.label || (l.type?.value === 'initiated_by' ? 'Initiated By' : 'Sponsored By'),
-          name: l.name ?? '',
-          value: l.type?.value === 'initiated_by' ? 'initiated_by' : 'sponsored_by',
-          logo: l.logo,
-          serverIndex: i,
+          name: l.name ?? '', value: l.type?.value === 'initiated_by' ? 'initiated_by' : 'sponsored_by', logo: l.logo, serverIndex: i,
         })));
       })
       .catch(() => undefined);
@@ -148,8 +118,9 @@ export default function PfaUploader() {
   }, [forestId, year, quarter]);
 
   const isUrl = (v?: string) => !!v && v !== 'uploading' && v !== 'error';
-  const filled = ALL.filter((s) => isUrl(status[s.key])).length;
-  const allDone = !!forestId && filled === ALL.length;
+  const count = (slots: Slot[]) => slots.filter((s) => isUrl(status[s.key])).length;
+  const filled = count(SITE_SLOTS) + count(QUARTER_SLOTS);
+  const total = SITE_SLOTS.length + QUARTER_SLOTS.length;
 
   const stopStream = () => { streamRef.current?.getTracks().forEach((t) => t.stop()); streamRef.current = null; };
   const closeCam = () => { stopStream(); setCamSlot(null); setCamErr(null); };
@@ -180,11 +151,7 @@ export default function PfaUploader() {
     const canvas = document.createElement('canvas');
     canvas.width = v.videoWidth; canvas.height = v.videoHeight;
     canvas.getContext('2d')?.drawImage(v, 0, 0);
-    canvas.toBlob((blob) => {
-      if (!blob) return;
-      stage(slot, new File([blob], `${slot.key}-${Date.now()}.jpg`, { type: 'image/jpeg' }));
-      closeCam();
-    }, 'image/jpeg', 0.92);
+    canvas.toBlob((blob) => { if (!blob) return; stage(slot, new File([blob], `${slot.key}-${Date.now()}.jpg`, { type: 'image/jpeg' })); closeCam(); }, 'image/jpeg', 0.92);
   };
 
   const commit = async () => {
@@ -202,12 +169,25 @@ export default function PfaUploader() {
     }
   };
 
+  const deletePhoto = async (slot: Slot) => {
+    setView(null);
+    const prev = status[slot.key];
+    setStatus((s) => ({ ...s, [slot.key]: '' }));
+    try {
+      await clearReportImage(forestId, slot.key, slot.perQuarter ? { year, quarter } : undefined);
+      toast.success(`${slot.label} removed.`);
+    } catch (e) {
+      setStatus((s) => ({ ...s, [slot.key]: prev ?? '' }));
+      toast.error(e instanceof Error ? e.message : 'Delete failed.');
+    }
+  };
+
+  // logos
   const patchLogo = (i: number, p: Partial<LogoRow>) => setLogos((ls) => ls.map((r, j) => (j === i ? { ...r, ...p } : r)));
   const addSponsor = () => setLogos((ls) => [...ls, { title: 'Sponsored By', name: '', value: 'sponsored_by', serverIndex: -1 }]);
   const persistLogo = async (i: number, file?: File | null) => {
-    if (!forestId) { toast.error('Pick a forest first.'); return; }
-    const row = logos[i];
-    if (!row) return;
+    if (!forestId) return;
+    const row = logos[i]; if (!row) return;
     try {
       const res = await uploadSponsorLogo(forestId, { title: row.title, name: row.name, value: row.value, index: row.serverIndex, file });
       setLogos((ls) => ls.map((r, j) => (j === i ? { ...r, serverIndex: res.index, logo: res.logo ?? r.logo } : r)));
@@ -215,15 +195,9 @@ export default function PfaUploader() {
     } catch (e) { toast.error(e instanceof Error ? e.message : 'Logo save failed.'); }
   };
   const removeSponsor = async (i: number) => {
-    const row = logos[i];
-    if (!row) return;
+    const row = logos[i]; if (!row) return;
     try { if (row.serverIndex >= 0) await deleteSponsorLogo(forestId, row.serverIndex); } catch { /* ignore */ }
     setLogos((ls) => ls.filter((_, j) => j !== i).map((r) => (row.serverIndex >= 0 && r.serverIndex > row.serverIndex ? { ...r, serverIndex: r.serverIndex - 1 } : r)));
-  };
-
-  const captureNext = () => {
-    const next = ALL.find((s) => !isUrl(status[s.key]));
-    if (next) setCamSlot(next); else toast.success('All photos added.');
   };
 
   const Tile = ({ slot }: { slot: Slot }) => {
@@ -233,7 +207,7 @@ export default function PfaUploader() {
     return (
       <button
         type="button"
-        onClick={() => (url ? setLightbox(url) : setSheet(slot))}
+        onClick={() => (url ? setView(slot) : setSheet(slot))}
         className={`relative flex aspect-square flex-col items-center justify-center gap-1.5 overflow-hidden rounded-card border p-2 text-center transition-colors ${url ? 'border-transparent bg-primary/10' : 'border-border hover:border-primary/60'}`}
       >
         {url ? <img src={url} alt="" className="absolute inset-0 h-full w-full bg-surface object-cover opacity-90" /> : null}
@@ -245,101 +219,148 @@ export default function PfaUploader() {
     );
   };
 
+  const TopBar = ({ title, onBack }: { title: string; onBack?: () => void }) => (
+    <header className="sticky top-0 z-20 flex h-14 items-center gap-3 border-b border-border bg-appbg/95 px-4 backdrop-blur">
+      {onBack ? <button type="button" aria-label="Back" onClick={onBack} className="text-textSecondary hover:text-textPrimary"><i className="ti ti-chevron-left text-xl" aria-hidden="true" /></button>
+        : <Link to="/dashboard" aria-label="Dashboard" className="text-textSecondary hover:text-textPrimary"><i className="ti ti-chevron-left text-xl" aria-hidden="true" /></Link>}
+      <span className="min-w-0 flex-1 truncate font-serif text-base font-semibold">{title}</span>
+    </header>
+  );
+
+  const forestName = forests.find((f) => f.value === forestId)?.label ?? 'Forest';
+
   return (
     <div className="min-h-screen bg-appbg text-textPrimary">
       <input ref={fileInput} type="file" accept="image/*" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (fileSlot.current) stage(fileSlot.current, f); e.target.value = ''; }} />
       <input ref={logoInput} type="file" accept="image/*" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f && logoIdx.current >= 0) persistLogo(logoIdx.current, f); e.target.value = ''; }} />
 
-      {/* sticky header */}
-      <header className="sticky top-0 z-20 border-b border-border bg-appbg/95 backdrop-blur">
-        <div className="mx-auto flex max-w-xl items-center gap-3 px-4 py-3">
-          <Link to="/dashboard" aria-label="Back" className="text-textSecondary hover:text-textPrimary"><i className="ti ti-chevron-left text-xl" aria-hidden="true" /></Link>
-          <select value={forestId} onChange={(e) => setForestId(e.target.value)} className="min-w-0 flex-1 truncate rounded-button border border-border bg-surface px-3 py-2 text-sm">
-            <option value="">Select a forest…</option>
-            {forests.map((f) => <option key={f.value} value={f.value}>{f.label}</option>)}
-          </select>
-          <select value={year} onChange={(e) => setYear(Number(e.target.value))} className="rounded-button border border-border bg-surface px-2 py-2 text-sm">
-            {[fiscal.year - 1, fiscal.year, fiscal.year + 1].map((y) => <option key={y} value={y}>{y}</option>)}
-          </select>
-          <select value={quarter} onChange={(e) => setQuarter(Number(e.target.value))} className="rounded-button border border-border bg-surface px-2 py-2 text-sm">
-            {[1, 2, 3, 4].map((q) => <option key={q} value={q}>Q{q}</option>)}
-          </select>
-        </div>
-        {forestId ? (
-          <div className="mx-auto max-w-xl px-4 pb-2">
-            <div className="mb-1 flex justify-between text-xs text-textSecondary"><span>Q{quarter} {year} · {filled} of {ALL.length} photos</span><span className="text-primary">{Math.round((filled / ALL.length) * 100)}%</span></div>
-            <div className="h-1.5 overflow-hidden rounded-full bg-surface"><div className="h-full rounded-full bg-primary transition-all" style={{ width: `${(filled / ALL.length) * 100}%` }} /></div>
-          </div>
-        ) : null}
-      </header>
-
-      <main className="mx-auto max-w-xl px-4 pb-28 pt-4">
-        {!forestId ? (
-          <div className="mt-16 text-center text-textSecondary"><i className="ti ti-photo text-3xl" aria-hidden="true" /><p className="mt-2 text-sm">Pick a forest above to add its report photos.</p></div>
-        ) : allDone ? (
-          <div className="mt-14 flex flex-col items-center text-center">
-            <i className="ti ti-circle-check text-5xl text-primary" aria-hidden="true" />
-            <p className="mt-3 text-lg font-semibold">{ALL.length} of {ALL.length} photos added</p>
-            <p className="mt-1 text-sm text-textSecondary">Q{quarter} {year} · all slots filled</p>
-            <a href={`/report/forest/${forestId}?year=${year}&quarter=${quarter}`} target="_blank" rel="noopener" className="mt-6 w-full rounded-button bg-primary py-3 text-center text-sm font-semibold text-black">View &amp; send report ↗</a>
-            <button type="button" onClick={() => setForestId('')} className="mt-2 w-full rounded-button border border-border py-3 text-sm">Add another forest</button>
-          </div>
-        ) : (
-          <>
-            <div className="mb-1.5 text-xs uppercase tracking-wide text-textSecondary/70">Site · enter once</div>
-            <div className="mb-5 grid grid-cols-3 gap-2.5">{SITE_SLOTS.map((s) => <Tile key={s.key} slot={s} />)}</div>
-            <div className="mb-1.5 text-xs uppercase tracking-wide text-textSecondary/70">This quarter · Q{quarter}</div>
-            <div className="grid grid-cols-3 gap-2.5">{QUARTER_SLOTS.map((s) => <Tile key={s.key} slot={s} />)}</div>
-
-            <div className="mb-1.5 mt-6 flex items-center justify-between text-xs uppercase tracking-wide text-textSecondary/70">
-              <span>Sponsors &amp; logos</span>
-              <button type="button" onClick={addSponsor} className="rounded-button border border-border px-2.5 py-1 text-[11px] normal-case text-textPrimary"><i className="ti ti-plus" aria-hidden="true" /> Add</button>
+      {/* PAGE: pick forest */}
+      {page === 'pick' ? (
+        <>
+          <TopBar title="Photo uploader" />
+          <main className="mx-auto max-w-md px-4 py-6">
+            <label className="text-sm"><span className="mb-1 block text-textSecondary">Forest</span>
+              <select value={forestId} onChange={(e) => setForestId(e.target.value)} className="w-full rounded-button border border-border bg-surface px-3 py-3 text-sm">
+                <option value="">Select a forest…</option>
+                {forests.map((f) => <option key={f.value} value={f.value}>{f.label}</option>)}
+              </select>
+            </label>
+            <div className="mt-3 grid grid-cols-2 gap-3">
+              <label className="text-sm"><span className="mb-1 block text-textSecondary">FY year</span>
+                <select value={year} onChange={(e) => setYear(Number(e.target.value))} className="w-full rounded-button border border-border bg-surface px-3 py-3 text-sm">
+                  {[fiscal.year - 1, fiscal.year, fiscal.year + 1].map((y) => <option key={y} value={y}>{y}</option>)}
+                </select></label>
+              <label className="text-sm"><span className="mb-1 block text-textSecondary">Quarter</span>
+                <select value={quarter} onChange={(e) => setQuarter(Number(e.target.value))} className="w-full rounded-button border border-border bg-surface px-3 py-3 text-sm">
+                  {[1, 2, 3, 4].map((q) => <option key={q} value={q}>Q{q}</option>)}
+                </select></label>
             </div>
-            <div className="space-y-2.5">
-              {logos.length === 0 ? <p className="text-xs text-textSecondary">No logos yet. Add a sponsor or initiator.</p> : null}
+            <button type="button" disabled={!forestId} onClick={() => setPage('menu')} className="mt-5 w-full rounded-button bg-primary py-3 text-sm font-semibold text-black disabled:opacity-50">Continue →</button>
+          </main>
+        </>
+      ) : null}
+
+      {/* PAGE: menu */}
+      {page === 'menu' ? (
+        <>
+          <TopBar title={forestName} onBack={() => setPage('pick')} />
+          <main className="mx-auto max-w-md px-4 py-5">
+            <div className="mb-4 flex items-center justify-between rounded-card border border-border bg-surface px-4 py-3">
+              <div><div className="text-sm font-medium">Q{quarter} {year}</div><div className="text-xs text-textSecondary">{filled} of {total} photos</div></div>
+              <div className="text-lg font-semibold text-primary">{Math.round((filled / total) * 100)}%</div>
+            </div>
+            {[
+              { p: 'site' as Page, icon: 'ti-building-community', label: 'Site photos', sub: 'Enter once', n: count(SITE_SLOTS), of: SITE_SLOTS.length },
+              { p: 'quarter' as Page, icon: 'ti-calendar', label: 'This quarter', sub: `Q${quarter} ${year}`, n: count(QUARTER_SLOTS), of: QUARTER_SLOTS.length },
+              { p: 'sponsors' as Page, icon: 'ti-building-store', label: 'Sponsors & logos', sub: `${logos.length} added`, n: logos.filter((l) => l.logo).length, of: logos.length },
+            ].map((row) => (
+              <button key={row.p} type="button" onClick={() => setPage(row.p)} className="mb-2.5 flex w-full items-center gap-3 rounded-card border border-border bg-surface px-4 py-4 text-left hover:border-primary/50">
+                <i className={`ti ${row.icon} text-2xl text-primary`} aria-hidden="true" />
+                <div className="flex-1"><div className="text-sm font-medium">{row.label}</div><div className="text-xs text-textSecondary">{row.sub}</div></div>
+                <span className="text-xs text-textSecondary">{row.of ? `${row.n}/${row.of}` : ''}</span>
+                <i className="ti ti-chevron-right text-textSecondary" aria-hidden="true" />
+              </button>
+            ))}
+            <a href={`/report/forest/${forestId}?year=${year}&quarter=${quarter}`} target="_blank" rel="noopener" className="mt-3 flex w-full items-center justify-center gap-2 rounded-button border border-border py-3 text-sm"><i className="ti ti-external-link" aria-hidden="true" /> View report</a>
+          </main>
+        </>
+      ) : null}
+
+      {/* PAGE: site / quarter photo grids */}
+      {page === 'site' || page === 'quarter' ? (
+        <>
+          <TopBar title={page === 'site' ? 'Site photos' : `This quarter · Q${quarter}`} onBack={() => setPage('menu')} />
+          <main className="mx-auto max-w-md px-4 py-5">
+            <p className="mb-3 text-xs text-textSecondary">Tap an empty tile to add. Tap a photo to preview, replace or delete.</p>
+            <div className="grid grid-cols-2 gap-3">
+              {(page === 'site' ? SITE_SLOTS : QUARTER_SLOTS).map((s) => <Tile key={s.key} slot={s} />)}
+            </div>
+          </main>
+        </>
+      ) : null}
+
+      {/* PAGE: sponsors & logos */}
+      {page === 'sponsors' ? (
+        <>
+          <TopBar title="Sponsors & logos" onBack={() => setPage('menu')} />
+          <main className="mx-auto max-w-md px-4 py-5">
+            {logos.length === 0 ? <p className="mb-3 text-sm text-textSecondary">No logos yet. Add a sponsor or the initiator.</p> : null}
+            <div className="space-y-3">
               {logos.map((row, i) => (
-                <div key={i} className="flex items-center gap-2.5 rounded-card border border-border p-2.5">
-                  <button
-                    type="button"
-                    aria-label="Upload logo"
-                    onClick={() => { logoIdx.current = i; logoInput.current?.click(); }}
-                    className="relative flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-card border border-border bg-surface"
-                  >
-                    {row.logo ? <img src={row.logo} alt="" className="h-full w-full object-contain" /> : <i className="ti ti-photo text-lg text-textSecondary" aria-hidden="true" />}
-                  </button>
-                  <div className="min-w-0 flex-1 space-y-1.5">
-                    <input value={row.title} placeholder="Title (e.g. Sponsored by)" onChange={(e) => patchLogo(i, { title: e.target.value })} onBlur={() => persistLogo(i)} className="w-full rounded-button border border-border bg-surface px-2.5 py-1.5 text-sm" />
-                    <input value={row.name} placeholder="Sponsor name" onChange={(e) => patchLogo(i, { name: e.target.value })} onBlur={() => persistLogo(i)} className="w-full rounded-button border border-border bg-surface px-2.5 py-1.5 text-sm" />
+                <div key={i} className="rounded-card border border-border bg-surface p-3">
+                  <div className="flex items-start gap-3">
+                    <button type="button" aria-label="Upload logo" onClick={() => { logoIdx.current = i; logoInput.current?.click(); }} className="relative flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-card border border-border bg-appbg">
+                      {row.logo ? <img src={row.logo} alt="" className="h-full w-full object-contain" /> : <i className="ti ti-upload text-lg text-textSecondary" aria-hidden="true" />}
+                    </button>
+                    <div className="min-w-0 flex-1 space-y-2">
+                      <input value={row.title} placeholder="Title (e.g. Sponsored by)" onChange={(e) => patchLogo(i, { title: e.target.value })} onBlur={() => persistLogo(i)} className="w-full rounded-button border border-border bg-appbg px-3 py-2.5 text-sm" />
+                      <input value={row.name} placeholder="Sponsor name" onChange={(e) => patchLogo(i, { name: e.target.value })} onBlur={() => persistLogo(i)} className="w-full rounded-button border border-border bg-appbg px-3 py-2.5 text-sm" />
+                    </div>
                   </div>
-                  <div className="flex shrink-0 flex-col items-center gap-1.5">
-                    <button type="button" onClick={() => patchLogo(i, { value: row.value === 'initiated_by' ? 'sponsored_by' : 'initiated_by' })} title="Toggle initiated/sponsor" className={`rounded px-1.5 py-0.5 text-[10px] ${row.value === 'initiated_by' ? 'bg-primary/15 text-primary' : 'text-textSecondary'}`}>{row.value === 'initiated_by' ? 'init' : 'spon'}</button>
-                    <button type="button" aria-label="Remove" onClick={() => removeSponsor(i)} className="text-textSecondary hover:text-danger"><i className="ti ti-trash text-base" aria-hidden="true" /></button>
+                  <div className="mt-2.5 flex items-center justify-between">
+                    <button type="button" onClick={() => patchLogo(i, { value: row.value === 'initiated_by' ? 'sponsored_by' : 'initiated_by' })} className={`rounded-button px-3 py-1.5 text-xs ${row.value === 'initiated_by' ? 'bg-primary/15 text-primary' : 'border border-border text-textSecondary'}`}>{row.value === 'initiated_by' ? 'Initiated by' : 'Sponsor'}</button>
+                    <button type="button" onClick={() => removeSponsor(i)} className="flex items-center gap-1 text-xs text-textSecondary hover:text-danger"><i className="ti ti-trash" aria-hidden="true" /> Remove</button>
                   </div>
                 </div>
               ))}
             </div>
-          </>
-        )}
-      </main>
+            <button type="button" onClick={addSponsor} className="mt-3 w-full rounded-button border border-border py-3 text-sm"><i className="ti ti-plus" aria-hidden="true" /> Add sponsor / logo</button>
+          </main>
+        </>
+      ) : null}
 
-      {/* sticky bottom bar */}
-      {forestId && !allDone ? (
-        <div className="fixed inset-x-0 bottom-0 z-20 border-t border-border bg-appbg/95 px-4 py-3 backdrop-blur">
-          <div className="mx-auto flex max-w-xl gap-2">
-            <button type="button" onClick={captureNext} className="flex-1 rounded-button bg-primary py-3 text-sm font-semibold text-black"><i className="ti ti-camera" aria-hidden="true" /> Capture next</button>
-            <a href={`/report/forest/${forestId}?year=${year}&quarter=${quarter}`} target="_blank" rel="noopener" aria-label="View report" className="flex w-12 items-center justify-center rounded-button border border-border"><i className="ti ti-external-link text-lg" aria-hidden="true" /></a>
-          </div>
+      {/* sticky capture bar on photo pages */}
+      {page === 'site' || page === 'quarter' ? (
+        <div className="sticky bottom-0 z-20 border-t border-border bg-appbg/95 px-4 py-3 backdrop-blur">
+          <button type="button" onClick={() => { const slots = page === 'site' ? SITE_SLOTS : QUARTER_SLOTS; const next = slots.find((s) => !isUrl(status[s.key])); if (next) setCamSlot(next); else toast.success('All done on this page.'); }} className="mx-auto block w-full max-w-md rounded-button bg-primary py-3 text-sm font-semibold text-black"><i className="ti ti-camera" aria-hidden="true" /> Capture next</button>
         </div>
       ) : null}
 
-      {/* action sheet */}
+      {/* action sheet (empty tile tapped) */}
       {sheet ? (
         <div className="fixed inset-0 z-40 flex flex-col justify-end bg-black/50" onClick={() => setSheet(null)}>
           <div className="rounded-t-2xl bg-surface p-2" onClick={(e) => e.stopPropagation()}>
             <div className="px-3 py-2 text-sm font-medium">{sheet.label}{sheet.perQuarter ? ` · Q${quarter} ${year}` : ''}</div>
-            <button type="button" onClick={() => { const s = sheet; setSheet(null); setCamSlot(s); }} className="flex w-full items-center gap-3 rounded-button px-3 py-3.5 text-left text-sm hover:bg-white/5"><i className="ti ti-camera text-xl text-primary" aria-hidden="true" /> Take photo</button>
-            <button type="button" onClick={() => { fileSlot.current = sheet; setSheet(null); fileInput.current?.click(); }} className="flex w-full items-center gap-3 rounded-button px-3 py-3.5 text-left text-sm hover:bg-white/5"><i className="ti ti-folder text-xl" aria-hidden="true" /> Choose a file</button>
+            <button type="button" onClick={() => { const s = sheet; setSheet(null); setCamSlot(s); }} className="flex w-full items-center gap-3 rounded-button px-3 py-4 text-left text-sm hover:bg-white/5"><i className="ti ti-camera text-xl text-primary" aria-hidden="true" /> Take photo</button>
+            <button type="button" onClick={() => { fileSlot.current = sheet; setSheet(null); fileInput.current?.click(); }} className="flex w-full items-center gap-3 rounded-button px-3 py-4 text-left text-sm hover:bg-white/5"><i className="ti ti-folder text-xl" aria-hidden="true" /> Choose a file</button>
             <button type="button" onClick={() => setSheet(null)} className="mt-1 w-full rounded-button border border-border py-3 text-sm">Cancel</button>
+          </div>
+        </div>
+      ) : null}
+
+      {/* filled-photo preview: replace / delete */}
+      {view ? (
+        <div className="fixed inset-0 z-50 flex flex-col bg-black/90" onClick={() => setView(null)}>
+          <div className="flex h-14 items-center justify-between px-4 text-white" onClick={(e) => e.stopPropagation()}>
+            <span className="text-sm">{view.label}{view.perQuarter ? ` · Q${quarter} ${year}` : ''}</span>
+            <button type="button" aria-label="Close" onClick={() => setView(null)}><i className="ti ti-x text-xl" aria-hidden="true" /></button>
+          </div>
+          <div className="flex flex-1 items-center justify-center px-4" onClick={(e) => e.stopPropagation()}>
+            <img src={status[view.key]} alt="" className="max-h-full max-w-full rounded-card object-contain" />
+          </div>
+          <div className="flex gap-3 p-4" onClick={(e) => e.stopPropagation()}>
+            <button type="button" onClick={() => { const s = view; setView(null); setSheet(s); }} className="flex-1 rounded-button border border-white/40 py-3 text-sm text-white"><i className="ti ti-refresh" aria-hidden="true" /> Replace</button>
+            <button type="button" onClick={() => deletePhoto(view)} className="flex-1 rounded-button bg-danger py-3 text-sm font-semibold text-white"><i className="ti ti-trash" aria-hidden="true" /> Delete</button>
           </div>
         </div>
       ) : null}
@@ -379,15 +400,6 @@ export default function PfaUploader() {
           </div>
         </div>
       ) : null}
-
-      {/* lightbox */}
-      {lightbox ? (
-        <div onClick={() => setLightbox(null)} className="fixed inset-0 z-50 flex cursor-zoom-out items-center justify-center bg-black/85 p-6">
-          <img src={lightbox} alt="preview" className="max-h-full max-w-full rounded-card object-contain" />
-        </div>
-      ) : null}
-
-      <PwaInstallPrompt />
     </div>
   );
 }

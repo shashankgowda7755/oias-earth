@@ -119,6 +119,15 @@ export interface ForestWeather {
   reason?: string;
 }
 
+/** PFA uploader: clear (delete) a report photo slot. */
+export async function clearReportImage(
+  forestId: string,
+  slot: string,
+  opts?: { year?: number; quarter?: number; url?: string },
+): Promise<void> {
+  await api.post(`/forest/${forestId}/report-image/clear`, { slot, ...opts });
+}
+
 /** PFA uploader: POST a report photo to a slot; returns the stored URL. */
 export async function uploadReportImage(
   forestId: string,

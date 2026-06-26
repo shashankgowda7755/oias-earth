@@ -2631,6 +2631,66 @@ async function applyImageSlot(id: string, slot: ImgSlot, url: string, year?: num
   }
 }
 
+/** Clear (delete) a report-image slot's value. Scalars → NULL; report_images →
+ *  drop the slide_type entry; arrays (security/dashboard/earth) → remove the
+ *  entry matching `url` (or the first); per-quarter → null that field in the
+ *  quarter row. Mirrors applyImageSlot's storage layout. */
+async function clearImageSlot(id: string, slot: ImgSlot, year?: number, quarter?: number, url?: string): Promise<void> {
+  if (slot === 'permission') return void (await query(`UPDATE forests SET permission_letter = NULL, is_updated = TRUE, updated_at = now() WHERE id = $1`, [id]));
+  if (slot === 'layout') return void (await query(`UPDATE forests SET site_layout = NULL, is_updated = TRUE, updated_at = now() WHERE id = $1`, [id]));
+  if (slot === 'cover' || slot === 'content' || slot === 'impact') {
+    const st = SLIDE_TYPE[slot]!;
+    const arr = (await loadJsonb(id, 'report_images')) as { slide_type?: string }[] | null;
+    return saveJsonb(id, 'report_images', (Array.isArray(arr) ? arr : []).filter((e) => e?.slide_type !== st));
+  }
+  if (slot === 'security') {
+    const cur = ((await loadJsonb(id, 'security_and_infrastructure')) as { image_data?: { image?: string }[] } | null) ?? {};
+    const img = Array.isArray(cur.image_data) ? cur.image_data : [];
+    const next = url ? img.filter((e) => e?.image !== url) : img.slice(1);
+    return saveJsonb(id, 'security_and_infrastructure', { ...cur, image_data: next });
+  }
+  if (slot === 'dashboard') {
+    const arr = (await loadJsonb(id, 'dashboard_images')) as { image?: string }[] | null;
+    const img = Array.isArray(arr) ? arr : [];
+    return saveJsonb(id, 'dashboard_images', url ? img.filter((e) => e?.image !== url) : img.slice(1));
+  }
+  if (slot === 'earth') {
+    const cur = ((await loadJsonb(id, 'area_population_statistics_details')) as { google_earth_image?: unknown[] } | null) ?? {};
+    const img = Array.isArray(cur.google_earth_image) ? cur.google_earth_image : [];
+    return saveJsonb(id, 'area_population_statistics_details', { ...cur, google_earth_image: url ? img.filter((e) => e !== url) : img.slice(1) });
+  }
+  const y = year ?? new Date().getFullYear();
+  const q = quarter && quarter >= 1 && quarter <= 4 ? quarter : Math.floor(new Date().getMonth() / 3) + 1;
+  if (slot === 'progress') {
+    const arr = await loadJsonb(id, 'plantation_progress');
+    return saveJsonb(id, 'plantation_progress', upsertQ(arr, y, q, (r) => ({ ...r, image: undefined })));
+  }
+  if (slot === 'soil_meter') {
+    const arr = await loadJsonb(id, 'soil_ph_level');
+    return saveJsonb(id, 'soil_ph_level', upsertQ(arr, y, q, (r) => ({ ...r, meter_image: undefined })));
+  }
+  if (slot === 'temp_inside' || slot === 'temp_outside') {
+    const side = slot === 'temp_inside' ? 'inside_plantation' : 'outside_plantation';
+    const arr = await loadJsonb(id, 'temperature_humidity');
+    return saveJsonb(id, 'temperature_humidity', upsertQ(arr, y, q, (r) => ({ ...r, [side]: { ...(r[side] as object), image: undefined } })));
+  }
+  if (slot === 'gallery') {
+    const arr = await loadJsonb(id, 'gallery_images');
+    return saveJsonb(id, 'gallery_images', upsertQ(arr, y, q, (r) => ({ ...r, image: undefined })));
+  }
+}
+
+/** POST /forest/:id/report-image/clear { slot, year?, quarter?, url? } — delete a slot's photo. */
+async function clearReportImage(req: Request, res: Response): Promise<void> {
+  const id = String(req.params.id);
+  if (!WX_UUID_RE.test(id)) throw notFound('Forest not found');
+  const b = (req.body ?? {}) as { slot?: string; year?: number; quarter?: number; url?: string };
+  const slot = b.slot as ImgSlot;
+  if (!REPORT_IMAGE_SLOTS.includes(slot)) { res.status(400).json({ error: true, message: 'Unknown slot' }); return; }
+  await clearImageSlot(id, slot, b.year, b.quarter, b.url);
+  res.json({ data: { ok: true, slot, cleared: true } });
+}
+
 /**
  * POST /forest/:id/sponsor-logo (multipart: logo + title + name + value + index?)
  * — upload a sponsor/initiator logo and upsert the additional_sponsor_logo entry.
@@ -2712,6 +2772,7 @@ async function uploadReportImage(req: Request, res: Response): Promise<void> {
 /* ------------------------------------------------------------------ */
 
 forestRouter.post('/forest/:id/report-image', photoUpload.single('photo'), wrap(uploadReportImage));
+forestRouter.post('/forest/:id/report-image/clear', wrap(clearReportImage));
 forestRouter.post('/forest/:id/sponsor-logo', photoUpload.single('logo'), wrap(uploadSponsorLogo));
 forestRouter.post('/forest/:id/sponsor-logo/delete', wrap(deleteSponsorLogo));
 forestRouter.post('/email-log/list', wrap(emailLogList));
