@@ -21,7 +21,8 @@
  *  - report_data JSON schema is undocumented (openQuestions[6]); the form takes
  *    free-form validated JSON instead of inventing fields.
  */
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import {
   AddButton,
@@ -465,20 +466,46 @@ function RowActions({
   label: string;
 }) {
   const [open, setOpen] = useState(false);
+  const [coords, setCoords] = useState({ top: 0, left: 0 });
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const onDown = (e: MouseEvent) => {
+      if (
+        buttonRef.current && !buttonRef.current.contains(e.target as Node) &&
+        menuRef.current && !menuRef.current.contains(e.target as Node)
+      ) setOpen(false);
+    };
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setOpen(false); };
+    document.addEventListener('mousedown', onDown);
+    document.addEventListener('keydown', onKey);
+    return () => { document.removeEventListener('mousedown', onDown); document.removeEventListener('keydown', onKey); };
+  }, [open]);
+
+  const handleOpen = () => {
+    if (buttonRef.current) {
+      const rect = buttonRef.current.getBoundingClientRect();
+      const menuWidth = 160; // w-40
+      const openRight = rect.right + menuWidth <= window.innerWidth - 8;
+      const left = openRight ? rect.right : rect.right - menuWidth;
+      setCoords({ top: rect.bottom + 4, left: Math.max(8, left) });
+    }
+    setOpen((o) => !o);
+  };
+
+  const run = (fn: () => void) => { setOpen(false); fn(); };
 
   return (
-    <div
-      className="relative inline-block text-left"
-      onBlur={(e) => {
-        if (!e.currentTarget.contains(e.relatedTarget as Node)) setOpen(false);
-      }}
-    >
+    <div className="inline-block text-left">
       <button
+        ref={buttonRef}
         type="button"
         aria-label={`Actions for ${label}`}
         aria-haspopup="menu"
         aria-expanded={open}
-        onClick={() => setOpen((o) => !o)}
+        onClick={handleOpen}
         className="rounded-full p-1.5 text-textSecondary hover:bg-white/5 hover:text-textPrimary focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary"
       >
         <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
@@ -487,61 +514,54 @@ function RowActions({
           <circle cx="12" cy="19" r="1.6" />
         </svg>
       </button>
-      {open ? (
-        <div
-          role="menu"
-          className="absolute left-0 z-40 mt-1 w-40 overflow-hidden rounded-card border border-border bg-surface py-1 text-left shadow-dialog"
-        >
-          {onView ? (
-            <button
-              type="button"
-              role="menuitem"
-              onClick={() => {
-                setOpen(false);
-                onView();
-              }}
-              className="block w-full px-4 py-2 text-sm text-textPrimary hover:bg-white/5"
+      {open
+        ? createPortal(
+            <div
+              ref={menuRef}
+              role="menu"
+              style={{ position: 'fixed', top: coords.top, left: coords.left, zIndex: 9999 }}
+              className="w-40 overflow-hidden rounded-card border border-border bg-surface py-1 text-left shadow-dialog"
             >
-              View report ↗
-            </button>
-          ) : null}
-          {onSend ? (
-            <button
-              type="button"
-              role="menuitem"
-              onClick={() => {
-                setOpen(false);
-                onSend();
-              }}
-              className="block w-full px-4 py-2 text-sm text-textPrimary hover:bg-white/5"
-            >
-              Send report
-            </button>
-          ) : null}
-          <button
-            type="button"
-            role="menuitem"
-            onClick={() => {
-              setOpen(false);
-              onEdit();
-            }}
-            className="block w-full px-4 py-2 text-sm text-textPrimary hover:bg-white/5"
-          >
-            Edit
-          </button>
-          <button
-            type="button"
-            role="menuitem"
-            onClick={() => {
-              setOpen(false);
-              onDelete();
-            }}
-            className="block w-full px-4 py-2 text-sm text-danger hover:bg-danger/5"
-          >
-            Delete
-          </button>
-        </div>
-      ) : null}
+              {onView ? (
+                <button
+                  type="button"
+                  role="menuitem"
+                  onClick={() => run(onView)}
+                  className="block w-full px-4 py-2 text-sm text-textPrimary hover:bg-white/5"
+                >
+                  View report ↗
+                </button>
+              ) : null}
+              {onSend ? (
+                <button
+                  type="button"
+                  role="menuitem"
+                  onClick={() => run(onSend)}
+                  className="block w-full px-4 py-2 text-sm text-textPrimary hover:bg-white/5"
+                >
+                  Send report
+                </button>
+              ) : null}
+              <button
+                type="button"
+                role="menuitem"
+                onClick={() => run(onEdit)}
+                className="block w-full px-4 py-2 text-sm text-textPrimary hover:bg-white/5"
+              >
+                Edit
+              </button>
+              <button
+                type="button"
+                role="menuitem"
+                onClick={() => run(onDelete)}
+                className="block w-full px-4 py-2 text-sm text-danger hover:bg-danger/5"
+              >
+                Delete
+              </button>
+            </div>,
+            document.body,
+          )
+        : null}
     </div>
   );
 }

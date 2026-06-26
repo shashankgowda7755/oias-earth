@@ -21,6 +21,7 @@ import {
   useState,
   type ReactNode,
 } from 'react';
+import { createPortal } from 'react-dom';
 import { Spinner } from './Spinner';
 
 export interface Column<T> {
@@ -472,12 +473,17 @@ function RowActionsMenu({
   onDelete?: () => void;
 }) {
   const [open, setOpen] = useState(false);
-  const rootRef = useRef<HTMLDivElement>(null);
+  const [coords, setCoords] = useState({ top: 0, left: 0 });
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!open) return;
     const onDown = (e: MouseEvent) => {
-      if (rootRef.current && !rootRef.current.contains(e.target as Node)) {
+      if (
+        buttonRef.current && !buttonRef.current.contains(e.target as Node) &&
+        menuRef.current && !menuRef.current.contains(e.target as Node)
+      ) {
         setOpen(false);
       }
     };
@@ -497,36 +503,54 @@ function RowActionsMenu({
     fn?.();
   };
 
+  const handleOpen = () => {
+    if (buttonRef.current) {
+      const rect = buttonRef.current.getBoundingClientRect();
+      const menuWidth = 144; // w-36
+      // prefer opening right-of-button; if it overflows viewport, flip left
+      const openRight = rect.right + menuWidth <= window.innerWidth - 8;
+      const left = openRight ? rect.right : rect.right - menuWidth;
+      setCoords({ top: rect.bottom + 4, left: Math.max(8, left) });
+    }
+    setOpen((v) => !v);
+  };
+
   return (
-    <div ref={rootRef} className="relative inline-block text-left">
+    <div className="inline-block text-left">
       <button
+        ref={buttonRef}
         type="button"
         aria-haspopup="menu"
         aria-expanded={open}
         aria-label="Row actions"
-        onClick={() => setOpen((v) => !v)}
+        onClick={handleOpen}
         className="inline-flex h-8 w-8 items-center justify-center rounded-full text-textSecondary transition-colors hover:bg-white/5 hover:text-textPrimary"
       >
         <KebabIcon />
       </button>
-      {open ? (
-        <div
-          role="menu"
-          className="absolute left-0 z-30 mt-1 w-36 overflow-hidden rounded-input border border-border bg-surface py-1 text-left shadow-dialog"
-        >
-          {onView ? (
-            <MenuItem onClick={() => run(onView)}>View</MenuItem>
-          ) : null}
-          {onEdit ? (
-            <MenuItem onClick={() => run(onEdit)}>Edit</MenuItem>
-          ) : null}
-          {onDelete ? (
-            <MenuItem onClick={() => run(onDelete)} danger>
-              Delete
-            </MenuItem>
-          ) : null}
-        </div>
-      ) : null}
+      {open
+        ? createPortal(
+            <div
+              ref={menuRef}
+              role="menu"
+              style={{ position: 'fixed', top: coords.top, left: coords.left, zIndex: 9999 }}
+              className="w-36 overflow-hidden rounded-input border border-border bg-surface py-1 text-left shadow-dialog"
+            >
+              {onView ? (
+                <MenuItem onClick={() => run(onView)}>View</MenuItem>
+              ) : null}
+              {onEdit ? (
+                <MenuItem onClick={() => run(onEdit)}>Edit</MenuItem>
+              ) : null}
+              {onDelete ? (
+                <MenuItem onClick={() => run(onDelete)} danger>
+                  Delete
+                </MenuItem>
+              ) : null}
+            </div>,
+            document.body,
+          )
+        : null}
     </div>
   );
 }

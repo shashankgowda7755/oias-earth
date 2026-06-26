@@ -6,3 +6,4 @@
 - [x] Verify kebab is leftmost + `sticky/left:0` + visible at mobile (390px) and desktop
 - [x] tsc clean, build, deploy
 - [x] Row-action dropdown opens RIGHT (left-0), not left, so it is fully on-screen next to the left-pinned kebab (DataTable + Reports menus)
+- [x] Portal-render ALL row-action menus via `createPortal` to `document.body` (position:fixed) — escapes overflow-x-auto clipping site-wide; smart flip when near viewport right edge
