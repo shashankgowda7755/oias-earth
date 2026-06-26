@@ -2,8 +2,8 @@
 
 ### Requirement: Per-forest tree map renders a species matrix, not a point cloud
 
-The per-forest tree map on both `/forest/:id` and the `/map` per-forest
-drill-down SHALL render a forest's saplings as a uniform planting **matrix** —
+The per-forest tree map SHALL render a forest's saplings as a uniform planting
+matrix on both `/forest/:id` and the `/map` per-forest drill-down —
 a regular lattice of 10×10 "matrices" with real relative spacing (1 ft sapling
 / 2 ft matrix-gap / 10 ft pathway) — and SHALL NOT use a markercluster layer
 that spiderfies dense, near-coincident planting points into an overlapping web.

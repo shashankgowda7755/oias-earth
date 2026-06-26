@@ -3,9 +3,7 @@
 ## Purpose
 Locate every forest and every tree on a map so sponsors and the public can see
 WHERE living proof exists and verify it independently.
-
 ## Requirements
-
 ### Requirement: Per-tree geo-tagging
 The system SHALL store a latitude/longitude per tree and let authorised users set
 it via device GPS, tapping the map, or manual entry.
@@ -39,3 +37,18 @@ in hectares (EUDR-grade GeoJSON).
 #### Scenario: Boundary drawn on the public map
 - WHEN a forest has a boundary of 3+ points
 - THEN the map renders the polygon and shows the computed area in hectares
+
+### Requirement: Forest coordinate validity guard
+The system SHALL require a centre coordinate when a forest is created, and SHALL
+reject invalid coordinates on any write that sets them, so a forest can never be
+persisted in a state where it cannot appear on the map.
+
+#### Scenario: Create without coordinates is rejected
+- WHEN a forest is created without a latitude and longitude
+- THEN the request fails with `400` and the forest is not created
+
+#### Scenario: Garbage coordinates are rejected
+- WHEN a write sets coordinates that are blank, `0/0`, `lat == lng`, or out of
+  range (`|lat| > 90` or `|lng| > 180`)
+- THEN the request fails with `400` and the coordinates are not saved
+
