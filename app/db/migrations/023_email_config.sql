@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS system_email_config (
 INSERT INTO system_email_config (key) VALUES ('global') ON CONFLICT DO NOTHING;
 
 CREATE TABLE IF NOT EXISTS forest_email_config (
-  forest_id      text PRIMARY KEY REFERENCES forests(id) ON DELETE CASCADE,
+  forest_id      uuid PRIMARY KEY REFERENCES forests(id) ON DELETE CASCADE,
   to_emails      text[] NOT NULL DEFAULT '{}',   -- additive on top of global To
   cc_emails      text[] NOT NULL DEFAULT '{}',   -- replaces global CC when non-empty
   updated_at     timestamptz NOT NULL DEFAULT now(),
