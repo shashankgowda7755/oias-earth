@@ -118,6 +118,7 @@ export interface GoogleEarthImage {
 }
 
 export interface AreaPopulationStatistics {
+  region_name?: string;
   total_jurisdiction_area?: number;
   population?: number;
   population_density?: number;
@@ -193,6 +194,7 @@ export interface SoilPhReading {
   reading_date?: string;
   meter_image?: string;
   meter_reading?: number;
+  before_reading?: number;
 }
 
 export interface TempHumidityPoint {

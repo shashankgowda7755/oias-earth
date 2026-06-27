@@ -94,14 +94,14 @@ export function S01Cover({ data }: SlideProps) {
 }
 
 /* --------------------------- Slide 2: Contents --------------------------- */
-const TOC = [
-  ['Description: OSR Land', '03'], ['Permission Letter', '04'], ['Area and Population Statistics of Chennai', '05'],
+const tocRows = (area: string): [string, string][] => [
+  ['Description: OSR Land', '03'], ['Permission Letter', '04'], [`Area and Population Statistics of ${area}`, '05'],
   ['Project Impact And Outcome', '06'], ['Description: Direct And Indirect Beneficiaries', '07'],
   ['Forest Value Flow Impact Report', '08'], ['Approximate Forest Value in 3, 5, 10 Years', '09'],
   ['Maintenance Summary', '10'], ['Workforce Contribution & Effort Analysis', '11'],
   ['Workforce Contribution & Effort Analysis Till Date', '12'], ['Expected Plant Growth', '13'],
   ['Site Master Plan', '14'], ['Description: Soil pH Level', '15'], ['Description: Temperature', '16'],
-  ['Environmental Need Indicators of Chennai', '17'], ['Saplings Planted & Species Inventory', '18'],
+  [`Environmental Need Indicators of ${area}`, '17'], ['Saplings Planted & Species Inventory', '18'],
   ['Score Card With GRI Framework Integration', '19'], ['Site Security & Infrastructure', '20'],
   ['Transforming Landscapes: Plantation Progress', '21'],
   ['Photo Gallery', '22'],
@@ -109,6 +109,8 @@ const TOC = [
 export function S02Contents({ data }: SlideProps) {
   const { meta, forest } = data;
   const hero = forest.report_images?.find((r) => r.slide_type === 'content_slide')?.image;
+  const area = forest.area_population_statistics_details?.region_name?.trim() || dash(forest.forest_city);
+  const TOC = tocRows(area);
   return (
     <SlidePage meta={meta} bare>
       <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 22 }}>
@@ -232,7 +234,7 @@ export function S05AreaPopulation({ data }: SlideProps) {
   const ap = forest.area_population_statistics_details;
   return (
     <SlidePage meta={meta}>
-      <SectionTitle>Area and Population Statistics of {dash(forest.forest_city)}</SectionTitle>
+      <SectionTitle>Area and Population Statistics of {ap?.region_name?.trim() || dash(forest.forest_city)}</SectionTitle>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 16 }}>
         <StatCard label="Total Jurisdiction Area" tint="green" icon={areaIcon} value={ap?.total_jurisdiction_area != null ? numOrDash(ap.total_jurisdiction_area) : '—'} unit="km²" />
         <StatCard label="Population" tint="blue" icon={peopleIcon} value={ap?.population != null ? `~${numOrDash(ap.population)}` : '—'} />

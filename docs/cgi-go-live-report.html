@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CGI Bangalore — Go-Live Verification</title>
+<style>
+  :root{
+    --bg:#f4f6f3; --card:#fff; --ink:#1f2a23; --mut:#67756b; --line:#e1e7df;
+    --green:#7aa53f; --greenD:#4f6b2a; --p0:#d64545; --p1:#dd8a2c; --p2:#3f86c4; --ok:#4f9d5e; --sec:#8b3fb0;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--ink);line-height:1.5}
+  .wrap{max-width:1000px;margin:0 auto;padding:20px 16px 80px}
+  header.hero{background:linear-gradient(135deg,#7aa53f,#4f6b2a);color:#fff;border-radius:16px;padding:24px;margin-bottom:18px}
+  header.hero h1{margin:0 0 4px;font-size:22px}
+  header.hero p{margin:2px 0;opacity:.92;font-size:13px}
+  .verdict{display:inline-block;background:#fff;color:#d64545;font-weight:700;padding:6px 14px;border-radius:999px;margin-top:10px;font-size:14px}
+  .url{font-family:ui-monospace,Menlo,monospace;font-size:12px;background:rgba(255,255,255,.15);padding:4px 8px;border-radius:6px;display:inline-block;margin-top:8px;word-break:break-all}
+
+  .counts{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px;margin:16px 0}
+  .pill{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;text-align:center;cursor:pointer;transition:.15s;user-select:none}
+  .pill:hover{transform:translateY(-2px);box-shadow:0 4px 14px rgba(0,0,0,.06)}
+  .pill.active{border-color:var(--green);box-shadow:0 0 0 2px rgba(122,165,63,.25)}
+  .pill .n{font-size:26px;font-weight:800;line-height:1}
+  .pill .l{font-size:11px;color:var(--mut);text-transform:uppercase;letter-spacing:.04em;margin-top:4px}
+  .pill.p0 .n{color:var(--p0)} .pill.p1 .n{color:var(--p1)} .pill.p2 .n{color:var(--p2)}
+  .pill.sec .n{color:var(--sec)} .pill.ok .n{color:var(--ok)} .pill.all .n{color:var(--greenD)}
+
+  .bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:6px 0 16px}
+  .bar input{flex:1;min-width:160px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;font-size:14px;background:#fff}
+  .bar button{padding:9px 12px;border:1px solid var(--line);background:#fff;border-radius:10px;cursor:pointer;font-size:13px}
+  .prog{font-size:12px;color:var(--mut)}
+
+  .card{background:var(--card);border:1px solid var(--line);border-left-width:5px;border-radius:12px;margin-bottom:10px;overflow:hidden}
+  .card.P0{border-left-color:var(--p0)} .card.P1{border-left-color:var(--p1)}
+  .card.P2{border-left-color:var(--p2)} .card.SEC{border-left-color:var(--sec)} .card.OK{border-left-color:var(--ok)}
+  .head{display:flex;align-items:center;gap:10px;padding:12px 14px;cursor:pointer}
+  .tag{font-size:10px;font-weight:800;padding:3px 8px;border-radius:6px;color:#fff;white-space:nowrap}
+  .tag.P0{background:var(--p0)} .tag.P1{background:var(--p1)} .tag.P2{background:var(--p2)}
+  .tag.SEC{background:var(--sec)} .tag.OK{background:var(--ok)}
+  .ttl{flex:1;font-weight:600;font-size:15px}
+  .chev{color:var(--mut);transition:.2s}
+  .card.open .chev{transform:rotate(90deg)}
+  .body{display:none;padding:0 14px 14px 14px;border-top:1px solid var(--line)}
+  .card.open .body{display:block}
+  .row{display:flex;gap:10px;margin-top:10px;font-size:13.5px;flex-wrap:wrap}
+  .row b{display:block;font-size:10px;text-transform:uppercase;letter-spacing:.04em;color:var(--mut);margin-bottom:2px}
+  .kv{flex:1;min-width:150px;background:#f8faf6;border:1px solid var(--line);border-radius:8px;padding:8px 10px}
+  .kv.bad{background:#fdeeee;border-color:#f4cccc}
+  .kv.good{background:#eef7ef;border-color:#cfe7d3}
+  code{font-family:ui-monospace,Menlo,monospace;font-size:12px;background:#eef0ec;padding:1px 5px;border-radius:4px}
+  .fix{margin-top:10px;font-size:13.5px;background:#f0f5ea;border:1px solid #d8e6c8;border-radius:8px;padding:9px 11px}
+  .fix b{color:var(--greenD)}
+  .done{display:flex;align-items:center;gap:7px;margin-top:10px;font-size:13px;color:var(--mut)}
+  .done input{width:17px;height:17px;accent-color:var(--green)}
+  .card.checked{opacity:.62}
+  .card.checked .ttl{text-decoration:line-through}
+
+  h2.sec{margin:26px 0 8px;font-size:16px;color:var(--greenD)}
+  table{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden;font-size:12.5px}
+  th,td{padding:8px 10px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+  th{background:#eef3e8;font-size:11px;text-transform:uppercase;letter-spacing:.03em;color:var(--greenD)}
+  td .s{font-weight:700}
+  .s.y{color:var(--ok)} .s.n{color:var(--p0)} .s.w{color:#c98a1a}
+  .hide{display:none!important}
+  footer{margin-top:30px;font-size:12px;color:var(--mut);text-align:center}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <h1>🌳 CGI Bangalore University — Go-Live Check</h1>
+    <p>Old report tested: <b>CGI Bangalore Q3 PDF</b> (14 sections + scorecard + gallery)</p>
+    <p>Live tested: render clean, 0 errors, all 23 slides show.</p>
+    <div class="verdict" id="verdict">⛔ NOT ready — 4 big bugs, 1 security issue</div>
+    <div class="url">communitree-rebuild.vercel.app/report/forest/preview?src=cgiblr</div>
+  </header>
+
+  <div class="counts" id="counts">
+    <div class="pill all active" data-f="ALL"><div class="n">15</div><div class="l">All findings</div></div>
+    <div class="pill p0" data-f="P0"><div class="n">4</div><div class="l">P0 · must fix</div></div>
+    <div class="pill p1" data-f="P1"><div class="n">5</div><div class="l">P1 · should fix</div></div>
+    <div class="pill p2" data-f="P2"><div class="n">3</div><div class="l">P2 · minor</div></div>
+    <div class="pill sec" data-f="SEC"><div class="n">1</div><div class="l">Security</div></div>
+    <div class="pill ok" data-f="OK"><div class="n">2</div><div class="l">Working OK</div></div>
+  </div>
+
+  <div class="bar">
+    <input id="q" placeholder="🔍 Search findings…">
+    <button id="expandAll">Expand all</button>
+    <button id="collapseAll">Collapse all</button>
+    <span class="prog" id="prog"></span>
+  </div>
+
+  <div id="list"></div>
+
+  <h2 class="sec">📋 Every data point — old PDF vs live site</h2>
+  <table id="matchTbl">
+    <thead><tr><th>Section</th><th>Saved?</th><th>Shows?</th><th>Matches old?</th><th>Note</th></tr></thead>
+    <tbody></tbody>
+  </table>
+
+  <footer>Generated 2026-06-27 · full notes in <code>docs/GO-LIVE-CGI-VERIFICATION.md</code> · tick boxes save in this browser</footer>
+</div>
+
+<script>
+const F=[
+ {id:"BUG-1",pri:"P0",t:"4 trees become 1 tree",old:"5 species (Golden Shower, Copper Pod, Nochu, Terminalia Arjuna)",live:"1 species — “Golden Shower 700”",where:"Slide 9 species table, Slide 18 inventory, “Sapling Species: 1”, per-species O₂/carbon, slide-14 traits",why:"All 4 species have empty species_id, so they merge into one bucket.",fix:"Group species by common name when species_id is empty, or link species to the master table."},
+ {id:"BUG-2",pri:"P0",t:"Plantation grid lost on import",old:"Per Matrix 170+170+160, 3 grids",live:"Per Matrix 1×1=1",where:"Slide 14 Site Master Plan",why:"PDF→JSON→create path sends box_columns / tree_rows / tree_columns (plural). DB columns are singular, so server drops them. This is exactly the path you use.",fix:"Accept singular keys (box_column / tree_row / tree_column) or alias the plurals in the upsert allowlist."},
+ {id:"PERSIST-4",pri:"P0",t:"Photos may all fail (503)",old:"Cover, meter, temperature, 4 gallery photos",live:"Empty placeholders",where:"Every image slot",why:"Uploads work only if BLOB_READ_WRITE_TOKEN or SUPABASE_* env is set on the server. If not, every upload returns HTTP 503 and saves nothing.",fix:"Confirm the storage env var is set in production before go-live."},
+ {id:"BUG-5",pri:"P0",t:"Forest money value wrong",old:"₹0.41552 / 0.69254 / 1.38508 Cr (3/5/10y)",live:"₹0.08 / 0.13 / 0.26 Cr",where:"Slide 8 Forest Value Flow",why:"Land Value and Tree Value are empty (null); only oxygen + carbon are summed.",fix:"Capture land_value + tree_value in the form, or compute them (land from area, tree from saplings) like the old sheet."},
+
+ {id:"BUG-3",pri:"P1",t:"“Site Manager” is gone",old:"Site Supervisor AND Site Manager (each 1)",live:"Only Site Supervisor; Site Manager shows “—”",where:"Slide 7 Beneficiaries + Slide 3 OSR Land",why:"Schema has no site_manager field (was merged into Supervisor in commit 8f024d8).",fix:"Add a site_manager field + render its row."},
+ {id:"TOC-CHENNAI",pri:"P1",t:"Contents page says wrong city",old:"Bangalore everywhere",live:"“Area & Population of Chennai”, “Env Indicators of Chennai”",where:"Slide 2 Contents",why:"City name hardcoded to Chennai in the Contents slide.",fix:"Use the forest city instead of a hardcoded string."},
+ {id:"PERSIST-2",pri:"P1",t:"Editing report eats the gallery",old:"4 gallery photos",live:"Can disappear after a report edit",where:"Report edit save path",why:"REPORT_UPDATE_JSONB (forest.ts ~2121) leaves out gallery_images, so a bulk report-data save drops it.",fix:"Add gallery_images to REPORT_UPDATE_JSONB."},
+ {id:"BUG-4",pri:"P1",t:"“Till Date” numbers wrong",old:"Till Date 275 / 133 / 121 / 6 / 44",live:"Till Date = Quarter (91 / 74 / 67 / 6 / 18)",where:"Slide 10 Maintenance, Slide 12 Workforce",why:"Only one quarter of data exists, so nothing accumulates. Also “days not watered” formula differs (18 vs 24).",fix:"Enter prior fiscal quarters as maintenance rows, and reconcile the not-watered formula."},
+ {id:"BUG-6",pri:"P1",t:"Score Card is empty",old:"SDG 99/100, GRI 95/100 + QR",live:"—/100",where:"Slide 19 Score Card",why:"No field exists for these scores; slide is marked “added in a later phase”.",fix:"Add capture for SDG/GRI scores, or hide the slide for go-live."},
+
+ {id:"PERIOD",pri:"P2",t:"Wrong quarter labelled",old:"Q3 · Oct–Dec 2025",live:"Q1 · Apr–Jun 2026",where:"Cover + all period labels",why:"Sample data is mapped to fiscal Q1 2026 (a mock), not the old Q3.",fix:"Set the report quarter + maintenance/temperature/pH rows to the real reporting period."},
+ {id:"GROWTH-DATE",pri:"P2",t:"Growth dates off",old:"Apr-25 / Sep-25 / Apr-26 / Apr-27 / Apr-28 (5 rows)",live:"Jun-24 / Jun-25 / Jun-26 / Jun-27 (4 rows)",where:"Slide 13 Expected Plant Growth",why:"Dates auto-computed from plantation month (June). Old report used Apr/Sep manually.",fix:"Make milestone dates editable if exact dates matter."},
+ {id:"MISC",pri:"P2",t:"Small missing bits",old:"Sub-region “West Bangalore”, before-plantation pH",live:"Not captured",where:"Slides 5 + 15; also permission_letter/site_layout files vanish on redeploy (/tmp)",why:"No fields for sub-region name or before-pH; doc files stored on temporary disk.",fix:"Add fields if needed; move doc uploads to durable storage."},
+
+ {id:"SEC-1",pri:"SEC",t:"Exposed GitHub token",old:"—",live:"Token sits in your git config",where:"git remote “shashank”",why:"URL contains a live GitHub PAT (ghp_…@github.com/shashankgowda7755/oias-earth.git) = push access for anyone who reads the config.",fix:"Rotate the token now, then: git remote remove shashank. Re-add without the token."},
+
+ {id:"OK-1",pri:"OK",t:"Data saves & loads back fine",old:"All sections",live:"18 report sections round-trip cleanly",where:"Storage layer",why:"Land, area, beneficiaries, maintenance, growth, soil, temperature, env indicators, value, species all persist and read back (except the bugs above).",fix:"No action."},
+ {id:"OK-2",pri:"OK",t:"Live site healthy",old:"—",live:"All 23 slides render, 0 console errors, layout intact",where:"Production",why:"Page loads (HTTP 200), public report route works without login.",fix:"No action."},
+];
+
+const M=[
+ ["Cover (client, qtr, 700 saplings, logos)","y","y","w","Period shows Q1 26, old = Q3 25"],
+ ["1 · OSR Land (ownership, DIGIPIN, 900ft², coords)","y","y","y","All correct"],
+ ["2 · Area & Population","y","y","w","“West Bangalore” sub-name missing"],
+ ["3 · Saplings (700, mixed, species)","y","y","n","Shows 1 species not 5 → BUG-1"],
+ ["4 · Plantation Grid (170+170+160)","w","y","n","Shows 1×1=1 → BUG-2"],
+ ["5 · Beneficiaries (+ Site Manager)","w","y","n","Site Manager dropped → BUG-3"],
+ ["6 · Maintenance (Qtr + Till Date)","y","y","n","Till Date = Quarter → BUG-4"],
+ ["7 · Workforce (627 / 1172)","y","y","n","Till Date = Quarter → BUG-4"],
+ ["8 · Environmental Indicators (5)","y","y","y","All 5 correct"],
+ ["9 · Project Impact + SDGs","y","y","y","Template, matches"],
+ ["10 · Soil pH (reading, date, photo)","w","y","w","One reading ok; before-pH + photo missing"],
+ ["11 · Temperature (in/out, humidity)","y","y","y","27.3/31.4, 68/62 correct"],
+ ["12 · Plant Growth (ranges + dates)","y","y","w","Ranges ok; dates differ"],
+ ["13 · Forest Value (3/5/10y)","w","y","n","0.08 vs 0.41 Cr → BUG-5"],
+ ["13b · Per-species O₂/carbon","n","y","n","Collapsed to 1 row → BUG-1"],
+ ["14 · Multipurpose traits","n","n","n","Not captured/shown"],
+ ["Score Card (SDG/GRI)","n","y","n","—/100 → BUG-6"],
+ ["Photo Gallery (4 photos)","y","y","w","Empty; needs upload + storage env"],
+ ["Thank You (created by)","y","y","w","Empty in this preview; wiring works"],
+ ["Contents (TOC)","—","y","n","Hardcoded “Chennai” → TOC-CHENNAI"],
+];
+
+const LABEL={P0:"P0",P1:"P1",P2:"P2",SEC:"SEC",OK:"OK"};
+const list=document.getElementById('list');
+const KEY='cgi_done_v1';
+let done=JSON.parse(localStorage.getItem(KEY)||'{}');
+
+function render(){
+  list.innerHTML='';
+  F.forEach(f=>{
+    const c=document.createElement('div');
+    c.className='card '+f.pri+(done[f.id]?' checked':'');
+    c.dataset.pri=f.pri;
+    c.dataset.txt=(f.id+' '+f.t+' '+f.why+' '+f.where+' '+f.fix).toLowerCase();
+    c.innerHTML=`
+      <div class="head">
+        <span class="tag ${f.pri}">${LABEL[f.pri]}</span>
+        <span class="ttl">${f.t}</span>
+        <span class="chev">▶</span>
+      </div>
+      <div class="body">
+        <div class="row">
+          <div class="kv bad"><b>Old report</b>${f.old}</div>
+          <div class="kv good"><b>Live site now</b>${f.live}</div>
+        </div>
+        <div class="row"><div class="kv"><b>Where</b>${f.where}</div></div>
+        <div class="row"><div class="kv"><b>Why</b>${f.why}</div></div>
+        <div class="fix"><b>Fix →</b> ${f.fix}</div>
+        <label class="done"><input type="checkbox" ${done[f.id]?'checked':''} data-id="${f.id}"> Mark fixed / handled</label>
+      </div>`;
+    c.querySelector('.head').onclick=()=>c.classList.toggle('open');
+    c.querySelector('input').onchange=e=>{
+      done[f.id]=e.target.checked; localStorage.setItem(KEY,JSON.stringify(done));
+      c.classList.toggle('checked',e.target.checked); updProg();
+    };
+    list.appendChild(c);
+  });
+  updProg();
+}
+function updProg(){
+  const fixable=F.filter(f=>f.pri!=='OK');
+  const n=fixable.filter(f=>done[f.id]).length;
+  document.getElementById('prog').textContent=`${n} / ${fixable.length} handled`;
+}
+// matrix table
+const tb=document.querySelector('#matchTbl tbody');
+M.forEach(r=>{
+  const cls={y:'y',n:'n',w:'w','—':''};
+  const S=v=>`<span class="s ${cls[v]||''}">${ {y:'✔ yes',n:'✗ no',w:'~ part','—':'—'}[v]||v }</span>`;
+  tb.innerHTML+=`<tr><td>${r[0]}</td><td>${S(r[1])}</td><td>${S(r[2])}</td><td>${S(r[3])}</td><td>${r[4]}</td></tr>`;
+});
+// filters
+let filter='ALL';
+document.getElementById('counts').onclick=e=>{
+  const p=e.target.closest('.pill'); if(!p)return;
+  document.querySelectorAll('.pill').forEach(x=>x.classList.remove('active'));
+  p.classList.add('active'); filter=p.dataset.f; apply();
+};
+document.getElementById('q').oninput=apply;
+function apply(){
+  const q=document.getElementById('q').value.toLowerCase();
+  document.querySelectorAll('.card').forEach(c=>{
+    const okF=filter==='ALL'||c.dataset.pri===filter;
+    const okQ=!q||c.dataset.txt.includes(q);
+    c.classList.toggle('hide',!(okF&&okQ));
+  });
+}
+document.getElementById('expandAll').onclick=()=>document.querySelectorAll('.card').forEach(c=>c.classList.add('open'));
+document.getElementById('collapseAll').onclick=()=>document.querySelectorAll('.card').forEach(c=>c.classList.remove('open'));
+render();
+</script>
+</body>
+</html>

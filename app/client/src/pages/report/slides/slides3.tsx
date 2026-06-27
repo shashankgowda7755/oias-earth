@@ -25,6 +25,7 @@ export function S15SoilPh({ data }: SlideProps) {
   const { meta, forest } = data;
   const ph = pickQuarter(forest.soil_ph_level, meta.year, meta.quarter);
   const phReading = pos(ph?.meter_reading);
+  const beforeReading = pos(ph?.before_reading);
   const phIdx = phReading != null ? Math.max(0, Math.min(14, Math.round(phReading))) : null;
   const cards = [
     ['Acidic Land', 'Acidic soils often increase availability of toxic metals like aluminium & manganese, which can damage roots.', C.red],
@@ -48,7 +49,7 @@ export function S15SoilPh({ data }: SlideProps) {
             ))}
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: C.muted, marginBottom: 16 }}>
-            <span>Before Plantation</span><span>After Plantation</span>
+            <span>Before Plantation{beforeReading != null ? `: ${beforeReading} pH` : ''}</span><span>After Plantation{phReading != null ? `: ${phReading} pH` : ''}</span>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 10 }}>
             {cards.map(([t, d, col]) => (
@@ -130,9 +131,10 @@ export function S16Temperature({ data }: SlideProps) {
 export function S17EnvIndicators({ data }: SlideProps) {
   const { meta, forest } = data;
   const items = forest.environmental_need_indicators ?? [];
+  const area = forest.area_population_statistics_details?.region_name?.trim() || dash(forest.forest_city);
   return (
     <SlidePage meta={meta}>
-      <SectionTitle>Environmental Need Indicators of {dash(forest.forest_city)}</SectionTitle>
+      <SectionTitle>Environmental Need Indicators of {area}</SectionTitle>
       {items.length ? (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: 16 }}>
           {items.map((it, i) => (

@@ -167,6 +167,13 @@ const FOREST_JSONB_COLUMNS = new Set([
 
 const FOREST_ALL_COLUMNS = new Set([...FOREST_SCALAR_COLUMNS, ...FOREST_JSONB_COLUMNS]);
 
+/** Plural grid keys the full payload / JSON-import skill sends -> singular DB columns. */
+const GRID_KEY_ALIAS: Record<string, string> = {
+  box_columns: 'box_column',
+  tree_rows: 'tree_row',
+  tree_columns: 'tree_column',
+};
+
 /**
  * Payload key (camelCase from the live UI OR snake_case) -> column.
  * The forest_create_payload.jsonc uses snake_case names that already match the
@@ -250,7 +257,8 @@ async function upsertForest(req: Request, res: Response): Promise<void> {
   // 1. Collect scalar + jsonb forest columns from the body.
   const colMap = new Map<string, unknown>();
   for (const [rawKey, rawVal] of Object.entries(body)) {
-    const col = FOREST_ALL_COLUMNS.has(rawKey) ? rawKey : toSnake(rawKey);
+    const aliased = GRID_KEY_ALIAS[rawKey] ?? rawKey;
+    const col = FOREST_ALL_COLUMNS.has(aliased) ? aliased : toSnake(aliased);
     if (!FOREST_ALL_COLUMNS.has(col)) continue;
     let value: unknown = rawVal;
     if (FOREST_JSONB_COLUMNS.has(col) && value !== null && value !== undefined) {
@@ -261,10 +269,20 @@ async function upsertForest(req: Request, res: Response): Promise<void> {
   }
 
   // 2. Uploaded files override their URL columns (permission_letter, site_layout).
+  // Prefer durable object storage (survives redeploys); fall back to the local
+  // /uploads URL only when no storage backend is configured.
   const files = (req.files as Express.Multer.File[] | undefined) ?? [];
   for (const f of files) {
     if (f.fieldname === 'permission_letter' || f.fieldname === 'site_layout') {
-      colMap.set(f.fieldname, fileUrl(req, f.filename));
+      let url = fileUrl(req, f.filename);
+      if (storageReady()) {
+        try {
+          const buf = fs.readFileSync(f.path);
+          url = await putObject(`forest-docs/${f.filename}`, buf, f.mimetype || 'application/octet-stream');
+          fs.unlink(f.path, () => { /* best-effort cleanup of the temp file */ });
+        } catch { /* keep local fileUrl fallback */ }
+      }
+      colMap.set(f.fieldname, url);
     }
   }
 
@@ -2123,7 +2141,7 @@ const REPORT_UPDATE_JSONB = [
   'direct_and_indirect_beneficiaries', 'forest_value_flow_impact_report', 'species_details',
   'maintenance_workforce', 'plant_growth_data', 'soil_ph_level', 'temperature_humidity',
   'environmental_need_indicators', 'security_and_infrastructure', 'plantation_progress',
-  'additional_sponsor_logo', 'dashboard_images', 'report_images',
+  'additional_sponsor_logo', 'dashboard_images', 'report_images', 'gallery_images',
 ];
 
 async function updateForestReportData(req: Request, res: Response): Promise<void> {

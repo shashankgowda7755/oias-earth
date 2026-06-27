@@ -46,6 +46,7 @@
   "site_layout": "",
   "authorization_details": { "authorized_by_name": "", "authorized_by_designation": "", "authorized_date": "", "authorized_period": "3", "project_context": "" },
   "area_population_statistics_details": {
+    "region_name": "West Bangalore",
     "total_jurisdiction_area": 6.5,
     "population": 200000,
     "population_density": null,
@@ -75,7 +76,7 @@
     ],
     "actual_height_range": [ { "year": 2026, "quarter": 1, "min": 3, "max": 4 } ]
   },
-  "soil_ph_level": [ { "year": 2026, "quarter": 1, "reading_date": "2025-12-19", "meter_image": "", "meter_reading": 6.5 } ],
+  "soil_ph_level": [ { "year": 2026, "quarter": 1, "reading_date": "2025-12-19", "meter_image": "", "before_reading": 4, "meter_reading": 6.5 } ],
   "temperature_humidity": [
     { "year": 2026, "quarter": 1, "reading_date": "2025-12-19", "inside_plantation": { "image": "", "humidity": 68, "temperature": 27.3 }, "outside_plantation": { "image": "", "humidity": 62, "temperature": 31.4 } }
   ],

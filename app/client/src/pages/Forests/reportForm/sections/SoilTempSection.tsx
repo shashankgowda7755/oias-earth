@@ -17,7 +17,8 @@ export function SoilTempSection({ draft, patch }: SectionProps) {
               <Num label="Quarter" value={row.quarter} onChange={(v) => update({ quarter: v ?? 0 })} />
               <Dt label="Reading Date" value={row.reading_date} onChange={(v) => update({ reading_date: v })} />
               <Url label="Meter Image" value={row.meter_image} onChange={(v) => update({ meter_image: v })} />
-              <Num label="Meter Reading" value={row.meter_reading} onChange={(v) => update({ meter_reading: v })} />
+              <Num label="Before-plantation pH" value={row.before_reading} onChange={(v) => update({ before_reading: v })} />
+              <Num label="Meter Reading (after)" value={row.meter_reading} onChange={(v) => update({ meter_reading: v })} />
             </FieldGrid>
           )}
         />

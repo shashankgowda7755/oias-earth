@@ -5,6 +5,13 @@ export function AreaPopulationSection({ draft, patch }: SectionProps) {
   return (
     <SectionShell title="Area & Population Statistics">
       <FieldGrid cols={2}>
+        <Txt
+          label="Region / Sub-area Name"
+          value={aps?.region_name}
+          onChange={(v) =>
+            patch({ area_population_statistics_details: { ...draft.area_population_statistics_details, region_name: v } })
+          }
+        />
         <Num
           label="Total Jurisdiction Area"
           value={aps?.total_jurisdiction_area}
