@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 import QRCode from 'qrcode';
 import type { SlideProps } from '../reportTypes';
 import {
-  C, SectionTitle, SlidePage, ReportImage, EmptyBlock,
+  C, SectionTitle, SlidePage, ReportImage, EmptyBlock, DarkPanel, Pill, CARD_SHADOW,
   dash, numOrDash, fmtDate, enumLabel,
 } from '../reportPrimitives';
 
@@ -35,8 +35,8 @@ export function S15SoilPh({ data }: SlideProps) {
     <SlidePage meta={meta}>
       <SectionTitle>Description: Soil pH Level</SectionTitle>
       <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr', gap: 22, flex: 1, minHeight: 0 }}>
-        <div style={{ border: `1px solid ${C.line}`, borderRadius: 14, padding: '16px 18px' }}>
-          <strong style={{ fontSize: 14, color: C.ink }}>pH Improvement Trajectory</strong>
+        <div style={{ border: `1px solid ${C.line}`, borderRadius: 16, padding: '16px 18px', background: '#fff', boxShadow: CARD_SHADOW }}>
+          <strong style={{ fontSize: 14, color: C.ink }}>📋 pH Improvement Trajectory</strong>
           <div style={{ display: 'flex', gap: 2, marginTop: 18 }}>
             {PH_COLORS.map((_, i) => (
               <div key={i} style={{ flex: 1, textAlign: 'center', fontSize: 12, color: C.ink, height: 16 }}>{phIdx === i ? '▼' : ''}</div>
@@ -52,14 +52,14 @@ export function S15SoilPh({ data }: SlideProps) {
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 10 }}>
             {cards.map(([t, d, col]) => (
-              <div key={t} style={{ border: `1px solid ${col}`, borderRadius: 10, padding: '10px 12px' }}>
+              <div key={t} style={{ border: `1px solid ${col}33`, background: `${col}0f`, borderRadius: 12, padding: '12px 14px' }}>
                 <div style={{ fontSize: 12.5, fontWeight: 700, color: col }}>{t}</div>
                 <div style={{ fontSize: 11, color: C.body, marginTop: 4, lineHeight: 1.4 }}>{d}</div>
               </div>
             ))}
           </div>
         </div>
-        <div style={{ border: `1px solid ${C.line}`, borderRadius: 14, padding: '16px 18px', display: 'flex', flexDirection: 'column' }}>
+        <div style={{ border: `1px solid ${C.line}`, borderRadius: 16, padding: '16px 18px', display: 'flex', flexDirection: 'column', background: '#fff', boxShadow: CARD_SHADOW }}>
           <strong style={{ fontSize: 14, color: C.ink }}>On-Site Verification</strong>
           <div style={{ fontSize: 12, color: C.muted, margin: '6px 0 12px' }}>Real-time measurement taken inside the plantation area.</div>
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11.5, color: C.muted, marginBottom: 8 }}>
@@ -86,7 +86,7 @@ export function S16Temperature({ data }: SlideProps) {
   const tempDiff = inT != null && outT != null ? Math.abs(outT - inT) : null;
   const humDiff = inH != null && outH != null ? Math.abs(outH - inH) : null;
   const panel = (title: string, p?: { temperature?: number; humidity?: number; image?: string }) => (
-    <div style={{ border: `1px solid ${C.line}`, borderRadius: 14, padding: '16px 18px' }}>
+    <div style={{ border: `1px solid ${C.line}`, borderRadius: 16, padding: '16px 18px', background: '#fff', boxShadow: CARD_SHADOW }}>
       <div style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: '.05em', color: C.muted, marginBottom: 14 }}>{title}</div>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, alignItems: 'center' }}>
         <div>
@@ -108,13 +108,13 @@ export function S16Temperature({ data }: SlideProps) {
         {panel('Outside Plantation', outside)}
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: '0.6fr 1.4fr', gap: 18, marginTop: 18, flex: 1, alignItems: 'start' }}>
-        <div style={{ background: C.dark, borderRadius: 14, padding: '16px 18px', color: '#fff' }}>
+        <DarkPanel radius={14} style={{ padding: '16px 18px' }}>
           <div style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '.05em', color: 'rgba(255,255,255,.6)' }}>The Difference</div>
           <div style={{ display: 'flex', gap: 22, marginTop: 12 }}>
             <div><div style={{ fontSize: 24, fontWeight: 800 }}>{tempDiff != null ? `${tempDiff.toFixed(1)}°c` : '—'}</div><div style={{ fontSize: 10, color: 'rgba(255,255,255,.6)' }}>TEMP</div></div>
             <div><div style={{ fontSize: 24, fontWeight: 800 }}>{humDiff != null ? `${humDiff.toFixed(1)} RH` : '—'}</div><div style={{ fontSize: 10, color: 'rgba(255,255,255,.6)' }}>HUMID</div></div>
           </div>
-        </div>
+        </DarkPanel>
         <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
           <div style={{ fontSize: 11.5, textTransform: 'uppercase', letterSpacing: '.05em', color: C.green, fontWeight: 700, marginBottom: 6 }}>💡 Scientific Insight</div>
           <div style={{ fontSize: 14, color: C.body, lineHeight: 1.6 }}>
@@ -136,7 +136,7 @@ export function S17EnvIndicators({ data }: SlideProps) {
       {items.length ? (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: 16 }}>
           {items.map((it, i) => (
-            <div key={i} style={{ border: `1px solid ${C.line}`, borderRadius: 14, padding: '16px 18px' }}>
+            <div key={i} style={{ border: `1px solid ${C.line}`, borderLeft: `4px solid ${[C.green, C.blue, C.orange, C.purple][i % 4]}`, borderRadius: 14, padding: '16px 18px', background: '#fff', boxShadow: CARD_SHADOW }}>
               <div style={{ fontSize: 16, fontWeight: 800, color: C.ink }}>{dash(it.heading)}</div>
               <div style={{ fontSize: 13.5, color: C.body, marginTop: 6, lineHeight: 1.5 }}>{dash(it.description)}</div>
             </div>
@@ -177,7 +177,7 @@ export function S18Species({ data }: SlideProps) {
     <SlidePage meta={meta}>
       <SectionTitle>Saplings Planted &amp; Species Inventory</SectionTitle>
       <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: 18, marginBottom: 16 }}>
-        <div style={{ border: `1px solid ${C.line}`, borderRadius: 14, padding: '14px 18px' }}>
+        <div style={{ border: `1px solid ${C.line}`, borderRadius: 16, padding: '16px 18px', background: '#fff', boxShadow: CARD_SHADOW }}>
           <strong style={{ fontSize: 14, color: C.ink }}>Saplings Management (Plantation Data)</strong>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px 24px', marginTop: 12 }}>
             {facts.map(([k, v]) => (
@@ -187,7 +187,7 @@ export function S18Species({ data }: SlideProps) {
             ))}
           </div>
         </div>
-        <div style={{ border: `1px solid ${C.line}`, borderRadius: 14, padding: 14, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ border: `1px solid ${C.line}`, borderRadius: 16, padding: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#fff', boxShadow: CARD_SHADOW }}>
           <svg width="150" height="150" viewBox="0 0 36 36">
             <circle cx="18" cy="18" r="15.9" fill="none" stroke={C.line} strokeWidth="3.4" />
             {segs.map((s, i) => {
@@ -207,7 +207,7 @@ export function S18Species({ data }: SlideProps) {
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5,1fr)', gap: 10, flex: 1, minHeight: 0, overflow: 'hidden' }}>
         {inv.slice(0, 5).map((s) => (
-          <div key={s.common_name} style={{ border: `1px solid ${C.line}`, borderRadius: 12, padding: '12px 14px', display: 'flex', flexDirection: 'column' }}>
+          <div key={s.common_name} style={{ border: `1px solid ${C.line}`, borderRadius: 14, padding: '12px 14px', display: 'flex', flexDirection: 'column', background: '#fff', boxShadow: CARD_SHADOW }}>
             <strong style={{ fontSize: 14, color: C.ink }}>{s.common_name}</strong>
             {s.description && <div style={{ fontSize: 11, color: C.muted, margin: '6px 0', flex: 1, overflow: 'hidden', lineHeight: 1.4 }}>{s.description}</div>}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: `1px solid ${C.line}`, paddingTop: 8, marginTop: 'auto' }}>
@@ -245,10 +245,10 @@ export function S19ScoreCard({ data }: SlideProps) {
         </div>
         <div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-            <div style={{ background: '#f7faf8', borderRadius: 14, padding: '22px', textAlign: 'center' }}>
+            <div style={{ background: '#fff', border: `1px solid ${C.line}`, boxShadow: CARD_SHADOW, borderRadius: 16, padding: '22px', textAlign: 'center' }}>
               <div style={{ fontSize: 14, color: C.muted }}>SDG Score Total</div><div style={{ fontSize: 40, fontWeight: 800, color: C.ink }}>—/100</div>
             </div>
-            <div style={{ background: '#f7faf8', borderRadius: 14, padding: '22px', textAlign: 'center' }}>
+            <div style={{ background: '#fff', border: `1px solid ${C.line}`, boxShadow: CARD_SHADOW, borderRadius: 16, padding: '22px', textAlign: 'center' }}>
               <div style={{ fontSize: 14, color: C.muted }}>GRI framework Total</div><div style={{ fontSize: 40, fontWeight: 800, color: C.ink }}>—/100</div>
             </div>
           </div>
@@ -317,8 +317,8 @@ export function S21Progress({ data }: SlideProps) {
         <SectionTitle>Transforming Landscapes: Plantation Progress - {meta.year}</SectionTitle>
       </div>
       <div style={{ display: 'flex', gap: 10, marginTop: -8, marginBottom: 12 }}>
-        <span style={{ border: `1px solid ${C.line}`, borderRadius: 999, padding: '6px 16px', fontSize: 13, color: C.ink }}>Year {meta.year}</span>
-        <span style={{ border: `1px solid ${C.line}`, borderRadius: 999, padding: '6px 16px', fontSize: 13, color: C.ink }}>Quarter {meta.quarter} {meta.year}</span>
+        <Pill style={{ padding: '8px 16px', fontSize: 13 }}>Year {meta.year}</Pill>
+        <Pill style={{ padding: '8px 16px', fontSize: 13 }}>Quarter {meta.quarter} {meta.year}</Pill>
       </div>
       <ReportImage src={pp?.image} label={`Plantation progress · ${meta.quarter_label} ${meta.year}`} style={{ flex: 1, minHeight: 0 }} />
     </SlidePage>
@@ -348,18 +348,18 @@ export function S22Thanks({ data }: SlideProps) {
         <span style={{ flex: 1 }} />
         <span style={{ color: C.muted, fontSize: 14 }}>Report Dated : {meta.report_date}</span>
       </div>
-      <div style={{ background: C.dark, borderRadius: 18, padding: '40px', textAlign: 'center', color: '#fff' }}>
+      <DarkPanel style={{ padding: '40px', textAlign: 'center' }}>
         <div style={{ width: 64, height: 64, borderRadius: '50%', background: C.green, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
           <svg width="30" height="30" viewBox="0 0 24 24" fill="#0f3d2e"><path d="M12 21s-7-4.6-9.5-9C1 9 2.5 5.5 6 5.5c2 0 3.2 1.3 4 2.5.8-1.2 2-2.5 4-2.5 3.5 0 5 3.5 3.5 6.5C19 16.4 12 21 12 21z" /></svg>
         </div>
-        <h1 style={{ fontSize: 40, fontWeight: 800, margin: 0 }}>Thank You!</h1>
-      </div>
+        <h1 style={{ fontSize: 40, fontWeight: 700, margin: 0, color: '#fff' }}>Thank You!</h1>
+      </DarkPanel>
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 16, justifyContent: cards.length > 2 ? 'center' : 'space-between', marginTop: 24 }}>
         {cards.map((c, i) => <div key={i}>{logoCard(c.caption, c.name, c.logo)}</div>)}
       </div>
       <div style={{ display: 'flex', gap: 12, justifyContent: 'center', marginTop: 22 }}>
-        <span style={{ border: `1px solid ${C.line}`, borderRadius: 999, padding: '8px 18px', fontSize: 14 }}>{meta.quarter_label} Report</span>
-        <span style={{ border: `1px solid ${C.line}`, borderRadius: 999, padding: '8px 18px', fontSize: 14 }}>{meta.period_label}</span>
+        <Pill>{meta.quarter_label} Report</Pill>
+        <Pill>{meta.period_label}</Pill>
       </div>
       <div style={{ textAlign: 'center', marginTop: 'auto', paddingTop: 18, borderTop: `1px solid ${C.line}` }}>
         <div style={{ fontSize: 16, fontWeight: 700, color: C.ink }}>Created By {dash(meta.created_by_name)}</div>

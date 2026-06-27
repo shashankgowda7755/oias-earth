@@ -7,15 +7,16 @@ import type { ReactNode } from 'react';
 import type { SlideProps } from '../reportTypes';
 import {
   C, Breadcrumb, ClientMark, SectionTitle, SlidePage, StatCard, ReportImage, EmptyBlock,
-  ReportFooter, dash, numOrDash, fmtDate, enumLabel,
+  ReportFooter, Pill, TintIcon, ConicRing, CARD_SHADOW, dash, numOrDash, fmtDate, enumLabel,
 } from '../reportPrimitives';
 
-const pill = (children: ReactNode, filled = false): ReactNode => (
-  <span style={{
-    display: 'inline-flex', alignItems: 'center', borderRadius: 999, padding: '9px 18px', fontSize: 15, fontWeight: 600,
-    border: filled ? 'none' : `1px solid ${C.line}`, background: filled ? C.dark : '#fff', color: filled ? '#fff' : C.ink,
-  }}>{children}</span>
-);
+const pill = (children: ReactNode, filled = false): ReactNode => <Pill filled={filled}>{children}</Pill>;
+
+const areaIcon = <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 3h18v18H3z" /><path d="M3 9h18M9 3v18" /></svg>;
+const userIcon = <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="8" r="4" /><path d="M4 21c0-4 4-6 8-6s8 2 8 6" /></svg>;
+const treeIcon = <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 22v-6M8 16a4 4 0 0 1-1-7 5 5 0 0 1 10 0 4 4 0 0 1-1 7z" /></svg>;
+const peopleIcon = <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="9" cy="8" r="3" /><circle cx="17" cy="9" r="2.5" /><path d="M3 20c0-3 3-5 6-5s6 2 6 5M15 20c0-2 2-3.5 4-3.5" /></svg>;
+const chartIcon = <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2" /></svg>;
 
 const calIcon = (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" /></svg>
@@ -157,13 +158,20 @@ export function S03OsrLand({ data }: SlideProps) {
       <div style={{ display: 'grid', gridTemplateColumns: '1.15fr 1fr', gridTemplateRows: 'minmax(0, 1fr)', gap: 24, flex: 1, minHeight: 0 }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
-            <StatCard label="Site Location" value={dash(forest.forest_city)} sub={[forest.forest_state, forest.forest_country].filter(Boolean).join(', ') || '—'} />
-            <StatCard label="Land Ownership" value={dash(o?.name)} sub={enumLabel(o?.agreement_status)} />
-            <StatCard label="Total Land Area" value={a?.total_area != null ? numOrDash(a.total_area) : '—'} unit="ft²" sub={a?.planted_area != null ? `${numOrDash(a.planted_area)} ft² planted` : undefined} />
-            <StatCard label="Project Status" value="Active" sub={`Maintenance · ${progress}%`} valueColor={C.green} />
+            <StatCard label="Site Location" tint="green" icon={pinIcon} value={dash(forest.forest_city)} sub={[forest.forest_state, forest.forest_country].filter(Boolean).join(', ') || '—'} />
+            <StatCard label="Land Ownership" tint="blue" icon={userIcon} value={dash(o?.name)} sub={enumLabel(o?.agreement_status)} />
+            <StatCard label="Total Land Area" tint="orange" icon={areaIcon} value={a?.total_area != null ? numOrDash(a.total_area) : '—'} unit="ft²" sub={a?.planted_area != null ? `${numOrDash(a.planted_area)} ft² planted` : undefined} />
+            <div style={{ border: `1px solid ${C.line}`, borderRadius: 16, padding: '18px 20px', background: '#fff', boxShadow: CARD_SHADOW, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div>
+                <div style={{ fontSize: 11, letterSpacing: '.1em', textTransform: 'uppercase', color: C.muted, fontWeight: 600 }}>Project Status</div>
+                <div style={{ fontSize: 20, fontWeight: 700, color: C.green, marginTop: 8 }}>Active</div>
+                <div style={{ fontSize: 13, color: C.muted }}>● Maintenance</div>
+              </div>
+              <ConicRing pct={progress} />
+            </div>
           </div>
-          <StatCard label="Plantation Strategy" value={enumLabel(forest.plantation_strategy === 'others' ? forest.plantation_strategy_other : forest.plantation_strategy)} />
-          <div style={{ border: `1px solid ${C.line}`, borderRadius: 14, padding: '14px 18px', flex: 1 }}>
+          <StatCard label="Plantation Strategy" tint="green" icon={treeIcon} value={enumLabel(forest.plantation_strategy === 'others' ? forest.plantation_strategy_other : forest.plantation_strategy)} />
+          <div style={{ border: `1px solid ${C.line}`, borderRadius: 16, padding: '16px 18px', flex: 1, background: '#fff', boxShadow: CARD_SHADOW }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
               <strong style={{ fontSize: 15, color: C.ink }}>Technical Specifications</strong>
               <span style={{ fontSize: 11.5, color: C.muted, background: C.greenSoft, borderRadius: 999, padding: '4px 12px' }}>Last Inspection : {fmtDate(forest.last_inspection_date)}</span>
@@ -226,13 +234,13 @@ export function S05AreaPopulation({ data }: SlideProps) {
     <SlidePage meta={meta}>
       <SectionTitle>Area and Population Statistics of {dash(forest.forest_city)}</SectionTitle>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 16 }}>
-        <StatCard label="Total Jurisdiction Area" value={ap?.total_jurisdiction_area != null ? numOrDash(ap.total_jurisdiction_area) : '—'} unit="km²" />
-        <StatCard label="Population" value={ap?.population != null ? `~${numOrDash(ap.population)}` : '—'} />
-        <StatCard label="Population Density" value={ap?.population_density != null ? numOrDash(ap.population_density) : '—'} unit="/km²" />
+        <StatCard label="Total Jurisdiction Area" tint="green" icon={areaIcon} value={ap?.total_jurisdiction_area != null ? numOrDash(ap.total_jurisdiction_area) : '—'} unit="km²" />
+        <StatCard label="Population" tint="blue" icon={peopleIcon} value={ap?.population != null ? `~${numOrDash(ap.population)}` : '—'} />
+        <StatCard label="Population Density" tint="purple" icon={chartIcon} value={ap?.population_density != null ? numOrDash(ap.population_density) : '—'} unit="/km²" />
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: 16, marginTop: 16 }}>
-        <StatCard label="Green Cover" value={<span style={{ fontSize: 15, fontWeight: 600 }}>{dash(ap?.green_cover)}</span>} />
-        <StatCard label="Environmental Need" value={<span style={{ fontSize: 15, fontWeight: 600 }}>{dash(ap?.environmental_need)}</span>} />
+        <StatCard label="Green Cover" tint="green" icon={treeIcon} value={<span style={{ fontSize: 15, fontWeight: 600 }}>{dash(ap?.green_cover)}</span>} />
+        <StatCard label="Environmental Need" tint="orange" icon={treeIcon} value={<span style={{ fontSize: 15, fontWeight: 600 }}>{dash(ap?.environmental_need)}</span>} />
       </div>
       <div style={{ marginTop: 20, flex: 1, minHeight: 0 }}>
         <div style={{ fontSize: 11.5, textTransform: 'uppercase', letterSpacing: '.06em', color: C.muted, marginBottom: 10 }}>Timeline of urban change</div>
@@ -308,18 +316,18 @@ export function S07Beneficiaries({ data }: SlideProps) {
     ['De-weeding Crew', 'Part-time contribution', pad2(b?.de_weeding_crew)],
     ['Plant Health Specialist', 'Pest & disease management', pad2(b?.plant_health_specialist)],
   ];
-  const indirect = [
-    ['People Visiting', dash(b?.people_visiting), 'Visitors & recreational users'],
-    ['People Living Near', dash(b?.people_living_near), 'Within 5km radius of the site'],
-    ['Educational Hubs', dash(b?.schools_colleges), 'Local schools & colleges'],
-    ['Trees Planted', numOrDash(computed.total_saplings), 'Enhancing local biodiversity'],
+  const indirect: [string, string, string, 'green' | 'blue' | 'orange' | 'purple' | 'red'][] = [
+    ['People Visiting', dash(b?.people_visiting), 'Visitors & recreational users', 'green'],
+    ['People Living Near', dash(b?.people_living_near), 'Within 5km radius of the site', 'orange'],
+    ['Educational Hubs', dash(b?.schools_colleges), 'Local schools & colleges', 'purple'],
+    ['Trees Planted', numOrDash(computed.total_saplings), 'Enhancing local biodiversity', 'red'],
   ];
   return (
     <SlidePage meta={meta}>
       <SectionTitle eyebrow="Key roles and contributions">Description: Direct And Indirect Beneficiaries</SectionTitle>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 14 }}>
         {direct.map(([t, s, v]) => (
-          <div key={t} style={{ border: `1px solid ${C.line}`, borderRadius: 14, padding: '14px 16px' }}>
+          <div key={t} style={{ border: `1px solid ${C.line}`, borderRadius: 16, padding: '16px 18px', background: '#fff', boxShadow: CARD_SHADOW }}>
             <div style={{ fontSize: 16, fontWeight: 800, color: C.ink }}>{t}</div>
             <div style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '.04em', color: C.muted, margin: '4px 0 8px' }}>{s}</div>
             <div style={{ fontSize: 26, fontWeight: 800, color: C.green }}>{v}</div>
@@ -331,10 +339,13 @@ export function S07Beneficiaries({ data }: SlideProps) {
         <span style={{ flex: 1, height: 3, borderRadius: 2, background: `linear-gradient(90deg, ${C.green}, ${C.greenSoft})` }} />
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 14 }}>
-        {indirect.map(([t, v, s]) => (
-          <div key={t} style={{ border: `1px solid ${C.line}`, borderRadius: 14, padding: '14px 16px' }}>
-            <div style={{ fontSize: 22, fontWeight: 800, color: C.green }}>{v}</div>
-            <div style={{ fontSize: 14, fontWeight: 700, color: C.ink, marginTop: 4 }}>{t}</div>
+        {indirect.map(([t, v, s, tint]) => (
+          <div key={t} style={{ border: `1px solid ${C.line}`, borderRadius: 16, padding: '16px 18px', background: '#fff', boxShadow: CARD_SHADOW }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+              <div style={{ fontSize: 22, fontWeight: 800, color: C.green }}>{v}</div>
+              <TintIcon tint={tint} size={36}>{treeIcon}</TintIcon>
+            </div>
+            <div style={{ fontSize: 14, fontWeight: 700, color: C.ink, marginTop: 8 }}>{t}</div>
             <div style={{ fontSize: 11.5, color: C.muted, marginTop: 4 }}>{s}</div>
           </div>
         ))}

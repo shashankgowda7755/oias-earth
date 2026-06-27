@@ -7,7 +7,7 @@ import type { ReactNode } from 'react';
 import type { ImpactTermValues } from '../../Forests/fullTypes';
 import type { MaintenanceRollup, SlideProps, WorkforceRollup } from '../reportTypes';
 import {
-  C, SectionTitle, SlidePage, StatCard, ValueBar, SplitBar, ReportImage, EmptyBlock, numOrDash, dash,
+  C, SectionTitle, SlidePage, StatCard, ValueBar, SplitBar, DarkPanel, ReportImage, EmptyBlock, CARD_SHADOW, numOrDash, dash,
 } from '../reportPrimitives';
 
 /* --------------------- Slide 8: Forest Value Flow --------------------- */
@@ -28,17 +28,17 @@ export function S08ValueFlow({ data }: SlideProps) {
   const max = Math.max(1, ...terms.flatMap((t) => t.vals.map(([, v]) => Number(v) || 0)));
   return (
     <SlidePage meta={meta}>
-      <div style={{ background: C.dark, borderRadius: 18, padding: '22px 26px', color: '#fff', textAlign: 'center', marginBottom: 18 }}>
-        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 7, background: 'rgba(255,255,255,.12)', borderRadius: 999, padding: '5px 14px', fontSize: 12 }}>
+      <DarkPanel style={{ padding: '22px 26px', textAlign: 'center', marginBottom: 18 }}>
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 7, background: 'rgba(255,255,255,.12)', border: '1px solid rgba(255,255,255,.25)', borderRadius: 999, padding: '5px 14px', fontSize: 12, color: '#dff5e6' }}>
           <span style={{ width: 8, height: 8, borderRadius: '50%', background: C.green }} /> PROJECT: {dash(forest.forest_name)}
         </span>
-        <h2 style={{ fontSize: 32, fontWeight: 800, margin: '10px 0 4px' }}>Forest Value Flow Impact Report</h2>
-        <div style={{ fontSize: 13.5, color: 'rgba(255,255,255,.7)' }}>Economic and environmental valuation across short, medium, and long-term horizons.</div>
-      </div>
+        <h2 style={{ fontSize: 32, fontWeight: 700, margin: '10px 0 4px' }}>Forest Value Flow Impact Report</h2>
+        <div style={{ fontSize: 13.5, color: 'rgba(255,255,255,.72)' }}>Economic and environmental valuation across short, medium, and long-term horizons.</div>
+      </DarkPanel>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 16, flex: 1 }}>
         {terms.map((t) => (
           <div key={t.tag} style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-            <div style={{ borderTop: `3px solid ${t.accent}`, borderRadius: '4px 4px 12px 12px', border: `1px solid ${C.line}`, borderTopColor: t.accent, padding: '12px 16px' }}>
+            <div style={{ borderTop: `3px solid ${t.accent}`, borderRadius: '4px 4px 16px 16px', border: `1px solid ${C.line}`, borderTopColor: t.accent, padding: '14px 16px', background: '#fff', boxShadow: CARD_SHADOW }}>
               <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '.05em', color: t.accent }}>{t.tag}</div>
               <div style={{ fontSize: 12, color: C.muted, marginTop: 6 }}>Net Impact Projection</div>
               <div style={{ fontSize: 26, fontWeight: 800, color: C.ink }}>{t.net != null ? `₹${t.net.toFixed(2)} Cr` : '—'}</div>
@@ -60,16 +60,21 @@ export function S09ApproxValue({ data }: SlideProps) {
   const { meta, computed } = data;
   const a100 = computed.approx_value_100;
   const a75 = computed.approx_value_75;
-  const block = (title: string, b: typeof a100, dark = false) => (
-    <div style={{ background: dark ? C.dark : '#fff', color: dark ? '#fff' : C.ink, border: dark ? 'none' : `1px solid ${C.line}`, borderRadius: 14, padding: '14px 18px' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, marginBottom: 10, color: dark ? 'rgba(255,255,255,.8)' : C.ink, fontWeight: 700 }}>
+  const blockInner = (title: string, b: typeof a100, dark: boolean) => (
+    <>
+      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, marginBottom: 10, color: dark ? 'rgba(255,255,255,.85)' : C.ink, fontWeight: 700 }}>
         <span>{title}</span><span>Saplings: {b ? numOrDash(b.saplings) : '—'}</span>
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
-        <div><div style={{ fontSize: 11, color: dark ? 'rgba(255,255,255,.6)' : C.muted }}>Oxygen / yr (25%)</div><div style={{ fontSize: 18, fontWeight: 800 }}>{b ? `${kg(b.oxygen_kg_year)} · ${rupees(b.oxygen_kg_year)}` : '—'}</div></div>
-        <div><div style={{ fontSize: 11, color: dark ? 'rgba(255,255,255,.6)' : C.muted }}>Carbon / yr (25%)</div><div style={{ fontSize: 18, fontWeight: 800 }}>{b ? `${kg(b.carbon_kg_year)} · ${rupees(b.carbon_kg_year)}` : '—'}</div></div>
+        <div><div style={{ fontSize: 11, color: dark ? 'rgba(255,255,255,.6)' : C.muted }}>Oxygen / yr (25%)</div><div style={{ fontSize: 18, fontWeight: 700, color: dark ? '#fff' : C.ink }}>{b ? `${kg(b.oxygen_kg_year)} · ${rupees(b.oxygen_kg_year)}` : '—'}</div></div>
+        <div><div style={{ fontSize: 11, color: dark ? 'rgba(255,255,255,.6)' : C.muted }}>Carbon / yr (25%)</div><div style={{ fontSize: 18, fontWeight: 700, color: dark ? '#fff' : C.ink }}>{b ? `${kg(b.carbon_kg_year)} · ${rupees(b.carbon_kg_year)}` : '—'}</div></div>
       </div>
-    </div>
+    </>
+  );
+  const block = (title: string, b: typeof a100, dark = false) => (
+    dark
+      ? <DarkPanel radius={14} style={{ padding: '14px 18px' }}>{blockInner(title, b, true)}</DarkPanel>
+      : <div style={{ background: '#f4f7f9', color: C.ink, border: `1px solid ${C.line}`, borderRadius: 14, padding: '14px 18px' }}>{blockInner(title, b, false)}</div>
   );
   return (
     <SlidePage meta={meta}>
@@ -100,8 +105,8 @@ export function S09ApproxValue({ data }: SlideProps) {
             </table>
           </div>
         </div>
-        <div style={{ background: '#f7faf8', border: `1px solid ${C.line}`, borderRadius: 12, padding: '14px 16px', fontSize: 11.5, color: C.body, lineHeight: 1.7 }}>
-          <strong style={{ color: C.ink }}>Calculation Notes</strong>
+        <div style={{ background: '#eef4fb', border: '1px solid #d7e6f7', borderRadius: 12, padding: '14px 16px', fontSize: 11.5, color: '#4a6a8a', lineHeight: 1.7 }}>
+          <strong style={{ color: C.blue }}>Calculation Notes</strong>
           <ul style={{ margin: '8px 0 0', paddingLeft: 16 }}>
             <li>Only 25% of O₂ generated and carbon sequestered considered. Cost of Oxygen &amp; Carbon Dioxide: Rs. 20 / Kg.</li>
             <li>Oxygen metrics use the standard NASA estimation for native deciduous species at median maturity.</li>
@@ -124,7 +129,7 @@ function maintCards(m: MaintenanceRollup | null, tag: string) {
   return (
     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5,1fr)', gap: 12 }}>
       {cells.map(([l, v]) => (
-        <div key={l} style={{ border: `1px solid ${C.line}`, borderRadius: 12, padding: '12px 14px' }}>
+        <div key={l} style={{ border: `1px solid ${C.line}`, borderRadius: 16, padding: '14px 16px', background: '#fff', boxShadow: CARD_SHADOW }}>
           <div style={{ fontSize: 10.5, color: C.faint, textAlign: 'right' }}>{tag}</div>
           <div style={{ fontSize: 26, fontWeight: 800, color: C.ink }}>{v != null ? v : '—'}</div>
           <div style={{ fontSize: 11.5, color: C.muted }}>{l}</div>
@@ -144,9 +149,9 @@ export function S10Maintenance({ data }: SlideProps) {
   const q = computed.maintenance_quarter, t = computed.maintenance_tilldate;
   const rq = ratio(q), rt = ratio(t);
   const ratioCard = (period: string, days: number | undefined, r: ReturnType<typeof ratio>) => (
-    <div style={{ border: `1px solid ${C.line}`, borderRadius: 12, padding: '14px 16px' }}>
+    <div style={{ border: `1px solid ${C.line}`, borderRadius: 16, padding: '16px 18px', background: '#fff', boxShadow: CARD_SHADOW }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10 }}>
-        <strong style={{ fontSize: 14, color: C.ink }}>Watering vs Weather Ratio</strong><span style={{ fontSize: 12, color: C.green }}>{period}</span>
+        <strong style={{ fontSize: 14, color: C.ink }}>📋 Watering vs Weather Ratio</strong><span style={{ fontSize: 12, color: C.green, fontWeight: 600 }}>{period}</span>
       </div>
       <div style={{ fontSize: 11.5, color: C.muted, marginBottom: 8 }}>Distribution ({days ?? '—'} Days)</div>
       {r ? <SplitBar segments={[{ pct: r.w, color: C.green, label: `${r.w}%` }, { pct: r.r, color: C.blue, label: `${r.r}%` }, { pct: r.n, color: '#cfd8d4', label: `${r.n}%` }]} />
@@ -259,7 +264,7 @@ export function S13Growth({ data }: SlideProps) {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           <div style={{ fontSize: 11.5, textTransform: 'uppercase', color: C.muted }}>Key Milestones</div>
           {ms.map((m) => (
-            <div key={m.label} style={{ border: `1px solid ${m.current ? C.green : C.line}`, background: m.current ? C.dark : '#fff', color: m.current ? '#fff' : C.ink, borderRadius: 12, padding: '12px 16px' }}>
+            <div key={m.label} className={m.current ? 'rpt-dark' : undefined} style={{ border: `1px solid ${m.current ? C.green : C.line}`, background: m.current ? `linear-gradient(135deg,${C.dark},${C.dark2})` : '#fff', color: m.current ? '#fff' : C.ink, borderRadius: 14, padding: '14px 16px', boxShadow: m.current ? 'none' : CARD_SHADOW }}>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <strong style={{ fontSize: 15, color: m.current ? C.green : C.ink }}>{m.label}</strong><span style={{ fontWeight: 800 }}>{m.range}</span>
               </div>
