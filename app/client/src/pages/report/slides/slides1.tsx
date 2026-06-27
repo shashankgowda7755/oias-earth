@@ -310,7 +310,7 @@ export function S07Beneficiaries({ data }: SlideProps) {
   const b = forest.direct_and_indirect_beneficiaries;
   const pad2 = (v: unknown) => { const n = Number(v); return Number.isFinite(n) ? String(n).padStart(2, '0') : '—'; };
   const direct = [
-    ['Site Manager', 'Leadership oversight', pad2(b ? (b as Record<string, unknown>)['site_manager'] : undefined)],
+    ['Site Supervisor', 'Leadership oversight', pad2(b?.site_supervisor)],
     ['Site Supervisor', 'On-ground coordination', pad2(b?.site_supervisor)],
     ['Watering Team', 'Full-time dedication', pad2(b?.watering_team)],
     ['De-weeding Crew', 'Part-time contribution', pad2(b?.de_weeding_crew)],

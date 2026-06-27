@@ -32,6 +32,7 @@ export interface ReportMeta {
   /** Top-right header brand (the sponsor/client). */
   client_name?: string;
   client_logo?: string;
+  communitree_logo?: string;
 }
 
 /** One row of the slide-9 native-species analysis + slide-18 inventory. */

@@ -28,6 +28,7 @@ export default function ReportForestQuarterly() {
   }, []);
   const [menuOpen, setMenuOpen] = useState(false);
   const [sendMsg, setSendMsg] = useState('');
+  const [manageMode, setManageMode] = useState(false);
 
   const sendFromViewer = async () => {
     if (id === 'preview' || sendMsg) return;
@@ -76,6 +77,15 @@ export default function ReportForestQuarterly() {
       const fname = data
         ? `${data.forest.forest_name} ${data.meta.quarter_label} ${data.meta.year} Report.pdf`.replace(/[\\/:*?"<>|]+/g, '-')
         : 'Forest Report.pdf';
+      // skipped slides are not in the DOM when !manageMode, so html2canvas naturally skips them
+      // Warn if critical images missing
+      const warnings: string[] = [];
+      if (!data?.forest.report_images?.find((r) => r.slide_type === 'first_slide')?.image) warnings.push('Cover slide hero image');
+      if (!data?.meta.client_logo) warnings.push('Client/Sponsor logo (Sponsored By)');
+      if (warnings.length > 0) {
+        const ok = window.confirm(`Missing content:\n• ${warnings.join('\n• ')}\n\nDownload anyway?`);
+        if (!ok) return;
+      }
       await downloadReportPdf(fname, setDl);
       // Log the download to the audit trail (fire-and-forget; public route).
       if (id && id !== 'preview') {
@@ -97,6 +107,18 @@ export default function ReportForestQuarterly() {
   const preview = useMemo(() => buildPreviewReport(previewSrc), [previewSrc]);
   const year = sp.get('year') ? Number(sp.get('year')) : undefined;
   const quarter = sp.get('quarter') ? Number(sp.get('quarter')) : undefined;
+  const skipKey = `rpt-skip-${id}-${year ?? 0}-${quarter ?? 0}`;
+  const [skipped, setSkipped] = useState<Set<number>>(() => {
+    try { return new Set(JSON.parse(localStorage.getItem(skipKey) ?? '[]')); } catch { return new Set(); }
+  });
+  const toggleSkip = (i: number) => {
+    setSkipped((prev) => {
+      const next = new Set(prev);
+      next.has(i) ? next.delete(i) : next.add(i);
+      localStorage.setItem(skipKey, JSON.stringify([...next]));
+      return next;
+    });
+  };
 
   useEffect(() => {
     if (isPreview) {
@@ -131,6 +153,14 @@ export default function ReportForestQuarterly() {
               ) : null}
             </div>
           ) : null}
+          {isAdmin && !isPreview ? (
+            <button
+              onClick={() => setManageMode((m) => !m)}
+              style={{ background: manageMode ? C.green : '#fff', color: manageMode ? '#fff' : C.ink, border: `1px solid ${manageMode ? C.green : C.line}`, borderRadius: 8, padding: '0 12px', height: 34, fontSize: 13, fontWeight: 600, cursor: 'pointer' }}
+            >
+              ☑ Manage Slides {skipped.size > 0 ? `(${skipped.size} hidden)` : ''}
+            </button>
+          ) : null}
           <span style={{ color: C.muted, fontSize: 13 }}>
             {data.meta.client_name ? `${data.meta.client_name} · ` : ''}{data.forest.forest_name} · {data.meta.quarter_label} {data.meta.year}
             {err && <span style={{ color: C.amber, marginLeft: 10 }}>· {err}</span>}
@@ -140,7 +170,7 @@ export default function ReportForestQuarterly() {
         <div className="no-print" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
           <button onClick={() => goTo(cur - 1)} disabled={cur === 0} aria-label="Previous section" style={{ background: '#fff', border: `1px solid ${C.line}`, borderRadius: 8, width: 30, height: 30, cursor: cur === 0 ? 'default' : 'pointer', color: C.ink, opacity: cur === 0 ? 0.4 : 1 }}>◀</button>
           <select value={cur} onChange={(e) => goTo(Number(e.target.value))} aria-label="Jump to section" style={{ border: `1px solid ${C.line}`, borderRadius: 8, padding: '6px 10px', fontSize: 13, color: C.ink, background: '#fff', maxWidth: 200 }}>
-            {SLIDE_TITLES.map((t, i) => <option key={i} value={i}>{i + 1}. {t}</option>)}
+            {SLIDE_TITLES.map((t, i) => <option key={i} value={i}>{i + 1}. {t}{skipped.has(i) ? ' (skipped)' : ''}</option>)}
           </select>
           <button onClick={() => goTo(cur + 1)} disabled={cur === SLIDES.length - 1} aria-label="Next section" style={{ background: '#fff', border: `1px solid ${C.line}`, borderRadius: 8, width: 30, height: 30, cursor: cur === SLIDES.length - 1 ? 'default' : 'pointer', color: C.ink, opacity: cur === SLIDES.length - 1 ? 0.4 : 1 }}>▶</button>
           <span style={{ fontSize: 12, color: C.faint, minWidth: 42, textAlign: 'center' }}>{cur + 1} / {SLIDES.length}</span>
@@ -157,11 +187,23 @@ export default function ReportForestQuarterly() {
       </div>
 
       <div style={{ padding: '22px 16px 60px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-        {SLIDES.map((Slide, i) => (
-          <div key={i} id={`rpt-slide-${i}`} style={{ scrollMarginTop: 64, width: '100%', display: 'flex', justifyContent: 'center' }}>
-            <Slide data={data} />
-          </div>
-        ))}
+        {SLIDES.map((Slide, i) => {
+          const isSkipped = skipped.has(i);
+          if (isSkipped && !manageMode) return null;
+          return (
+            <div key={i} id={`rpt-slide-${i}`} style={{ scrollMarginTop: 64, width: '100%', display: 'flex', justifyContent: 'center', position: 'relative', opacity: isSkipped ? 0.4 : 1 }}>
+              <Slide data={data} />
+              {manageMode && (
+                <button
+                  onClick={() => toggleSkip(i)}
+                  style={{ position: 'absolute', top: 12, right: 12, background: isSkipped ? C.amber : '#fff', color: isSkipped ? '#fff' : C.muted, border: `1px solid ${isSkipped ? C.amber : C.line}`, borderRadius: 8, padding: '6px 12px', fontSize: 13, fontWeight: 700, cursor: 'pointer', zIndex: 5, boxShadow: '0 2px 8px rgba(0,0,0,.1)' }}
+                >
+                  {isSkipped ? '+ Include slide' : '✕ Skip this slide'}
+                </button>
+              )}
+            </div>
+          );
+        })}
       </div>
     </div>
   );

@@ -151,14 +151,20 @@ export function SlideHeader({ meta }: { meta: ReportMeta }) {
 }
 
 /** CommuniTREE-style footer wordmark (matches the PDF footer). */
-export function ReportFooter() {
+export function ReportFooter({ meta }: { meta?: ReportMeta } = {}) {
   return (
     <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', marginTop: 'auto', paddingTop: 10 }}>
       <div style={{ textAlign: 'center', lineHeight: 1 }}>
-        <div style={{ fontSize: 17, fontWeight: 800, letterSpacing: '.04em', color: '#2f6b3f' }}>
-          COMMUNI<span style={{ color: C.green }}>TREE</span>
-        </div>
-        <div style={{ fontSize: 7.5, letterSpacing: '.22em', color: C.faint, marginTop: 2 }}>CREATING MAN MADE FORESTS</div>
+        {meta?.communitree_logo ? (
+          <img src={meta.communitree_logo} alt="CommuniTREE" style={{ height: 32, objectFit: 'contain' }} />
+        ) : (
+          <>
+            <div style={{ fontSize: 17, fontWeight: 800, letterSpacing: '.04em', color: '#2f6b3f' }}>
+              COMMUNI<span style={{ color: C.green }}>TREE</span>
+            </div>
+            <div style={{ fontSize: 7.5, letterSpacing: '.22em', color: C.faint, marginTop: 2 }}>CREATING MAN MADE FORESTS</div>
+          </>
+        )}
       </div>
     </div>
   );
@@ -221,7 +227,7 @@ export function SlidePage({
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0, paddingTop: bare ? 0 : 18, position: 'relative', zIndex: 1 }}>
         {children}
       </div>
-      {!bare && <ReportFooter />}
+      {!bare && <ReportFooter meta={meta} />}
     </section>
   );
 }

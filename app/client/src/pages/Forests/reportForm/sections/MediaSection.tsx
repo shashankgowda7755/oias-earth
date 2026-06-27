@@ -17,9 +17,9 @@ const SPONSOR_LOGO_TYPE_OPTIONS = [
 ];
 
 const REPORT_SLIDE_TYPE_OPTIONS = [
-  { label: 'First Slide', value: 'first_slide' },
-  { label: 'Content Slide', value: 'content_slide' },
-  { label: 'Project Impact Slide', value: 'project_impact_slide' },
+  { label: 'Cover Slide (Slide 1)', value: 'first_slide' },
+  { label: 'Contents Slide (Slide 2)', value: 'content_slide' },
+  { label: 'Project Impact Slide (Slide 6)', value: 'project_impact_slide' },
 ];
 
 const SPECIES_HEALTH_OPTIONS = [
@@ -191,8 +191,30 @@ export function MediaSection({ draft, patch }: SectionProps) {
       </SectionShell>
 
       <SectionShell
+        title="Photo Gallery (Slide 22)"
+        desc="Quarterly gallery photos shown on the Photo Gallery slide (Slide 22)."
+      >
+        <RepeatableRows
+          label="Gallery photos"
+          items={draft.gallery_images}
+          onChange={(next) => patch({ gallery_images: next })}
+          blank={() => ({ year: 0, quarter: 1 })}
+          addLabel="Add gallery photo"
+          rowTitle={(row, i) => row.year ? `Y${row.year} Q${row.quarter}` : `Photo ${i + 1}`}
+          renderRow={(row, update) => (
+            <FieldGrid cols={2}>
+              <Num label="Year" value={row.year} onChange={(v) => update({ year: v ?? 0 })} />
+              <Num label="Quarter" value={row.quarter} onChange={(v) => update({ quarter: v ?? 1 })} />
+              <Url label="Image" value={row.image} onChange={(v) => update({ image: v })} />
+              <Txt label="Caption" value={row.caption} onChange={(v) => update({ caption: v })} />
+            </FieldGrid>
+          )}
+        />
+      </SectionShell>
+
+      <SectionShell
         title="Additional Sponsor Logos"
-        desc="Logos of partners shown on the report (initiated by, sponsored by, etc.)."
+        desc="Organisation logos shown on report pages. 'Sponsored By' logo appears top-right on every slide. 'Initiated By' is the CommuniTREE logo shown bottom-right."
       >
         <RepeatableRows
           label="Sponsor logos"
@@ -219,8 +241,8 @@ export function MediaSection({ draft, patch }: SectionProps) {
       </SectionShell>
 
       <SectionShell
-        title="Report Images"
-        desc="Slides used to build the report deck."
+        title="Report Slide Hero Images"
+        desc="Background images for specific report slides. Add one entry per slide type needed."
       >
         <RepeatableRows
           label="Slides"

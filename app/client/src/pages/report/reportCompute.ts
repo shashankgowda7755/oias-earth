@@ -293,6 +293,7 @@ export function buildMeta(
   opts?: { report_date?: string; created_by_name?: string; created_by_phone?: string },
 ): ReportMeta {
   const sponsoredBy = (p.additional_sponsor_logo ?? []).find((l) => l.type?.value === 'sponsored_by');
+  const initiatedBy = (p.additional_sponsor_logo ?? []).find((l) => l.type?.value === 'initiated_by');
   const plantD = p.plantation_date ? new Date(p.plantation_date) : null;
   return {
     year,
@@ -305,5 +306,6 @@ export function buildMeta(
     created_by_phone: opts?.created_by_phone,
     client_name: sponsoredBy?.name,
     client_logo: sponsoredBy?.logo,
+    communitree_logo: initiatedBy?.logo,
   };
 }
