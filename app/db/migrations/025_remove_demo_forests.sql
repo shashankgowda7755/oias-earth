@@ -65,3 +65,36 @@ BEGIN
 
   DELETE FROM forests WHERE id = ANY(demo_ids);
 END $$;
+
+-- ---- non-forest demo rows seeded by 002 / 004 -----------------------
+-- These also re-insert on every cold start. Remove them so the platform
+-- starts empty. KEPT: communitree_admin (login), field_planter (006 PWA login),
+-- master roles, lookup tables, the species catalog. Real rows the user adds via
+-- the admin UI have different ids and are never matched here.
+
+-- second demo admin "anvar_communitree_admin" (002)
+DELETE FROM user_roles WHERE profile_id = '11111111-1111-1111-1111-111111111111';
+DELETE FROM user_profiles WHERE id = '11111111-1111-1111-1111-111111111111';
+
+-- demo sponsors: Acuity + IDFC (002), Vandalur placeholder (004)
+DELETE FROM sponsors WHERE id IN (
+  '64904581-84c8-440c-a313-b14b167f480b',
+  'eaadc2ee-f4d3-49be-8892-e52bdfdaa64b',
+  'f5786b29-cd96-40aa-abc4-3628cfd99f5e'
+);
+
+-- demo employees: the two seeded site managers (002)
+DELETE FROM employees WHERE id IN (
+  '0ed53c6f-24d1-4235-b761-ff47e298cb60',
+  'db746f3b-646d-4929-a4ec-5561f389e83d'
+);
+
+-- demo planter lookup rows "Field Team A/B" (002)
+DELETE FROM planters WHERE id IN (1, 2);
+
+-- demo job-log rows (002 x2, 004 x1)
+DELETE FROM jobs WHERE id IN (
+  '5a20e581-7da3-4c0e-a143-f3ba1192d68c',
+  '6b31f692-8eb4-5d1f-b254-04cb22a37e9d',
+  '7a11b0b0-0000-4000-8000-000000000099'
+);
