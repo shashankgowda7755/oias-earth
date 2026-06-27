@@ -382,3 +382,43 @@ listRouter.post(
     res.json({ data: rows.rows, pagination: { total, page, limit } });
   })
 );
+
+/* --------------------- master-plantspecies/list --------------------- */
+// Admin "Manage Species" table. Like /search but returns the trait booleans +
+// is_active so the table can render trait chips and the edit form can prefill.
+// Shows ALL rows (active + inactive) so admins can toggle is_active back on.
+listRouter.post(
+  '/master-plantspecies/list',
+  wrap(async (req, res) => {
+    const { limit, offset, page, search } = parsePageParams(req.body);
+    const like = `%${search}%`;
+    const where = `FROM master_plantspecies
+      WHERE ($1 = '' OR species_name ILIKE $2 OR common_name ILIKE $2)`;
+    const params = [search, like];
+
+    const total = await countTotal(where, params);
+    const rows = await query(
+      `SELECT
+         id,
+         species_category AS "speciesCategory",
+         species_name     AS "speciesName",
+         common_name      AS "commonName",
+         species_desc     AS "speciesDesc",
+         oxygen_per_day   AS "oxygenPerDay",
+         carbon_offset_per_day AS "carbonOffsetPerDay",
+         rate,
+         wood_density     AS "woodDensity",
+         is_timber_production AS "isTimberProduction",
+         is_flowering_plant   AS "isFloweringPlant",
+         is_fruit_bearing     AS "isFruitBearing",
+         is_nesting_habitat   AS "isNestingHabitat",
+         is_active            AS "isActive"
+       ${where}
+       ORDER BY species_name ASC
+       LIMIT $3 OFFSET $4`,
+      [...params, limit, offset]
+    );
+
+    res.json({ data: rows.rows, pagination: { total, page, limit } });
+  })
+);

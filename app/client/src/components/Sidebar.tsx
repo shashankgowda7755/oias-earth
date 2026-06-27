@@ -44,6 +44,12 @@ const NAV_ICONS: Record<SectionTab, JSX.Element> = {
       <line x1="12" y1="17" x2="12" y2="22" />
     </svg>
   ),
+  Species: (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 shrink-0">
+      <path d="M7 20s-4-1-4-7 4-9 9-9c0 6-1 9-5 11Z" />
+      <path d="M7 20c0-4 2-7 6-9" />
+    </svg>
+  ),
   Reports: (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 shrink-0">
       <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />

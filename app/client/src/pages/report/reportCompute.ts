@@ -26,6 +26,7 @@ import type {
   SpeciesRow,
   WorkforceRollup,
 } from './reportTypes';
+import { lookupSpeciesTraits } from './speciesTraits';
 
 /** Phase-1 placeholder annual rates (kg/tree/yr). Refined per-species in P2. */
 const O2_PER_TREE_YR = 20;
@@ -79,7 +80,9 @@ function speciesInventory(p: FullForestPayload): SpeciesRow[] {
   for (const b of p.box_data ?? []) {
     for (const s of b.species_data ?? []) {
       const common = s.species_common_name?.trim() || s.species_name?.trim() || `Species ${s.species_id}`;
-      const key = String(s.species_id ?? common);
+      // species_id may be "" (empty string) in hand-authored data — empty/0 must
+      // fall through to the name, else every species collapses into one row.
+      const key = s.species_id ? String(s.species_id) : common;
       const count = Math.max(0, num(s.count));
       const existing = byKey.get(key);
       if (existing) {
@@ -89,9 +92,10 @@ function speciesInventory(p: FullForestPayload): SpeciesRow[] {
           common_name: common,
           species_name: s.species_name,
           saplings: count,
-          // description + traits come from master_plantspecies (Phase 2); empty-safe here.
+          // description comes from master_plantspecies (Phase 2); traits resolved
+          // from the species catalog (live reports use the DB join server-side).
           description: undefined,
-          traits: { timber: false, pollination: false, nesting: false, fruit: false },
+          traits: lookupSpeciesTraits(s.species_name, s.species_common_name),
           oxygen_kg_year: 0,
           carbon_kg_year: 0,
         });
