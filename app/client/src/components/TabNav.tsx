@@ -15,6 +15,7 @@ export const SECTION_TABS = [
   'Sponsors',
   'Employees',
   'Forests',
+  'Species',
   'Reports',
   'Jobs',
   'Logs',

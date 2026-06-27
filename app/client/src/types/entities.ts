@@ -51,7 +51,9 @@ export type EntityName =
   | 'forest'
   | 'reports'
   | 'report' // CRUD segment for reports (singular)
-  | 'jobs';
+  | 'jobs'
+  | 'master-plantspecies' // list segment for the species catalog
+  | 'species'; // CRUD segment for master_plantspecies
 
 /* ---- Users (users/list — camelCase as returned live) ---- */
 export interface UserRow {
@@ -101,6 +103,24 @@ export interface SponsorRow {
   updated_by: string | null;
   createdAt: string;
   updatedAt: string;
+}
+
+/* ---- Species (master-plantspecies/list — camelCase) ---- */
+export interface SpeciesRow {
+  id: number | string;
+  speciesName: string | null;
+  commonName: string | null;
+  speciesCategory: string | null;
+  speciesDesc: string | null;
+  oxygenPerDay: number | null;
+  carbonOffsetPerDay: number | null;
+  rate: number | null;
+  woodDensity: number | null;
+  isTimberProduction: boolean;
+  isFloweringPlant: boolean;
+  isFruitBearing: boolean;
+  isNestingHabitat: boolean;
+  isActive: boolean;
 }
 
 /* ---- Employees (employee/list) ---- */

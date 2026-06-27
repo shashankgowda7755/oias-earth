@@ -80,6 +80,12 @@ interface EntityConfig {
   jsonbColumns?: Set<string>;
   /** Singular label used in the delete message ("Sponsor deleted successfully"). */
   label: string;
+  /**
+   * Whether the table has created_by/updated_by audit columns. Defaults to true.
+   * Set false for tables that only track created_at/updated_at (e.g.
+   * master_plantspecies) so the generic upsert doesn't write missing columns.
+   */
+  trackActor?: boolean;
 }
 
 const SPONSOR: EntityConfig = {
@@ -135,6 +141,28 @@ const REPORT: EntityConfig = {
   jsonbColumns: new Set(['report_data', 'skip']),
 };
 
+const SPECIES: EntityConfig = {
+  table: 'master_plantspecies',
+  label: 'Species',
+  // No created_by/updated_by on this table — only created_at/updated_at.
+  trackActor: false,
+  columns: [
+    'species_name',
+    'common_name',
+    'species_category',
+    'species_desc',
+    'oxygen_per_day',
+    'carbon_offset_per_day',
+    'rate',
+    'wood_density',
+    'is_timber_production',
+    'is_flowering_plant',
+    'is_fruit_bearing',
+    'is_nesting_habitat',
+    'is_active',
+  ],
+};
+
 // Generic-path entities. Forest + users have dedicated handlers (below).
 const ENTITIES: Record<string, EntityConfig> = {
   sponsor: SPONSOR,
@@ -143,6 +171,8 @@ const ENTITIES: Record<string, EntityConfig> = {
   employees: EMPLOYEE,
   report: REPORT,
   reports: REPORT,
+  species: SPECIES,
+  'master-plantspecies': SPECIES, // alias matching the list route segment
 };
 
 /** Map a camelCase body key to a snake_case column. */
@@ -395,12 +425,13 @@ async function genericUpsert(req: Request, res: Response, cfg: EntityConfig): Pr
   const actor = req.auth?.profileId ?? null;
   const id = bodyId(req);
   const { cols, values } = collectColumns(req, cfg);
+  const trackActor = cfg.trackActor !== false;
 
   if (!id) {
     // INSERT
     if (cols.length === 0) throw badRequest('No valid fields provided');
-    const allCols = [...cols, 'created_by', 'updated_by'];
-    const allVals = [...values, actor, actor];
+    const allCols = trackActor ? [...cols, 'created_by', 'updated_by'] : [...cols];
+    const allVals = trackActor ? [...values, actor, actor] : [...values];
     const placeholders = allCols.map((_, i) => `$${i + 1}`).join(', ');
     const r = await query<{ id: string }>(
       `INSERT INTO ${cfg.table} (${allCols.join(', ')}) VALUES (${placeholders}) RETURNING *`,
@@ -419,11 +450,16 @@ async function genericUpsert(req: Request, res: Response, cfg: EntityConfig): Pr
     return;
   }
   const setSql = cols.map((c, i) => `${c} = $${i + 1}`).join(', ');
-  const r = await query<Record<string, unknown>>(
-    `UPDATE ${cfg.table} SET ${setSql}, updated_by = $${cols.length + 1}
-      WHERE id = $${cols.length + 2} RETURNING *`,
-    [...values, actor, id]
-  );
+  const r = trackActor
+    ? await query<Record<string, unknown>>(
+        `UPDATE ${cfg.table} SET ${setSql}, updated_by = $${cols.length + 1}
+          WHERE id = $${cols.length + 2} RETURNING *`,
+        [...values, actor, id]
+      )
+    : await query<Record<string, unknown>>(
+        `UPDATE ${cfg.table} SET ${setSql} WHERE id = $${cols.length + 1} RETURNING *`,
+        [...values, id]
+      );
   if (r.rowCount === 0) throw notFound(`${cfg.label} not found`);
   res.json({ data: r.rows[0] });
 }
