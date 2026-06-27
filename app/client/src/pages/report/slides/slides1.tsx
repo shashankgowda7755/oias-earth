@@ -156,27 +156,27 @@ export function S03OsrLand({ data }: SlideProps) {
     <SlidePage meta={meta}>
       <SectionTitle>Description: OSR Land</SectionTitle>
       <div style={{ display: 'grid', gridTemplateColumns: '1.15fr 1fr', gridTemplateRows: 'minmax(0, 1fr)', gap: 24, flex: 1, minHeight: 0 }}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12, minHeight: 0 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
             <StatCard label="Site Location" tint="green" icon={pinIcon} value={dash(forest.forest_city)} sub={[forest.forest_state, forest.forest_country].filter(Boolean).join(', ') || '—'} />
             <StatCard label="Land Ownership" tint="blue" icon={userIcon} value={dash(o?.name)} sub={enumLabel(o?.agreement_status)} />
             <StatCard label="Total Land Area" tint="orange" icon={areaIcon} value={a?.total_area != null ? numOrDash(a.total_area) : '—'} unit="ft²" sub={a?.planted_area != null ? `${numOrDash(a.planted_area)} ft² planted` : undefined} />
-            <div style={{ border: `1px solid ${C.line}`, borderRadius: 16, padding: '18px 20px', background: '#fff', boxShadow: CARD_SHADOW, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ border: `1px solid ${C.line}`, borderRadius: 16, padding: '14px 16px', background: '#fff', boxShadow: CARD_SHADOW, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div>
                 <div style={{ fontSize: 11, letterSpacing: '.1em', textTransform: 'uppercase', color: C.muted, fontWeight: 600 }}>Project Status</div>
-                <div style={{ fontSize: 20, fontWeight: 700, color: C.green, marginTop: 8 }}>Active</div>
-                <div style={{ fontSize: 13, color: C.muted }}>● Maintenance</div>
+                <div style={{ fontSize: 19, fontWeight: 700, color: C.green, marginTop: 6 }}>Active</div>
+                <div style={{ fontSize: 12.5, color: C.muted }}>● Maintenance</div>
               </div>
-              <ConicRing pct={progress} />
+              <ConicRing pct={progress} size={54} />
             </div>
           </div>
           <StatCard label="Plantation Strategy" tint="green" icon={treeIcon} value={enumLabel(forest.plantation_strategy === 'others' ? forest.plantation_strategy_other : forest.plantation_strategy)} />
-          <div style={{ border: `1px solid ${C.line}`, borderRadius: 16, padding: '16px 18px', flex: 1, background: '#fff', boxShadow: CARD_SHADOW }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+          <div style={{ border: `1px solid ${C.line}`, borderRadius: 16, padding: '12px 18px', flex: 1, minHeight: 0, background: '#fff', boxShadow: CARD_SHADOW }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
               <strong style={{ fontSize: 15, color: C.ink }}>Technical Specifications</strong>
               <span style={{ fontSize: 11.5, color: C.muted, background: C.greenSoft, borderRadius: 999, padding: '4px 12px' }}>Last Inspection : {fmtDate(forest.last_inspection_date)}</span>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px 18px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px 18px' }}>
               {tech.map(([k, v]) => (
                 <div key={k}><div style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '.04em', color: C.muted }}>{k}</div><div style={{ fontSize: 14, fontWeight: 700, color: C.ink }}>{v}</div></div>
               ))}

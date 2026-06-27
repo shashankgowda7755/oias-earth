@@ -240,10 +240,10 @@ export function StatCard({
   label, value, unit, icon, tint = 'green', valueColor = C.ink, sub,
 }: { label: string; value: ReactNode; unit?: string; icon?: ReactNode; tint?: Tint; valueColor?: string; sub?: string }) {
   return (
-    <div style={{ border: `1px solid ${C.line}`, borderRadius: 16, padding: '18px 20px', background: '#fff', display: 'flex', flexDirection: 'column', gap: 8, boxShadow: CARD_SHADOW }}>
-      {icon && <TintIcon tint={tint}>{icon}</TintIcon>}
+    <div style={{ border: `1px solid ${C.line}`, borderRadius: 16, padding: '12px 16px', background: '#fff', display: 'flex', flexDirection: 'column', gap: 5, boxShadow: CARD_SHADOW }}>
+      {icon && <TintIcon tint={tint} size={32}>{icon}</TintIcon>}
       <div style={{ fontSize: 11, letterSpacing: '.1em', textTransform: 'uppercase', color: C.muted, fontWeight: 600 }}>{label}</div>
-      <div style={{ fontSize: 24, fontWeight: 700, color: valueColor, lineHeight: 1.05 }}>
+      <div style={{ fontSize: 22, fontWeight: 700, color: valueColor, lineHeight: 1.05 }}>
         {value}{unit && <span style={{ fontSize: 14, fontWeight: 600, color: C.muted, marginLeft: 4 }}>{unit}</span>}
       </div>
       {sub && <div style={{ fontSize: 13, color: C.muted }}>{sub}</div>}
