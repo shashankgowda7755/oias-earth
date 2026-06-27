@@ -240,6 +240,7 @@ export async function buildForestReport(forestId: string, year: number, quarter:
 
   const logos = (forest.additional_sponsor_logo as { type?: { value?: string }; name?: string; logo?: string }[]) ?? [];
   const sponsored = logos.find((l) => l.type?.value === 'sponsored_by');
+  const initiated = logos.find((l) => l.type?.value === 'initiated_by');
   const pd = forest.plantation_date ? new Date(String(forest.plantation_date)) : null;
   const meta = {
     year, quarter,
@@ -249,6 +250,7 @@ export async function buildForestReport(forestId: string, year: number, quarter:
     plantation_label: pd ? `${MONTHS[pd.getMonth()]} ${pd.getFullYear()}` : '—',
     client_name: sponsored?.name,
     client_logo: sponsored?.logo,
+    communitree_logo: initiated?.logo,
   };
 
   return { meta, forest, computed };
