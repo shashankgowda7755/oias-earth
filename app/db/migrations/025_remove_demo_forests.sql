@@ -29,9 +29,12 @@ BEGIN
     RETURN;
   END IF;
 
-  -- Tree-level dependents (FK -> forest_trees).
+  -- Tree-level dependents (FK -> forest_trees). carbon_ledger + timeline_assets
+  -- both reference forest_plant_timelines, so they go before the timelines.
   DELETE FROM gift_forest_plants WHERE gift_tree_id IN (SELECT id FROM forest_trees WHERE forest_id = ANY(demo_ids));
   DELETE FROM donor_trees WHERE tree_id IN (SELECT id FROM forest_trees WHERE forest_id = ANY(demo_ids));
+  DELETE FROM forest_tree_carbon_ledger WHERE forest_id = ANY(demo_ids)
+     OR tree_id IN (SELECT id FROM forest_trees WHERE forest_id = ANY(demo_ids));
   DELETE FROM forest_plant_timeline_assets WHERE timeline_id IN (
     SELECT id FROM forest_plant_timelines WHERE plant_id IN (
       SELECT id FROM forest_trees WHERE forest_id = ANY(demo_ids)));
@@ -40,8 +43,6 @@ BEGIN
   DELETE FROM forest_tree_sponsors WHERE forest_tree_id IN (SELECT id FROM forest_trees WHERE forest_id = ANY(demo_ids));
   DELETE FROM scene_hotspots WHERE tree_id IN (SELECT id FROM forest_trees WHERE forest_id = ANY(demo_ids));
   DELETE FROM tree_asserts WHERE tree_id IN (SELECT id FROM forest_trees WHERE forest_id = ANY(demo_ids));
-  DELETE FROM forest_tree_carbon_ledger WHERE forest_id = ANY(demo_ids)
-     OR tree_id IN (SELECT id FROM forest_trees WHERE forest_id = ANY(demo_ids));
 
   DELETE FROM forest_trees WHERE forest_id = ANY(demo_ids);
 
@@ -55,8 +56,10 @@ BEGIN
   DELETE FROM forest_asserts WHERE forest_id = ANY(demo_ids);
   DELETE FROM forest_email_config WHERE forest_id = ANY(demo_ids);
   DELETE FROM forest_panoramas WHERE forest_id = ANY(demo_ids);
-  DELETE FROM forest_scenes WHERE forest_id = ANY(demo_ids);
+  DELETE FROM scene_links WHERE from_scene_id IN (SELECT id FROM forest_scenes WHERE forest_id = ANY(demo_ids))
+     OR to_scene_id IN (SELECT id FROM forest_scenes WHERE forest_id = ANY(demo_ids));
   DELETE FROM scene_images WHERE forest_id = ANY(demo_ids);
+  DELETE FROM forest_scenes WHERE forest_id = ANY(demo_ids);
   DELETE FROM sapling_stores WHERE forest_id = ANY(demo_ids);
   DELETE FROM user_role_forest_accesses WHERE forest_id = ANY(demo_ids);
 
