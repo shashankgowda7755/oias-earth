@@ -1112,7 +1112,21 @@ export const SPECIES_TRAITS: Record<string, SpeciesTraits> = {
     "nesting": true,
     "pollination": true,
     "fruit": true
-  }
+  },
+  // --- merged from "Species list.xlsx" (Site-1); traits researched per-species ---
+  "prunus dulcis": { "timber": false, "nesting": true, "pollination": true, "fruit": true },
+  "country almond": { "timber": false, "nesting": true, "pollination": true, "fruit": true },
+  "leucaena leucocephala": { "timber": true, "nesting": true, "pollination": true, "fruit": false },
+  "subabul": { "timber": true, "nesting": true, "pollination": true, "fruit": false },
+  "annona reticulata": { "timber": false, "nesting": true, "pollination": true, "fruit": true },
+  "custard apple": { "timber": false, "nesting": true, "pollination": true, "fruit": true },
+  "ram seetha": { "timber": false, "nesting": true, "pollination": true, "fruit": true },
+  "citrus limon": { "timber": false, "nesting": false, "pollination": true, "fruit": true },
+  "lemon": { "timber": false, "nesting": false, "pollination": true, "fruit": true },
+  "swietenia mahagoni": { "timber": true, "nesting": true, "pollination": true, "fruit": false },
+  "west indian mahogany": { "timber": true, "nesting": true, "pollination": true, "fruit": false },
+  "piscidia piscipula": { "timber": true, "nesting": true, "pollination": true, "fruit": false },
+  "jamaica dogwood": { "timber": true, "nesting": true, "pollination": true, "fruit": false }
 };
 
 export function lookupSpeciesTraits(...names: (string | undefined)[]): SpeciesTraits {
