@@ -143,31 +143,6 @@ export function ReportFormDialog({
           placeholder="Select a quarter"
         />
 
-        <DateField
-          label="Report Date"
-          value={form.report_date}
-          onChange={set('report_date')}
-          error={errors.report_date}
-        />
-        <DateField
-          label="Plantation Date"
-          value={form.plantation_date}
-          onChange={set('plantation_date')}
-          error={errors.plantation_date}
-        />
-        <DateField
-          label="Start Date"
-          value={form.start_date}
-          onChange={set('start_date')}
-          error={errors.start_date}
-        />
-        <DateField
-          label="End Date"
-          value={form.end_date}
-          onChange={set('end_date')}
-          error={errors.end_date}
-        />
-
         <p className="sm:col-span-2 text-sm text-textSecondary">
           You only need Forest, Year and Quarter to start. Enter the report
           content — photos, weather, growth, maintenance — in the guided editor
@@ -230,55 +205,5 @@ export function ReportFormDialog({
         </details>
       </div>
     </FormDialog>
-  );
-}
-
-/**
- * Native date input with the same floating-label look as the shared TextField.
- * The shared TextField type union doesn't include "date", so we render a small
- * local control rather than editing shared components.
- */
-function DateField({
-  label,
-  value,
-  onChange,
-  error,
-}: {
-  label: string;
-  value: string;
-  onChange: (v: string) => void;
-  error?: string;
-}) {
-  const id = `date-${label.replace(/\s+/g, '-').toLowerCase()}`;
-  const describedBy = error ? `${id}-help` : undefined;
-  return (
-    <div className="relative">
-      <input
-        id={id}
-        type="date"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        aria-invalid={Boolean(error)}
-        aria-describedby={describedBy}
-        className={`peer w-full rounded-input border bg-surface px-3 py-3 text-[15px] text-textPrimary outline-none transition-colors focus:ring-1 ${
-          error
-            ? 'border-danger focus:border-danger focus:ring-danger'
-            : 'border-border focus:border-primary focus:ring-primary'
-        }`}
-      />
-      <label
-        htmlFor={id}
-        className={`pointer-events-none absolute -top-2 left-2 z-10 bg-surface px-1 text-label transition-all ${
-          error ? 'text-danger' : 'text-textSecondary'
-        }`}
-      >
-        {label}
-      </label>
-      {error ? (
-        <p id={describedBy} className="mt-1 px-1 text-xs text-danger">
-          {error}
-        </p>
-      ) : null}
-    </div>
   );
 }
