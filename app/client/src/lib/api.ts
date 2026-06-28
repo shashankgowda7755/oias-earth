@@ -401,6 +401,42 @@ export async function updateEntity<TResp = unknown, TBody = unknown>(
   return { data: record } as TResp;
 }
 
+/* ----------------------------- Forest read-one ----------------------------- */
+
+/** One reconstructed box (from forest_boxes + grouped forest_trees) for edit. */
+export interface ForestFullBox {
+  id: string;
+  row: number | null;
+  column: number | null;
+  prefix: string | null;
+  start: string | null;
+  tree_to_tree_distance: string | number | null;
+  row_position: number | null;
+  column_position: number | null;
+  species_data: { species_id: number; count: number; planted_on: string | null }[];
+}
+
+/**
+ * Full forest record from GET /forest/:id — every scalar + jsonb column plus the
+ * joined sponsors/employees, the user-role access, and a reconstructed box_data[].
+ * Used to hydrate the edit wizard so no field opens blank.
+ */
+export interface ForestFullRecord {
+  id: string;
+  sponsors: { id: string; sponsor_name: string; sponsor_logo: string | null }[];
+  employees: { id: string; name: string }[];
+  box_data: ForestFullBox[];
+  site_manager_id: string | null;
+  user_role_id: string | null;
+  [key: string]: unknown;
+}
+
+/** GET /api/v1/forest/:id — full record for the edit form. */
+export async function fetchForestFull(id: string): Promise<ForestFullRecord> {
+  const { data } = await api.get<{ data: ForestFullRecord }>(`/forest/${id}`);
+  return data.data;
+}
+
 /* ----------------------------- Species search ----------------------------- */
 /**
  * POST /api/v1/master-plantspecies/search { search } -> { data: [...] }.

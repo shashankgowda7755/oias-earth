@@ -94,11 +94,18 @@ export function toDateInput(value: string | null | undefined): string {
 /** Build form state from an existing row (edit mode). */
 export function formFromRow(row: ReportRow): ReportFormState {
   let reportDataText = '';
-  // reports/list does not return report_data, but if a future detail fetch
-  // includes it we render it; otherwise the textarea starts empty on edit.
+  // reports/list now returns report_data (jsonb). pg/PGlite usually hand it back
+  // as a parsed object, but accept a JSON string defensively too so the edit
+  // form prefills on the first open (the bug was a missing SELECT column).
   const rd = (row as unknown as { report_data?: unknown }).report_data;
   if (rd != null && typeof rd === 'object') {
     reportDataText = JSON.stringify(rd, null, 2);
+  } else if (typeof rd === 'string' && rd.trim()) {
+    try {
+      reportDataText = JSON.stringify(JSON.parse(rd), null, 2);
+    } catch {
+      reportDataText = rd;
+    }
   }
   return {
     forest_id: row.forest_id ?? row.Forest?.id ?? '',

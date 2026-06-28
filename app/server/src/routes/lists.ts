@@ -263,7 +263,7 @@ listRouter.post(
       `SELECT
          r.id, r.year, r.quarter, r.report_date, r.plantation_date,
          r.start_date, r.end_date, r.mode, r.type, r.version, r.project_period,
-         r.forest_id, r.skip, r.created_by, r.updated_by, r.is_active,
+         r.forest_id, r.report_data, r.skip, r.created_by, r.updated_by, r.is_active,
          r.created_at, r.updated_at,
          CASE WHEN fo.id IS NULL THEN NULL
               ELSE json_build_object('id', fo.id, 'forest_name', fo.forest_name,

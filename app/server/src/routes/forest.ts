@@ -295,6 +295,24 @@ async function upsertForest(req: Request, res: Response): Promise<void> {
   const sponsorIds = parseMaybeJson<string[]>(body.sponsor_ids ?? body.sponsorIds, []);
   const employeeIds = parseMaybeJson<string[]>(body.employee_ids ?? body.employeeIds, []);
 
+  // Which sections the caller actually supplied. On UPDATE we ONLY rebuild a
+  // section that was provided — omitting it leaves the existing rows intact.
+  // This is what makes "edit one or two fields, keep everything else" safe, and
+  // critically protects forest_trees (and their living-proof timelines / gifts /
+  // carbon ledger) from being wiped when the edit doesn't touch the grid.
+  const boxDataProvided = body.box_data !== undefined || body.boxData !== undefined;
+  const sponsorsProvided =
+    body.sponsor_ids !== undefined || body.sponsorIds !== undefined ||
+    body.sponsor_id !== undefined || body.sponsorId !== undefined;
+  const employeesProvided =
+    body.employee_id !== undefined || body.employeeId !== undefined ||
+    body.employee_ids !== undefined || body.employeeIds !== undefined;
+  // On create, always materialise children. On update, only the provided ones.
+  const isCreate = !id;
+  const rebuildBoxes = isCreate || boxDataProvided;
+  const rebuildSponsors = isCreate || sponsorsProvided;
+  const rebuildEmployees = isCreate || employeesProvided;
+
   const centerLat = Number(colMap.get('forest_geo_lat') ?? body.forest_geo_lat ?? 0);
   const centerLng = Number(colMap.get('forest_geo_long') ?? body.forest_geo_long ?? 0);
 
@@ -351,24 +369,32 @@ async function upsertForest(req: Request, res: Response): Promise<void> {
         );
         if (r.rowCount === 0) throw notFound('Forest not found');
       }
-      // Re-running rebuilds the generated child rows. Detach the tree-level
-      // dependents first (gift_forest_plants / donor_trees FK forest_trees),
-      // otherwise the tree DELETE trips their foreign keys.
-      await client.query(
-        `DELETE FROM gift_forest_plants
-          WHERE gift_tree_id IN (SELECT id FROM forest_trees WHERE forest_id = $1)`,
-        [forestId]
-      );
-      await client.query(
-        `DELETE FROM donor_trees
-          WHERE tree_id IN (SELECT id FROM forest_trees WHERE forest_id = $1)`,
-        [forestId]
-      );
-      await client.query(`DELETE FROM forest_trees WHERE forest_id = $1`, [forestId]);
-      await client.query(`DELETE FROM forest_boxes WHERE forest_id = $1`, [forestId]);
-      await client.query(`DELETE FROM forest_clusters WHERE forest_id = $1`, [forestId]);
-      await client.query(`DELETE FROM forest_sponsors WHERE forest_id = $1`, [forestId]);
-      await client.query(`DELETE FROM forests_employees WHERE forest_id = $1`, [forestId]);
+      // Rebuild ONLY the child sections the caller supplied (see rebuild* flags).
+      // A grid rebuild detaches the tree-level dependents first
+      // (gift_forest_plants / donor_trees FK forest_trees), otherwise the tree
+      // DELETE trips their foreign keys. When box_data is omitted we leave the
+      // boxes/trees (and their timelines/gifts/ledger) completely untouched.
+      if (rebuildBoxes) {
+        await client.query(
+          `DELETE FROM gift_forest_plants
+            WHERE gift_tree_id IN (SELECT id FROM forest_trees WHERE forest_id = $1)`,
+          [forestId]
+        );
+        await client.query(
+          `DELETE FROM donor_trees
+            WHERE tree_id IN (SELECT id FROM forest_trees WHERE forest_id = $1)`,
+          [forestId]
+        );
+        await client.query(`DELETE FROM forest_trees WHERE forest_id = $1`, [forestId]);
+        await client.query(`DELETE FROM forest_boxes WHERE forest_id = $1`, [forestId]);
+        await client.query(`DELETE FROM forest_clusters WHERE forest_id = $1`, [forestId]);
+      }
+      if (rebuildSponsors) {
+        await client.query(`DELETE FROM forest_sponsors WHERE forest_id = $1`, [forestId]);
+      }
+      if (rebuildEmployees) {
+        await client.query(`DELETE FROM forests_employees WHERE forest_id = $1`, [forestId]);
+      }
       // user_role_forest_accesses is left intact on update unless a new
       // userRoleId is supplied (handled below) — it governs portal access.
     }
@@ -380,24 +406,28 @@ async function upsertForest(req: Request, res: Response): Promise<void> {
     );
     const forestUniqueId = fuidRow.rows[0]?.forest_unique_id ?? forestId;
 
-    // --- join rows: sponsors + employees ---
-    const allSponsors = uniq([...(sponsorId ? [sponsorId] : []), ...sponsorIds]);
-    for (const sId of allSponsors) {
-      if (!sId) continue;
-      await client.query(
-        `INSERT INTO forest_sponsors (forest_id, sponsor_id, is_active, created_by, updated_by)
-         VALUES ($1,$2,TRUE,$3,$3)`,
-        [forestId, sId, actor]
-      );
+    // --- join rows: sponsors + employees (only when supplied; see rebuild*) ---
+    if (rebuildSponsors) {
+      const allSponsors = uniq([...(sponsorId ? [sponsorId] : []), ...sponsorIds]);
+      for (const sId of allSponsors) {
+        if (!sId) continue;
+        await client.query(
+          `INSERT INTO forest_sponsors (forest_id, sponsor_id, is_active, created_by, updated_by)
+           VALUES ($1,$2,TRUE,$3,$3)`,
+          [forestId, sId, actor]
+        );
+      }
     }
-    const allEmployees = uniq([...(employeeId ? [employeeId] : []), ...employeeIds]);
-    for (const eId of allEmployees) {
-      if (!eId) continue;
-      await client.query(
-        `INSERT INTO forests_employees (forest_id, employee_id, is_active, created_by, updated_by)
-         VALUES ($1,$2,TRUE,$3,$3)`,
-        [forestId, eId, actor]
-      );
+    if (rebuildEmployees) {
+      const allEmployees = uniq([...(employeeId ? [employeeId] : []), ...employeeIds]);
+      for (const eId of allEmployees) {
+        if (!eId) continue;
+        await client.query(
+          `INSERT INTO forests_employees (forest_id, employee_id, is_active, created_by, updated_by)
+           VALUES ($1,$2,TRUE,$3,$3)`,
+          [forestId, eId, actor]
+        );
+      }
     }
     // Grant portal access to the supplied user_role (sponsor login scope).
     if (userRoleId) {
@@ -416,54 +446,78 @@ async function upsertForest(req: Request, res: Response): Promise<void> {
       }
     }
 
-    // --- boxes + trees from box_data[] ---
-    const stats = await generateBoxesAndTrees(
-      client,
-      forestId,
-      forestUniqueId,
-      boxData,
-      centerLat,
-      centerLng,
-      actor
-    );
-
-    // One representative cluster centred on the forest (live job builds many).
-    if (Number.isFinite(centerLat) && Number.isFinite(centerLng) && (centerLat || centerLng)) {
-      await client.query(
-        `INSERT INTO forest_clusters (forest_id, lat, lng, tree_count) VALUES ($1,$2,$3,$4)`,
-        [forestId, String(centerLat), String(centerLng), stats.trees]
+    // --- boxes + trees from box_data[] (only when supplied; see rebuildBoxes) ---
+    let stats: GenStats = { boxes: 0, trees: 0, species: 0, oxygen: 0, carbon: 0 };
+    if (rebuildBoxes) {
+      stats = await generateBoxesAndTrees(
+        client,
+        forestId,
+        forestUniqueId,
+        boxData,
+        centerLat,
+        centerLng,
+        actor
       );
+
+      // One representative cluster centred on the forest (live job builds many).
+      if (Number.isFinite(centerLat) && Number.isFinite(centerLng) && (centerLat || centerLng)) {
+        await client.query(
+          `INSERT INTO forest_clusters (forest_id, lat, lng, tree_count) VALUES ($1,$2,$3,$4)`,
+          [forestId, String(centerLat), String(centerLng), stats.trees]
+        );
+      }
+
+      // Cache forest totals (matches live forests.forest_oxygen/_carbonoffset).
+      await client.query(
+        `UPDATE forests
+            SET total_trees = $1,
+                total_species_planted = $2,
+                forest_oxygen = $3,
+                forest_carbonoffset = $4,
+                updated_by = $5
+          WHERE id = $6`,
+        [stats.trees, stats.species, stats.oxygen, stats.carbon, actor, forestId]
+      );
+
+      // Mirror the live async-job record.
+      const jobId = `JOB_${Date.now()}_${Math.random().toString(36).slice(2, 10).toUpperCase()}`;
+      await client.query(
+        `INSERT INTO jobs (job_id, job_type, job_description, status, payload, result, created_by, updated_by)
+         VALUES ($1,'forest_upsert_v1',$2,'completed',$3,$4,$5,$5)`,
+        [
+          jobId,
+          JSON.stringify({
+            forest_id: `${forestUniqueId} - ${colMap.get('forest_name') ?? ''}`.trim(),
+            total_number_of_boxes: stats.boxes,
+            total_number_of_trees: stats.trees,
+          }),
+          JSON.stringify({ url: '/api/v1/forest/upsert', method: 'POST' }),
+          JSON.stringify({ success: true, message: id ? 'Forest updated successfully' : 'Forest created successfully' }),
+          actor,
+        ]
+      );
+    } else {
+      // Edit that didn't touch the grid: leave boxes/trees + cached totals exactly
+      // as they are, and just surface the current counts in the response.
+      const cur = await client.query<{
+        total_trees: number | null;
+        total_species_planted: number | null;
+        forest_oxygen: string | null;
+        forest_carbonoffset: string | null;
+      }>(
+        `SELECT total_trees, total_species_planted, forest_oxygen, forest_carbonoffset
+           FROM forests WHERE id = $1`,
+        [forestId]
+      );
+      const c = cur.rows[0];
+      stats = {
+        boxes: 0,
+        trees: Number(c?.total_trees) || 0,
+        species: Number(c?.total_species_planted) || 0,
+        oxygen: Number(c?.forest_oxygen) || 0,
+        carbon: Number(c?.forest_carbonoffset) || 0,
+      };
     }
-
-    // Cache forest totals (matches live forests.forest_oxygen/_carbonoffset).
-    await client.query(
-      `UPDATE forests
-          SET total_trees = $1,
-              total_species_planted = $2,
-              forest_oxygen = $3,
-              forest_carbonoffset = $4,
-              updated_by = $5
-        WHERE id = $6`,
-      [stats.trees, stats.species, stats.oxygen, stats.carbon, actor, forestId]
-    );
-
-    // Mirror the live async-job record.
-    const jobId = `JOB_${Date.now()}_${Math.random().toString(36).slice(2, 10).toUpperCase()}`;
-    await client.query(
-      `INSERT INTO jobs (job_id, job_type, job_description, status, payload, result, created_by, updated_by)
-       VALUES ($1,'forest_upsert_v1',$2,'completed',$3,$4,$5,$5)`,
-      [
-        jobId,
-        JSON.stringify({
-          forest_id: `${forestUniqueId} - ${colMap.get('forest_name') ?? ''}`.trim(),
-          total_number_of_boxes: stats.boxes,
-          total_number_of_trees: stats.trees,
-        }),
-        JSON.stringify({ url: '/api/v1/forest/upsert', method: 'POST' }),
-        JSON.stringify({ success: true, message: 'Forest created successfully' }),
-        actor,
-      ]
-    );
 
     await client.query('COMMIT');
 
@@ -655,6 +709,98 @@ async function fetchForestRecord(forestId: string): Promise<unknown> {
     [forestId]
   );
   return r.rows[0] ?? { id: forestId };
+}
+
+/**
+ * GET /forest/:id — the FULL forest record for the edit form.
+ *
+ * The forest/list row only carries scalar columns, so opening Edit used to leave
+ * most of the form blank (and submit then failed validation). This returns every
+ * scalar + jsonb column plus the joined sponsors / employees / user-role access
+ * and a reconstructed box_data[] (so the wizard can show the existing planting
+ * layout). The client hydrates the whole form from this, so an edit changes only
+ * the fields the user touches and never blanks the rest.
+ */
+async function getForestFull(req: Request, res: Response): Promise<void> {
+  if (req.auth?.role !== 'SuperAdmin' && req.auth?.role !== 'Admin') {
+    throw forbidden('Only Admin/SuperAdmin can open a forest for edit');
+  }
+  const id = String(req.params.id);
+  const fr = await query<Record<string, unknown>>(`SELECT * FROM forests WHERE id = $1`, [id]);
+  if (fr.rowCount === 0) throw notFound('Forest not found');
+  const forest = fr.rows[0]!;
+
+  const sponsors = (
+    await query(
+      `SELECT s.id, s.sponsor_name, s.sponsor_logo
+         FROM forest_sponsors fs JOIN sponsors s ON s.id = fs.sponsor_id
+        WHERE fs.forest_id = $1 AND fs.is_active = TRUE
+        ORDER BY fs.created_at`,
+      [id]
+    )
+  ).rows as { id: string; sponsor_name: string; sponsor_logo: string | null }[];
+
+  const employees = (
+    await query(
+      `SELECT e.id, e.name
+         FROM forests_employees fe JOIN employees e ON e.id = fe.employee_id
+        WHERE fe.forest_id = $1 AND fe.is_active = TRUE
+        ORDER BY fe.created_at`,
+      [id]
+    )
+  ).rows as { id: string; name: string }[];
+
+  const access = (
+    await query<{ user_role_id: string }>(
+      `SELECT user_role_id FROM user_role_forest_accesses
+        WHERE forest_id = $1 AND is_active = TRUE
+        ORDER BY created_at LIMIT 1`,
+      [id]
+    )
+  ).rows;
+
+  // Reconstruct box_data[] from forest_boxes + forest_trees (grouped by species)
+  // so the grid shows the saved layout. This is a read-only summary on edit; the
+  // grid is not re-sent on save, so existing trees / timelines are untouched.
+  const boxRows = (
+    await query<{
+      id: string;
+      row: number | null;
+      column: number | null;
+      prefix: string | null;
+      start: string | null;
+      tree_to_tree_distance: string | null;
+      row_position: number | null;
+      column_position: number | null;
+    }>(
+      `SELECT id, "row", "column", prefix, start, tree_to_tree_distance, row_position, column_position
+         FROM forest_boxes WHERE forest_id = $1 ORDER BY "row", "column"`,
+      [id]
+    )
+  ).rows;
+
+  const box_data: Record<string, unknown>[] = [];
+  for (const b of boxRows) {
+    const species = (
+      await query<{ species_id: number; count: number; planted_on: string | null }>(
+        `SELECT master_plant_species_id AS species_id, COUNT(*)::int AS count, MIN(planted_on) AS planted_on
+           FROM forest_trees WHERE box_id = $1 GROUP BY master_plant_species_id`,
+        [b.id]
+      )
+    ).rows;
+    box_data.push({ ...b, species_data: species });
+  }
+
+  res.json({
+    data: {
+      ...forest,
+      sponsors,
+      employees,
+      box_data,
+      site_manager_id: employees[0]?.id ?? null,
+      user_role_id: access[0]?.user_role_id ?? null,
+    },
+  });
 }
 
 /* ------------------------------------------------------------------ */
@@ -2893,6 +3039,8 @@ forestRouter.post('/forest/trees/bulk-import', wrap(bulkImportTrees));
 forestRouter.post('/forests/trees/bulk-import', wrap(bulkImportTrees));
 forestRouter.get('/forest/:id/dashboard', wrap(forestDashboard));
 forestRouter.get('/forest/:id/geo', wrap(forestGeo));
+forestRouter.get('/forest/:id', wrap(getForestFull));
+forestRouter.get('/forests/:id', wrap(getForestFull));
 forestRouter.post('/forest/:id/trees/list', wrap(forestTreesList));
 forestRouter.post('/forest/:id/trees/geo', wrap(tagTreeGeo));
 forestRouter.post('/forest/:id/trees/:treeId/visit', upload.any(), wrap(logTreeVisit));

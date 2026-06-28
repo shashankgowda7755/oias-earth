@@ -17,7 +17,7 @@ import {
 import { LocationPicker } from './LocationPicker';
 import { MultiAutocompleteField } from './MultiAutocompleteField';
 import { BoxGrid } from './BoxGrid';
-import type { FieldErrors, ForestFormState } from './types';
+import { boxPlanted, type FieldErrors, type ForestFormState } from './types';
 
 /** Setter: update one field by key. */
 type Update = <K extends keyof ForestFormState>(
@@ -213,6 +213,13 @@ export function Step2Grid({ form, errors, update }: StepProps) {
     Number.isInteger(treeRow) && treeRow > 0 &&
     Number.isInteger(treeColumn) && treeColumn > 0;
 
+  // EDIT mode: the planting grid is read-only. Re-sending it would rebuild every
+  // forest_tree and erase its living-proof timeline, so editing changes only the
+  // other fields; the layout is shown as a summary for reference.
+  const isEdit = Boolean(form.id);
+  const configuredBoxes = Object.values(form.boxes).filter((b) => b.prefix.trim().length > 0);
+  const totalTrees = configuredBoxes.reduce((sum, b) => sum + boxPlanted(b), 0);
+
   return (
     <div>
       <SectionTitle>Grid Config</SectionTitle>
@@ -247,7 +254,20 @@ export function Step2Grid({ form, errors, update }: StepProps) {
       {/* Box cards grid — appears once the grid dims are valid. */}
       <div className="mt-6">
         <SubHeading>Box Layout</SubHeading>
-        {gridReady ? (
+        {isEdit ? (
+          <div className="rounded-card border border-border bg-appbg px-4 py-4 text-sm text-textSecondary">
+            <p className="mb-1 font-medium text-textPrimary">
+              Planting layout is locked while editing
+            </p>
+            <p>
+              {configuredBoxes.length} box{configuredBoxes.length === 1 ? '' : 'es'} •{' '}
+              {totalTrees.toLocaleString()} tree{totalTrees === 1 ? '' : 's'} on record.
+              Rebuilding the grid here would erase each tree&apos;s monitoring timeline,
+              so the layout can only be changed from the dedicated tree tools. Every
+              other field above saves normally.
+            </p>
+          </div>
+        ) : gridReady ? (
           <BoxGrid
             boxRows={boxRows}
             boxColumn={boxColumn}

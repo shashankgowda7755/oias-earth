@@ -16,14 +16,14 @@ import { useMemo, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { AddButton, Button, ConfirmDialog, DataTable, useToast } from '@/components';
 import type { Column } from '@/components';
-import { deleteEntity, listEntity } from '@/lib/api';
-import type { ApiError } from '@/lib/api';
+import { deleteEntity, fetchForestFull, listEntity } from '@/lib/api';
+import type { ApiError, ForestFullRecord } from '@/lib/api';
 import type { ForestRow, ForestSponsorSummary } from '@/types/entities';
 import { AddForestWizard } from './AddForestWizard';
 import { CreateFromJsonDialog } from './CreateFromJsonDialog';
 import { ForestDetailView } from './ForestDetailView';
 import { rowToFullPayload, type FullForestPayload } from './fullTypes';
-import { emptyForestForm, type ForestFormState } from './types';
+import { boxKey, emptyForestForm, type BoxConfig, type ForestFormState } from './types';
 
 /* ------------------------------ formatting ------------------------------ */
 
@@ -121,6 +121,79 @@ function rowToForm(row: ForestRow): ForestFormState {
   };
 }
 
+/**
+ * Map the FULL forest record (GET /forest/:id) into the wizard's form for EDIT.
+ *
+ * Unlike rowToForm (list row only), this hydrates EVERY field the edit form has —
+ * description, site manager, user, all grid distances/angles, and the saved box
+ * layout — so nothing opens blank and required-field validation passes. The grid
+ * is shown read-only in edit mode and is not re-sent on save (protects trees).
+ */
+function fullToForm(full: ForestFullRecord): ForestFormState {
+  const str = (v: unknown): string => (v == null ? '' : String(v));
+
+  const sponsors = full.sponsors ?? [];
+  const sponsorIds = sponsors.map((s) => s.id);
+  const sponsorLabels: Record<string, string> = {};
+  for (const s of sponsors) sponsorLabels[s.id] = s.sponsor_name;
+
+  const manager = (full.employees ?? [])[0];
+
+  const boxes: Record<string, BoxConfig> = {};
+  for (const b of full.box_data ?? []) {
+    if (b.row == null || b.column == null) continue;
+    const startStr = b.start != null ? String(b.start) : '';
+    boxes[boxKey(b.row, b.column)] = {
+      row: b.row,
+      col: b.column,
+      prefix: b.prefix ?? '',
+      start_digits: /^\d+$/.test(startStr) ? String(startStr.length) : '1',
+      start: startStr,
+      species: (b.species_data ?? []).map((s) => ({
+        species_id: String(s.species_id),
+        species_label: `Species #${s.species_id}`,
+        count: String(s.count),
+      })),
+    };
+  }
+
+  const planted = str(full.plantation_date);
+
+  return {
+    ...emptyForestForm(),
+    id: full.id,
+    forest_name: str(full.forest_name),
+    forest_internal_id: str(full.forest_internal_id),
+    forest_city: str(full.forest_city),
+    forest_state: str(full.forest_state),
+    forest_country: str(full.forest_country),
+    forest_address: str(full.forest_address),
+    forest_desc: str(full.forest_desc),
+    forest_geo_lat: str(full.forest_geo_lat),
+    forest_geo_long: str(full.forest_geo_long),
+    site_manager_id: str(full.site_manager_id),
+    site_manager_label: manager?.name ?? str(full.site_manager_id),
+    sponsor_ids: sponsorIds,
+    sponsor_labels: sponsorLabels,
+    user_id: str(full.user_role_id),
+    user_label: full.user_role_id ? 'Assigned user' : '',
+
+    box_rows: str(full.box_rows),
+    box_column: str(full.box_column),
+    box_to_box_distance: str(full.box_to_box_distance),
+    tree_row: str(full.tree_row),
+    tree_column: str(full.tree_column),
+    tree_to_tree_distance: str(full.tree_to_tree_distance),
+    direction_angle: str(full.direction_angle),
+    boundary_gap: str(full.boundary_gap),
+    pathway_spacing: str(full.pathway_spacing),
+    project_site: str(full.project_site),
+    project_period: str(full.project_period),
+    plantation_date: planted ? planted.slice(0, 10) : '',
+    boxes,
+  };
+}
+
 const PAGE_SIZE_DEFAULT = 10;
 
 export default function Forests() {
@@ -166,8 +239,16 @@ export default function Forests() {
     setWizardOpen(true);
   };
 
-  const openEdit = (row: ForestRow) => {
-    setEditValues(rowToForm(row));
+  // Edit opens the wizard hydrated from the FULL record (GET /forest/:id) so no
+  // field is blank. Falls back to the list row if the read-one fails.
+  const openEdit = async (row: ForestRow) => {
+    try {
+      const full = await fetchForestFull(row.id);
+      setEditValues(fullToForm(full));
+    } catch {
+      toast.error('Could not load the full forest; opening with summary data.');
+      setEditValues(rowToForm(row));
+    }
     setWizardOpen(true);
   };
 
@@ -186,7 +267,7 @@ export default function Forests() {
 
   // "Edit" from the detail view: close detail, reopen the wizard prefilled.
   const editFromDetail = () => {
-    if (detailRow) openEdit(detailRow);
+    if (detailRow) void openEdit(detailRow);
     closeView();
   };
 
@@ -272,7 +353,7 @@ export default function Forests() {
         searchPlaceholder="Search forests..."
         caption="Forests"
         onView={(r) => openView(r)}
-        onEdit={(r) => openEdit(r)}
+        onEdit={(r) => void openEdit(r)}
         onDelete={(r) => setDeleteRow(r)}
         toolbar={
           <>

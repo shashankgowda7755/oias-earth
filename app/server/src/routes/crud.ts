@@ -37,6 +37,7 @@ import multer from 'multer';
 import bcrypt from 'bcryptjs';
 import { query, getClient } from '../db';
 import { badRequest, notFound } from '../errors';
+import { putObject, storageReady } from '../lib/storage';
 
 export const crudRouter = Router();
 
@@ -64,6 +65,41 @@ const upload = multer({ storage, limits: { fileSize: 10 * 1024 * 1024 } });
 /** Public base URL for stored files (served by index.ts at /uploads). */
 function fileUrl(req: Request, filename: string): string {
   return `${req.protocol}://${req.get('host')}/uploads/${filename}`;
+}
+
+/**
+ * Resolve the public URL to persist for an uploaded file.
+ *
+ * Prefer DURABLE object storage (Supabase/Vercel Blob) so the URL survives a
+ * redeploy/cold start — the local /uploads dir lives in Vercel's ephemeral /tmp
+ * and is wiped on every cold start, which is why sponsor logos / employee+user
+ * avatars used to vanish. Falls back to the local /uploads URL only when no
+ * storage backend is configured (dev), so behaviour degrades gracefully.
+ *
+ * NOTE (prod): set SUPABASE_URL + SUPABASE_SERVICE_KEY + SUPABASE_BUCKET (or
+ * BLOB_READ_WRITE_TOKEN) in Vercel or uploads still land in ephemeral /tmp.
+ */
+async function storedUrl(
+  req: Request,
+  f: Express.Multer.File,
+  keyPrefix: string,
+): Promise<string> {
+  if (storageReady()) {
+    try {
+      const buf = fs.readFileSync(f.path);
+      const url = await putObject(
+        `${keyPrefix}/${f.filename}`,
+        buf,
+        f.mimetype || 'application/octet-stream',
+      );
+      // Best-effort cleanup of the local temp file; ignore failures.
+      fs.unlink(f.path, () => undefined);
+      return url;
+    } catch {
+      // Fall through to the local URL on any storage error.
+    }
+  }
+  return fileUrl(req, f.filename);
 }
 
 /* ------------------------------------------------------------------ */
@@ -184,10 +220,10 @@ function toSnake(key: string): string {
  * Merge multer text fields + parsed JSON body + uploaded files into one
  * snake_case record limited to the entity's whitelisted columns.
  */
-function collectColumns(
+async function collectColumns(
   req: Request,
   cfg: EntityConfig
-): { cols: string[]; values: unknown[] } {
+): Promise<{ cols: string[]; values: unknown[] }> {
   const allowed = new Set(cfg.columns);
   const jsonCols = cfg.jsonbColumns ?? new Set<string>();
   const out = new Map<string, unknown>();
@@ -204,12 +240,13 @@ function collectColumns(
     out.set(col, value);
   }
 
-  // Uploaded files override / set their URL columns.
+  // Uploaded files override / set their URL columns — persisted to durable
+  // object storage when configured (survives redeploys), local URL otherwise.
   const files = (req.files as Express.Multer.File[] | undefined) ?? [];
   for (const f of files) {
     const col = cfg.fileFields?.[f.fieldname];
     if (col && allowed.has(col)) {
-      out.set(col, fileUrl(req, f.filename));
+      out.set(col, await storedUrl(req, f, cfg.table));
     }
   }
 
@@ -262,7 +299,8 @@ async function upsertUser(req: Request, res: Response): Promise<void> {
   const imageFile = files.find(
     (f) => f.fieldname === 'image_url' || f.fieldname === 'profile_image'
   );
-  const imageUrl = imageFile ? fileUrl(req, imageFile.filename) : b.imageUrl;
+  // Durable storage when configured (survives redeploys); local URL otherwise.
+  const imageUrl = imageFile ? await storedUrl(req, imageFile, 'users') : b.imageUrl;
   const roleId =
     b.roleId === undefined || b.roleId === null || b.roleId === ''
       ? undefined
@@ -424,7 +462,7 @@ async function deleteUser(req: Request, res: Response): Promise<void> {
 async function genericUpsert(req: Request, res: Response, cfg: EntityConfig): Promise<void> {
   const actor = req.auth?.profileId ?? null;
   const id = bodyId(req);
-  const { cols, values } = collectColumns(req, cfg);
+  const { cols, values } = await collectColumns(req, cfg);
   const trackActor = cfg.trackActor !== false;
 
   if (!id) {
