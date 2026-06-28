@@ -116,6 +116,9 @@ export interface ForestWeather {
   outside_temperature_max?: number | null;
   outside_temperature_min?: number | null;
   outside_humidity_avg?: number | null;
+  source?: string;
+  /** True when called with `write` — the outside readings were persisted (estimated). */
+  persisted?: boolean;
   reason?: string;
 }
 
@@ -171,8 +174,11 @@ export async function fetchForestWeather(
   forestId: string,
   year: number,
   quarter: number,
+  opts?: { write?: boolean },
 ): Promise<ForestWeather> {
-  const res = await api.get(`/forest/${forestId}/weather`, { params: { year, quarter } });
+  const params: Record<string, unknown> = { year, quarter };
+  if (opts?.write) params.write = 1;
+  const res = await api.get(`/forest/${forestId}/weather`, { params });
   return (res.data?.data ?? res.data) as ForestWeather;
 }
 

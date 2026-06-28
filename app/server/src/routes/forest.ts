@@ -2255,19 +2255,46 @@ async function forestWeather(req: Request, res: Response): Promise<void> {
   }
   const avg = (a: number[]): number | null => (a.length ? wxRound1(a.reduce((x, y) => x + y, 0) / a.length) : null);
 
-  res.json({
-    data: {
-      available: precip.length > 0 || tmean.length > 0,
-      year, quarter, period: { start, end }, source: 'open-meteo', days_sampled: precip.length,
-      raining_days: precip.filter((v) => v >= 1).length,
-      rainfall_mm: precip.length ? wxRound1(precip.reduce((x, y) => x + y, 0)) : null,
-      dry_spell_days: dry,
-      outside_temperature_avg: avg(tmean),
-      outside_temperature_max: tmax.length ? wxRound1(Math.max(...tmax)) : null,
-      outside_temperature_min: tmin.length ? wxRound1(Math.min(...tmin)) : null,
-      outside_humidity_avg: hum.length ? Math.round(hum.reduce((x, y) => x + y, 0) / hum.length) : null,
-    },
-  });
+  const data = {
+    available: precip.length > 0 || tmean.length > 0,
+    year, quarter, period: { start, end }, source: 'open-meteo', days_sampled: precip.length,
+    raining_days: precip.filter((v) => v >= 1).length,
+    rainfall_mm: precip.length ? wxRound1(precip.reduce((x, y) => x + y, 0)) : null,
+    dry_spell_days: dry,
+    outside_temperature_avg: avg(tmean),
+    outside_temperature_max: tmax.length ? wxRound1(Math.max(...tmax)) : null,
+    outside_temperature_min: tmin.length ? wxRound1(Math.min(...tmin)) : null,
+    outside_humidity_avg: hum.length ? Math.round(hum.reduce((x, y) => x + y, 0) / hum.length) : null,
+    persisted: false,
+  };
+
+  // ?write=1 persists the OUTSIDE readings (raining days + outside temp/humidity)
+  // into the (year, quarter) jsonb rows, stamped estimated so the renderer can
+  // label them and the operator can override. Inside readings are NEVER touched.
+  const write = String(req.query.write ?? '') === '1' || String(req.query.write ?? '') === 'true';
+  if (write && data.available) {
+    const stamp = { source: 'open-meteo', estimated: true };
+    const mwNext = upsertQ(await loadJsonb(id, 'maintenance_workforce'), year, quarter, (r) => ({
+      ...r,
+      total_raining_days: data.raining_days,
+      _weather: stamp,
+    }));
+    const thNext = upsertQ(await loadJsonb(id, 'temperature_humidity'), year, quarter, (r) => ({
+      ...r,
+      outside_plantation: {
+        ...(r.outside_plantation as object),
+        temperature: data.outside_temperature_avg ?? undefined,
+        humidity: data.outside_humidity_avg ?? undefined,
+        estimated: true,
+        source: 'open-meteo',
+      },
+    }));
+    await saveJsonb(id, 'maintenance_workforce', mwNext);
+    await saveJsonb(id, 'temperature_humidity', thNext);
+    data.persisted = true;
+  }
+
+  res.json({ data });
 }
 
 /* ------------------------------------------------------------------ */

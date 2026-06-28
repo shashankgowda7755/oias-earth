@@ -155,9 +155,14 @@ export default function Reports() {
     if (dialog.kind === 'create') {
       createMut.mutate(payload, {
         onSuccess: () => {
-          toast.success('Report created');
+          toast.success('Report created — opening the guided editor');
           setDialog({ kind: 'closed' });
           setPage(1);
+          // Land the operator on the guided data editor (photos, weather,
+          // growth, maintenance) — the surface the report actually renders from.
+          navigate(
+            `/forest/${payload.forest_id}/report-data?year=${payload.year}&quarter=${payload.quarter}`,
+          );
         },
         onError: (e: ApiError) =>
           toast.error(e.message || 'Failed to create report'),

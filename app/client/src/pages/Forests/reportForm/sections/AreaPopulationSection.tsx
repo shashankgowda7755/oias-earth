@@ -1,7 +1,8 @@
-import { SectionShell, FieldGrid, Txt, Num, Url, RepeatableRows, type SectionProps } from '../kit';
+import { SectionShell, FieldGrid, Txt, Num, Img, RepeatableRows, type SectionProps } from '../kit';
 
 export function AreaPopulationSection({ draft, patch }: SectionProps) {
   const aps = draft.area_population_statistics_details;
+  const forestId = draft.id;
   return (
     <SectionShell title="Area & Population Statistics">
       <FieldGrid cols={2}>
@@ -59,7 +60,13 @@ export function AreaPopulationSection({ draft, patch }: SectionProps) {
         rowTitle={(row, i) => `Image ${i + 1}${row.year != null ? ` — ${row.year}` : ''}`}
         renderRow={(row, update) => (
           <FieldGrid cols={2}>
-            <Url label="Image" value={row.image} onChange={(v) => update({ image: v })} />
+            <Img
+              label="Image"
+              value={row.image}
+              onChange={(v) => update({ image: v })}
+              forestId={forestId}
+              slot="earth"
+            />
             <Num label="Year" value={row.year} onChange={(v) => update({ year: v })} />
             <Num label="Population" value={row.population} onChange={(v) => update({ population: v })} />
           </FieldGrid>

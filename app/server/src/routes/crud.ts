@@ -428,6 +428,20 @@ async function genericUpsert(req: Request, res: Response, cfg: EntityConfig): Pr
   const trackActor = cfg.trackActor !== false;
 
   if (!id) {
+    // Guard: one report per (forest, year, quarter). Prevents duplicate quarters
+    // (a non-technical operator clicking "create" twice) before the INSERT.
+    if (cfg.table === 'reports') {
+      const b = (req.body ?? {}) as Record<string, unknown>;
+      if (b.forest_id != null && b.year != null && b.quarter != null) {
+        const dup = await query(
+          `SELECT 1 FROM reports WHERE forest_id = $1 AND year = $2 AND quarter = $3 AND is_active = TRUE LIMIT 1`,
+          [b.forest_id, b.year, b.quarter],
+        );
+        if ((dup.rowCount ?? 0) > 0) {
+          throw badRequest('A report for this forest, year and quarter already exists. Open the existing one instead.');
+        }
+      }
+    }
     // INSERT
     if (cols.length === 0) throw badRequest('No valid fields provided');
     const allCols = trackActor ? [...cols, 'created_by', 'updated_by'] : [...cols];

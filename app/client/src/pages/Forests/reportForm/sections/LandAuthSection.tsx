@@ -1,6 +1,7 @@
-import { SectionShell, FieldGrid, Txt, Num, Url, Sel, Dt, type SectionProps } from '../kit';
+import { SectionShell, FieldGrid, Txt, Num, Img, Sel, Dt, type SectionProps } from '../kit';
 
 export function LandAuthSection({ draft, patch }: SectionProps) {
+  const forestId = draft.id;
   return (
     <>
       <SectionShell title="Land Ownership & Area">
@@ -109,15 +110,19 @@ export function LandAuthSection({ draft, patch }: SectionProps) {
 
       <SectionShell title="Documents & Inspection">
         <FieldGrid cols={2}>
-          <Url
+          <Img
             label="Permission letter image"
             value={draft.permission_letter}
             onChange={(v) => patch({ permission_letter: v })}
+            forestId={forestId}
+            slot="permission"
           />
-          <Url
+          <Img
             label="Site layout image"
             value={draft.site_layout}
             onChange={(v) => patch({ site_layout: v })}
+            forestId={forestId}
+            slot="layout"
           />
           <Txt label="Digipin" value={draft.digipin} onChange={(v) => patch({ digipin: v })} />
           <Dt

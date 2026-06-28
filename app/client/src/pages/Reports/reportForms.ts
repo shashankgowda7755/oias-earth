@@ -18,7 +18,7 @@
  */
 import type { ReportRow } from '../../types/entities';
 
-/** Quarters are 1-4 (calendar quarters). */
+/** Quarters are 1-4 (FISCAL quarters, Indian FY: Q1 Apr–Jun … Q4 Jan–Mar). */
 export const QUARTER_OPTIONS = [
   { value: '1', label: 'Q1' },
   { value: '2', label: 'Q2' },
@@ -68,8 +68,10 @@ export const EMPTY_REPORT_FORM: ReportFormState = {
   plantation_date: '',
   start_date: '',
   end_date: '',
-  mode: '',
-  type: '',
+  // Sensible defaults so a non-technical operator only picks Forest/Year/Quarter.
+  // These are index metadata the renderer does not read; editable under "Advanced".
+  mode: 'automatic',
+  type: 'quarterly',
   version: '1',
   project_period: '',
   report_data: '',
@@ -119,10 +121,11 @@ export function formFromRow(row: ReportRow): ReportFormState {
 export type ReportFormErrors = Partial<Record<keyof ReportFormState, string>>;
 
 /**
- * Client-side validation. Required fields: forest, year, quarter, mode, type,
- * version, project_period (the non-nullable / business-key columns). Dates are
- * optional per the live data (some rows have nulls), but if start & end are both
- * provided we sanity-check ordering. report_data must parse as JSON when filled.
+ * Client-side validation. Required of the operator: only forest, year, quarter.
+ * mode/type/version/project_period are index metadata with sensible defaults (the
+ * renderer does not read them), so they are validated only for FORMAT when an
+ * operator changes them under "Advanced". Dates are optional, but when present we
+ * sanity-check ordering (plantation ≤ start ≤ end). report_data must parse as JSON.
  */
 export function validateReportForm(s: ReportFormState): ReportFormErrors {
   const e: ReportFormErrors = {};
@@ -136,19 +139,22 @@ export function validateReportForm(s: ReportFormState): ReportFormErrors {
 
   if (!s.quarter) e.quarter = 'Quarter is required';
 
-  if (!s.mode) e.mode = 'Mode is required';
-  if (!s.type) e.type = 'Type is required';
+  // Format-only checks for the optional/advanced metadata.
+  if (s.version) {
+    const versionNum = Number(s.version);
+    if (!Number.isInteger(versionNum) || versionNum < 1)
+      e.version = 'Version must be a positive whole number';
+  }
+  if (s.project_period) {
+    const ppNum = Number(s.project_period);
+    if (!Number.isInteger(ppNum) || ppNum < 0)
+      e.project_period = 'Enter a valid number of years';
+  }
 
-  const versionNum = Number(s.version);
-  if (!s.version) e.version = 'Version is required';
-  else if (!Number.isInteger(versionNum) || versionNum < 1)
-    e.version = 'Version must be a positive whole number';
-
-  const ppNum = Number(s.project_period);
-  if (!s.project_period) e.project_period = 'Project period is required';
-  else if (!Number.isInteger(ppNum) || ppNum < 0)
-    e.project_period = 'Enter a valid number of years';
-
+  // Date ordering: plantation ≤ start ≤ end (only when the pair is present).
+  if (s.plantation_date && s.start_date && s.plantation_date > s.start_date) {
+    e.start_date = 'Start date must be on or after the plantation date';
+  }
   if (s.start_date && s.end_date && s.start_date > s.end_date) {
     e.end_date = 'End date must be on or after the start date';
   }
@@ -190,10 +196,12 @@ export function formToPayload(s: ReportFormState): ReportWritePayload {
     plantation_date: s.plantation_date || null,
     start_date: s.start_date || null,
     end_date: s.end_date || null,
-    mode: s.mode,
-    type: s.type,
-    version: Number(s.version),
-    project_period: Number(s.project_period),
+    // Defaults so the NOT-NULL columns are always satisfied when the operator
+    // never opens "Advanced".
+    mode: s.mode || 'automatic',
+    type: s.type || 'quarterly',
+    version: Number(s.version) || 1,
+    project_period: s.project_period ? Number(s.project_period) : 0,
   };
   if (s.report_data.trim()) {
     // validated to parse already; send the object so the server can store jsonb.

@@ -15,9 +15,9 @@
 import type { FullForestPayload } from '../Forests/fullTypes';
 
 export interface ReportMeta {
-  /** Calendar year of the report period. */
+  /** Fiscal year (the April it starts in). */
   year: number;
-  /** Calendar quarter 1–4 (Q1 Jan–Mar, Q2 Apr–Jun, Q3 Jul–Sep, Q4 Oct–Dec). */
+  /** Fiscal quarter 1–4 (Indian FY: Q1 Apr–Jun, Q2 Jul–Sep, Q3 Oct–Dec, Q4 Jan–Mar of the next year). */
   quarter: number;
   /** "Q2" */
   quarter_label: string;

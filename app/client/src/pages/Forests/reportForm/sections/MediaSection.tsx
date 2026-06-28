@@ -3,6 +3,7 @@ import {
   FieldGrid,
   Txt,
   Url,
+  Img,
   Sel,
   RepeatableRows,
   Num,
@@ -34,7 +35,15 @@ function sponsorLogoLabel(value: string): string {
   return found ? found.label : value;
 }
 
+/** Map a report-slide hero type to its report-image upload slot. */
+function heroSlot(slideType?: string): string {
+  if (slideType === 'content_slide') return 'content';
+  if (slideType === 'project_impact_slide') return 'impact';
+  return 'cover';
+}
+
 export function MediaSection({ draft, patch }: SectionProps) {
+  const forestId = draft.id;
   return (
     <>
       <SectionShell
@@ -153,7 +162,13 @@ export function MediaSection({ draft, patch }: SectionProps) {
                 value={row.description}
                 onChange={(v) => update({ description: v })}
               />
-              <Url label="Image" value={row.image} onChange={(v) => update({ image: v })} />
+              <Img
+                label="Image"
+                value={row.image}
+                onChange={(v) => update({ image: v })}
+                forestId={forestId}
+                slot="security"
+              />
             </FieldGrid>
           )}
         />
@@ -184,7 +199,15 @@ export function MediaSection({ draft, patch }: SectionProps) {
                 value={row.quarter}
                 onChange={(v) => update({ quarter: v ?? 1 })}
               />
-              <Url label="Image" value={row.image} onChange={(v) => update({ image: v })} />
+              <Img
+                label="Image"
+                value={row.image}
+                onChange={(v) => update({ image: v })}
+                forestId={forestId}
+                slot="progress"
+                year={row.year}
+                quarter={row.quarter}
+              />
             </FieldGrid>
           )}
         />
@@ -205,7 +228,15 @@ export function MediaSection({ draft, patch }: SectionProps) {
             <FieldGrid cols={2}>
               <Num label="Year" value={row.year} onChange={(v) => update({ year: v ?? 0 })} />
               <Num label="Quarter" value={row.quarter} onChange={(v) => update({ quarter: v ?? 1 })} />
-              <Url label="Image" value={row.image} onChange={(v) => update({ image: v })} />
+              <Img
+                label="Image"
+                value={row.image}
+                onChange={(v) => update({ image: v })}
+                forestId={forestId}
+                slot="gallery"
+                year={row.year}
+                quarter={row.quarter}
+              />
               <Txt label="Caption" value={row.caption} onChange={(v) => update({ caption: v })} />
             </FieldGrid>
           )}
@@ -262,7 +293,13 @@ export function MediaSection({ draft, patch }: SectionProps) {
                 onChange={(v) => update({ slide_type: v })}
                 options={REPORT_SLIDE_TYPE_OPTIONS}
               />
-              <Url label="Image" value={row.image} onChange={(v) => update({ image: v })} />
+              <Img
+                label="Image"
+                value={row.image}
+                onChange={(v) => update({ image: v })}
+                forestId={forestId}
+                slot={heroSlot(row.slide_type)}
+              />
             </FieldGrid>
           )}
         />
@@ -287,7 +324,13 @@ export function MediaSection({ draft, patch }: SectionProps) {
                 value={row.description}
                 onChange={(v) => update({ description: v })}
               />
-              <Url label="Image" value={row.image} onChange={(v) => update({ image: v })} />
+              <Img
+                label="Image"
+                value={row.image}
+                onChange={(v) => update({ image: v })}
+                forestId={forestId}
+                slot="dashboard"
+              />
             </FieldGrid>
           )}
         />

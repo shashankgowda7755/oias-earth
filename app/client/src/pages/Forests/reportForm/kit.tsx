@@ -7,10 +7,11 @@
  * reads its slice from `draft` and calls `patch({ key: next })` with its own
  * FullForestPayload keys. The container owns the single draft + Save.
  */
-import type { ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
 import type { FullForestPayload } from '../fullTypes';
 import { TextField, TextAreaField, SelectField, type SelectOption } from '../../../components/fields/Fields';
-import { DateField, SwitchField } from '../../../components/fields/MoreFields';
+import { DateField, SwitchField, FileField } from '../../../components/fields/MoreFields';
+import { uploadReportImage } from '../forestApi';
 
 export interface SectionProps {
   draft: FullForestPayload;
@@ -42,9 +43,27 @@ export function Txt(props: { label: string; value?: string | number | null; onCh
   return <TextField label={props.label} name={props.label} value={v} onChange={props.onChange} placeholder={props.placeholder} />;
 }
 
-/** Number field — keeps the draft value numeric (undefined when blank). */
-export function Num(props: { label: string; value?: number | null; onChange: (v: number | undefined) => void; placeholder?: string }) {
+/**
+ * Number field — keeps the draft value numeric (undefined when blank, so a blank
+ * reading means "not measured", never 0). Optional `min`/`max` add inline range
+ * validation (e.g. pH 0–14, humidity 0–100).
+ */
+export function Num(props: {
+  label: string;
+  value?: number | null;
+  onChange: (v: number | undefined) => void;
+  placeholder?: string;
+  min?: number;
+  max?: number;
+  helperText?: string;
+}) {
   const v = props.value == null ? '' : String(props.value);
+  const n = props.value;
+  let err: string | undefined;
+  if (n != null && Number.isFinite(n)) {
+    if (props.min != null && n < props.min) err = `Must be ${props.min} or more`;
+    else if (props.max != null && n > props.max) err = `Must be ${props.max} or less`;
+  }
   return (
     <TextField
       label={props.label}
@@ -53,13 +72,96 @@ export function Num(props: { label: string; value?: number | null; onChange: (v:
       value={v}
       onChange={(s) => props.onChange(s.trim() === '' ? undefined : Number(s))}
       placeholder={props.placeholder}
+      error={err}
+      helperText={props.helperText}
     />
   );
 }
 
-/** URL text field (image links — manual paste until storage upload is wired). */
+/** URL text field (image links — kept as a fallback when storage is unavailable). */
 export function Url(props: { label: string; value?: string | null; onChange: (v: string) => void }) {
   return <TextField label={props.label} name={props.label} type="url" value={props.value ?? ''} onChange={props.onChange} placeholder="https://…" />;
+}
+
+/**
+ * Image field that UPLOADS to object storage instead of pasting a URL. Picks a
+ * file → POST /forest/:id/report-image (slot-aware) → writes the returned URL via
+ * `onChange` (the same draft location the old Url() field wrote). The report-data
+ * Save overwrites the JSONB column from the draft, so the server-side slot write
+ * is harmless/redundant — the draft is authoritative. If storage is unconfigured
+ * (503) it surfaces the error and reveals a URL-paste fallback so entry never
+ * dead-ends.
+ */
+export function Img(props: {
+  label: string;
+  value?: string | null;
+  onChange: (v: string) => void;
+  /** Forest id (from `draft.id`). Required to upload. */
+  forestId?: string;
+  /** report-image slot: cover/content/impact/security/progress/soil_meter/temp_inside/temp_outside/earth/dashboard/gallery. */
+  slot: string;
+  /** Per-quarter slots upsert the (year, quarter) row. */
+  year?: number;
+  quarter?: number;
+}) {
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
+
+  const onFile = async (file: File | null) => {
+    if (!file) return;
+    if (!props.forestId) {
+      setErr('Save the forest first, then add photos.');
+      return;
+    }
+    setBusy(true);
+    setErr(null);
+    try {
+      const { url } = await uploadReportImage(props.forestId, props.slot, file, {
+        year: props.year,
+        quarter: props.quarter,
+      });
+      props.onChange(url);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : 'Upload failed.';
+      setErr(/storage|503|configured/i.test(msg) ? 'Photo storage not configured — paste a URL below instead.' : msg);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <div className="space-y-1.5">
+      <FileField
+        label={props.label}
+        value={null}
+        previewUrl={props.value ?? null}
+        onChange={onFile}
+        helperText={busy ? 'Uploading…' : undefined}
+        error={err ?? undefined}
+      />
+      <div className="flex items-center gap-3">
+        {props.value ? (
+          <button
+            type="button"
+            onClick={() => props.onChange('')}
+            className="text-label text-textSecondary underline hover:text-textPrimary"
+          >
+            Remove photo
+          </button>
+        ) : null}
+      </div>
+      {err ? (
+        <TextField
+          label={`${props.label} URL (fallback)`}
+          name={`${props.label}-url`}
+          type="url"
+          value={props.value ?? ''}
+          onChange={props.onChange}
+          placeholder="https://…"
+        />
+      ) : null}
+    </div>
+  );
 }
 
 export function Sel(props: { label: string; value?: string | null; onChange: (v: string) => void; options: { label: string; value: string }[] }) {

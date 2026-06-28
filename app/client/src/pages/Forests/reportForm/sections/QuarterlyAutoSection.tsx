@@ -85,10 +85,15 @@ export function QuarterlyAutoSection({ draft, patch }: SectionProps) {
         setMsg(w.reason || 'No weather data for this quarter yet.');
         return;
       }
+      // Stamp the auto-filled values as estimated (Open-Meteo) so the renderer
+      // can label them and they survive the report-data Save. Inside readings
+      // are never written here — they stay manual on-site measurements.
+      const stamp = { source: 'open-meteo', estimated: true };
       patch({
         maintenance_workforce: upsertRow(draft.maintenance_workforce, year, quarter, (r) => ({
           ...r,
           total_raining_days: w.raining_days,
+          _weather: stamp,
         })),
         temperature_humidity: upsertRow(draft.temperature_humidity, year, quarter, (r) => ({
           ...r,
@@ -96,6 +101,8 @@ export function QuarterlyAutoSection({ draft, patch }: SectionProps) {
             ...(r.outside_plantation as object),
             temperature: w.outside_temperature_avg ?? undefined,
             humidity: w.outside_humidity_avg ?? undefined,
+            estimated: true,
+            source: 'open-meteo',
           },
         })),
       } as Partial<typeof draft>);
@@ -132,12 +139,17 @@ export function QuarterlyAutoSection({ draft, patch }: SectionProps) {
           {msg ? <span className="text-xs text-textSecondary">{msg}</span> : null}
         </div>
         {wx?.available ? (
-          <div className="mt-3 grid grid-cols-2 gap-2 text-xs text-textSecondary sm:grid-cols-4">
-            <div>Rain days: <b className="text-textPrimary">{wx.raining_days}</b></div>
-            <div>Rainfall: <b className="text-textPrimary">{wx.rainfall_mm ?? '—'} mm</b></div>
-            <div>Outside temp: <b className="text-textPrimary">{wx.outside_temperature_avg ?? '—'}°C</b></div>
-            <div>Outside humidity: <b className="text-textPrimary">{wx.outside_humidity_avg ?? '—'}%</b></div>
-          </div>
+          <>
+            <div className="mt-3 inline-flex items-center gap-1.5 rounded-pill bg-white/8 px-2 py-0.5 text-[11px] font-medium text-textSecondary">
+              <span aria-hidden="true">●</span> Estimated · Open-Meteo · overridable
+            </div>
+            <div className="mt-2 grid grid-cols-2 gap-2 text-xs text-textSecondary sm:grid-cols-4">
+              <div>Rain days: <b className="text-textPrimary">{wx.raining_days}</b></div>
+              <div>Rainfall: <b className="text-textPrimary">{wx.rainfall_mm ?? '—'} mm</b></div>
+              <div>Outside temp: <b className="text-textPrimary">{wx.outside_temperature_avg ?? '—'}°C</b></div>
+              <div>Outside humidity: <b className="text-textPrimary">{wx.outside_humidity_avg ?? '—'}%</b></div>
+            </div>
+          </>
         ) : null}
       </SectionShell>
 
@@ -146,9 +158,9 @@ export function QuarterlyAutoSection({ draft, patch }: SectionProps) {
         desc="The only readings a person must take in the field — these are what the report compares against the outside weather above."
       >
         <FieldGrid cols={2}>
-          <Num label="Inside-plantation temperature (°C)" value={inside.temperature ?? undefined} onChange={(v) => setInside('temperature', v)} />
-          <Num label="Inside-plantation humidity (%)" value={inside.humidity ?? undefined} onChange={(v) => setInside('humidity', v)} />
-          <Num label="Soil pH meter reading" value={(phRow?.meter_reading as number) ?? undefined} onChange={setPh} />
+          <Num label="Inside-plantation temperature (°C)" value={inside.temperature ?? undefined} onChange={(v) => setInside('temperature', v)} min={-20} max={60} />
+          <Num label="Inside-plantation humidity (%)" value={inside.humidity ?? undefined} onChange={(v) => setInside('humidity', v)} min={0} max={100} />
+          <Num label="Soil pH meter reading" value={(phRow?.meter_reading as number) ?? undefined} onChange={setPh} min={0} max={14} helperText="Leave blank if not measured (0 is not a valid pH)." />
         </FieldGrid>
       </SectionShell>
     </>

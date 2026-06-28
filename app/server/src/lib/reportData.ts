@@ -39,6 +39,27 @@ function daysInQuarter(year: number, q: number): number {
   return d;
 }
 
+/**
+ * Sundays (the default weekly off) in a fiscal quarter — derived so the operator
+ * never types the weekly-off count. Used as the fallback when an entry omits
+ * `total_holidays_weekly_off`; an explicit value still overrides it.
+ */
+function sundaysInQuarter(year: number, q: number): number {
+  const start = FQ_START_MONTH[q] ?? 0;
+  const calYear = fqCalYear(year, q);
+  const to = new Date(calYear, start + 3, 0);
+  let count = 0;
+  for (const d = new Date(calYear, start, 1); d <= to; d.setDate(d.getDate() + 1)) {
+    if (d.getDay() === 0) count += 1;
+  }
+  return count;
+}
+
+/** Weekly-off for an entry: explicit value if given, else the quarter's Sundays. */
+function weeklyOffOf(e: MaintQ): number {
+  return e.total_holidays_weekly_off != null ? num(e.total_holidays_weekly_off) : sundaysInQuarter(e.year, e.quarter);
+}
+
 function quarterPeriodLabel(year: number, q: number): string {
   const start = FQ_START_MONTH[q] ?? 0;
   return `${MONTHS[start]} – ${MONTHS[start + 2]} ${String(fqCalYear(year, q)).slice(-2)}`;
@@ -90,7 +111,7 @@ function maintenanceRollup(entries: MaintQ[], year: number, q: number, tillDate:
   const rows = tillDate ? entries.filter((e) => e.year < year || (e.year === year && e.quarter <= q)) : entries.filter((e) => e.year === year && e.quarter === q);
   if (rows.length === 0) return null;
   let total = 0, weekly_off = 0, festival = 0, watering = 0, rainy = 0;
-  for (const e of rows) { total += daysInQuarter(e.year, e.quarter); weekly_off += num(e.total_holidays_weekly_off); festival += num(e.total_holidays_festival); watering += num(e.total_watering_days); rainy += num(e.total_raining_days); }
+  for (const e of rows) { total += daysInQuarter(e.year, e.quarter); weekly_off += weeklyOffOf(e); festival += num(e.total_holidays_festival); watering += num(e.total_watering_days); rainy += num(e.total_raining_days); }
   return { total_days: total, working_days: Math.max(0, total - weekly_off - festival), watering_days: watering, rainy_days: rainy, not_watered_days: Math.max(0, total - watering - rainy), weekly_off, festival };
 }
 
@@ -100,7 +121,7 @@ function workforceRollup(entries: MaintQ[], year: number, q: number, tillDate: b
   let total_days = 0, weekly_off = 0, festival = 0, ft_hours = 0, pt_hours = 0, ft_labour_days = 0, pt_labour_days = 0, ft_gardeners = 0, pt_gardeners = 0;
   for (const e of rows) {
     const total = daysInQuarter(e.year, e.quarter);
-    const wOff = num(e.total_holidays_weekly_off), fest = num(e.total_holidays_festival);
+    const wOff = weeklyOffOf(e), fest = num(e.total_holidays_festival);
     const working = Math.max(0, total - wOff - fest);
     const ftG = num(e.full_time_gardeners), ptG = num(e.part_time_gardeners), ptDays = num(e.total_part_time_labour_days);
     total_days += total; weekly_off += wOff; festival += fest; ft_labour_days += working; pt_labour_days += ptDays;
@@ -215,6 +236,22 @@ export async function buildForestReport(forestId: string, year: number, quarter:
   const o2_100 = species_inventory.reduce((s, x) => s + x.oxygen_kg_year, 0);
   const co2_100 = species_inventory.reduce((s, x) => s + x.carbon_kg_year, 0);
 
+  // Derive survival/mortality from tagged tree status (1=Healthy,2=Drying,
+  // 3=Damaged,4=Dead) so health/mortality need not be typed. Surfaced as a
+  // suggestion the operator can override; null when no trees are tagged.
+  const statusAgg = await query<Row>(
+    `SELECT COUNT(*)::int AS total,
+            COUNT(*) FILTER (WHERE COALESCE(tree_status_id, 1) = 4)::int AS dead
+       FROM forest_trees WHERE forest_id = $1 AND is_active = TRUE`,
+    [forestId],
+  );
+  const treesTotal = num(statusAgg.rows[0]?.total);
+  const treesDead = num(statusAgg.rows[0]?.dead);
+  const derived_mortality_rate = treesTotal > 0 ? Math.round((treesDead / treesTotal) * 1000) / 10 : null;
+  const alivePct = treesTotal > 0 ? ((treesTotal - treesDead) / treesTotal) * 100 : null;
+  const derived_health: 'good' | 'average' | 'poor' | null =
+    alivePct == null ? null : alivePct >= 95 ? 'good' : alivePct >= 85 ? 'average' : 'poor';
+
   const vf = forest.forest_value_flow_impact_report as { short_term?: object; medium_term?: object; long_term?: object } | null;
   const maint = (forest.maintenance_workforce as MaintQ[]) ?? [];
 
@@ -222,6 +259,11 @@ export async function buildForestReport(forestId: string, year: number, quarter:
     total_saplings: total,
     species_count: species_inventory.length,
     species_inventory,
+    // Derived survival (overridable suggestion; null when no trees are tagged).
+    alive_trees: treesTotal > 0 ? treesTotal - treesDead : null,
+    dead_trees: treesTotal > 0 ? treesDead : null,
+    derived_mortality_rate,
+    derived_health,
     value_flow: {
       short: valueNet((vf?.short_term as never)),
       medium: valueNet((vf?.medium_term as never)),

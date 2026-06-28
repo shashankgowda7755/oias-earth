@@ -143,44 +143,6 @@ export function ReportFormDialog({
           placeholder="Select a quarter"
         />
 
-        <SelectField
-          label="Mode"
-          value={form.mode}
-          onChange={set('mode')}
-          options={modeOptions}
-          required
-          error={errors.mode}
-          placeholder="Select a mode"
-        />
-        <SelectField
-          label="Type"
-          value={form.type}
-          onChange={set('type')}
-          options={typeOptions}
-          required
-          error={errors.type}
-          placeholder="Select a type"
-        />
-
-        <TextField
-          label="Version"
-          type="number"
-          inputMode="numeric"
-          value={form.version}
-          onChange={set('version')}
-          required
-          error={errors.version}
-        />
-        <TextField
-          label="Project Period (years)"
-          type="number"
-          inputMode="numeric"
-          value={form.project_period}
-          onChange={set('project_period')}
-          required
-          error={errors.project_period}
-        />
-
         <DateField
           label="Report Date"
           value={form.report_date}
@@ -206,19 +168,66 @@ export function ReportFormDialog({
           error={errors.end_date}
         />
 
-        <TextAreaField
-          label="Report Data (JSON)"
-          value={form.report_data}
-          onChange={set('report_data')}
-          rows={6}
-          error={errors.report_data}
-          helperText={
-            errors.report_data
-              ? undefined
-              : 'Optional. Free-form JSON; schema not documented (openQuestions[6]).'
-          }
-          className="sm:col-span-2 font-mono"
-        />
+        <p className="sm:col-span-2 text-sm text-textSecondary">
+          You only need Forest, Year and Quarter to start. Enter the report
+          content — photos, weather, growth, maintenance — in the guided editor
+          after creating.
+        </p>
+
+        {/* Advanced: index metadata the renderer does not read. Defaults are
+            automatic / quarterly / v1, so most operators never open this. */}
+        <details className="sm:col-span-2 rounded-input border border-border bg-surface/50 px-3 py-2">
+          <summary className="cursor-pointer select-none text-sm font-medium text-textSecondary">
+            Advanced (optional)
+          </summary>
+          <div className="mt-4 grid grid-cols-1 gap-x-4 gap-y-5 sm:grid-cols-2">
+            <SelectField
+              label="Mode"
+              value={form.mode}
+              onChange={set('mode')}
+              options={modeOptions}
+              error={errors.mode}
+              placeholder="Select a mode"
+            />
+            <SelectField
+              label="Type"
+              value={form.type}
+              onChange={set('type')}
+              options={typeOptions}
+              error={errors.type}
+              placeholder="Select a type"
+            />
+            <TextField
+              label="Version"
+              type="number"
+              inputMode="numeric"
+              value={form.version}
+              onChange={set('version')}
+              error={errors.version}
+            />
+            <TextField
+              label="Project Period (years)"
+              type="number"
+              inputMode="numeric"
+              value={form.project_period}
+              onChange={set('project_period')}
+              error={errors.project_period}
+            />
+            <TextAreaField
+              label="Report Data (JSON)"
+              value={form.report_data}
+              onChange={set('report_data')}
+              rows={6}
+              error={errors.report_data}
+              helperText={
+                errors.report_data
+                  ? undefined
+                  : 'Advanced/legacy. The report renders from the guided editor, not this field.'
+              }
+              className="sm:col-span-2 font-mono"
+            />
+          </div>
+        </details>
       </div>
     </FormDialog>
   );
