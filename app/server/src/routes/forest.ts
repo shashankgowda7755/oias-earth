@@ -3159,51 +3159,110 @@ async function clearReportImage(req: Request, res: Response): Promise<void> {
   res.json({ data: { ok: true, slot, cleared: true } });
 }
 
+/** One entry in forests.additional_sponsor_logo. `id` is a stable client-minted
+ *  key used to upsert idempotently; legacy entries have none (matched by index). */
+type SponsorLogoEntry = { id?: string; type?: { label?: string; value?: string }; name?: string; logo?: string };
+
 /**
- * POST /forest/:id/sponsor-logo (multipart: logo + title + name + value + index?)
+ * POST /forest/:id/sponsor-logo (multipart: logo + title + name + value + index? + clientId?)
  * — upload a sponsor/initiator logo and upsert the additional_sponsor_logo entry.
  * `value` = 'initiated_by' | 'sponsored_by'; `title` = the per-sponsor caption.
+ * Upsert is keyed by `clientId` (stable) under a row lock, so concurrent persists
+ * on the same row collapse to one entry instead of duplicating.
  */
 async function uploadSponsorLogo(req: Request, res: Response): Promise<void> {
   const id = String(req.params.id);
   if (!WX_UUID_RE.test(id)) throw notFound('Forest not found');
   if (!storageReady()) { res.status(503).json({ error: true, message: 'Photo storage not configured.' }); return; }
   const file = (req as Request & { file?: { buffer: Buffer; mimetype: string; originalname: string } }).file;
-  const body = (req.body ?? {}) as { title?: string; name?: string; value?: string; index?: string };
+  const body = (req.body ?? {}) as { title?: string; name?: string; value?: string; index?: string; clientId?: string };
   const value = body.value === 'initiated_by' ? 'initiated_by' : 'sponsored_by';
   const title = String(body.title ?? (value === 'initiated_by' ? 'Initiated By' : 'Sponsored By')).slice(0, 80);
   const name = String(body.name ?? '').slice(0, 120);
   const idx = body.index != null && body.index !== '' ? Number(body.index) : -1;
+  const clientId = body.clientId != null && body.clientId !== '' ? String(body.clientId).slice(0, 64) : '';
 
   let logoUrl: string | undefined;
   if (file) {
     const ext = (file.originalname.split('.').pop() || 'png').toLowerCase().replace(/[^a-z0-9]/g, '') || 'png';
     logoUrl = await putObject(`forests/${id}/logo-${Date.now()}.${ext}`, file.buffer, file.mimetype || 'image/png');
   }
-  const exists = await query(`SELECT 1 FROM forests WHERE id = $1`, [id]);
-  if (exists.rowCount === 0) throw notFound('Forest not found');
 
-  const arr = (await loadJsonb(id, 'additional_sponsor_logo')) as { type?: { label?: string; value?: string }; name?: string; logo?: string }[] | null;
-  const list = Array.isArray(arr) ? [...arr] : [];
-  const entry = { type: { label: title, value }, name, ...(logoUrl ? { logo: logoUrl } : {}) };
-  if (idx >= 0 && idx < list.length) {
-    const cur = list[idx]!;
-    list[idx] = { ...cur, ...entry, logo: logoUrl ?? cur.logo };
-  } else list.push(entry);
-  await saveJsonb(id, 'additional_sponsor_logo', list);
-  res.json({ data: { ok: true, logo: logoUrl, index: idx >= 0 ? idx : list.length - 1, entries: list } });
+  // Atomic upsert under a row lock (mirrors listItemReportData): identity is the
+  // client-supplied `id`, falling back to array index for legacy entries. Without
+  // this, two rapid persists on a fresh row (index = -1) both ADD → duplicates.
+  const client = await getClient();
+  try {
+    await client.query('BEGIN');
+    const r = await client.query<{ col: unknown }>(
+      `SELECT additional_sponsor_logo AS col FROM forests WHERE id = $1 FOR UPDATE`,
+      [id],
+    );
+    if (r.rowCount === 0) { await client.query('ROLLBACK'); throw notFound('Forest not found'); }
+    const parsed = parseMaybeJson<SponsorLogoEntry[]>(r.rows[0]!.col, []);
+    const list: SponsorLogoEntry[] = Array.isArray(parsed) ? parsed : [];
+    const entry: SponsorLogoEntry = { type: { label: title, value }, name, ...(logoUrl ? { logo: logoUrl } : {}) };
+
+    let pos = clientId ? list.findIndex((e) => e?.id === clientId) : -1;
+    if (pos < 0 && idx >= 0 && idx < list.length) pos = idx;
+    if (pos >= 0) {
+      const cur = list[pos]!;
+      list[pos] = { ...cur, ...entry, ...(clientId ? { id: clientId } : {}), logo: logoUrl ?? cur.logo };
+    } else {
+      list.push({ ...(clientId ? { id: clientId } : {}), ...entry });
+      pos = list.length - 1;
+    }
+
+    await client.query(
+      `UPDATE forests SET additional_sponsor_logo = $2::jsonb, is_updated = TRUE, updated_at = now() WHERE id = $1`,
+      [id, JSON.stringify(list)],
+    );
+    await client.query('COMMIT');
+    res.json({ data: { ok: true, logo: logoUrl, index: pos, id: list[pos]!.id, entries: list } });
+  } catch (err) {
+    await client.query('ROLLBACK').catch(() => undefined);
+    throw err;
+  } finally {
+    client.release();
+  }
 }
 
-/** POST /forest/:id/sponsor-logo/delete { index } — remove one logo entry. */
+/** POST /forest/:id/sponsor-logo/delete { index?, clientId? } — remove one logo
+ *  entry, matched by stable id first then index, atomically under a row lock. */
 async function deleteSponsorLogo(req: Request, res: Response): Promise<void> {
   const id = String(req.params.id);
   if (!WX_UUID_RE.test(id)) throw notFound('Forest not found');
-  const idx = Number((req.body as { index?: unknown })?.index);
-  const arr = (await loadJsonb(id, 'additional_sponsor_logo')) as unknown[] | null;
-  const list = Array.isArray(arr) ? [...arr] : [];
-  if (Number.isInteger(idx) && idx >= 0 && idx < list.length) list.splice(idx, 1);
-  await saveJsonb(id, 'additional_sponsor_logo', list);
-  res.json({ data: { ok: true, entries: list } });
+  const b = (req.body ?? {}) as { index?: unknown; clientId?: unknown };
+  const idx = Number(b.index);
+  const clientId = b.clientId != null && b.clientId !== '' ? String(b.clientId).slice(0, 64) : '';
+
+  const client = await getClient();
+  try {
+    await client.query('BEGIN');
+    const r = await client.query<{ col: unknown }>(
+      `SELECT additional_sponsor_logo AS col FROM forests WHERE id = $1 FOR UPDATE`,
+      [id],
+    );
+    if (r.rowCount === 0) { await client.query('ROLLBACK'); throw notFound('Forest not found'); }
+    const parsed = parseMaybeJson<SponsorLogoEntry[]>(r.rows[0]!.col, []);
+    const list: SponsorLogoEntry[] = Array.isArray(parsed) ? parsed : [];
+
+    let pos = clientId ? list.findIndex((e) => e?.id === clientId) : -1;
+    if (pos < 0 && Number.isInteger(idx) && idx >= 0 && idx < list.length) pos = idx;
+    if (pos >= 0) list.splice(pos, 1);
+
+    await client.query(
+      `UPDATE forests SET additional_sponsor_logo = $2::jsonb, is_updated = TRUE, updated_at = now() WHERE id = $1`,
+      [id, JSON.stringify(list)],
+    );
+    await client.query('COMMIT');
+    res.json({ data: { ok: true, entries: list } });
+  } catch (err) {
+    await client.query('ROLLBACK').catch(() => undefined);
+    throw err;
+  } finally {
+    client.release();
+  }
 }
 
 /**
