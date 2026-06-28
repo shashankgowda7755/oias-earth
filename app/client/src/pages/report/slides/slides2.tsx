@@ -318,12 +318,17 @@ function GrowthChartSvg({ g }: { g: GrowthChart }) {
 export function S13Growth({ data }: SlideProps) {
   const { meta, computed } = data;
   const g = computed.growth;
-  const cards = g
-    ? [...g.milestones, ...(g.existing ? [g.existing] : [])].sort((a, b) => a.months - b.months)
-    : [];
+  // Year 0 → End of Year N cards (no separate "Existing growth" row); the card the
+  // report date has reached gets highlighted + a live "Current Height" pill.
+  const cards = g ? g.milestones.slice().sort((a, b) => a.months - b.months) : [];
+  let curIdx = -1;
+  if (g) cards.forEach((m, i) => { if (m.months <= g.current_months) curIdx = i; });
   return (
     <SlidePage meta={meta}>
       <SectionTitle eyebrow="Growth Report">Expected Plant Growth</SectionTitle>
+      <div style={{ fontSize: 13, color: C.muted, marginTop: -8, marginBottom: 14 }}>
+        Projected sequestration and structural transformation of the reforestation site.
+      </div>
       {!g ? (
         <EmptyBlock label="No growth data" height={280} />
       ) : (
@@ -338,17 +343,33 @@ export function S13Growth({ data }: SlideProps) {
               </div>
             )}
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 9 }}>
-            <div style={{ fontSize: 11.5, textTransform: 'uppercase', color: C.muted }}>Key Milestones</div>
-            {cards.map((m) => (
-              <div key={`${m.label}-${m.months}`} style={{ border: `1px solid ${m.current ? '#e6b800' : C.line}`, background: m.current ? '#FFE600' : '#fff', color: C.ink, borderRadius: 12, padding: '11px 14px', boxShadow: m.current ? '0 2px 8px rgba(230,184,0,.3)' : CARD_SHADOW }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <strong style={{ fontSize: 14, color: m.current ? '#5c4900' : C.ink, fontWeight: m.current ? 800 : 700 }}>{m.label}</strong>
-                  <span style={{ fontWeight: 800, color: m.current ? '#5c4900' : C.ink }}>{m.range}</span>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 11, minHeight: 0 }}>
+            <div style={{ fontSize: 11.5, letterSpacing: '.08em', textTransform: 'uppercase', color: C.muted, fontWeight: 700 }}>Key Milestones</div>
+            {cards.map((m, i) => {
+              const cur = i === curIdx;
+              return (
+                <div key={`${m.label}-${m.months}`} style={{
+                  borderRadius: 14,
+                  padding: '13px 16px',
+                  background: cur ? '#16280c' : '#fff',
+                  border: cur ? '1px solid #2f5a1c' : `1px solid ${C.line}`,
+                  boxShadow: cur ? '0 4px 14px rgba(20,50,15,.28)' : CARD_SHADOW,
+                }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+                    <strong style={{ fontSize: 15, fontWeight: 800, color: cur ? '#7bdc8f' : C.ink }}>{m.label}</strong>
+                    <span style={{ fontSize: 14.5, fontWeight: 800, color: cur ? '#fff' : C.ink }}>{m.range}</span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 6 }}>
+                    <span style={{ fontSize: 12, color: cur ? '#cfe8d4' : C.muted }}>{m.date}</span>
+                    {cur && g.current_feet != null && (
+                      <span style={{ background: '#bdf0c6', color: '#15400f', borderRadius: 999, padding: '3px 10px', fontSize: 11.5, fontWeight: 700 }}>
+                        Current Height: {Math.round(g.current_feet * 10) / 10} ft
+                      </span>
+                    )}
+                  </div>
                 </div>
-                <div style={{ fontSize: 12, color: m.current ? '#7a5f00' : C.muted, marginTop: 4 }}>{m.date}</div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       )}

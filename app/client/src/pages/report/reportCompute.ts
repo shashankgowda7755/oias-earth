@@ -216,12 +216,26 @@ function interpGrowthFeet(ms: GrowthMilestone[], months: number): number | null 
  * the "as of" date: months elapsed → arrow x-position; height is INTERPOLATED
  * across the per-forest target curve (actual_height_range is not used here).
  */
+/**
+ * Standard 3-year growth curve. Used when a forest has no manually-entered
+ * targets, so Slide 13 auto-renders from the plantation date with nothing typed.
+ * Each year's band is divided equally across its 4 quarters by the interpolation
+ * below (linear month→height), and the report period picks the current point.
+ */
+const DEFAULT_GROWTH_TARGETS: { year: number; min: number; max: number }[] = [
+  { year: 0, min: 2, max: 3 },
+  { year: 1, min: 7, max: 8 },
+  { year: 2, min: 8, max: 9 },
+  { year: 3, min: 10, max: 14 },
+];
+
 function buildGrowth(p: FullForestPayload, fy: number, q: number): GrowthChart | null {
-  const targets = (p.plant_growth_data?.target_height_range ?? [])
+  const entered = (p.plant_growth_data?.target_height_range ?? [])
     .filter(t => t.min != null && t.max != null)
     .slice()
     .sort((a, b) => a.year - b.year);
-  if (targets.length === 0) return null;
+  // Auto: no manual curve → standard 3-year default so the slide is never blank.
+  const targets = entered.length > 0 ? entered : DEFAULT_GROWTH_TARGETS;
 
   const ft = (v: number): number => Math.max(0, Math.min(50, v));
   const plantD = p.plantation_date ? new Date(p.plantation_date) : null;
@@ -263,7 +277,7 @@ function buildGrowth(p: FullForestPayload, fy: number, q: number): GrowthChart |
 
   // Injected "Existing growth" row — always interpolated.
   const existing: GrowthMilestone | null = plantD ? {
-    label: 'Existing growth',
+    label: 'Existing Growth',
     range: currentFeet != null ? `${Math.round(currentFeet * 10) / 10} Feet` : '—',
     date: growthDateLabel(plantD, currentMonths),
     year: -1,

@@ -136,10 +136,20 @@ function workforceRollup(entries: MaintQ[], year: number, q: number, tillDate: b
   };
 }
 
+// Standard 3-year default curve — parity with client buildGrowth so the report
+// auto-renders growth from the plantation date when no targets were entered.
+const DEFAULT_GROWTH_TARGETS: { year: number; min: number; max: number }[] = [
+  { year: 0, min: 2, max: 3 },
+  { year: 1, min: 7, max: 8 },
+  { year: 2, min: 8, max: 9 },
+  { year: 3, min: 10, max: 14 },
+];
+
 function growthMilestones(forest: Row) {
   const pg = forest.plant_growth_data as { target_height_range?: { year: number; min?: number; max?: number }[] } | null;
-  const targets = (pg?.target_height_range ?? []).slice().sort((a, b) => a.year - b.year);
-  if (targets.length === 0) return [];
+  const entered = (pg?.target_height_range ?? []).filter((t) => t.min != null && t.max != null).slice().sort((a, b) => a.year - b.year);
+  // Auto: no manual curve → standard 3-year default.
+  const targets = entered.length > 0 ? entered : DEFAULT_GROWTH_TARGETS;
   const pd = forest.plantation_date ? new Date(String(forest.plantation_date)) : null;
   // Heights are floored at 0 and shown as entered (no upper ceiling).
   const ft = (v: number): number => Math.max(0, v);
