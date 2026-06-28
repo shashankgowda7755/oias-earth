@@ -32,7 +32,7 @@ import {
   useToast,
   type Column,
 } from '../../components';
-import type { ApiError } from '../../lib/api';
+import { errorText, type ApiError } from '../../lib/api';
 import type { SponsorRow } from '../../types/entities';
 import { SponsorAvatar } from './SponsorAvatar';
 import { SponsorForm } from './SponsorForm';
@@ -272,7 +272,7 @@ export default function Sponsors() {
         rows={rows}
         getRowId={(row) => row.id}
         loading={listQuery.isLoading}
-        error={listQuery.isError ? listQuery.error.message : null}
+        error={listQuery.isError ? errorText(listQuery.error, 'Could not load sponsors.') : null}
         emptyContent="No sponsors found."
         caption="Sponsors"
         page={page}

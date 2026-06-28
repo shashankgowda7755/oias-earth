@@ -32,7 +32,7 @@ export default function Integrity() {
   useEffect(() => {
     api
       .get<{ data: Flag[] }>('/admin/integrity')
-      .then((r) => setRows(r.data.data))
+      .then((r) => setRows(Array.isArray(r.data?.data) ? r.data.data : []))
       .catch((e) => setErr(e?.response?.data?.message || 'Failed to load'))
       .finally(() => setLoading(false));
   }, []);

@@ -1,6 +1,7 @@
 import { useState, type ComponentType } from 'react';
 import { Sidebar } from '../components/Sidebar';
 import { type SectionTab } from '../components/TabNav';
+import { ErrorBoundary } from '../components/ErrorBoundary';
 
 import DashboardHome from './DashboardHome';
 import Users from './Users';
@@ -44,11 +45,16 @@ export default function Dashboard() {
             aria-labelledby={`tab-${active}`}
             tabIndex={0}
           >
-            {active === 'Home' ? (
-              <DashboardHome onOpenTab={setActive} />
-            ) : ActiveSection ? (
-              <ActiveSection />
-            ) : null}
+            {/* Per-section boundary: a render crash in one tab shows a friendly
+                card with the sidebar/nav intact (not a whole-app white screen).
+                key={active} resets the boundary when the tab changes. */}
+            <ErrorBoundary scope={active} key={active}>
+              {active === 'Home' ? (
+                <DashboardHome onOpenTab={setActive} />
+              ) : ActiveSection ? (
+                <ActiveSection />
+              ) : null}
+            </ErrorBoundary>
           </div>
         </div>
       </main>

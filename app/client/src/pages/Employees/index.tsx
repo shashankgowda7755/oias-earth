@@ -32,6 +32,7 @@ import {
   type Column,
 } from '@/components';
 import type { EmployeeRow } from '@/types/entities';
+import { errorText } from '@/lib/api';
 import { AvatarCell, ActiveBadge, TextCell, RowActions } from './cells';
 import { EmployeeFormDialog } from './EmployeeFormDialog';
 import {
@@ -185,7 +186,7 @@ export default function Employees() {
         rows={rows}
         getRowId={(row) => row.id}
         loading={listQuery.isLoading}
-        error={listQuery.isError ? listQuery.error.message : null}
+        error={listQuery.isError ? errorText(listQuery.error, 'Could not load employees.') : null}
         emptyContent="No employees found."
         caption="Employees"
         page={page}

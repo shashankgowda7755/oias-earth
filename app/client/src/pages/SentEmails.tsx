@@ -61,7 +61,9 @@ export default function SentEmails() {
         .post('/email-log/list', { page: 1, limit: 200, search, ...filter })
         .then((r) => {
           if (off) return;
-          setRows(((r.data?.data ?? r.data) as EmailRow[]) ?? []);
+          // Guard against a non-array error body so rows.map can't crash.
+          const body = r.data?.data ?? r.data;
+          setRows(Array.isArray(body) ? (body as EmailRow[]) : []);
           setTotal(Number(r.data?.total ?? 0));
         })
         .catch((e) => { if (!off) setErr(e instanceof Error ? e.message : 'Failed to load sent emails'); })

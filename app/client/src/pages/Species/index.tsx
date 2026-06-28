@@ -17,7 +17,7 @@ import {
   useToast,
   type Column,
 } from '../../components';
-import type { ApiError } from '../../lib/api';
+import { errorText, type ApiError } from '../../lib/api';
 import type { SpeciesRow } from '../../types/entities';
 import { SpeciesForm } from './SpeciesForm';
 import {
@@ -229,7 +229,7 @@ export default function Species() {
         rows={rows}
         getRowId={(row) => row.id}
         loading={listQuery.isLoading}
-        error={listQuery.isError ? listQuery.error.message : null}
+        error={listQuery.isError ? errorText(listQuery.error, 'Could not load species.') : null}
         emptyContent="No species found."
         caption="Species"
         page={page}

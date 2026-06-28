@@ -78,20 +78,40 @@ export interface ApiError {
   raw?: unknown;
 }
 
+/** Only accept a value as a display message when it is a non-empty string. */
+function asMessageString(value: unknown): string | undefined {
+  return typeof value === 'string' && value ? value : undefined;
+}
+
 function normalizeError(error: unknown): ApiError {
   if (axios.isAxiosError(error)) {
     const status = error.response?.status;
     const data = error.response?.data as
-      | { message?: string; error?: string }
+      | { message?: unknown; error?: unknown }
       | undefined;
+    // A 500 body can be object-shaped (e.g. {code, message}); only let a STRING
+    // through to .message so it can never render as a raw object (React #31).
     const message =
-      data?.message ||
-      data?.error ||
-      error.message ||
+      asMessageString(data?.message) ||
+      asMessageString(data?.error) ||
+      asMessageString(error.message) ||
       'Something went wrong. Please try again.';
     return { message, status, raw: error.response?.data };
   }
   return { message: 'Unexpected error', raw: error };
+}
+
+/**
+ * Pull a flat, display-ready string off any throw shape (ApiError, Error, or an
+ * object/value of unknown shape). Guarantees a string so callers can render it
+ * directly without risking React error #31 ("objects are not valid as a child").
+ */
+export function errorText(err: unknown, fallback = 'Something went wrong.'): string {
+  if (err && typeof err === 'object' && 'message' in err) {
+    const m = (err as { message?: unknown }).message;
+    if (typeof m === 'string' && m) return m;
+  }
+  return fallback;
 }
 
 /* ----------------------------- Auth ----------------------------- */
@@ -166,10 +186,11 @@ function normalizePagination(
   raw: RawPaginatedResponse<unknown> | RawFlatResponse<unknown>,
   requested: { page: number; limit: number },
 ): Pagination {
+  const rowCount = Array.isArray(raw?.data) ? raw.data.length : 0;
   // {pagination:{...}} variant
   if ('pagination' in raw && raw.pagination) {
     return {
-      total: raw.pagination.total ?? raw.data.length,
+      total: raw.pagination.total ?? rowCount,
       page: raw.pagination.page ?? requested.page,
       limit: raw.pagination.limit ?? requested.limit,
     };
@@ -177,7 +198,7 @@ function normalizePagination(
   // flat {total,page,limit} variant (employee/list)
   const flat = raw as RawFlatResponse<unknown>;
   return {
-    total: flat.total ?? raw.data.length,
+    total: flat.total ?? rowCount,
     page: flat.page ?? requested.page,
     limit: flat.limit ?? requested.limit,
   };
@@ -225,7 +246,9 @@ export async function listEntity<T>(
     RawPaginatedResponse<T> | RawFlatResponse<T>
   >(`/${name}/list`, body);
 
-  const rows = data.data ?? [];
+  // Guard against an error/non-array body (e.g. a 500 returning {code,message}):
+  // never hand a non-array to callers that .map() over it.
+  const rows = Array.isArray(data?.data) ? data.data : [];
   const pagination = normalizePagination(data, { page, limit });
   const filter_limit =
     'filter_limit' in data

@@ -29,7 +29,7 @@ export default function Planters() {
   const load = () =>
     api
       .get<{ data: Planter[] }>('/admin/planters')
-      .then((r) => setList(r.data.data))
+      .then((r) => setList(Array.isArray(r.data?.data) ? r.data.data : []))
       .catch(() => undefined)
       .finally(() => setLoading(false));
 

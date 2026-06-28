@@ -51,7 +51,13 @@ export default function Logs() {
     const t = setTimeout(() => {
       api
         .post('/audit/list', { page: 1, limit: 200, search, ...(cat ? { category: cat } : {}) })
-        .then((r) => { if (!off) setRows(((r.data?.data ?? r.data) as AuditRow[]) ?? []); })
+        .then((r) => {
+          if (off) return;
+          // A 500/error body (e.g. {code,message}) is not an array — never store
+          // a non-array, or the rows.map below crashes.
+          const body = r.data?.data ?? r.data;
+          setRows(Array.isArray(body) ? (body as AuditRow[]) : []);
+        })
         .catch((e) => { if (!off) setErr(e instanceof Error ? e.message : 'Failed to load logs'); })
         .finally(() => { if (!off) setLoading(false); });
     }, search ? 300 : 0);

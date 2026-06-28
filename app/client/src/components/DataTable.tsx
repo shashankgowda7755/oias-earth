@@ -134,6 +134,12 @@ export function DataTable<T>({
     Boolean(onDelete);
   const colCount = columns.length + (hasActions ? 1 : 0);
   const pageCount = Math.max(1, Math.ceil(total / Math.max(1, limit)));
+  // Defensive: a non-array `rows` (e.g. an error body that slipped past the data
+  // layer) would crash `.map`; an object `error` would render as a raw React
+  // child (#31). Coerce both before any render path can hit them.
+  const safeRows: T[] = Array.isArray(rows) ? rows : [];
+  const errorText: string | null =
+    error == null ? null : typeof error === 'string' ? error : 'Failed to load data';
 
   // --- debounced search input (controlled by parent's committed value) ---
   const [searchInput, setSearchInput] = useState(search ?? '');
@@ -233,16 +239,16 @@ export function DataTable<T>({
                   </div>
                 </td>
               </tr>
-            ) : error ? (
+            ) : errorText ? (
               <tr>
                 <td colSpan={colCount} className="py-16">
                   <div className="flex flex-col items-center justify-center gap-1 text-center">
                     <span className="font-medium text-danger">Failed to load data</span>
-                    <span className="text-sm text-textSecondary">{error}</span>
+                    <span className="text-sm text-textSecondary">{errorText}</span>
                   </div>
                 </td>
               </tr>
-            ) : rows.length === 0 ? (
+            ) : safeRows.length === 0 ? (
               <tr>
                 <td colSpan={colCount} className="py-16">
                   <div className="flex items-center justify-center text-sm text-textSecondary">
@@ -251,7 +257,7 @@ export function DataTable<T>({
                 </td>
               </tr>
             ) : (
-              rows.map((row, rowIndex) => {
+              safeRows.map((row, rowIndex) => {
                 const id = getRowId
                   ? getRowId(row, rowIndex)
                   : ((row as { id?: string | number }).id ?? rowIndex);
