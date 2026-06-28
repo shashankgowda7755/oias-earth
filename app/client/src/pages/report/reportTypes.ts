@@ -27,6 +27,8 @@ export interface ReportMeta {
   report_date: string;
   /** Plantation month label for the cover, e.g. "January 2026". */
   plantation_label: string;
+  /** Assigned site supervisor (employee) name — shown on the OSR Land slide. */
+  supervisor?: string;
   created_by_name?: string;
   created_by_phone?: string;
   /** Top-right header brand (the sponsor/client). */
@@ -119,6 +121,14 @@ export interface ComputedReport {
   /** Current height label for slide 13 (from latest actual_height_range). */
   current_height_label: string | null;
   site_master_plan: SiteMasterPlan | null;
+  /** Per-box species placement (granular grid layout) for the Site Master Plan. */
+  site_plan_boxes?: BoxSpeciesBreakdown[];
+}
+
+/** One box's species counts, for the Site Master Plan box-wise breakdown. */
+export interface BoxSpeciesBreakdown {
+  label: string;
+  species: { name: string; count: number }[];
 }
 
 export interface ForestReportData {
