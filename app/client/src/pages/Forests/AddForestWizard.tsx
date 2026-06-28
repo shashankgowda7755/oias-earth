@@ -65,14 +65,17 @@ function compact(obj: Record<string, unknown>): UpsertValues {
 /**
  * Build the snake_case upsert values from the string-keyed form.
  *
- * Relations (sponsor_ids, site_manager_id, user_id) and the per-box config are
- * sent as JSON strings — the multipart/JSON upsert body is flat scalars, and the
- * async forest_upsert_v1 job parses these into join rows + ForestBox/Tree rows.
+ * Keys match the CONFIRMED server contract (spec/forest_create_payload.jsonc +
+ * server/src/routes/forest.ts): `employee_id` (Site Manager), `user_role_id`
+ * (User), `sponsor_ids`, and the per-box planting layout as `box_data[]` whose
+ * boxes use `column` + `species_data[]`. (The earlier `boxes`/`col`/`species`/
+ * `site_manager_id`/`user_id` keys did NOT match the server, so boxes, trees,
+ * the site manager and the user were silently DROPPED on save.)
  *
- * TODO(spec openQuestions[2]): the exact server field NAMES for the box payload
- * and the sponsor/manager/user relation keys are not captured from the live
- * network calls. We send the most likely keys (`boxes`, `sponsor_ids`,
- * `site_manager_id`, `user_id`) as JSON; confirm against a real upsert capture.
+ * box_data is sent ONLY on create. On edit we intentionally omit it: re-sending
+ * the grid would make the server rebuild forest_trees and destroy their
+ * living-proof timelines / gifts / carbon ledger. The grid is shown read-only in
+ * edit mode; everything else still saves. (Full grid re-edit is a separate flow.)
  */
 export function buildForestValues(f: ForestFormState): UpsertValues {
   // Only include boxes the user actually configured (prefix set).
@@ -80,13 +83,13 @@ export function buildForestValues(f: ForestFormState): UpsertValues {
     .filter((b) => b.prefix.trim().length > 0)
     .map((b) => ({
       row: b.row,
-      col: b.col,
+      column: b.col,
       prefix: b.prefix.trim(),
       start_digits: num(b.start_digits) ?? 3,
       start: b.start.trim() || '001',
-      species: b.species
+      species_data: b.species
         .filter((s) => s.species_id)
-        .map((s) => ({ species_id: s.species_id, count: num(s.count) ?? 0 })),
+        .map((s) => ({ species_id: Number(s.species_id), count: num(s.count) ?? 0 })),
       ...(b.box_lat && b.box_lng ? { box_lat: b.box_lat, box_lng: b.box_lng } : {}),
     }));
 
@@ -104,9 +107,10 @@ export function buildForestValues(f: ForestFormState): UpsertValues {
     forest_desc: f.forest_desc.trim() || undefined,
     forest_geo_lat: f.forest_geo_lat.trim(),
     forest_geo_long: f.forest_geo_long.trim(),
-    site_manager_id: f.site_manager_id || undefined,
-    user_id: f.user_id || undefined,
-    // Multi relation as a JSON array string (flat-body friendly).
+    // Site Manager => employee_id; User => user_role_id (canonical contract).
+    employee_id: f.site_manager_id || undefined,
+    user_role_id: f.user_id || undefined,
+    // Multi relation as a JSON array string (flat-body friendly; server parses).
     sponsor_ids: f.sponsor_ids.length ? JSON.stringify(f.sponsor_ids) : undefined,
 
     // Step 2
@@ -123,8 +127,8 @@ export function buildForestValues(f: ForestFormState): UpsertValues {
     project_period: num(f.project_period),
     plantation_date: f.plantation_date.trim() || undefined,
 
-    // Per-box layout (prefix/start/species) for the forest_upsert_v1 job.
-    boxes: configuredBoxes.length ? JSON.stringify(configuredBoxes) : undefined,
+    // Per-box planting layout (creates forest_boxes + forest_trees). Create-only.
+    box_data: !f.id && configuredBoxes.length ? JSON.stringify(configuredBoxes) : undefined,
 
     // Tree ID generation fields
     client_code: f.client_code.trim() || undefined,

@@ -41,7 +41,10 @@ const findLogo = (data: SlideProps['data'], value: string) =>
 /* ----------------------------- Slide 1: Cover ----------------------------- */
 export function S01Cover({ data }: SlideProps) {
   const { meta, forest, computed } = data;
-  const hero = forest.report_images?.find((r) => r.slide_type === 'first_slide')?.image;
+  // Cover hero: the report's first-slide image, falling back to the first
+  // dashboard image when no dedicated cover image was uploaded.
+  const hero = forest.report_images?.find((r) => r.slide_type === 'first_slide')?.image
+    ?? forest.dashboard_images?.[0]?.image;
   const initiated = findLogo(data, 'initiated_by');
   const sponsors = (forest.additional_sponsor_logo ?? []).filter((l) => l.type?.value !== 'initiated_by');
   const logoCards: { caption: string; name?: string; logo?: string }[] = [
@@ -62,6 +65,9 @@ export function S01Cover({ data }: SlideProps) {
         <div style={{ display: 'flex', flexDirection: 'column' }}>
           {meta.client_name && <div style={{ fontSize: 30, fontWeight: 800, color: C.green }}>{meta.client_name}</div>}
           <h1 style={{ fontSize: 44, lineHeight: 1.08, fontWeight: 800, color: C.ink, margin: '4px 0 0' }}>{dash(forest.forest_name)}</h1>
+          {forest.forest_desc ? (
+            <p style={{ fontSize: 15, color: C.body, lineHeight: 1.5, margin: '12px 0 0', maxWidth: 460 }}>{forest.forest_desc}</p>
+          ) : null}
 
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginTop: 22 }}>
             {pill(`${meta.quarter_label} Quarterly Report`)}
@@ -81,7 +87,10 @@ export function S01Cover({ data }: SlideProps) {
           <ReportImage src={hero} height={undefined} label="Cover image" style={{ flex: 1, minHeight: 0 }} />
           <div style={{ position: 'absolute', left: 18, right: 18, bottom: 18, background: 'rgba(255,255,255,.94)', borderRadius: 14, padding: '14px 18px' }}>
             <div style={{ fontSize: 12, color: C.muted, marginBottom: 4 }}>Project Site</div>
-            <div style={{ fontSize: 14, fontWeight: 700, color: C.ink, lineHeight: 1.4 }}>{dash(forest.forest_address)}</div>
+            <div style={{ fontSize: 14, fontWeight: 700, color: C.ink, lineHeight: 1.4 }}>{dash(forest.project_site || forest.forest_address)}</div>
+            {forest.project_site && forest.forest_address ? (
+              <div style={{ fontSize: 12, color: C.muted, marginTop: 2, lineHeight: 1.4 }}>{forest.forest_address}</div>
+            ) : null}
           </div>
         </div>
       </div>
@@ -148,7 +157,8 @@ export function S03OsrLand({ data }: SlideProps) {
   }
   const tech: [string, string][] = [
     ['Google Coordinates', forest.forest_geo_lat && forest.forest_geo_long ? `${forest.forest_geo_lat}, ${forest.forest_geo_long}` : '—'],
-    ['Site Manager', '—'],
+    ['Supervisor', dash(meta.supervisor)],
+    ['Forest ID', dash(forest.forest_unique_id)],
     ['Irrigation Method', enumLabel(forest.irrigation_method === 'others' ? forest.irrigation_method_other : forest.irrigation_method)],
     ['Climate', dash(forest.climate === 'others' ? forest.climate_other : forest.climate)],
     ['Soil Type', enumLabel(forest.soil_type === 'others' ? forest.soil_type_other : forest.soil_type)],

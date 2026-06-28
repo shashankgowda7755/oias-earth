@@ -86,19 +86,25 @@ export async function loadSponsorOptions(query: string): Promise<AutocompleteOpt
   }));
 }
 
-/** User picker. */
+/**
+ * User picker. The forest contract grants portal access by `user_role_id` (the
+ * user_roles join-row uuid), so the option VALUE is that id — not the profile id.
+ * Rows without a user_role_id can't be granted access, so they're skipped.
+ */
 export async function loadUserOptions(query: string): Promise<AutocompleteOption[]> {
   const res = await listEntity<UserRow>('users', {
     page: PAGE,
     limit: LIMIT,
     ...(query ? { search: query } : {}),
   });
-  return res.rows.map((u) => {
-    const name = [u.firstName, u.lastName].filter(Boolean).join(' ').trim();
-    return {
-      value: String(u.id),
-      label: name || u.username,
-      ...(name && u.username ? { description: u.username } : {}),
-    };
-  });
+  return res.rows
+    .filter((u) => Boolean(u.user_role_id))
+    .map((u) => {
+      const name = [u.firstName, u.lastName].filter(Boolean).join(' ').trim();
+      return {
+        value: String(u.user_role_id),
+        label: name || u.username,
+        ...(name && u.username ? { description: u.username } : {}),
+      };
+    });
 }

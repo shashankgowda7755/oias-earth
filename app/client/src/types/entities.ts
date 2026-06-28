@@ -207,6 +207,8 @@ export interface ReportRow {
   version: number;
   project_period: number;
   forest_id: string;
+  /** Free-form report payload (jsonb). Returned by reports/list for edit prefill. */
+  report_data?: unknown;
   skip: unknown;
   created_by: string | null;
   updated_by: string | null;

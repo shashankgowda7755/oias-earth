@@ -197,6 +197,55 @@ export async function buildForestReport(forestId: string, year: number, quarter:
   if (fr.rowCount === 0 || !forestRow) throw notFound('Forest not found');
   const forest = mapForest(forestRow);
 
+  // Supervisor (site manager): the report used to hard-code "—". Surface the
+  // assigned employee's name.
+  const empRes = await query<{ name: string }>(
+    `SELECT e.name FROM forests_employees fe JOIN employees e ON e.id = fe.employee_id
+      WHERE fe.forest_id = $1 AND fe.is_active = TRUE ORDER BY fe.created_at LIMIT 1`,
+    [forestId],
+  );
+  const supervisor = (empRes.rows[0]?.name as string) || undefined;
+
+  // Sponsor name+logo must always show. If the richer additional_sponsor_logo
+  // block wasn't filled, fall back to the linked sponsors (sponsor picker).
+  if (((forest.additional_sponsor_logo as unknown[]) ?? []).length === 0) {
+    const spRes = await query<{ sponsor_name: string; sponsor_logo: string | null }>(
+      `SELECT s.sponsor_name, s.sponsor_logo FROM forest_sponsors fs JOIN sponsors s ON s.id = fs.sponsor_id
+        WHERE fs.forest_id = $1 AND fs.is_active = TRUE ORDER BY fs.created_at`,
+      [forestId],
+    );
+    if (spRes.rows.length) {
+      forest.additional_sponsor_logo = spRes.rows.map((s) => ({
+        type: { label: 'Sponsored by', value: 'sponsored_by' },
+        name: s.sponsor_name,
+        logo: s.sponsor_logo ?? undefined,
+      }));
+    }
+  }
+
+  // Per-box species breakdown (granular planting layout for the Site Master Plan).
+  const boxRes = await query<{ id: string; row: number | null; column: number | null; prefix: string | null }>(
+    `SELECT id, "row", "column", prefix FROM forest_boxes WHERE forest_id = $1 ORDER BY "row", "column"`,
+    [forestId],
+  );
+  const site_plan_boxes: { label: string; species: { name: string; count: number }[] }[] = [];
+  for (const b of boxRes.rows) {
+    const bs = await query<{ name: string; count: number }>(
+      `SELECT COALESCE(mp.common_name, mp.species_name, 'Species ' || ft.master_plant_species_id) AS name,
+              COUNT(ft.id)::int AS count
+         FROM forest_trees ft LEFT JOIN master_plantspecies mp ON mp.id = ft.master_plant_species_id
+        WHERE ft.box_id = $1 AND ft.is_active = TRUE
+        GROUP BY 1 ORDER BY count DESC`,
+      [b.id],
+    );
+    if (bs.rows.length === 0) continue;
+    const rc = b.row != null && b.column != null ? ` (${b.row}-${b.column})` : '';
+    site_plan_boxes.push({
+      label: `${(b.prefix as string) || 'Box'}${rc}`,
+      species: bs.rows.map((r) => ({ name: String(r.name), count: num(r.count) })),
+    });
+  }
+
   // Actual per-species sapling counts + rates + traits + description.
   const sr = await query<Row>(
     `SELECT ft.master_plant_species_id AS species_id,
@@ -278,6 +327,7 @@ export async function buildForestReport(forestId: string, year: number, quarter:
     growth_milestones: growthMilestones(forest),
     current_height_label: currentHeightLabel(forest),
     site_master_plan: siteMasterPlan(forest, total),
+    site_plan_boxes,
   };
 
   const logos = (forest.additional_sponsor_logo as { type?: { value?: string }; name?: string; logo?: string }[]) ?? [];
@@ -290,6 +340,7 @@ export async function buildForestReport(forestId: string, year: number, quarter:
     period_label: quarterPeriodLabel(year, quarter),
     report_date: new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' }),
     plantation_label: pd ? `${MONTHS[pd.getMonth()]} ${pd.getFullYear()}` : '—',
+    supervisor,
     client_name: sponsored?.name,
     client_logo: sponsored?.logo,
     communitree_logo: initiated?.logo,

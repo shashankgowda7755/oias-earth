@@ -299,7 +299,7 @@ export function S14SiteMasterPlan({ data }: SlideProps) {
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gridTemplateRows: 'minmax(0, 1fr)', gap: 22, flex: 1, minHeight: 0 }}>
         <ReportImage src={forest.site_layout} label="Site layout plan" style={{ height: '100%' }} />
-        <div>
+        <div style={{ display: 'flex', flexDirection: 'column', minHeight: 0 }}>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 18 }}>
             <StatCard label="Box Count" value={p ? numOrDash(p.box_count) : '—'} sub="Allocated plots" />
             <StatCard label="Total Saplings" value={p ? numOrDash(p.total_saplings) : '—'} sub="Planted across all plots" valueColor={C.green} />
@@ -312,6 +312,22 @@ export function S14SiteMasterPlan({ data }: SlideProps) {
               </div>
             ))}
           </div>
+          {computed.site_plan_boxes && computed.site_plan_boxes.length ? (
+            <div style={{ marginTop: 14, flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
+              <div style={{ fontSize: 11.5, textTransform: 'uppercase', letterSpacing: '.06em', color: C.muted, marginBottom: 6 }}>Box-wise Planting</div>
+              <div style={{ border: `1px solid ${C.line}`, borderRadius: 12, padding: '4px 16px', flex: 1, minHeight: 0, overflow: 'hidden' }}>
+                {computed.site_plan_boxes.slice(0, 8).map((b) => (
+                  <div key={b.label} style={{ display: 'flex', justifyContent: 'space-between', gap: 12, padding: '8px 0', borderBottom: `1px solid ${C.line}`, fontSize: 12.5 }}>
+                    <strong style={{ color: C.ink, whiteSpace: 'nowrap' }}>{b.label}</strong>
+                    <span style={{ color: C.body, textAlign: 'right' }}>{b.species.map((s) => `${s.name} ×${s.count}`).join(', ')}</span>
+                  </div>
+                ))}
+                {computed.site_plan_boxes.length > 8 ? (
+                  <div style={{ padding: '8px 0', fontSize: 12, color: C.muted, textAlign: 'center' }}>+{computed.site_plan_boxes.length - 8} more boxes</div>
+                ) : null}
+              </div>
+            </div>
+          ) : null}
         </div>
       </div>
     </SlidePage>

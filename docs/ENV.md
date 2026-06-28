@@ -19,8 +19,11 @@ The server picks a backend via `app/server/src/lib/storage.ts`:
 **Vercel Blob (alternative):**
 - `BLOB_READ_WRITE_TOKEN`
 
-If neither is set, photo uploads fall back to an ephemeral `/uploads` path (lost on
-cold start) and 360 image upload is rejected with a clear message.
+If neither is set, **every** upload — sponsor logos, employee + user avatars,
+forest permission letters / site layouts, report photos — falls back to an
+ephemeral `/uploads` path under `/tmp` that is **wiped on every cold start**, so
+those images vanish after a redeploy. 360 image upload is rejected outright with
+a clear message. For production you MUST set the Supabase (or Blob) vars above.
 
 ## Email (certificates / gifting)
 - `RESEND_API_KEY` — Resend API key. Without it, certificate emails are skipped

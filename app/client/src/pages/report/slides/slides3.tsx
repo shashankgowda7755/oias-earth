@@ -287,10 +287,16 @@ export function S20Security({ data }: SlideProps) {
 /* --------------------- Slide 22: Photo Gallery (one per quarter) --------------------- */
 export function S21bGallery({ data }: SlideProps) {
   const { meta, forest } = data;
-  const all = (forest.gallery_images ?? []).filter((g) => g && g.image);
-  const sorted = [...all].sort((a, b) => (Number(a.year) - Number(b.year)) || (Number(a.quarter) - Number(b.quarter)));
-  // Empty-safe: show 4 placeholders when there are no gallery photos yet.
-  const cells = sorted.length ? sorted : [{}, {}, {}, {}];
+  const gallery = (forest.gallery_images ?? []).filter((g) => g && g.image);
+  const sorted = [...gallery].sort((a, b) => (Number(a.year) - Number(b.year)) || (Number(a.quarter) - Number(b.quarter)));
+  // Dashboard images are also surfaced here (no quarter — labelled by name).
+  const dashImgs = (forest.dashboard_images ?? [])
+    .filter((d) => d && d.image)
+    .map((d) => ({ image: d.image, caption: d.name || d.description }));
+  type GCell = { image?: string; year?: number; quarter?: number; caption?: string };
+  const cellsData: GCell[] = [...sorted, ...dashImgs];
+  // Empty-safe: show 4 placeholders when there are no photos yet.
+  const cells: GCell[] = cellsData.length ? cellsData : [{}, {}, {}, {}];
   const cols = Math.min(4, Math.max(2, Math.ceil(Math.sqrt(cells.length))));
   return (
     <SlidePage meta={meta}>
@@ -300,7 +306,7 @@ export function S21bGallery({ data }: SlideProps) {
           <div key={i} style={{ display: 'flex', flexDirection: 'column', minHeight: 0 }}>
             <ReportImage src={g.image} label={g.year && g.quarter ? `Q${g.quarter} ${g.year}` : 'Gallery photo'} style={{ flex: 1, minHeight: 0 }} />
             <div style={{ fontSize: 12.5, color: C.muted, marginTop: 6, textAlign: 'center' }}>
-              {g.year && g.quarter ? `Q${g.quarter} ${g.year}` : '—'}{g.caption ? ` · ${g.caption}` : ''}
+              {g.year && g.quarter ? `Q${g.quarter} ${g.year}${g.caption ? ` · ${g.caption}` : ''}` : (g.caption || '—')}
             </div>
           </div>
         ))}

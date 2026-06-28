@@ -18,6 +18,7 @@ import type {
 } from '../Forests/fullTypes';
 import type {
   ApproxValueBlock,
+  BoxSpeciesBreakdown,
   ComputedReport,
   GrowthMilestone,
   MaintenanceRollup,
@@ -257,6 +258,23 @@ function siteMasterPlan(p: FullForestPayload): SiteMasterPlan | null {
   };
 }
 
+/** Per-box species placement for the Site Master Plan box-wise breakdown. */
+function sitePlanBoxes(p: FullForestPayload): BoxSpeciesBreakdown[] {
+  const out: BoxSpeciesBreakdown[] = [];
+  for (const b of p.box_data ?? []) {
+    const species = (b.species_data ?? [])
+      .map((s) => ({
+        name: s.species_common_name?.trim() || s.species_name?.trim() || `Species ${s.species_id}`,
+        count: Math.max(0, num(s.count)),
+      }))
+      .filter((s) => s.count > 0);
+    if (species.length === 0) continue;
+    const rc = b.row != null && b.column != null ? ` (${b.row}-${b.column})` : '';
+    out.push({ label: `${b.prefix || 'Box'}${rc}`, species });
+  }
+  return out;
+}
+
 function valueNet(term?: { land_value?: number; tree_value?: number; oxygen_generated?: number; carbon_sequestration?: number }): number | null {
   if (!term) return null;
   const vals = [term.land_value, term.tree_value, term.oxygen_generated, term.carbon_sequestration];
@@ -287,6 +305,7 @@ export function computeReport(p: FullForestPayload, year: number, quarter: numbe
     growth_milestones: growthMilestones(p, year, quarter),
     current_height_label: currentHeightLabel(p),
     site_master_plan: siteMasterPlan(p),
+    site_plan_boxes: sitePlanBoxes(p),
   };
 }
 

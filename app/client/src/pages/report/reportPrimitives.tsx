@@ -366,16 +366,43 @@ export function EmptyBlock({ label, height }: { label: string; height?: number }
 }
 
 /**
- * Image region. Real photo → object-cover; empty → PhotoPlaceholder filling the
- * SAME box. Wrap in a div carrying the layout height/flex so both states size
- * identically (the placeholder no longer collapses to a fixed small box).
+ * Default dummy image rendered wherever a real photo is missing or fails to
+ * load. A clearly-a-placeholder graphic (image icon on a soft grey field) — NOT
+ * a stock photo, so it never reads as a real, verified site image. Inline SVG
+ * data-URI so it always resolves (no asset/network dependency, prints fine).
+ */
+const DUMMY_SVG =
+  `<svg xmlns='http://www.w3.org/2000/svg' width='320' height='240' viewBox='0 0 320 240'>` +
+  `<rect width='320' height='240' fill='#eef2f0'/>` +
+  `<g stroke='#c2cdc8' stroke-width='6' fill='none' stroke-linecap='round' stroke-linejoin='round'>` +
+  `<rect x='96' y='78' width='128' height='96' rx='10'/>` +
+  `<circle cx='128' cy='110' r='12'/>` +
+  `<path d='M104 166 l36 -36 28 24 24 -20 28 32'/>` +
+  `</g></svg>`;
+export const DUMMY_IMAGE = `data:image/svg+xml,${encodeURIComponent(DUMMY_SVG)}`;
+
+/**
+ * Image region. Real photo → object-cover. Missing OR broken src → the default
+ * dummy image fills the SAME box (with the contextual caption overlaid when the
+ * src was missing) so the layout never collapses or shows an empty grey panel.
  */
 export function ReportImage({ src, alt = '', height, label = 'Photo', radius = 14, style }: { src?: string; alt?: string; height?: number; label?: string; radius?: number; style?: CSSProperties }) {
-  const wrap: CSSProperties = { width: '100%', height: height ?? '100%', minHeight: 96, ...style };
-  if (!src) return <div style={wrap}><PhotoPlaceholder label={label} radius={radius} /></div>;
+  const wrap: CSSProperties = { position: 'relative', width: '100%', height: height ?? '100%', minHeight: 96, ...style };
+  const missing = !src;
   return (
     <div style={wrap}>
-      <img src={src} alt={alt} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: radius, display: 'block' }} />
+      <img
+        src={src || DUMMY_IMAGE}
+        alt={alt}
+        onError={(e) => {
+          const t = e.currentTarget;
+          if (!t.dataset.fallback) { t.dataset.fallback = '1'; t.src = DUMMY_IMAGE; }
+        }}
+        style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: radius, display: 'block', background: '#eef2f0' }}
+      />
+      {missing && label ? (
+        <span style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'flex-end', justifyContent: 'center', paddingBottom: 12, fontSize: 12, fontWeight: 600, color: '#9aa7a2', pointerEvents: 'none' }}>{label}</span>
+      ) : null}
     </div>
   );
 }

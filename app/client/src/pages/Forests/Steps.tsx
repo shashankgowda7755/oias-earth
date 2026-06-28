@@ -20,7 +20,7 @@ import { BoxGrid } from './BoxGrid';
 import { loadSpeciesOptions } from './api';
 import { autoFillBoxes } from './boxAutoFill';
 import { genClientCode, genForestCode, previewTreeIds } from './treeId';
-import type { FieldErrors, ForestFormState, GlobalSpeciesRow } from './types';
+import { boxPlanted, type FieldErrors, type ForestFormState, type GlobalSpeciesRow } from './types';
 
 /** Setter: update one field by key. */
 type Update = <K extends keyof ForestFormState>(
@@ -220,6 +220,11 @@ export function Step2Grid({ form, errors, update }: StepProps) {
   const totalTrees = Number(form.total_trees) || 0;
   const gridCapacity = gridReady ? boxRows * boxColumn * capacity : 0;
 
+  // EDIT mode: planting grid is read-only (rebuilding would erase tree timelines).
+  const isEdit = Boolean(form.id);
+  const configuredBoxes = Object.values(form.boxes).filter((b) => b.prefix.trim().length > 0);
+  const editTreeCount = configuredBoxes.reduce((sum, b) => sum + boxPlanted(b), 0);
+
   // Auto-derive forest_code from forest_name when it changes.
   useEffect(() => {
     if (form.forest_name && !form.forest_code) {
@@ -237,9 +242,9 @@ export function Step2Grid({ form, errors, update }: StepProps) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [form.sponsor_labels]);
 
-  // Re-run auto-fill whenever inputs change (skips overridden boxes).
+  // Re-run auto-fill whenever inputs change (skips overridden boxes, skips edit mode).
   useEffect(() => {
-    if (!gridReady || totalTrees <= 0 || !form.client_code || !form.forest_code) return;
+    if (isEdit || !gridReady || totalTrees <= 0 || !form.client_code || !form.forest_code) return;
     const filled = autoFillBoxes({
       totalTrees,
       speciesMix: form.species_mix,
@@ -413,39 +418,59 @@ export function Step2Grid({ form, errors, update }: StepProps) {
 
       {/* Layer 2: Geo-tag toggle */}
       <div className="mt-6">
-        <label className="flex cursor-pointer items-start gap-3 rounded-card border border-border bg-appbg px-4 py-3">
-          <input
-            type="checkbox"
-            className="mt-0.5"
-            checked={form.geo_tag_mode}
-            onChange={(e) => update('geo_tag_mode', e.target.checked)}
-          />
-          <div>
-            <p className="text-sm font-semibold text-textPrimary">Enable per-box geo-tagging</p>
-            <p className="text-xs text-textSecondary">
-              Add GPS coordinates and override species per box. Required for physical QR-code tracking.
-            </p>
-          </div>
-        </label>
+        {isEdit ? (
+          <>
+            <SubHeading>Box Layout</SubHeading>
+            <div className="rounded-card border border-border bg-appbg px-4 py-4 text-sm text-textSecondary">
+              <p className="mb-1 font-medium text-textPrimary">
+                Planting layout is locked while editing
+              </p>
+              <p>
+                {configuredBoxes.length} box{configuredBoxes.length === 1 ? '' : 'es'} •{' '}
+                {editTreeCount.toLocaleString()} tree{editTreeCount === 1 ? '' : 's'} on record.
+                Rebuilding the grid here would erase each tree&apos;s monitoring timeline,
+                so the layout can only be changed from the dedicated tree tools. Every
+                other field above saves normally.
+              </p>
+            </div>
+          </>
+        ) : (
+          <>
+            <label className="flex cursor-pointer items-start gap-3 rounded-card border border-border bg-appbg px-4 py-3">
+              <input
+                type="checkbox"
+                className="mt-0.5"
+                checked={form.geo_tag_mode}
+                onChange={(e) => update('geo_tag_mode', e.target.checked)}
+              />
+              <div>
+                <p className="text-sm font-semibold text-textPrimary">Enable per-box geo-tagging</p>
+                <p className="text-xs text-textSecondary">
+                  Add GPS coordinates and override species per box. Required for physical QR-code tracking.
+                </p>
+              </div>
+            </label>
 
-        {form.geo_tag_mode && gridReady && (
-          <div className="mt-4">
-            <SubHeading>Box Layout — Geo-tag Mode</SubHeading>
-            <BoxGrid
-              boxRows={boxRows}
-              boxColumn={boxColumn}
-              treeRow={treeRow}
-              treeColumn={treeColumn}
-              boxes={form.boxes}
-              onChange={(boxes) => update('boxes', boxes)}
-            />
-          </div>
-        )}
+            {form.geo_tag_mode && gridReady && (
+              <div className="mt-4">
+                <SubHeading>Box Layout — Geo-tag Mode</SubHeading>
+                <BoxGrid
+                  boxRows={boxRows}
+                  boxColumn={boxColumn}
+                  treeRow={treeRow}
+                  treeColumn={treeColumn}
+                  boxes={form.boxes}
+                  onChange={(boxes) => update('boxes', boxes)}
+                />
+              </div>
+            )}
 
-        {form.geo_tag_mode && !gridReady && (
-          <p className="mt-3 rounded-card border border-dashed border-border bg-appbg px-3 py-4 text-center text-sm text-textSecondary">
-            Fill in grid dimensions above to show the box map.
-          </p>
+            {form.geo_tag_mode && !gridReady && (
+              <p className="mt-3 rounded-card border border-dashed border-border bg-appbg px-3 py-4 text-center text-sm text-textSecondary">
+                Fill in grid dimensions above to show the box map.
+              </p>
+            )}
+          </>
         )}
       </div>
     </div>
