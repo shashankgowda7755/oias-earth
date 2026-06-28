@@ -184,24 +184,27 @@ export async function uploadReportImage(
   return (data?.data ?? data) as { url: string; slot: string };
 }
 
-/** PFA: upsert a sponsor/initiator logo entry (multipart: logo file + meta). */
+/** PFA: upsert a sponsor/initiator logo entry (multipart: logo file + meta).
+ *  `clientId` is the stable per-row key the server upserts on — required to make
+ *  rapid double-saves on a new row idempotent (one entry, not two). */
 export async function uploadSponsorLogo(
   forestId: string,
-  opts: { title: string; name?: string; value: 'sponsored_by' | 'initiated_by'; index?: number; file?: File | null },
-): Promise<{ index: number; logo?: string; entries: unknown[] }> {
+  opts: { title: string; name?: string; value: 'sponsored_by' | 'initiated_by'; index?: number; clientId?: string; file?: File | null },
+): Promise<{ index: number; id?: string; logo?: string; entries: unknown[] }> {
   const fd = new FormData();
   fd.append('title', opts.title);
   fd.append('name', opts.name ?? '');
   fd.append('value', opts.value);
   if (opts.index != null && opts.index >= 0) fd.append('index', String(opts.index));
+  if (opts.clientId) fd.append('clientId', opts.clientId);
   if (opts.file) fd.append('logo', opts.file);
   const { data } = await api.post(`/forest/${forestId}/sponsor-logo`, fd, { headers: { 'Content-Type': 'multipart/form-data' } });
-  return (data?.data ?? data) as { index: number; logo?: string; entries: unknown[] };
+  return (data?.data ?? data) as { index: number; id?: string; logo?: string; entries: unknown[] };
 }
 
-/** PFA: delete a sponsor logo entry by index. */
-export async function deleteSponsorLogo(forestId: string, index: number): Promise<void> {
-  await api.post(`/forest/${forestId}/sponsor-logo/delete`, { index });
+/** PFA: delete a sponsor logo entry by stable id (preferred) or array index. */
+export async function deleteSponsorLogo(forestId: string, index: number, clientId?: string): Promise<void> {
+  await api.post(`/forest/${forestId}/sponsor-logo/delete`, { index, ...(clientId ? { clientId } : {}) });
 }
 
 export interface CityStatsResult {

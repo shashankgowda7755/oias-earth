@@ -17,7 +17,7 @@ import { fetchForestOptions, type ForestOption } from '../Reports/reportApi';
 // so what the operator frames is exactly what the report shows — no surprise crop
 // at render time. Keep these in sync with the slide render boxes.
 interface Slot { key: string; label: string; perQuarter?: boolean; ratio: number }
-interface LogoRow { title: string; name: string; value: 'sponsored_by' | 'initiated_by'; logo?: string; serverIndex: number }
+interface LogoRow { id: string; title: string; name: string; value: 'sponsored_by' | 'initiated_by'; logo?: string; serverIndex: number }
 type Page = 'pick' | 'menu' | 'site' | 'quarter' | 'sponsors';
 
 const SITE_SLOTS: Slot[] = [
@@ -141,6 +141,9 @@ export default function PfaUploader() {
   const fileSlot = useRef<Slot | null>(null);
   const logoInput = useRef<HTMLInputElement | null>(null);
   const logoIdx = useRef<number>(-1);
+  // serialize persists per row (keyed by stable id) so the title+name double-blur
+  // can't fire two concurrent ADDs; the 2nd waits and sends the assigned index.
+  const persistChain = useRef<Map<string, Promise<void>>>(new Map());
   const [camSlot, setCamSlot] = useState<Slot | null>(null);
   const [facing, setFacing] = useState<'environment' | 'user'>('environment');
   const [camErr, setCamErr] = useState<string | null>(null);
@@ -172,8 +175,9 @@ export default function PfaUploader() {
           }
           return { url: '', year: '' };
         }));
-        const raw = (f.additional_sponsor_logo as { type?: { label?: string; value?: string }; name?: string; logo?: string }[]) ?? [];
+        const raw = (f.additional_sponsor_logo as { id?: string; type?: { label?: string; value?: string }; name?: string; logo?: string }[]) ?? [];
         setLogos(raw.map((l, i) => ({
+          id: l.id ?? crypto.randomUUID(),
           title: l.type?.label || (l.type?.value === 'initiated_by' ? 'Initiated By' : 'Sponsored By'),
           name: l.name ?? '', value: l.type?.value === 'initiated_by' ? 'initiated_by' : 'sponsored_by', logo: l.logo, serverIndex: i,
         })));
@@ -309,19 +313,25 @@ export default function PfaUploader() {
 
   // logos
   const patchLogo = (i: number, p: Partial<LogoRow>) => setLogos((ls) => ls.map((r, j) => (j === i ? { ...r, ...p } : r)));
-  const addSponsor = () => setLogos((ls) => [...ls, { title: 'Sponsored By', name: '', value: 'sponsored_by', serverIndex: -1 }]);
-  const persistLogo = async (i: number, file?: File | null) => {
-    if (!forestId) return;
-    const row = logos[i]; if (!row) return;
-    try {
-      const res = await uploadSponsorLogo(forestId, { title: row.title, name: row.name, value: row.value, index: row.serverIndex, file });
-      setLogos((ls) => ls.map((r, j) => (j === i ? { ...r, serverIndex: res.index, logo: res.logo ?? r.logo } : r)));
-      if (file) toast.success('Logo uploaded.');
-    } catch (e) { toast.error(e instanceof Error ? e.message : 'Logo save failed.'); }
+  const addSponsor = () => setLogos((ls) => [...ls, { id: crypto.randomUUID(), title: 'Sponsored By', name: '', value: 'sponsored_by', serverIndex: -1 }]);
+  const persistLogo = (i: number, file?: File | null): Promise<void> => {
+    if (!forestId) return Promise.resolve();
+    const row = logos[i]; if (!row) return Promise.resolve();
+    const prior = persistChain.current.get(row.id) ?? Promise.resolve();
+    const next = prior.catch(() => undefined).then(async () => {
+      try {
+        const res = await uploadSponsorLogo(forestId, { title: row.title, name: row.name, value: row.value, index: row.serverIndex, clientId: row.id, file });
+        setLogos((ls) => ls.map((r) => (r.id === row.id ? { ...r, serverIndex: res.index, logo: res.logo ?? r.logo } : r)));
+        if (file) toast.success('Logo uploaded.');
+      } catch (e) { toast.error(e instanceof Error ? e.message : 'Logo save failed.'); }
+    });
+    persistChain.current.set(row.id, next);
+    return next;
   };
   const removeSponsor = async (i: number) => {
     const row = logos[i]; if (!row) return;
-    try { if (row.serverIndex >= 0) await deleteSponsorLogo(forestId, row.serverIndex); } catch { /* ignore */ }
+    persistChain.current.delete(row.id);
+    try { if (row.serverIndex >= 0) await deleteSponsorLogo(forestId, row.serverIndex, row.id); } catch { /* ignore */ }
     setLogos((ls) => ls.filter((_, j) => j !== i).map((r) => (row.serverIndex >= 0 && r.serverIndex > row.serverIndex ? { ...r, serverIndex: r.serverIndex - 1 } : r)));
   };
 
