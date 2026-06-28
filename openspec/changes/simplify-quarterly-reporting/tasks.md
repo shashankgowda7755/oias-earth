@@ -1,9 +1,9 @@
 # Tasks — simplify-quarterly-reporting
 
-> Status: Q1 slice landed (typecheck + build green). `report-value-flow` is blocked
-> on the operator's Excel. Storage backend (Vercel Blob) is reportedly live — verify
-> before image-upload e2e. Q2–Q4 delta surface + live preview are the next slice.
-> Coordinate storage + forest-save with the parallel audit/fix operation.
+> Status (2026-06-28): Q2-Q4 delta surface shipped. City-stats auto-fill shipped
+> (Wikidata + Wikipedia, climate + soil_type). `lib/holidays.ts` shipped (5 Indian
+> states). `/quarterly-session` skill created. `report-value-flow` blocked on
+> operator Excel. Storage (Vercel Blob) live — image upload e2e not yet verified.
 
 ## 1. Guided entry point (kill raw JSON)
 
@@ -15,8 +15,8 @@
 
 - [ ] 2.1 `ReportDataEditor.tsx` reads `?year=&quarter=`; passes them to sections
 - [x] 2.2 Q1: all sections shown (existing behaviour); structural fields pre-filled from forest creation
-- [ ] 2.3 Q2–Q4: show only delta fields (photos, workforce contribution, growth) + auto weather + on-site; carried-forward setup read-only
-- [ ] 2.4 Per-quarter banner stating what must be updated
+- [x] 2.3 Q2–Q4: nav collapses setup sections into "Setup (carried from Q1) ▸" disclosure; growth/soiltemp/media promoted to quarterly group
+- [x] 2.4 Green banner above editor: "Q{n}: photos, workforce and growth change each quarter. Setup fields carried from Q1." with Show all ▸ toggle
 
 ## 3. Inline photo upload (reuse existing slots)
 
@@ -32,7 +32,7 @@
 ## 5. Maximal derivation
 
 - [x] 5.1 `sundaysInQuarter()` in `reportData.ts` → weekly-off falls back to Sundays when not entered; `working_days` already computed
-- [ ] 5.2 `lib/holidays.ts` (operator per-state festival calendar) → auto-count `total_holidays_festival`
+- [x] 5.2 `lib/holidays.ts` — festival calendar for TN/KA/MH/DL/GJ; `festivalHolidaysInQuarter(year, quarter, state)` + `getStateHolidays(state, year)` exported; re-exported from `reportData.ts`
 - [x] 5.3 Species health/mortality from `forest_trees.tree_status_id` (`COUNT FILTER`) → `computed.derived_mortality_rate` / `derived_health` (overridable)
 - [ ] 5.4 Growth targets from operator per-species growth curves → `plant_growth_data.target_height_range`
 - [ ] 5.5 Carry-forward slow-changing fields into a new quarter's draft
@@ -55,3 +55,21 @@
 - [x] 8.1 Standardized on fiscal quarters; fixed stale calendar-quarter docs in `reportTypes.ts` + `reportForms.ts`
 - [x] 8.2 `app/client` + `app/server` typecheck + build green; `graphify update .` done
 - [ ] 8.3 Manual browser e2e (needs running stack + storage + a seeded forest)
+
+## 9. City / area statistics auto-fill
+
+- [x] 9.1 `GET /forest/city-stats?city=&state=&country=` — multi-source waterfall: Wikidata (P1082 population, P2046 area km², P1539 density) → Wikipedia REST summary extract; returns `region_name`, `total_jurisdiction_area`, `population`, `population_density`
+- [x] 9.2 Climate detection from Wikipedia extract (tropical wet and dry / humid subtropical / semi-arid / tropical savanna / hot desert) → `climate` field
+- [x] 9.3 Soil type detection from Wikipedia extract (alluvial / black soil / red soil / loamy / sandy) → `soil_type` field
+- [x] 9.4 `AreaPopulationSection.tsx` — ⚡ Auto-fill from city name button; reads `forest_city/state/country`; fills region_name, area, population, density; manual override always available
+- [x] 9.5 `CityStatsResult` interface in `forestApi.ts` updated with `climate` and `soil_type`
+- [ ] 9.6 Census India API (`api.data.gov.in`) fallback for districts not well-covered by Wikidata
+- [ ] 9.7 Wire `climate` + `soil_type` from city-stats fill into forest JSONB fields so report renders them on slide 3
+
+## 10. Quarterly-session operator skill
+
+- [x] 10.1 `.claude/skills/quarterly-session/SKILL.md` — 10-min operator session automation
+  - Usage: `/quarterly-session <forest_id> <year> <Q1|Q2|Q3|Q4>`
+  - Steps: navigate prod app → auto-fill weather + city stats → collect 7 manual delta values → fill fields → preview slides 15/16/17/20 → send
+- [ ] 10.2 Wire `festivalHolidaysInQuarter` into `buildForestReport()` for `total_holidays_festival` auto-count (currently exported, not yet consumed)
+- [ ] 10.3 Per-species growth curve table → auto-fill `plant_growth_data.target_height_range` (task 5.4)
