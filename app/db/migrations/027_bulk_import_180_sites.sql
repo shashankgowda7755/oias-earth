@@ -3,65 +3,68 @@
 -- 52 sponsors + 107 active forests
 
 -- Add unique constraints (idempotent) so ON CONFLICT works
-CREATE UNIQUE INDEX IF NOT EXISTS uq_sponsors_name ON sponsors (upper(trim(sponsor_name)));
+-- (hardened) uq_sponsors_name index removed: prod had case-insensitive duplicate
+-- sponsor names, so creating a UNIQUE index here crashed the migration on boot.
+-- Sponsor inserts below use WHERE NOT EXISTS instead of ON CONFLICT, so no
+-- unique index is needed and existing (duplicate) sponsors are left untouched.
 CREATE UNIQUE INDEX IF NOT EXISTS uq_forests_internal_id ON forests (forest_internal_id) WHERE forest_internal_id IS NOT NULL;
 CREATE UNIQUE INDEX IF NOT EXISTS uq_forest_sponsors ON forest_sponsors (forest_id, sponsor_id);
 
 -- ============================================================
 -- SPONSORS (52 unique clients)
 -- ============================================================
-INSERT INTO sponsors (sponsor_name, is_active) VALUES ('Acuity', TRUE) ON CONFLICT (upper(trim(sponsor_name))) DO NOTHING;
-INSERT INTO sponsors (sponsor_name, is_active) VALUES ('Apollo', TRUE) ON CONFLICT (upper(trim(sponsor_name))) DO NOTHING;
-INSERT INTO sponsors (sponsor_name, is_active) VALUES ('Athena Health', TRUE) ON CONFLICT (upper(trim(sponsor_name))) DO NOTHING;
-INSERT INTO sponsors (sponsor_name, is_active) VALUES ('Balmer & lawrie', TRUE) ON CONFLICT (upper(trim(sponsor_name))) DO NOTHING;
-INSERT INTO sponsors (sponsor_name, is_active) VALUES ('Barclays', TRUE) ON CONFLICT (upper(trim(sponsor_name))) DO NOTHING;
-INSERT INTO sponsors (sponsor_name, is_active) VALUES ('Bosch', TRUE) ON CONFLICT (upper(trim(sponsor_name))) DO NOTHING;
-INSERT INTO sponsors (sponsor_name, is_active) VALUES ('CGI', TRUE) ON CONFLICT (upper(trim(sponsor_name))) DO NOTHING;
-INSERT INTO sponsors (sponsor_name, is_active) VALUES ('Children Forest #3', TRUE) ON CONFLICT (upper(trim(sponsor_name))) DO NOTHING;
-INSERT INTO sponsors (sponsor_name, is_active) VALUES ('Children Forest #4', TRUE) ON CONFLICT (upper(trim(sponsor_name))) DO NOTHING;
-INSERT INTO sponsors (sponsor_name, is_active) VALUES ('Children Forest #5', TRUE) ON CONFLICT (upper(trim(sponsor_name))) DO NOTHING;
-INSERT INTO sponsors (sponsor_name, is_active) VALUES ('Children Forest #6', TRUE) ON CONFLICT (upper(trim(sponsor_name))) DO NOTHING;
-INSERT INTO sponsors (sponsor_name, is_active) VALUES ('Concern India', TRUE) ON CONFLICT (upper(trim(sponsor_name))) DO NOTHING;
-INSERT INTO sponsors (sponsor_name, is_active) VALUES ('Connect for', TRUE) ON CONFLICT (upper(trim(sponsor_name))) DO NOTHING;
-INSERT INTO sponsors (sponsor_name, is_active) VALUES ('Coronis', TRUE) ON CONFLICT (upper(trim(sponsor_name))) DO NOTHING;
-INSERT INTO sponsors (sponsor_name, is_active) VALUES ('Decathlon', TRUE) ON CONFLICT (upper(trim(sponsor_name))) DO NOTHING;
-INSERT INTO sponsors (sponsor_name, is_active) VALUES ('GBT', TRUE) ON CONFLICT (upper(trim(sponsor_name))) DO NOTHING;
-INSERT INTO sponsors (sponsor_name, is_active) VALUES ('GenPact', TRUE) ON CONFLICT (upper(trim(sponsor_name))) DO NOTHING;
-INSERT INTO sponsors (sponsor_name, is_active) VALUES ('HDFC', TRUE) ON CONFLICT (upper(trim(sponsor_name))) DO NOTHING;
-INSERT INTO sponsors (sponsor_name, is_active) VALUES ('HDFC Bank Ltd - Chennai', TRUE) ON CONFLICT (upper(trim(sponsor_name))) DO NOTHING;
-INSERT INTO sponsors (sponsor_name, is_active) VALUES ('HDFC Bank Ltd - Kovai', TRUE) ON CONFLICT (upper(trim(sponsor_name))) DO NOTHING;
-INSERT INTO sponsors (sponsor_name, is_active) VALUES ('HDFC Bank Ltd - Madurai', TRUE) ON CONFLICT (upper(trim(sponsor_name))) DO NOTHING;
-INSERT INTO sponsors (sponsor_name, is_active) VALUES ('HSBC', TRUE) ON CONFLICT (upper(trim(sponsor_name))) DO NOTHING;
-INSERT INTO sponsors (sponsor_name, is_active) VALUES ('Honda', TRUE) ON CONFLICT (upper(trim(sponsor_name))) DO NOTHING;
-INSERT INTO sponsors (sponsor_name, is_active) VALUES ('Honeywell', TRUE) ON CONFLICT (upper(trim(sponsor_name))) DO NOTHING;
-INSERT INTO sponsors (sponsor_name, is_active) VALUES ('IDFC - Madurai', TRUE) ON CONFLICT (upper(trim(sponsor_name))) DO NOTHING;
-INSERT INTO sponsors (sponsor_name, is_active) VALUES ('Inchcape', TRUE) ON CONFLICT (upper(trim(sponsor_name))) DO NOTHING;
-INSERT INTO sponsors (sponsor_name, is_active) VALUES ('Infosys', TRUE) ON CONFLICT (upper(trim(sponsor_name))) DO NOTHING;
-INSERT INTO sponsors (sponsor_name, is_active) VALUES ('JPMC - Bangalore', TRUE) ON CONFLICT (upper(trim(sponsor_name))) DO NOTHING;
-INSERT INTO sponsors (sponsor_name, is_active) VALUES ('KVB', TRUE) ON CONFLICT (upper(trim(sponsor_name))) DO NOTHING;
-INSERT INTO sponsors (sponsor_name, is_active) VALUES ('Kaleesuwari', TRUE) ON CONFLICT (upper(trim(sponsor_name))) DO NOTHING;
-INSERT INTO sponsors (sponsor_name, is_active) VALUES ('Kenvue', TRUE) ON CONFLICT (upper(trim(sponsor_name))) DO NOTHING;
-INSERT INTO sponsors (sponsor_name, is_active) VALUES ('L&T', TRUE) ON CONFLICT (upper(trim(sponsor_name))) DO NOTHING;
-INSERT INTO sponsors (sponsor_name, is_active) VALUES ('Lenovo', TRUE) ON CONFLICT (upper(trim(sponsor_name))) DO NOTHING;
-INSERT INTO sponsors (sponsor_name, is_active) VALUES ('Mira Tech', TRUE) ON CONFLICT (upper(trim(sponsor_name))) DO NOTHING;
-INSERT INTO sponsors (sponsor_name, is_active) VALUES ('Myntra', TRUE) ON CONFLICT (upper(trim(sponsor_name))) DO NOTHING;
-INSERT INTO sponsors (sponsor_name, is_active) VALUES ('PNB', TRUE) ON CONFLICT (upper(trim(sponsor_name))) DO NOTHING;
-INSERT INTO sponsors (sponsor_name, is_active) VALUES ('Rotary', TRUE) ON CONFLICT (upper(trim(sponsor_name))) DO NOTHING;
-INSERT INTO sponsors (sponsor_name, is_active) VALUES ('Rotary RCME', TRUE) ON CONFLICT (upper(trim(sponsor_name))) DO NOTHING;
-INSERT INTO sponsors (sponsor_name, is_active) VALUES ('SMFG', TRUE) ON CONFLICT (upper(trim(sponsor_name))) DO NOTHING;
-INSERT INTO sponsors (sponsor_name, is_active) VALUES ('SMFG Bangalore', TRUE) ON CONFLICT (upper(trim(sponsor_name))) DO NOTHING;
-INSERT INTO sponsors (sponsor_name, is_active) VALUES ('SMFG Chennai', TRUE) ON CONFLICT (upper(trim(sponsor_name))) DO NOTHING;
-INSERT INTO sponsors (sponsor_name, is_active) VALUES ('SMFG Hyderabad', TRUE) ON CONFLICT (upper(trim(sponsor_name))) DO NOTHING;
-INSERT INTO sponsors (sponsor_name, is_active) VALUES ('SUZLON', TRUE) ON CONFLICT (upper(trim(sponsor_name))) DO NOTHING;
-INSERT INTO sponsors (sponsor_name, is_active) VALUES ('Severn', TRUE) ON CONFLICT (upper(trim(sponsor_name))) DO NOTHING;
-INSERT INTO sponsors (sponsor_name, is_active) VALUES ('Tata Elxi', TRUE) ON CONFLICT (upper(trim(sponsor_name))) DO NOTHING;
-INSERT INTO sponsors (sponsor_name, is_active) VALUES ('Tata Elxsi', TRUE) ON CONFLICT (upper(trim(sponsor_name))) DO NOTHING;
-INSERT INTO sponsors (sponsor_name, is_active) VALUES ('Team Everest', TRUE) ON CONFLICT (upper(trim(sponsor_name))) DO NOTHING;
-INSERT INTO sponsors (sponsor_name, is_active) VALUES ('Temenos', TRUE) ON CONFLICT (upper(trim(sponsor_name))) DO NOTHING;
-INSERT INTO sponsors (sponsor_name, is_active) VALUES ('United Way', TRUE) ON CONFLICT (upper(trim(sponsor_name))) DO NOTHING;
-INSERT INTO sponsors (sponsor_name, is_active) VALUES ('Veolia', TRUE) ON CONFLICT (upper(trim(sponsor_name))) DO NOTHING;
-INSERT INTO sponsors (sponsor_name, is_active) VALUES ('Visit.Org', TRUE) ON CONFLICT (upper(trim(sponsor_name))) DO NOTHING;
-INSERT INTO sponsors (sponsor_name, is_active) VALUES ('Zura', TRUE) ON CONFLICT (upper(trim(sponsor_name))) DO NOTHING;
+INSERT INTO sponsors (sponsor_name, is_active) SELECT 'Acuity', TRUE WHERE NOT EXISTS (SELECT 1 FROM sponsors WHERE upper(trim(sponsor_name)) = upper(trim('Acuity')));
+INSERT INTO sponsors (sponsor_name, is_active) SELECT 'Apollo', TRUE WHERE NOT EXISTS (SELECT 1 FROM sponsors WHERE upper(trim(sponsor_name)) = upper(trim('Apollo')));
+INSERT INTO sponsors (sponsor_name, is_active) SELECT 'Athena Health', TRUE WHERE NOT EXISTS (SELECT 1 FROM sponsors WHERE upper(trim(sponsor_name)) = upper(trim('Athena Health')));
+INSERT INTO sponsors (sponsor_name, is_active) SELECT 'Balmer & lawrie', TRUE WHERE NOT EXISTS (SELECT 1 FROM sponsors WHERE upper(trim(sponsor_name)) = upper(trim('Balmer & lawrie')));
+INSERT INTO sponsors (sponsor_name, is_active) SELECT 'Barclays', TRUE WHERE NOT EXISTS (SELECT 1 FROM sponsors WHERE upper(trim(sponsor_name)) = upper(trim('Barclays')));
+INSERT INTO sponsors (sponsor_name, is_active) SELECT 'Bosch', TRUE WHERE NOT EXISTS (SELECT 1 FROM sponsors WHERE upper(trim(sponsor_name)) = upper(trim('Bosch')));
+INSERT INTO sponsors (sponsor_name, is_active) SELECT 'CGI', TRUE WHERE NOT EXISTS (SELECT 1 FROM sponsors WHERE upper(trim(sponsor_name)) = upper(trim('CGI')));
+INSERT INTO sponsors (sponsor_name, is_active) SELECT 'Children Forest #3', TRUE WHERE NOT EXISTS (SELECT 1 FROM sponsors WHERE upper(trim(sponsor_name)) = upper(trim('Children Forest #3')));
+INSERT INTO sponsors (sponsor_name, is_active) SELECT 'Children Forest #4', TRUE WHERE NOT EXISTS (SELECT 1 FROM sponsors WHERE upper(trim(sponsor_name)) = upper(trim('Children Forest #4')));
+INSERT INTO sponsors (sponsor_name, is_active) SELECT 'Children Forest #5', TRUE WHERE NOT EXISTS (SELECT 1 FROM sponsors WHERE upper(trim(sponsor_name)) = upper(trim('Children Forest #5')));
+INSERT INTO sponsors (sponsor_name, is_active) SELECT 'Children Forest #6', TRUE WHERE NOT EXISTS (SELECT 1 FROM sponsors WHERE upper(trim(sponsor_name)) = upper(trim('Children Forest #6')));
+INSERT INTO sponsors (sponsor_name, is_active) SELECT 'Concern India', TRUE WHERE NOT EXISTS (SELECT 1 FROM sponsors WHERE upper(trim(sponsor_name)) = upper(trim('Concern India')));
+INSERT INTO sponsors (sponsor_name, is_active) SELECT 'Connect for', TRUE WHERE NOT EXISTS (SELECT 1 FROM sponsors WHERE upper(trim(sponsor_name)) = upper(trim('Connect for')));
+INSERT INTO sponsors (sponsor_name, is_active) SELECT 'Coronis', TRUE WHERE NOT EXISTS (SELECT 1 FROM sponsors WHERE upper(trim(sponsor_name)) = upper(trim('Coronis')));
+INSERT INTO sponsors (sponsor_name, is_active) SELECT 'Decathlon', TRUE WHERE NOT EXISTS (SELECT 1 FROM sponsors WHERE upper(trim(sponsor_name)) = upper(trim('Decathlon')));
+INSERT INTO sponsors (sponsor_name, is_active) SELECT 'GBT', TRUE WHERE NOT EXISTS (SELECT 1 FROM sponsors WHERE upper(trim(sponsor_name)) = upper(trim('GBT')));
+INSERT INTO sponsors (sponsor_name, is_active) SELECT 'GenPact', TRUE WHERE NOT EXISTS (SELECT 1 FROM sponsors WHERE upper(trim(sponsor_name)) = upper(trim('GenPact')));
+INSERT INTO sponsors (sponsor_name, is_active) SELECT 'HDFC', TRUE WHERE NOT EXISTS (SELECT 1 FROM sponsors WHERE upper(trim(sponsor_name)) = upper(trim('HDFC')));
+INSERT INTO sponsors (sponsor_name, is_active) SELECT 'HDFC Bank Ltd - Chennai', TRUE WHERE NOT EXISTS (SELECT 1 FROM sponsors WHERE upper(trim(sponsor_name)) = upper(trim('HDFC Bank Ltd - Chennai')));
+INSERT INTO sponsors (sponsor_name, is_active) SELECT 'HDFC Bank Ltd - Kovai', TRUE WHERE NOT EXISTS (SELECT 1 FROM sponsors WHERE upper(trim(sponsor_name)) = upper(trim('HDFC Bank Ltd - Kovai')));
+INSERT INTO sponsors (sponsor_name, is_active) SELECT 'HDFC Bank Ltd - Madurai', TRUE WHERE NOT EXISTS (SELECT 1 FROM sponsors WHERE upper(trim(sponsor_name)) = upper(trim('HDFC Bank Ltd - Madurai')));
+INSERT INTO sponsors (sponsor_name, is_active) SELECT 'HSBC', TRUE WHERE NOT EXISTS (SELECT 1 FROM sponsors WHERE upper(trim(sponsor_name)) = upper(trim('HSBC')));
+INSERT INTO sponsors (sponsor_name, is_active) SELECT 'Honda', TRUE WHERE NOT EXISTS (SELECT 1 FROM sponsors WHERE upper(trim(sponsor_name)) = upper(trim('Honda')));
+INSERT INTO sponsors (sponsor_name, is_active) SELECT 'Honeywell', TRUE WHERE NOT EXISTS (SELECT 1 FROM sponsors WHERE upper(trim(sponsor_name)) = upper(trim('Honeywell')));
+INSERT INTO sponsors (sponsor_name, is_active) SELECT 'IDFC - Madurai', TRUE WHERE NOT EXISTS (SELECT 1 FROM sponsors WHERE upper(trim(sponsor_name)) = upper(trim('IDFC - Madurai')));
+INSERT INTO sponsors (sponsor_name, is_active) SELECT 'Inchcape', TRUE WHERE NOT EXISTS (SELECT 1 FROM sponsors WHERE upper(trim(sponsor_name)) = upper(trim('Inchcape')));
+INSERT INTO sponsors (sponsor_name, is_active) SELECT 'Infosys', TRUE WHERE NOT EXISTS (SELECT 1 FROM sponsors WHERE upper(trim(sponsor_name)) = upper(trim('Infosys')));
+INSERT INTO sponsors (sponsor_name, is_active) SELECT 'JPMC - Bangalore', TRUE WHERE NOT EXISTS (SELECT 1 FROM sponsors WHERE upper(trim(sponsor_name)) = upper(trim('JPMC - Bangalore')));
+INSERT INTO sponsors (sponsor_name, is_active) SELECT 'KVB', TRUE WHERE NOT EXISTS (SELECT 1 FROM sponsors WHERE upper(trim(sponsor_name)) = upper(trim('KVB')));
+INSERT INTO sponsors (sponsor_name, is_active) SELECT 'Kaleesuwari', TRUE WHERE NOT EXISTS (SELECT 1 FROM sponsors WHERE upper(trim(sponsor_name)) = upper(trim('Kaleesuwari')));
+INSERT INTO sponsors (sponsor_name, is_active) SELECT 'Kenvue', TRUE WHERE NOT EXISTS (SELECT 1 FROM sponsors WHERE upper(trim(sponsor_name)) = upper(trim('Kenvue')));
+INSERT INTO sponsors (sponsor_name, is_active) SELECT 'L&T', TRUE WHERE NOT EXISTS (SELECT 1 FROM sponsors WHERE upper(trim(sponsor_name)) = upper(trim('L&T')));
+INSERT INTO sponsors (sponsor_name, is_active) SELECT 'Lenovo', TRUE WHERE NOT EXISTS (SELECT 1 FROM sponsors WHERE upper(trim(sponsor_name)) = upper(trim('Lenovo')));
+INSERT INTO sponsors (sponsor_name, is_active) SELECT 'Mira Tech', TRUE WHERE NOT EXISTS (SELECT 1 FROM sponsors WHERE upper(trim(sponsor_name)) = upper(trim('Mira Tech')));
+INSERT INTO sponsors (sponsor_name, is_active) SELECT 'Myntra', TRUE WHERE NOT EXISTS (SELECT 1 FROM sponsors WHERE upper(trim(sponsor_name)) = upper(trim('Myntra')));
+INSERT INTO sponsors (sponsor_name, is_active) SELECT 'PNB', TRUE WHERE NOT EXISTS (SELECT 1 FROM sponsors WHERE upper(trim(sponsor_name)) = upper(trim('PNB')));
+INSERT INTO sponsors (sponsor_name, is_active) SELECT 'Rotary', TRUE WHERE NOT EXISTS (SELECT 1 FROM sponsors WHERE upper(trim(sponsor_name)) = upper(trim('Rotary')));
+INSERT INTO sponsors (sponsor_name, is_active) SELECT 'Rotary RCME', TRUE WHERE NOT EXISTS (SELECT 1 FROM sponsors WHERE upper(trim(sponsor_name)) = upper(trim('Rotary RCME')));
+INSERT INTO sponsors (sponsor_name, is_active) SELECT 'SMFG', TRUE WHERE NOT EXISTS (SELECT 1 FROM sponsors WHERE upper(trim(sponsor_name)) = upper(trim('SMFG')));
+INSERT INTO sponsors (sponsor_name, is_active) SELECT 'SMFG Bangalore', TRUE WHERE NOT EXISTS (SELECT 1 FROM sponsors WHERE upper(trim(sponsor_name)) = upper(trim('SMFG Bangalore')));
+INSERT INTO sponsors (sponsor_name, is_active) SELECT 'SMFG Chennai', TRUE WHERE NOT EXISTS (SELECT 1 FROM sponsors WHERE upper(trim(sponsor_name)) = upper(trim('SMFG Chennai')));
+INSERT INTO sponsors (sponsor_name, is_active) SELECT 'SMFG Hyderabad', TRUE WHERE NOT EXISTS (SELECT 1 FROM sponsors WHERE upper(trim(sponsor_name)) = upper(trim('SMFG Hyderabad')));
+INSERT INTO sponsors (sponsor_name, is_active) SELECT 'SUZLON', TRUE WHERE NOT EXISTS (SELECT 1 FROM sponsors WHERE upper(trim(sponsor_name)) = upper(trim('SUZLON')));
+INSERT INTO sponsors (sponsor_name, is_active) SELECT 'Severn', TRUE WHERE NOT EXISTS (SELECT 1 FROM sponsors WHERE upper(trim(sponsor_name)) = upper(trim('Severn')));
+INSERT INTO sponsors (sponsor_name, is_active) SELECT 'Tata Elxi', TRUE WHERE NOT EXISTS (SELECT 1 FROM sponsors WHERE upper(trim(sponsor_name)) = upper(trim('Tata Elxi')));
+INSERT INTO sponsors (sponsor_name, is_active) SELECT 'Tata Elxsi', TRUE WHERE NOT EXISTS (SELECT 1 FROM sponsors WHERE upper(trim(sponsor_name)) = upper(trim('Tata Elxsi')));
+INSERT INTO sponsors (sponsor_name, is_active) SELECT 'Team Everest', TRUE WHERE NOT EXISTS (SELECT 1 FROM sponsors WHERE upper(trim(sponsor_name)) = upper(trim('Team Everest')));
+INSERT INTO sponsors (sponsor_name, is_active) SELECT 'Temenos', TRUE WHERE NOT EXISTS (SELECT 1 FROM sponsors WHERE upper(trim(sponsor_name)) = upper(trim('Temenos')));
+INSERT INTO sponsors (sponsor_name, is_active) SELECT 'United Way', TRUE WHERE NOT EXISTS (SELECT 1 FROM sponsors WHERE upper(trim(sponsor_name)) = upper(trim('United Way')));
+INSERT INTO sponsors (sponsor_name, is_active) SELECT 'Veolia', TRUE WHERE NOT EXISTS (SELECT 1 FROM sponsors WHERE upper(trim(sponsor_name)) = upper(trim('Veolia')));
+INSERT INTO sponsors (sponsor_name, is_active) SELECT 'Visit.Org', TRUE WHERE NOT EXISTS (SELECT 1 FROM sponsors WHERE upper(trim(sponsor_name)) = upper(trim('Visit.Org')));
+INSERT INTO sponsors (sponsor_name, is_active) SELECT 'Zura', TRUE WHERE NOT EXISTS (SELECT 1 FROM sponsors WHERE upper(trim(sponsor_name)) = upper(trim('Zura')));
 
 -- ============================================================
 -- FORESTS (107 active sites)
