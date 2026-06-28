@@ -17,7 +17,7 @@
  */
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { SectionShell, FieldGrid, Num, type SectionProps } from '../kit';
+import { SectionShell, FieldGrid, Num, Img, type SectionProps } from '../kit';
 import { fetchForestWeather, type ForestWeather } from '../../forestApi';
 
 type Row = Record<string, unknown> & { year?: number; quarter?: number };
@@ -76,6 +76,24 @@ export function QuarterlyAutoSection({ draft, patch, onQuarterChange }: SectionP
       soil_ph_level: upsertRow(draft.soil_ph_level, year, quarter, (r) => ({ ...r, meter_reading: v })),
     } as Partial<typeof draft>);
   };
+
+  // Per-quarter photos (same slots as the PFA app). Each uploads to storage AND
+  // writes the URL into the draft's (year,quarter) row so it autosaves + the
+  // report reads it. Mirrors the PFA "This quarter" page inside the editor.
+  const progressRow = findRow(draft.plantation_progress, year, quarter);
+  const galleryRow = findRow(draft.gallery_images, year, quarter);
+  const insideImg = (tempRow?.inside_plantation as { image?: string })?.image;
+  const outsideImg = (tempRow?.outside_plantation as { image?: string })?.image;
+
+  const setQuarterImg = (col: 'soil_ph_level' | 'plantation_progress' | 'gallery_images', key: string, v: string) =>
+    patch({ [col]: upsertRow(draft[col], year, quarter, (r) => ({ ...r, [key]: v })) } as Partial<typeof draft>);
+  const setSideImg = (side: 'inside_plantation' | 'outside_plantation', v: string) =>
+    patch({
+      temperature_humidity: upsertRow(draft.temperature_humidity, year, quarter, (r) => ({
+        ...r,
+        [side]: { ...(r[side] as object), image: v },
+      })),
+    } as Partial<typeof draft>);
 
   const autoFillWeather = async () => {
     setBusy(true);
@@ -163,6 +181,19 @@ export function QuarterlyAutoSection({ draft, patch, onQuarterChange }: SectionP
           <Num label="Inside-plantation temperature (°C)" value={inside.temperature ?? undefined} onChange={(v) => setInside('temperature', v)} min={-20} max={60} />
           <Num label="Inside-plantation humidity (%)" value={inside.humidity ?? undefined} onChange={(v) => setInside('humidity', v)} min={0} max={100} />
           <Num label="Soil pH meter reading" value={(phRow?.meter_reading as number) ?? undefined} onChange={setPh} min={0} max={14} helperText="Leave blank if not measured (0 is not a valid pH)." />
+        </FieldGrid>
+      </SectionShell>
+
+      <SectionShell
+        title={`Quarter photos · Q${quarter} ${year}`}
+        desc="Add this quarter's site photos right here (same options as the PFA field app). Each is uploaded and saved to the selected year/quarter."
+      >
+        <FieldGrid cols={2}>
+          <Img label="Soil pH meter photo" value={phRow?.meter_image as string | undefined} onChange={(v) => setQuarterImg('soil_ph_level', 'meter_image', v)} forestId={id} slot="soil_meter" year={year} quarter={quarter} />
+          <Img label="Plantation progress photo" value={progressRow?.image as string | undefined} onChange={(v) => setQuarterImg('plantation_progress', 'image', v)} forestId={id} slot="progress" year={year} quarter={quarter} />
+          <Img label="Inside-plantation photo" value={insideImg} onChange={(v) => setSideImg('inside_plantation', v)} forestId={id} slot="temp_inside" year={year} quarter={quarter} />
+          <Img label="Outside-plantation photo" value={outsideImg} onChange={(v) => setSideImg('outside_plantation', v)} forestId={id} slot="temp_outside" year={year} quarter={quarter} />
+          <Img label="Gallery photo" value={galleryRow?.image as string | undefined} onChange={(v) => setQuarterImg('gallery_images', 'image', v)} forestId={id} slot="gallery" year={year} quarter={quarter} />
         </FieldGrid>
       </SectionShell>
     </>
