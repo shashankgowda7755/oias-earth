@@ -3330,11 +3330,39 @@ async function uploadReportImage(req: Request, res: Response): Promise<void> {
   res.json({ data: { ok: true, url, slot, index } });
 }
 
+// ---- Esri Wayback: historical satellite imagery (free, no key) ----
+interface WaybackRelease { num: string; date: string; url: string }
+let _waybackCache: { at: number; rels: WaybackRelease[] } | null = null;
+async function loadWayback(): Promise<WaybackRelease[]> {
+  if (_waybackCache && Date.now() - _waybackCache.at < 6 * 3600_000) return _waybackCache.rels;
+  const resp = await fetch('https://s3-us-west-2.amazonaws.com/config.maptiles.arcgis.com/waybackconfig.json', { signal: AbortSignal.timeout(8000) });
+  const cfg = (await resp.json()) as Record<string, { itemTitle?: string; itemURL?: string }>;
+  const rels: WaybackRelease[] = Object.entries(cfg)
+    .map(([num, v]) => ({ num, date: (v.itemTitle?.match(/(\d{4}-\d{2}-\d{2})/) ?? [])[1] ?? '', url: v.itemURL ?? '' }))
+    .filter((r) => r.date && r.url);
+  _waybackCache = { at: Date.now(), rels };
+  return rels;
+}
+function lonLatToTile(lat: number, lon: number, z: number): { x: number; y: number } {
+  const n = 2 ** z;
+  const x = Math.floor(((lon + 180) / 360) * n);
+  const r = (lat * Math.PI) / 180;
+  const y = Math.floor(((1 - Math.asinh(Math.tan(r)) / Math.PI) / 2) * n);
+  return { x, y };
+}
+// A blank/no-data/black satellite tile is tiny; real aerial imagery is high-entropy
+// and far larger. This gate keeps black frames out of the report.
+const SAT_MIN_BYTES = 4096;
+
 /**
- * POST /forest/:id/satellite-fetch { index?, year? } — auto-pull a CURRENT
- * satellite image for the forest's lat/long from Esri World Imagery (free, no
- * key) and store it into google_earth_image[index] (default 0) with the given
- * year (default current). Feeds slide 5's "Timeline of urban change".
+ * POST /forest/:id/satellite-fetch { index?, year? } — auto-pull a satellite
+ * image for the forest's lat/long into google_earth_image[index].
+ *
+ * Source = Esri Wayback (free, no key): walks the releases NEAREST the requested
+ * year and takes the first tile that actually has imagery (size gate), so blank/
+ * black tiles are never stored. Falls back to current Esri export, then 404 (the
+ * report then shows a grey placeholder — never a black box). Returns the ACTUAL
+ * imagery year used.
  */
 async function fetchSatellite(req: Request, res: Response): Promise<void> {
   const id = String(req.params.id);
@@ -3352,22 +3380,57 @@ async function fetchSatellite(req: Request, res: Response): Promise<void> {
   const idxRaw = Number((req.body as { index?: unknown })?.index);
   const index = Number.isInteger(idxRaw) && idxRaw >= 0 ? idxRaw : 0;
   const yearRaw = Number((req.body as { year?: unknown })?.year);
-  const year = Number.isInteger(yearRaw) ? yearRaw : new Date().getFullYear();
-  const d = 0.012; // ~1.3 km half-box around the point
-  const exportUrl = `https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/export?bbox=${lng - d},${lat - d},${lng + d},${lat + d}&bboxSR=4326&imageSR=3857&size=900,675&format=jpg&f=image`;
-  let buf: Buffer;
+  const targetYear = Number.isInteger(yearRaw) ? yearRaw : new Date().getFullYear();
+  const z = 15;
+
+  let url: string | null = null;
+  let usedYear = targetYear;
+
+  // 1. Wayback — nearest year with REAL imagery (validated).
   try {
-    const resp = await fetch(exportUrl);
-    if (!resp.ok) { res.status(502).json({ error: true, message: `Satellite source returned ${resp.status}` }); return; }
-    buf = Buffer.from(await resp.arrayBuffer());
-  } catch {
-    res.status(502).json({ error: true, message: 'Could not reach the satellite imagery service.' });
+    const rels = await loadWayback();
+    const ordered = [...rels].sort(
+      (a, b) => Math.abs(Number(a.date.slice(0, 4)) - targetYear) - Math.abs(Number(b.date.slice(0, 4)) - targetYear),
+    );
+    const { x, y } = lonLatToTile(lat, lng, z);
+    for (const rel of ordered.slice(0, 10)) {
+      const tileUrl = rel.url.replace('{level}', String(z)).replace('{row}', String(y)).replace('{col}', String(x));
+      try {
+        const tr = await fetch(tileUrl, { signal: AbortSignal.timeout(8000) });
+        if (!tr.ok) continue;
+        const buf = Buffer.from(await tr.arrayBuffer());
+        if (buf.length < SAT_MIN_BYTES) continue; // blank/black tile — skip
+        const key = `forests/${id}/satellite-${Date.now()}.jpg`;
+        url = await putObject(key, buf, tr.headers.get('content-type') || 'image/jpeg');
+        usedYear = Number(rel.date.slice(0, 4));
+        break;
+      } catch { /* try next release */ }
+    }
+  } catch { /* fall through to Esri export */ }
+
+  // 2. Fallback — current Esri export (bbox), reliable for land.
+  if (!url) {
+    const d = 0.012;
+    const exportUrl = `https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/export?bbox=${lng - d},${lat - d},${lng + d},${lat + d}&bboxSR=4326&imageSR=3857&size=900,675&format=jpg&f=image`;
+    try {
+      const resp = await fetch(exportUrl, { signal: AbortSignal.timeout(8000) });
+      if (resp.ok) {
+        const buf = Buffer.from(await resp.arrayBuffer());
+        if (buf.length >= SAT_MIN_BYTES) {
+          const key = `forests/${id}/satellite-${Date.now()}.jpg`;
+          url = await putObject(key, buf, 'image/jpeg');
+          usedYear = new Date().getFullYear();
+        }
+      }
+    } catch { /* ignore */ }
+  }
+
+  if (!url) {
+    res.status(404).json({ error: true, message: 'No clear satellite imagery for this location/year — try another year or upload manually.' });
     return;
   }
-  const key = `forests/${id}/satellite-${Date.now()}.jpg`;
-  const url = await putObject(key, buf, 'image/jpeg');
-  await applyImageSlot(id, 'earth', url, year, undefined, index);
-  res.json({ data: { ok: true, url, index, year } });
+  await applyImageSlot(id, 'earth', url, usedYear, undefined, index);
+  res.json({ data: { ok: true, url, index, year: usedYear } });
 }
 
 /* ------------------------------------------------------------------ */

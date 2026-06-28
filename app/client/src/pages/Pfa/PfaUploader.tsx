@@ -310,6 +310,22 @@ export default function PfaUploader() {
     } catch (e) { toast.error(e instanceof Error ? e.message : 'Fetch failed — set the forest map location first.'); }
     finally { setAerialBusy(null); }
   };
+  // Fill all 3 slots with a satellite timeline (oldest → now). Each year the
+  // server returns the nearest year with real imagery, so no blank/black frames.
+  const autoTimeline = async () => {
+    if (!forestId) { toast.error('Pick a forest first.'); return; }
+    const now = new Date().getFullYear();
+    const targets = [now - 8, now - 4, now]; // slot 0 = oldest, slot 2 = now
+    try {
+      for (let i = 0; i < 3; i++) {
+        setAerialBusy(i);
+        const r = await satelliteFetch(forestId, i, targets[i]);
+        setEarth((e) => e.map((c, j) => (j === i ? { url: r.url, year: String(r.year) } : c)));
+      }
+      toast.success('Satellite timeline fetched.');
+    } catch (e) { toast.error(e instanceof Error ? e.message : 'Timeline fetch failed — set the map location first.'); }
+    finally { setAerialBusy(null); }
+  };
 
   // logos
   const patchLogo = (i: number, p: Partial<LogoRow>) => setLogos((ls) => ls.map((r, j) => (j === i ? { ...r, ...p } : r)));
@@ -454,10 +470,15 @@ export default function PfaUploader() {
                   <span className="text-sm font-semibold">Satellite imagery</span>
                   <span className="text-[11px] text-textSecondary">slide 5 · up to 3</span>
                 </div>
-                <p className="mb-3 text-xs text-textSecondary">Timeline of urban change. Auto-fetch the current view; add older years from Google Earth. Type the year, then add the image.</p>
-                <button type="button" onClick={autoSat} disabled={aerialBusy !== null} className="mb-3 flex w-full items-center justify-center gap-2 rounded-button border border-primary/60 py-2.5 text-sm font-semibold text-primary disabled:opacity-50">
-                  <i className={`ti ${aerialBusy === 0 ? 'ti-loader-2' : 'ti-satellite'}`} aria-hidden="true" /> Auto-fetch current
-                </button>
+                <p className="mb-3 text-xs text-textSecondary">Timeline of urban change. Auto-fetch real satellite imagery (no key) — blank/black frames are skipped automatically. Or add your own; type the year first.</p>
+                <div className="mb-3 flex gap-2">
+                  <button type="button" onClick={autoTimeline} disabled={aerialBusy !== null} className="flex flex-1 items-center justify-center gap-2 rounded-button bg-primary py-2.5 text-sm font-semibold text-black disabled:opacity-50">
+                    <i className={`ti ${aerialBusy !== null ? 'ti-loader-2' : 'ti-timeline'}`} aria-hidden="true" /> Auto-fetch timeline
+                  </button>
+                  <button type="button" onClick={autoSat} disabled={aerialBusy !== null} className="flex items-center justify-center gap-2 rounded-button border border-primary/60 px-3 py-2.5 text-sm font-semibold text-primary disabled:opacity-50">
+                    <i className="ti ti-satellite" aria-hidden="true" /> Current
+                  </button>
+                </div>
                 <div className="space-y-2">
                   {earth.map((c, i) => (
                     <div key={i} className="flex items-center gap-2">
