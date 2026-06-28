@@ -139,6 +139,8 @@ const FOREST_SCALAR_COLUMNS = [
   'forest_contact_email',
   'is_updated',
   'is_active',
+  'client_code',
+  'forest_code',
 ];
 
 /** jsonb forest columns (JSON.stringify'd before binding). */

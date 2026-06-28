@@ -60,9 +60,7 @@ function validateBasic(f: ForestFormState): FieldErrors {
   if (isBlank(f.forest_geo_long)) e.forest_geo_long = REQUIRED;
   else if (!validLong(f.forest_geo_long)) e.forest_geo_long = 'Longitude must be between -180 and 180.';
 
-  if (isBlank(f.site_manager_id)) e.site_manager_id = REQUIRED;
-  if (f.sponsor_ids.length === 0) e.sponsor_ids = 'Select at least one sponsor.';
-  if (isBlank(f.user_id)) e.user_id = REQUIRED;
+  // site_manager_id and user_id are optional (server accepts without them)
   return e;
 }
 
