@@ -16,6 +16,7 @@ import { uploadReportImage } from '../forestApi';
 export interface SectionProps {
   draft: FullForestPayload;
   patch: (p: Partial<FullForestPayload>) => void;
+  onQuarterChange?: (q: number) => void;
 }
 
 /** Titled card wrapper for a group of fields. */

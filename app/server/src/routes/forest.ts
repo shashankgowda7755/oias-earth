@@ -2525,6 +2525,93 @@ async function forestWeather(req: Request, res: Response): Promise<void> {
 }
 
 /* ------------------------------------------------------------------ */
+/* City stats auto-fill (Wikipedia / Wikidata) — populates slide 5    */
+/* ------------------------------------------------------------------ */
+
+/**
+ * GET /forest/city-stats?city=Chennai&state=Tamil+Nadu&country=India
+ * Returns area, population, density from Wikidata and a description
+ * extract from Wikipedia REST API so the Area & Population section
+ * can be pre-filled without manual lookup.
+ */
+async function cityStats(req: Request, res: Response): Promise<void> {
+  const { city, state, country = 'India' } = req.query as Record<string, string>;
+  if (!city?.trim()) { res.status(400).json({ error: 'city is required' }); return; }
+
+  const terms = [city.trim(), state?.trim(), country?.trim()].filter(Boolean);
+  const encoded = encodeURIComponent(terms.join(' '));
+
+  // 1. Wikipedia search → page title
+  const searchResp = await fetch(
+    `https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encoded}&format=json&origin=*&srlimit=3`,
+    { signal: AbortSignal.timeout(8000) },
+  );
+  if (!searchResp.ok) { res.status(502).json({ error: 'Wikipedia search failed' }); return; }
+  const searchJson = (await searchResp.json()) as any;
+  const pageTitle = searchJson?.query?.search?.[0]?.title as string | undefined;
+  if (!pageTitle) { res.json({ error: 'City not found on Wikipedia' }); return; }
+
+  // 2. Wikidata → structured numeric fields
+  const wdResp = await fetch(
+    `https://www.wikidata.org/w/api.php?action=wbgetentities&sites=enwiki&titles=${encodeURIComponent(pageTitle)}&props=claims&format=json`,
+    { signal: AbortSignal.timeout(8000) },
+  );
+  const wdJson = (await wdResp.json()) as any;
+  const entity: any = Object.values(wdJson?.entities ?? {})[0];
+
+  const pickClaim = (prop: string): any => {
+    const claims: any[] = entity?.claims?.[prop] ?? [];
+    return (claims.find((c) => c.rank === 'preferred') ?? claims[0])?.mainsnak?.datavalue?.value;
+  };
+  const numFromAmount = (v: any): number | null => {
+    const n = parseFloat(v?.amount ?? '');
+    return Number.isFinite(n) ? Math.abs(n) : null;
+  };
+
+  const population = numFromAmount(pickClaim('P1082'));
+  const area_km2 = numFromAmount(pickClaim('P2046'));
+  const density =
+    numFromAmount(pickClaim('P1539')) ??
+    (population && area_km2 ? Math.round(population / area_km2) : null);
+
+  // 3. Wikipedia REST summary → description + extract hint
+  const summaryResp = await fetch(
+    `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(pageTitle)}`,
+    { signal: AbortSignal.timeout(8000) },
+  );
+  const summary = (await summaryResp.json()) as any;
+  const extractText: string = (summary?.extract as string | undefined) ?? '';
+
+  // 4. Climate detection from Wikipedia extract
+  const extractLower = extractText.toLowerCase();
+  let climate: string | null = null;
+  if (extractLower.includes('tropical wet and dry')) climate = 'Tropical wet and dry';
+  else if (extractLower.includes('humid subtropical')) climate = 'Humid subtropical';
+  else if (extractLower.includes('semi-arid') || extractLower.includes('semi arid')) climate = 'Semi-arid';
+  else if (extractLower.includes('tropical savanna')) climate = 'Tropical savanna';
+  else if (extractLower.includes('hot desert')) climate = 'Hot desert';
+
+  // 5. Soil type detection from Wikipedia extract
+  let soil_type: string | null = null;
+  if (extractLower.includes('alluvial')) soil_type = 'Alluvial soil';
+  else if (extractLower.includes('black soil') || extractLower.includes('black cotton')) soil_type = 'Black soil';
+  else if (extractLower.includes('red soil') || extractLower.includes('laterite')) soil_type = 'Red soil';
+  else if (extractLower.includes('loamy')) soil_type = 'Loamy soil';
+  else if (extractLower.includes('sandy')) soil_type = 'Sandy soil';
+
+  res.json({
+    region_name: pageTitle,
+    total_jurisdiction_area: area_km2 != null ? Math.round(area_km2 * 10) / 10 : null,
+    population: population != null ? Math.round(population) : null,
+    population_density: density != null ? Math.round(density) : null,
+    description: summary?.description ?? null,
+    extract: extractText.slice(0, 600) || null,
+    climate,
+    soil_type,
+  });
+}
+
+/* ------------------------------------------------------------------ */
 /* Send a report to the sponsor via Composio Gmail                     */
 /* ------------------------------------------------------------------ */
 
@@ -3139,6 +3226,7 @@ forestRouter.delete('/email-templates/:key', wrap(resetEmailTemplate));
 forestRouter.get('/report/:id/recipient', wrap(reportRecipient));
 forestRouter.post('/report/:id/send', wrap(sendReportEmail));
 forestRouter.post('/forest/:id/send-report', photoUpload.single('pdf'), wrap(sendForestReport));
+forestRouter.get('/forest/city-stats', wrap(cityStats));
 forestRouter.get('/forest/:id/weather', wrap(forestWeather));
 forestRouter.post('/forest/:id/report-data', wrap(updateForestReportData));
 forestRouter.post('/forest/:id/report-data/list-item', wrap(listItemReportData));
