@@ -14,6 +14,27 @@ import { SLIDES, SLIDE_TITLES } from './slides';
 import type { ForestReportData } from './reportTypes';
 import { fetchForestReport } from '@/lib/publicApi';
 
+/** Warn (never block) if required report content is missing before download/send. */
+function getCompletenessWarnings(
+  data: ForestReportData | null,
+  year: number | undefined,
+  quarter: number | undefined,
+): string[] {
+  if (!data) return [];
+  const w: string[] = [];
+  if (!data.forest.report_images?.find((r) => r.slide_type === 'first_slide')?.image)
+    w.push('Cover slide hero image');
+  if (!data.meta.client_logo)
+    w.push('Client/sponsor logo (Sponsored By slide)');
+  if (year != null && quarter != null) {
+    if (!data.forest.plantation_progress?.find((r) => r.year === year && r.quarter === quarter)?.image)
+      w.push(`Q${quarter} plantation progress photo`);
+    if (!data.forest.gallery_images?.find((r) => r.year === year && r.quarter === quarter)?.image)
+      w.push(`Q${quarter} gallery photo`);
+  }
+  return w;
+}
+
 export default function ReportForestQuarterly() {
   const { id = '' } = useParams();
   const [sp] = useSearchParams();
@@ -32,6 +53,11 @@ export default function ReportForestQuarterly() {
 
   const sendFromViewer = async () => {
     if (id === 'preview' || sendMsg) return;
+    const warns = getCompletenessWarnings(data, year, quarter);
+    if (warns.length > 0) {
+      const ok = window.confirm(`Some content is missing before sending:\n• ${warns.join('\n• ')}\n\nSend anyway?`);
+      if (!ok) return;
+    }
     try {
       // Render the report to a PDF in the browser, then send it as a real
       // attachment (the server can't regenerate it) alongside the live link.
@@ -78,10 +104,7 @@ export default function ReportForestQuarterly() {
         ? `${data.forest.forest_name} ${data.meta.quarter_label} ${data.meta.year} Report.pdf`.replace(/[\\/:*?"<>|]+/g, '-')
         : 'Forest Report.pdf';
       // skipped slides are not in the DOM when !manageMode, so html2canvas naturally skips them
-      // Warn if critical images missing
-      const warnings: string[] = [];
-      if (!data?.forest.report_images?.find((r) => r.slide_type === 'first_slide')?.image) warnings.push('Cover slide hero image');
-      if (!data?.meta.client_logo) warnings.push('Client/Sponsor logo (Sponsored By)');
+      const warnings = getCompletenessWarnings(data, year, quarter);
       if (warnings.length > 0) {
         const ok = window.confirm(`Missing content:\n• ${warnings.join('\n• ')}\n\nDownload anyway?`);
         if (!ok) return;
