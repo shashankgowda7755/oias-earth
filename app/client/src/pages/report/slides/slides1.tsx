@@ -67,12 +67,11 @@ export function S01Cover({ data }: SlideProps) {
       ? sponsors.map((s) => ({ caption: s.type?.label || 'Sponsored by', name: s.name, logo: s.logo }))
       : [{ caption: 'Sponsored by', name: meta.client_name ?? undefined, logo: meta.client_logo ?? undefined }]),
   ];
-  // Forest name + description render at the SAME size; auto-fit to whichever is
-  // longer so both stay large yet neither overflows the cover.
-  const longest = (forest.forest_name ?? '').length >= (forest.forest_desc ?? '').length
-    ? forest.forest_name
-    : forest.forest_desc;
-  const titleSize = fitHeadline(longest);
+  // Forest name is the bigger title (100%); description sits at ~70% of it.
+  // Both auto-fit to their own length, and the description is capped at 70% of
+  // the name so it never reads bigger and never overflows the cover.
+  const nameSize = fitHeadline(forest.forest_name);
+  const descSize = Math.round(Math.min(nameSize, fitHeadline(forest.forest_desc)) * 0.7);
   return (
     <SlidePage meta={meta} bare>
       <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 22 }}>
@@ -83,11 +82,11 @@ export function S01Cover({ data }: SlideProps) {
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 36, flex: 1 }}>
         <div style={{ display: 'flex', flexDirection: 'column' }}>
-          {/* Forest name (dark) + description (green) at the SAME size. No
-              client/sponsor name on the cover — sponsor shows only in the card below. */}
-          <div style={{ fontSize: titleSize, lineHeight: 1.08, fontWeight: 800, color: C.ink, maxWidth: 540 }}>{dash(forest.forest_name)}</div>
+          {/* Forest name (dark) is the bigger title; description (green) ~70%.
+              No client/sponsor name on the cover — sponsor only in the card below. */}
+          <div style={{ fontSize: nameSize, lineHeight: 1.08, fontWeight: 800, color: C.ink, maxWidth: 540 }}>{dash(forest.forest_name)}</div>
           {forest.forest_desc ? (
-            <h1 style={{ fontSize: titleSize, lineHeight: 1.08, fontWeight: 800, color: C.green, margin: '4px 0 0', maxWidth: 540 }}>{forest.forest_desc}</h1>
+            <h1 style={{ fontSize: descSize, lineHeight: 1.12, fontWeight: 800, color: C.green, margin: '6px 0 0', maxWidth: 540 }}>{forest.forest_desc}</h1>
           ) : null}
 
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginTop: 22 }}>
