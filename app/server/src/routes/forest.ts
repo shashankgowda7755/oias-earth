@@ -2538,41 +2538,63 @@ async function cityStats(req: Request, res: Response): Promise<void> {
   const { city, state, country = 'India' } = req.query as Record<string, string>;
   if (!city?.trim()) { res.status(400).json({ error: 'city is required' }); return; }
 
-  const terms = [city.trim(), state?.trim(), country?.trim()].filter(Boolean);
-  const encoded = encodeURIComponent(terms.join(' '));
-
-  // 1. Wikipedia search → page title
-  const searchResp = await fetch(
-    `https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encoded}&format=json&origin=*&srlimit=3`,
-    { signal: AbortSignal.timeout(8000) },
-  );
-  if (!searchResp.ok) { res.status(502).json({ error: 'Wikipedia search failed' }); return; }
-  const searchJson = (await searchResp.json()) as any;
-  const pageTitle = searchJson?.query?.search?.[0]?.title as string | undefined;
-  if (!pageTitle) { res.json({ error: 'City not found on Wikipedia' }); return; }
-
-  // 2. Wikidata → structured numeric fields
-  const wdResp = await fetch(
-    `https://www.wikidata.org/w/api.php?action=wbgetentities&sites=enwiki&titles=${encodeURIComponent(pageTitle)}&props=claims&format=json`,
-    { signal: AbortSignal.timeout(8000) },
-  );
-  const wdJson = (await wdResp.json()) as any;
-  const entity: any = Object.values(wdJson?.entities ?? {})[0];
-
-  const pickClaim = (prop: string): any => {
-    const claims: any[] = entity?.claims?.[prop] ?? [];
-    return (claims.find((c) => c.rank === 'preferred') ?? claims[0])?.mainsnak?.datavalue?.value;
-  };
   const numFromAmount = (v: any): number | null => {
     const n = parseFloat(v?.amount ?? '');
     return Number.isFinite(n) ? Math.abs(n) : null;
   };
 
-  const population = numFromAmount(pickClaim('P1082'));
+  // 1. Find the city as a WIKIDATA ENTITY (structured), not a Wikipedia text
+  //    search — the old text search matched unrelated pages (e.g. "… elections").
+  const searchTerm = encodeURIComponent([city.trim(), state?.trim()].filter(Boolean).join(' '));
+  const searchResp = await fetch(
+    `https://www.wikidata.org/w/api.php?action=wbsearchentities&search=${searchTerm}&language=en&type=item&limit=10&format=json&origin=*`,
+    { signal: AbortSignal.timeout(8000) },
+  );
+  if (!searchResp.ok) { res.status(502).json({ error: 'Wikidata search failed' }); return; }
+  const searchJson = (await searchResp.json()) as any;
+  const candidateIds: string[] = (searchJson?.search ?? []).map((s: any) => s.id).filter(Boolean).slice(0, 10);
+  if (candidateIds.length === 0) { res.json({ error: 'City not found', region_name: city.trim() }); return; }
+
+  // 2. Pull claims/labels/sitelinks; pick the candidate that is a settlement
+  //    (P31 ∈ settlement types) AND has a population (P1082).
+  const entsResp = await fetch(
+    `https://www.wikidata.org/w/api.php?action=wbgetentities&ids=${candidateIds.join('|')}&props=claims|labels|sitelinks&languages=en&format=json&origin=*`,
+    { signal: AbortSignal.timeout(8000) },
+  );
+  const entsJson = (await entsResp.json()) as any;
+  const ents: Record<string, any> = entsJson?.entities ?? {};
+  const SETTLEMENT = new Set(['Q515', 'Q486972', 'Q1549591', 'Q15284', 'Q3957', 'Q1093829', 'Q1637706', 'Q2074737', 'Q702492', 'Q1066984', 'Q5119', 'Q12076836']);
+  const p31ids = (e: any): string[] => (e?.claims?.P31 ?? []).map((c: any) => c?.mainsnak?.datavalue?.value?.id).filter(Boolean);
+  const hasPop = (e: any): boolean => (e?.claims?.P1082 ?? []).length > 0;
+  let entity: any = null;
+  for (const id of candidateIds) {
+    const e = ents[id];
+    if (e && hasPop(e) && p31ids(e).some((q) => SETTLEMENT.has(q))) { entity = e; break; }
+  }
+  if (!entity) entity = candidateIds.map((id) => ents[id]).find((e) => e && hasPop(e)) ?? null;
+  if (!entity) { res.json({ error: 'No population data found', region_name: city.trim() }); return; }
+
+  const pickClaim = (prop: string): any => {
+    const claims: any[] = entity?.claims?.[prop] ?? [];
+    return (claims.find((c) => c.rank === 'preferred') ?? claims[0])?.mainsnak?.datavalue?.value;
+  };
+  // Population history: each P1082 statement may carry a P585 "point in time".
+  const population_by_year = ((entity?.claims?.P1082 ?? []) as any[])
+    .map((c) => {
+      const pop = numFromAmount(c?.mainsnak?.datavalue?.value);
+      const t = c?.qualifiers?.P585?.[0]?.datavalue?.value?.time as string | undefined;
+      const year = t ? Number(t.slice(1, 5)) : null;
+      return pop != null ? { year, population: Math.round(pop) } : null;
+    })
+    .filter((x): x is { year: number | null; population: number } => !!x)
+    .sort((a, b) => (b.year ?? 0) - (a.year ?? 0));
+
+  const population = numFromAmount(pickClaim('P1082')) ?? (population_by_year[0]?.population ?? null);
   const area_km2 = numFromAmount(pickClaim('P2046'));
   const density =
     numFromAmount(pickClaim('P1539')) ??
     (population && area_km2 ? Math.round(population / area_km2) : null);
+  const pageTitle: string = entity?.sitelinks?.enwiki?.title ?? entity?.labels?.en?.value ?? city.trim();
 
   // 3. Wikipedia REST summary → description + extract hint
   const summaryResp = await fetch(
@@ -2604,6 +2626,8 @@ async function cityStats(req: Request, res: Response): Promise<void> {
     total_jurisdiction_area: area_km2 != null ? Math.round(area_km2 * 10) / 10 : null,
     population: population != null ? Math.round(population) : null,
     population_density: density != null ? Math.round(density) : null,
+    population_by_year,
+    green_cover: null, // no reliable free per-city source — stays manual
     description: summary?.description ?? null,
     extract: extractText.slice(0, 600) || null,
     climate,
