@@ -103,9 +103,12 @@ export function S01Cover({ data }: SlideProps) {
           </div>
         </div>
 
-        <div style={{ position: 'relative', display: 'flex', flexDirection: 'column' }}>
-          <ReportImage src={hero} height={undefined} label="Cover image" style={{ flex: 1, minHeight: 0 }} />
-          <div style={{ position: 'absolute', left: 18, right: 18, bottom: 18, background: 'rgba(255,255,255,.94)', borderRadius: 14, padding: '14px 18px' }}>
+        {/* Cover photo shown as a normal 4:3 image (matches the PFA capture ratio
+            so the whole board/scene is visible, never side-cropped), with the
+            project-site caption as a plain card beneath it. */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <ReportImage src={hero} label="Cover image" style={{ width: '100%', aspectRatio: '4 / 3', height: 'auto', minHeight: 0 }} />
+          <div style={{ background: C.greenSoft, borderRadius: 14, padding: '14px 18px' }}>
             <div style={{ fontSize: 12, color: C.muted, marginBottom: 4 }}>Project Site</div>
             <div style={{ fontSize: 14, fontWeight: 700, color: C.ink, lineHeight: 1.4 }}>{dash(forest.project_site || forest.forest_address)}</div>
             {forest.project_site && forest.forest_address ? (

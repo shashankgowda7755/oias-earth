@@ -12,27 +12,72 @@ import { fetchForestReport } from '@/lib/publicApi';
 import { uploadReportImage, clearReportImage, uploadSponsorLogo, deleteSponsorLogo } from '../Forests/forestApi';
 import { fetchForestOptions, type ForestOption } from '../Reports/reportApi';
 
-interface Slot { key: string; label: string; perQuarter?: boolean }
+// `ratio` is the target aspect ratio (width / height) the report slot renders at.
+// Every capture (camera or file) is centre-cropped to this ratio before upload,
+// so what the operator frames is exactly what the report shows — no surprise crop
+// at render time. Keep these in sync with the slide render boxes.
+interface Slot { key: string; label: string; perQuarter?: boolean; ratio: number }
 interface LogoRow { title: string; name: string; value: 'sponsored_by' | 'initiated_by'; logo?: string; serverIndex: number }
 type Page = 'pick' | 'menu' | 'site' | 'quarter' | 'sponsors';
 
 const SITE_SLOTS: Slot[] = [
-  { key: 'cover', label: 'Cover' },
-  { key: 'content', label: 'Contents' },
-  { key: 'impact', label: 'Impact' },
-  { key: 'permission', label: 'Permission' },
-  { key: 'layout', label: 'Site layout' },
-  { key: 'earth', label: 'Aerial / map' },
-  { key: 'security', label: 'Security' },
-  { key: 'dashboard', label: 'Dashboard' },
+  { key: 'cover', label: 'Cover', ratio: 4 / 3 },
+  { key: 'content', label: 'Contents', ratio: 4 / 3 },
+  { key: 'impact', label: 'Impact', ratio: 4 / 3 },
+  { key: 'permission', label: 'Permission', ratio: 3 / 4 },
+  { key: 'layout', label: 'Site layout', ratio: 4 / 3 },
+  { key: 'earth', label: 'Aerial / map', ratio: 1 },
+  { key: 'security', label: 'Security', ratio: 4 / 3 },
+  { key: 'dashboard', label: 'Dashboard', ratio: 16 / 9 },
 ];
 const QUARTER_SLOTS: Slot[] = [
-  { key: 'soil_meter', label: 'Soil meter', perQuarter: true },
-  { key: 'temp_inside', label: 'Inside', perQuarter: true },
-  { key: 'temp_outside', label: 'Outside', perQuarter: true },
-  { key: 'progress', label: 'Progress', perQuarter: true },
-  { key: 'gallery', label: 'Gallery', perQuarter: true },
+  { key: 'soil_meter', label: 'Soil meter', perQuarter: true, ratio: 1 },
+  { key: 'temp_inside', label: 'Inside', perQuarter: true, ratio: 4 / 3 },
+  { key: 'temp_outside', label: 'Outside', perQuarter: true, ratio: 4 / 3 },
+  { key: 'progress', label: 'Progress', perQuarter: true, ratio: 4 / 3 },
+  { key: 'gallery', label: 'Gallery', perQuarter: true, ratio: 4 / 3 },
 ];
+
+/** Human label for an aspect ratio (4/3 -> "4:3"). Best-effort, falls back to 2dp. */
+function ratioLabel(r: number): string {
+  const known: [number, string][] = [[16 / 9, '16:9'], [4 / 3, '4:3'], [3 / 2, '3:2'], [1, '1:1'], [3 / 4, '3:4'], [2 / 3, '2:3'], [9 / 16, '9:16']];
+  const hit = known.find(([v]) => Math.abs(v - r) < 0.01);
+  return hit ? hit[1] : r.toFixed(2);
+}
+
+/**
+ * Centre-crop an image File to a target aspect ratio and re-encode as JPEG.
+ * Crops the longer axis (never stretches), so the subject the operator framed in
+ * the centre is preserved. Falls back to the original file on any decode error.
+ */
+async function cropToRatio(file: File, ratio: number): Promise<File> {
+  const url = URL.createObjectURL(file);
+  try {
+    const img = await new Promise<HTMLImageElement>((res, rej) => {
+      const im = new Image();
+      im.onload = () => res(im);
+      im.onerror = rej;
+      im.src = url;
+    });
+    const iw = img.naturalWidth, ih = img.naturalHeight;
+    if (!iw || !ih) return file;
+    let sw = iw, sh = ih, sx = 0, sy = 0;
+    if (iw / ih > ratio) { sw = Math.round(ih * ratio); sx = Math.round((iw - sw) / 2); }
+    else if (iw / ih < ratio) { sh = Math.round(iw / ratio); sy = Math.round((ih - sh) / 2); }
+    const canvas = document.createElement('canvas');
+    canvas.width = sw; canvas.height = sh;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return file;
+    ctx.drawImage(img, sx, sy, sw, sh, 0, 0, sw, sh);
+    const blob: Blob | null = await new Promise((res) => canvas.toBlob((b) => res(b), 'image/jpeg', 0.92));
+    if (!blob) return file;
+    return new File([blob], file.name.replace(/\.\w+$/, '') + '.jpg', { type: 'image/jpeg' });
+  } catch {
+    return file;
+  } finally {
+    URL.revokeObjectURL(url);
+  }
+}
 
 function defaultFiscal(): { year: number; quarter: number } {
   const d = new Date(); const m = d.getMonth();
@@ -168,9 +213,12 @@ export default function PfaUploader() {
     else toast.success('Open your browser menu → “Install app” / “Add to Home screen”.');
   };
 
-  const stage = (slot: Slot, file?: File | null) => {
+  const stage = async (slot: Slot, file?: File | null) => {
     if (!file) return;
-    setPending((p) => { if (p) URL.revokeObjectURL(p.url); return { slot, url: URL.createObjectURL(file), file }; });
+    // Centre-crop to the slot's target ratio so the preview + upload match the
+    // report render box exactly (capture once, at the ratio we want).
+    const cropped = await cropToRatio(file, slot.ratio);
+    setPending((p) => { if (p) URL.revokeObjectURL(p.url); return { slot, url: URL.createObjectURL(cropped), file: cropped }; });
   };
   const clearPending = () => setPending((p) => { if (p) URL.revokeObjectURL(p.url); return null; });
 
@@ -424,8 +472,13 @@ export default function PfaUploader() {
             </div>
           ) : (
             <>
-              <video ref={videoRef} autoPlay playsInline muted className="max-h-[68vh] w-auto max-w-full rounded-card bg-black" />
-              <div className="mt-5 flex items-center gap-8">
+              <div className="relative flex max-h-[68vh] items-center justify-center">
+                <video ref={videoRef} autoPlay playsInline muted className="max-h-[68vh] w-auto max-w-full rounded-card bg-black" />
+                {/* Framing guide: the box the photo is centre-cropped to on capture. */}
+                <div aria-hidden className="pointer-events-none absolute inset-0 m-auto rounded-card border-2 border-primary/90" style={{ aspectRatio: String(camSlot.ratio), boxShadow: '0 0 0 9999px rgba(0,0,0,0.35)' }} />
+              </div>
+              <div className="mt-2 text-xs text-white/70">Framing {ratioLabel(camSlot.ratio)} — fills the {camSlot.label.toLowerCase()} slot exactly</div>
+              <div className="mt-4 flex items-center gap-8">
                 <button type="button" onClick={closeCam} className="text-sm text-white">Cancel</button>
                 <button type="button" onClick={snap} aria-label="Capture" className="flex h-[72px] w-[72px] items-center justify-center rounded-full border-4 border-white bg-primary"><i className="ti ti-camera text-2xl text-black" aria-hidden="true" /></button>
                 <button type="button" onClick={() => setFacing((f) => (f === 'environment' ? 'user' : 'environment'))} aria-label="Flip" className="text-white"><i className="ti ti-rotate text-xl" aria-hidden="true" /></button>
