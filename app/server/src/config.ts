@@ -22,6 +22,10 @@ export const config = {
   // Dev-only default secret. CHANGE in any real deployment.
   jwtSecret: required('JWT_SECRET', 'dev-only-change-me-communitree-secret'),
   jwtExpiresIn: process.env.JWT_EXPIRES_IN ?? '7d',
+  // TEMPORARY pre-launch convenience: a password-free "demo login" that mints an
+  // admin session (POST /auth/demo-login). PUBLIC BACKDOOR — disable before real
+  // launch by setting ALLOW_DEMO_LOGIN=false. Defaults ON until then.
+  allowDemoLogin: process.env.ALLOW_DEMO_LOGIN !== 'false',
   port: Number(process.env.PORT ?? 4000),
   corsOrigins: (process.env.CORS_ORIGIN ?? 'http://localhost:5173')
     .split(',')

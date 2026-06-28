@@ -13,6 +13,7 @@ import {
 } from 'react';
 import {
   login as apiLogin,
+  demoLogin as apiDemoLogin,
   type LoginResponse,
 } from '../lib/api';
 import {
@@ -29,6 +30,8 @@ interface AuthContextValue {
   role: string | null;
   /** Throws on failure (caller renders the inline error). */
   signIn: (username: string, password: string) => Promise<void>;
+  /** Password-free admin sign-in (pre-launch). Throws if disabled/unavailable. */
+  signInDemo: () => Promise<void>;
   signOut: () => void;
 }
 
@@ -66,6 +69,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setSession(next);
   }, []);
 
+  const signInDemo = useCallback(async () => {
+    const resp = await apiDemoLogin();
+    if (!resp?.token) {
+      throw new Error('Demo login did not return a token.');
+    }
+    const next = sessionFromLogin(resp);
+    persistSession(next);
+    setSession(next);
+  }, []);
+
   const signOut = useCallback(() => {
     clearSession();
     setSession(null);
@@ -77,9 +90,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       isAuthenticated: Boolean(session?.token),
       role: session?.role ?? null,
       signIn,
+      signInDemo,
       signOut,
     }),
-    [session, signIn, signOut],
+    [session, signIn, signInDemo, signOut],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

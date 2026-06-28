@@ -122,6 +122,20 @@ export async function login(
   return data;
 }
 
+/**
+ * POST /auth/demo-login -> { token, ... }. Password-free admin session for the
+ * pre-launch "click Dashboard, straight in" flow. 404s when the server has
+ * ALLOW_DEMO_LOGIN=false. TEMPORARY — remove with the server route before launch.
+ */
+export async function demoLogin(): Promise<LoginResponse> {
+  const { data } = await axios.post<LoginResponse>(
+    `${AUTH_BASE_URL}/auth/demo-login`,
+    {},
+    { headers: { 'Content-Type': 'application/json' } },
+  );
+  return data;
+}
+
 /* ----------------------------- Lists ----------------------------- */
 
 export interface ListParams {

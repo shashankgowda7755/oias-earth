@@ -7,7 +7,7 @@
  * /dashboard before this renders (spec flow Login: "existing valid token ->
  * auto land on /dashboard").
  */
-import { useState, type FormEvent } from 'react';
+import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
 import { Button } from '../components/Buttons';
@@ -15,12 +15,28 @@ import { PasswordField, TextField } from '../components/fields/Fields';
 
 export default function Login() {
   const navigate = useNavigate();
-  const { signIn } = useAuth();
+  const { signIn, signInDemo, isAuthenticated } = useAuth();
 
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  // Pre-launch: try a password-free admin sign-in first. Falls back to the form
+  // if the server has demo login disabled (ALLOW_DEMO_LOGIN=false) or it fails.
+  const [autoTrying, setAutoTrying] = useState(true);
+  const autoRan = useRef(false);
+
+  useEffect(() => {
+    if (autoRan.current) return;
+    autoRan.current = true;
+    if (isAuthenticated) {
+      navigate('/dashboard', { replace: true });
+      return;
+    }
+    signInDemo()
+      .then(() => navigate('/dashboard', { replace: true }))
+      .catch(() => setAutoTrying(false)); // reveal the manual form
+  }, [isAuthenticated, navigate, signInDemo]);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -45,6 +61,22 @@ export default function Login() {
       setSubmitting(false);
     }
   };
+
+  if (autoTrying) {
+    return (
+      <main className="flex min-h-screen flex-col items-center justify-center gap-4 bg-appbg px-4">
+        <img src="/oias-mark.svg" alt="" aria-hidden="true" className="h-12 w-12" />
+        <p className="text-sm text-textSecondary">Signing you in…</p>
+        <button
+          type="button"
+          onClick={() => setAutoTrying(false)}
+          className="text-sm text-textSecondary underline underline-offset-2"
+        >
+          Use a password instead
+        </button>
+      </main>
+    );
+  }
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-appbg px-4">

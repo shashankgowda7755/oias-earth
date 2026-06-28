@@ -108,7 +108,7 @@ export default function Landing() {
           <Link to="/carbon" style={{ color: 'var(--surface)', textDecoration: 'none', opacity: .85 }}>Carbon</Link>
           <Link to="/verify" style={{ color: 'var(--surface)', textDecoration: 'none', opacity: .85 }}>Verify</Link>
           <a href="#business" style={{ color: 'var(--surface)', textDecoration: 'none', opacity: .85 }}>For business</a>
-          <Link to="/login" style={{ color: 'var(--ink)', background: 'var(--alive)', textDecoration: 'none', padding: '8px 16px', borderRadius: 999, fontWeight: 600 }}>Sign in</Link>
+          <Link to="/dashboard" style={{ color: 'var(--ink)', background: 'var(--alive)', textDecoration: 'none', padding: '8px 16px', borderRadius: 999, fontWeight: 600 }}>Dashboard</Link>
         </div>
       </nav>
 
@@ -261,7 +261,7 @@ export default function Landing() {
         </div>
         <div style={{ display: 'flex', gap: 22 }}>
           <Link to="/map" style={{ color: '#9fb0ad', textDecoration: 'none' }}>Live map</Link>
-          <Link to="/login" style={{ color: '#9fb0ad', textDecoration: 'none' }}>Admin sign in</Link>
+          <Link to="/dashboard" style={{ color: '#9fb0ad', textDecoration: 'none' }}>Dashboard</Link>
         </div>
       </footer>
     </div>
