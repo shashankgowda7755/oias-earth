@@ -93,6 +93,14 @@ function validateGrid(f: ForestFormState): FieldErrors {
 
   if (isBlank(f.plantation_date)) e.plantation_date = REQUIRED;
 
+  // Tree setup
+  const ttMsg = positiveIntError(f.total_trees);
+  if (ttMsg) e.total_trees = ttMsg;
+  if (f.total_trees.trim() && Number(f.total_trees) > 0) {
+    if (isBlank(f.client_code)) e.client_code = REQUIRED;
+    if (isBlank(f.forest_code)) e.forest_code = REQUIRED;
+  }
+
   return e;
 }
 

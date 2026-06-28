@@ -82,11 +82,12 @@ export function buildForestValues(f: ForestFormState): UpsertValues {
       row: b.row,
       col: b.col,
       prefix: b.prefix.trim(),
-      start_digits: num(b.start_digits) ?? 1,
-      start: num(b.start) ?? 1,
+      start_digits: num(b.start_digits) ?? 3,
+      start: b.start.trim() || '001',
       species: b.species
         .filter((s) => s.species_id)
         .map((s) => ({ species_id: s.species_id, count: num(s.count) ?? 0 })),
+      ...(b.box_lat && b.box_lng ? { box_lat: b.box_lat, box_lng: b.box_lng } : {}),
     }));
 
   return compact({
@@ -124,6 +125,11 @@ export function buildForestValues(f: ForestFormState): UpsertValues {
 
     // Per-box layout (prefix/start/species) for the forest_upsert_v1 job.
     boxes: configuredBoxes.length ? JSON.stringify(configuredBoxes) : undefined,
+
+    // Tree ID generation fields
+    client_code: f.client_code.trim() || undefined,
+    forest_code: f.forest_code.trim() || undefined,
+    total_trees: num(f.total_trees),
   });
 }
 

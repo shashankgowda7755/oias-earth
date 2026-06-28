@@ -127,12 +127,15 @@ export function BoxGrid({
               aria-label={`Edit box Row ${row} Column ${col}, ${planted} of ${capacity} planted`}
             >
               <span className="text-label font-medium text-textPrimary">
-                Row {row} • Column {col}
+                {box?.prefix ? box.prefix.replace(/-$/, '') : `R${row}·C${col}`}
               </span>
-              {configured && box ? (
-                <span className="text-label text-textSecondary">
-                  Prefix {box.prefix}
-                </span>
+              {box?.box_lat && box?.box_lng ? (
+                <span className="text-label text-primary">GPS set</span>
+              ) : null}
+              {box?.overridden ? (
+                <span className="text-label text-warning">edited</span>
+              ) : configured ? (
+                <span className="text-label text-textSecondary">auto</span>
               ) : null}
               <span className="mt-auto flex flex-wrap gap-x-2 text-label text-textSecondary">
                 <span>Cap {capacity}</span>

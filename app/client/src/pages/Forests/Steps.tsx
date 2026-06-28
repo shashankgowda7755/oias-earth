@@ -6,7 +6,7 @@
  * `update` setter, and (Step 1) the async picker loaders. No data fetching here
  * — the wizard owns state; the AutocompleteField components fetch on demand.
  */
-import type { ReactNode } from 'react';
+import { useEffect, type ReactNode } from 'react';
 import {
   AutocompleteField,
   DateField,
@@ -17,7 +17,10 @@ import {
 import { LocationPicker } from './LocationPicker';
 import { MultiAutocompleteField } from './MultiAutocompleteField';
 import { BoxGrid } from './BoxGrid';
-import type { FieldErrors, ForestFormState } from './types';
+import { loadSpeciesOptions } from './api';
+import { autoFillBoxes } from './boxAutoFill';
+import { genClientCode, genForestCode, previewTreeIds } from './treeId';
+import type { FieldErrors, ForestFormState, GlobalSpeciesRow } from './types';
 
 /** Setter: update one field by key. */
 type Update = <K extends keyof ForestFormState>(
@@ -206,6 +209,7 @@ export function Step2Grid({ form, errors, update }: StepProps) {
   const boxColumn = Number(form.box_column);
   const treeRow = Number(form.tree_row);
   const treeColumn = Number(form.tree_column);
+  const capacity = treeRow * treeColumn;
 
   const gridReady =
     Number.isInteger(boxRows) && boxRows > 0 &&
@@ -213,10 +217,173 @@ export function Step2Grid({ form, errors, update }: StepProps) {
     Number.isInteger(treeRow) && treeRow > 0 &&
     Number.isInteger(treeColumn) && treeColumn > 0;
 
+  const totalTrees = Number(form.total_trees) || 0;
+  const gridCapacity = gridReady ? boxRows * boxColumn * capacity : 0;
+
+  // Auto-derive forest_code from forest_name when it changes.
+  useEffect(() => {
+    if (form.forest_name && !form.forest_code) {
+      update('forest_code', genForestCode(form.forest_name));
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [form.forest_name]);
+
+  // Auto-derive client_code from first sponsor label when it changes.
+  useEffect(() => {
+    const firstLabel = Object.values(form.sponsor_labels)[0];
+    if (firstLabel && !form.client_code) {
+      update('client_code', genClientCode(firstLabel));
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [form.sponsor_labels]);
+
+  // Re-run auto-fill whenever inputs change (skips overridden boxes).
+  useEffect(() => {
+    if (!gridReady || totalTrees <= 0 || !form.client_code || !form.forest_code) return;
+    const filled = autoFillBoxes({
+      totalTrees,
+      speciesMix: form.species_mix,
+      boxRows,
+      boxColumn,
+      capacity,
+      clientCode: form.client_code,
+      forestCode: form.forest_code,
+      existingBoxes: form.boxes,
+    });
+    update('boxes', filled);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [form.total_trees, form.species_mix, form.client_code, form.forest_code,
+      form.box_rows, form.box_column, form.tree_row, form.tree_column]);
+
+  const addSpeciesRow = () => {
+    update('species_mix', [
+      ...form.species_mix,
+      { species_id: '', species_label: '', count: '' },
+    ]);
+  };
+
+  const updateSpecies = (i: number, patch: Partial<GlobalSpeciesRow>) => {
+    const next = form.species_mix.map((s, idx) => idx === i ? { ...s, ...patch } : s);
+    update('species_mix', next);
+  };
+
+  const removeSpecies = (i: number) => {
+    update('species_mix', form.species_mix.filter((_, idx) => idx !== i));
+  };
+
+  const speciesTotal = form.species_mix.reduce((s, m) => s + (Number(m.count) || 0), 0);
+  const boxesUsed = gridReady && totalTrees > 0 ? Math.ceil(totalTrees / capacity) : 0;
+
   return (
     <div>
-      <SectionTitle>Grid Config</SectionTitle>
-      <SubHeading>Box &amp; Tree Grid</SubHeading>
+      {/* Layer 1: Quick Setup */}
+      <SectionTitle>Tree Setup</SectionTitle>
+      <SubHeading>Quick Entry</SubHeading>
+
+      <Grid>
+        <TextField
+          label="Total Saplings to Plant"
+          required
+          type="number"
+          inputMode="numeric"
+          value={form.total_trees}
+          onChange={(v) => update('total_trees', v)}
+          {...err(errors, 'total_trees')}
+          helperText={
+            gridReady && totalTrees > 0
+              ? `${boxesUsed} box${boxesUsed !== 1 ? 'es' : ''} used · ${gridCapacity} max capacity`
+              : undefined
+          }
+        />
+        <div className="flex items-end gap-1">
+          <TextField
+            label="Client Code"
+            required
+            value={form.client_code}
+            onChange={(v) => update('client_code', v.toUpperCase().replace(/[^A-Z]/g, '').slice(0, 5))}
+            {...err(errors, 'client_code')}
+            helperText="Auto-derived from sponsor"
+          />
+          <TextField
+            label="Forest Code"
+            required
+            value={form.forest_code}
+            onChange={(v) => update('forest_code', v.toUpperCase().replace(/[^A-Z]/g, '').slice(0, 5))}
+            {...err(errors, 'forest_code')}
+            helperText="Auto-derived from name"
+          />
+        </div>
+      </Grid>
+
+      {form.client_code && form.forest_code && (
+        <p className="mb-4 rounded-card border border-border bg-appbg px-3 py-2 font-mono text-xs text-textSecondary">
+          ID preview: {previewTreeIds(form.client_code, form.forest_code)}
+        </p>
+      )}
+
+      {/* Species mix */}
+      <div className="mb-6">
+        <div className="mb-2 flex items-center justify-between">
+          <h4 className="text-sm font-semibold text-textPrimary">
+            Species Mix <span className="font-normal text-textSecondary">(optional — add later if unknown)</span>
+          </h4>
+          <button type="button" onClick={addSpeciesRow} className="text-xs font-semibold text-primary hover:underline">
+            + Add species
+          </button>
+        </div>
+
+        {form.species_mix.length === 0 ? (
+          <p className="rounded-card border border-dashed border-border bg-appbg px-3 py-3 text-center text-sm text-textSecondary">
+            No species — trees created without species assignment. Add later.
+          </p>
+        ) : (
+          <ul className="space-y-2">
+            {form.species_mix.map((row, i) => (
+              <li key={i} className="flex items-end gap-2">
+                <div className="flex-1">
+                  <AutocompleteField
+                    label="Species"
+                    value={row.species_id}
+                    onChange={(id, opt) => updateSpecies(i, { species_id: id, species_label: opt?.label ?? '' })}
+                    loadOptions={loadSpeciesOptions}
+                    selectedOption={row.species_id ? { value: row.species_id, label: row.species_label || row.species_id } : null}
+                    placeholder="Search species…"
+                  />
+                </div>
+                <div className="w-28">
+                  <TextField
+                    label="Count"
+                    type="number"
+                    inputMode="numeric"
+                    value={row.count}
+                    onChange={(v) => updateSpecies(i, { count: v })}
+                  />
+                </div>
+                <button
+                  type="button"
+                  onClick={() => removeSpecies(i)}
+                  className="mb-1.5 flex h-9 w-9 flex-none items-center justify-center rounded-button text-textSecondary hover:bg-danger/5 hover:text-danger"
+                  aria-label={`Remove species row ${i + 1}`}
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                    <polyline points="3 6 5 6 21 6" />
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                  </svg>
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+
+        {form.species_mix.length > 0 && totalTrees > 0 && (
+          <p className={`mt-2 text-xs font-medium ${speciesTotal === totalTrees ? 'text-primary' : speciesTotal > totalTrees ? 'text-danger' : 'text-warning'}`}>
+            {speciesTotal} / {totalTrees} assigned{speciesTotal < totalTrees ? ` — ${totalTrees - speciesTotal} unassigned (distributed evenly)` : speciesTotal > totalTrees ? ' — exceeds total' : ' ✓'}
+          </p>
+        )}
+      </div>
+
+      {/* Grid Config (existing fields) */}
+      <SubHeading>Grid Configuration</SubHeading>
       <Grid>
         <TextField label="Box Rows" required type="number" inputMode="numeric"
           value={form.box_rows} onChange={(v) => update('box_rows', v)} {...err(errors, 'box_rows')} />
@@ -244,22 +411,40 @@ export function Step2Grid({ form, errors, update }: StepProps) {
           value={form.plantation_date} onChange={(v) => update('plantation_date', v)} {...err(errors, 'plantation_date')} />
       </Grid>
 
-      {/* Box cards grid — appears once the grid dims are valid. */}
+      {/* Layer 2: Geo-tag toggle */}
       <div className="mt-6">
-        <SubHeading>Box Layout</SubHeading>
-        {gridReady ? (
-          <BoxGrid
-            boxRows={boxRows}
-            boxColumn={boxColumn}
-            treeRow={treeRow}
-            treeColumn={treeColumn}
-            boxes={form.boxes}
-            onChange={(boxes) => update('boxes', boxes)}
+        <label className="flex cursor-pointer items-start gap-3 rounded-card border border-border bg-appbg px-4 py-3">
+          <input
+            type="checkbox"
+            className="mt-0.5"
+            checked={form.geo_tag_mode}
+            onChange={(e) => update('geo_tag_mode', e.target.checked)}
           />
-        ) : (
-          <p className="rounded-card border border-dashed border-border bg-appbg px-3 py-6 text-center text-sm text-textSecondary">
-            Fill in Box Rows, Box Column, Tree Rows and Tree Column (all &gt; 0) to
-            generate the box grid.
+          <div>
+            <p className="text-sm font-semibold text-textPrimary">Enable per-box geo-tagging</p>
+            <p className="text-xs text-textSecondary">
+              Add GPS coordinates and override species per box. Required for physical QR-code tracking.
+            </p>
+          </div>
+        </label>
+
+        {form.geo_tag_mode && gridReady && (
+          <div className="mt-4">
+            <SubHeading>Box Layout — Geo-tag Mode</SubHeading>
+            <BoxGrid
+              boxRows={boxRows}
+              boxColumn={boxColumn}
+              treeRow={treeRow}
+              treeColumn={treeColumn}
+              boxes={form.boxes}
+              onChange={(boxes) => update('boxes', boxes)}
+            />
+          </div>
+        )}
+
+        {form.geo_tag_mode && !gridReady && (
+          <p className="mt-3 rounded-card border border-dashed border-border bg-appbg px-3 py-4 text-center text-sm text-textSecondary">
+            Fill in grid dimensions above to show the box map.
           </p>
         )}
       </div>

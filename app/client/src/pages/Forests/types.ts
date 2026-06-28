@@ -14,6 +14,13 @@
 
 /* ------------------------------ box / species ------------------------------ */
 
+/** One species row in the global species mix (Layer 1). */
+export interface GlobalSpeciesRow {
+  species_id: string;
+  species_label: string;
+  count: string;
+}
+
 /** One species row inside an EditBoxDialog: a picked species + a planted count. */
 export interface BoxSpeciesRow {
   /** Master plant-species id (from POST /master-plantspecies/search). */
@@ -42,6 +49,9 @@ export interface BoxConfig {
   start_digits: string;   // default "1"
   start: string;          // auto-calc; editable
   species: BoxSpeciesRow[];
+  box_lat?: string;
+  box_lng?: string;
+  overridden?: boolean;
 }
 
 /** Stable key for a box cell in the boxes map. */
@@ -104,6 +114,13 @@ export interface ForestFormState {
 
   /** Per-box config keyed by `${row}-${col}` (1-based). */
   boxes: Record<string, BoxConfig>;
+
+  /* ---- Tree setup (Layer 1) ---- */
+  total_trees: string;
+  client_code: string;
+  forest_code: string;
+  species_mix: GlobalSpeciesRow[];
+  geo_tag_mode: boolean;
 }
 
 export type StepKey = 'basic' | 'grid';
@@ -152,10 +169,16 @@ export function emptyForestForm(): ForestFormState {
     plantation_date: '',
 
     boxes: {},
+
+    total_trees: '',
+    client_code: '',
+    forest_code: '',
+    species_mix: [],
+    geo_tag_mode: false,
   };
 }
 
 /** A fresh, empty box config for a given cell. */
 export function emptyBox(row: number, col: number): BoxConfig {
-  return { row, col, prefix: '', start_digits: '1', start: '', species: [] };
+  return { row, col, prefix: '', start_digits: '1', start: '', species: [], box_lat: '', box_lng: '', overridden: false };
 }
