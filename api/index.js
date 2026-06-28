@@ -78,8 +78,14 @@ function ensureMigrated() {
         const client = new Client({ connectionString: process.env.DATABASE_URL });
         await client.connect();
         try {
-          for (const { sql } of files) {
-            await client.query(sql);
+          for (const { file, sql } of files) {
+            try {
+              await client.query(sql);
+            } catch (e) {
+              // A single bad migration must NOT take down the whole API. Log it
+              // and continue — the app boots and every other migration still runs.
+              console.error(`[vercel] migration ${file} failed (continuing):`, e && e.message ? e.message : e);
+            }
           }
           await rotateAdminPassword((q) => client.query(q.text, q.values));
         } finally {
@@ -91,8 +97,12 @@ function ensureMigrated() {
         const db = new PGlite(process.env.PGLITE_DIR);
         await db.waitReady;
         try {
-          for (const { sql } of files) {
-            await db.exec(sql);
+          for (const { file, sql } of files) {
+            try {
+              await db.exec(sql);
+            } catch (e) {
+              console.error(`[vercel] migration ${file} failed (continuing):`, e && e.message ? e.message : e);
+            }
           }
           await rotateAdminPassword((q) => db.query(q.text, q.values));
         } finally {
