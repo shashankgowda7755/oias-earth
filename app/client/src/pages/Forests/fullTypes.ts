@@ -289,9 +289,12 @@ export interface FullForestPayload {
   /* Grid */
   box_rows?: number;
   box_columns?: number;
+  box_column?: number; // singular alias (DB/list shape)
   box_to_box_distance?: number;
   tree_rows?: number;
+  tree_row?: number; // singular alias (DB/list shape)
   tree_columns?: number;
+  tree_column?: number; // singular alias (DB/list shape)
   tree_to_tree_distance?: number;
   direction_angle?: number;
   boundary_gap?: number;

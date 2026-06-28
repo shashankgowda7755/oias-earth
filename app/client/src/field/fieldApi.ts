@@ -42,8 +42,8 @@ export async function fetchTrees(forestId: string): Promise<FieldTree[]> {
 export interface VisitPayload {
   timeline_date: string;
   status_id: number;
-  height?: string;
-  diameter?: string;
+  height?: number;
+  diameter?: number;
   lat?: number;
   lng?: number;
 }
@@ -57,8 +57,8 @@ export async function submitVisit(
   const fd = new FormData();
   fd.append('timeline_date', p.timeline_date);
   fd.append('status_id', String(p.status_id));
-  if (p.height) fd.append('height', p.height);
-  if (p.diameter) fd.append('diameter', p.diameter);
+  if (p.height != null && Number.isFinite(p.height)) fd.append('height', String(p.height));
+  if (p.diameter != null && Number.isFinite(p.diameter)) fd.append('diameter', String(p.diameter));
   if (p.lat != null) fd.append('lat', String(p.lat));
   if (p.lng != null) fd.append('lng', String(p.lng));
   if (photo) fd.append('photo', photo, 'capture.jpg');

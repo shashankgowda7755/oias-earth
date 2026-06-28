@@ -89,10 +89,19 @@ export default function Field() {
     const q = await getQueue();
     for (const c of q) {
       try {
+        const h = c.height != null ? Number(c.height) : undefined;
+        const d = c.diameter != null ? Number(c.diameter) : undefined;
         await submitVisit(
           c.forestId,
           c.treeId,
-          { timeline_date: c.timeline_date, status_id: c.status_id, height: c.height, diameter: c.diameter, lat: c.lat, lng: c.lng },
+          {
+            timeline_date: c.timeline_date,
+            status_id: c.status_id,
+            height: h != null && Number.isFinite(h) ? h : undefined,
+            diameter: d != null && Number.isFinite(d) ? d : undefined,
+            lat: c.lat,
+            lng: c.lng,
+          },
           c.photo,
         );
         await removeFromQueue(c.localId);
@@ -182,12 +191,16 @@ export default function Field() {
 
   const save = async () => {
     if (!forest || !tree) return;
+    const heightNum = height.trim() === '' ? undefined : Number(height);
+    const diaNum = dia.trim() === '' ? undefined : Number(dia);
+    if (heightNum != null && !Number.isFinite(heightNum)) { flash('Height must be a number'); return; }
+    if (diaNum != null && !Number.isFinite(diaNum)) { flash('Diameter must be a number'); return; }
     setSaving(true);
     const payload = {
       timeline_date: date,
       status_id: status,
-      height: height || undefined,
-      diameter: dia || undefined,
+      height: heightNum,
+      diameter: diaNum,
       lat: gps?.lat,
       lng: gps?.lng,
     };
@@ -206,8 +219,8 @@ export default function Field() {
         treeLabel: tree.tree_unique_id ?? 'tree',
         timeline_date: date,
         status_id: status,
-        height: height || undefined,
-        diameter: dia || undefined,
+        height: heightNum != null ? String(heightNum) : undefined,
+        diameter: diaNum != null ? String(diaNum) : undefined,
         lat: gps?.lat,
         lng: gps?.lng,
         photo: photo ?? undefined,

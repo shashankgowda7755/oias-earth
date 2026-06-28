@@ -141,8 +141,8 @@ function growthMilestones(forest: Row) {
   const targets = (pg?.target_height_range ?? []).slice().sort((a, b) => a.year - b.year);
   if (targets.length === 0) return [];
   const pd = forest.plantation_date ? new Date(String(forest.plantation_date)) : null;
-  // Clamp heights to a sane ceiling so a data typo ("84" for "14") can't render.
-  const ft = (v: number): number => Math.max(0, Math.min(30, v));
+  // Heights are floored at 0 and shown as entered (no upper ceiling).
+  const ft = (v: number): number => Math.max(0, v);
   return targets.map((t) => ({
     label: t.year === 0 ? 'Year 0' : `End of Year ${t.year}`,
     range: t.min != null && t.max != null ? `${ft(t.min)}–${ft(t.max)} Feet` : '—',
@@ -155,7 +155,7 @@ function currentHeightLabel(forest: Row): string | null {
   const pg = forest.plant_growth_data as { actual_height_range?: { year: number; quarter: number; min?: number; max?: number }[] } | null;
   const a = (pg?.actual_height_range ?? []).slice().sort((x, y) => x.year - y.year || x.quarter - y.quarter);
   const last = a[a.length - 1];
-  const ft = (v: number): number => Math.max(0, Math.min(30, v));
+  const ft = (v: number): number => Math.max(0, v);
   return last && last.min != null && last.max != null ? `${ft(last.min)}–${ft(last.max)} Feet` : null;
 }
 

@@ -299,9 +299,9 @@ function buildGrowth(p: FullForestPayload, fy: number, q: number): GrowthChart |
 
 function siteMasterPlan(p: FullForestPayload): SiteMasterPlan | null {
   const boxRows = num(p.box_rows);
-  const boxCols = num(p.box_columns);
-  const treeRows = num(p.tree_rows);
-  const treeCols = num(p.tree_columns);
+  const boxCols = num(p.box_column ?? p.box_columns);
+  const treeRows = num(p.tree_row ?? p.tree_rows);
+  const treeCols = num(p.tree_column ?? p.tree_columns);
   const boxes = p.box_data ?? [];
   const boxCount = boxes.length || boxRows * boxCols;
   if (!boxCount && !treeRows) return null;
