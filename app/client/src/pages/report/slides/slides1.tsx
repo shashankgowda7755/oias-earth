@@ -39,9 +39,9 @@ const findLogo = (data: SlideProps['data'], value: string) =>
   (data.forest.additional_sponsor_logo ?? []).find((l) => l.type?.value === value);
 
 /**
- * Cover text is data-driven (any forest name / description length), so the
- * headline + eyebrow auto-size to the content — a long description shrinks to
- * fit the cover instead of overflowing, a short one stays large.
+ * Cover text is data-driven (any forest name / description length), so the title
+ * auto-sizes to the content — long text shrinks to fit the cover instead of
+ * overflowing, short text stays large. Name + description share this size.
  */
 function fitHeadline(text: string | null | undefined): number {
   const n = (text ?? '').trim().length;
@@ -50,10 +50,6 @@ function fitHeadline(text: string | null | undefined): number {
   if (n > 44) return 36;
   if (n > 30) return 42;
   return 46;
-}
-function fitEyebrow(text: string | null | undefined): number {
-  const n = (text ?? '').trim().length;
-  return n > 40 ? 16 : n > 26 ? 19 : 22;
 }
 
 /* ----------------------------- Slide 1: Cover ----------------------------- */
@@ -71,6 +67,12 @@ export function S01Cover({ data }: SlideProps) {
       ? sponsors.map((s) => ({ caption: s.type?.label || 'Sponsored by', name: s.name, logo: s.logo }))
       : [{ caption: 'Sponsored by', name: meta.client_name ?? undefined, logo: meta.client_logo ?? undefined }]),
   ];
+  // Forest name + description render at the SAME size; auto-fit to whichever is
+  // longer so both stay large yet neither overflows the cover.
+  const longest = (forest.forest_name ?? '').length >= (forest.forest_desc ?? '').length
+    ? forest.forest_name
+    : forest.forest_desc;
+  const titleSize = fitHeadline(longest);
   return (
     <SlidePage meta={meta} bare>
       <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 22 }}>
@@ -81,17 +83,12 @@ export function S01Cover({ data }: SlideProps) {
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 36, flex: 1 }}>
         <div style={{ display: 'flex', flexDirection: 'column' }}>
-          {/* Forest name = small eyebrow; description = the big green headline.
-              No client/sponsor name on the cover — the sponsor shows only in the
-              "Sponsored by" logo card below. */}
+          {/* Forest name (dark) + description (green) at the SAME size. No
+              client/sponsor name on the cover — sponsor shows only in the card below. */}
+          <div style={{ fontSize: titleSize, lineHeight: 1.08, fontWeight: 800, color: C.ink, maxWidth: 540 }}>{dash(forest.forest_name)}</div>
           {forest.forest_desc ? (
-            <>
-              <div style={{ fontSize: fitEyebrow(forest.forest_name), fontWeight: 800, color: C.ink, letterSpacing: '.01em' }}>{dash(forest.forest_name)}</div>
-              <h1 style={{ fontSize: fitHeadline(forest.forest_desc), lineHeight: 1.06, fontWeight: 800, color: C.green, margin: '6px 0 0', maxWidth: 540 }}>{forest.forest_desc}</h1>
-            </>
-          ) : (
-            <h1 style={{ fontSize: fitHeadline(forest.forest_name), lineHeight: 1.06, fontWeight: 800, color: C.ink, margin: '4px 0 0', maxWidth: 540 }}>{dash(forest.forest_name)}</h1>
-          )}
+            <h1 style={{ fontSize: titleSize, lineHeight: 1.08, fontWeight: 800, color: C.green, margin: '4px 0 0', maxWidth: 540 }}>{forest.forest_desc}</h1>
+          ) : null}
 
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginTop: 22 }}>
             {pill(`${meta.quarter_label} Quarterly Report`)}
