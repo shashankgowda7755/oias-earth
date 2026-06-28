@@ -5,7 +5,7 @@
  */
 import type { ReactNode } from 'react';
 import type { ImpactTermValues } from '../../Forests/fullTypes';
-import type { MaintenanceRollup, SlideProps, WorkforceRollup } from '../reportTypes';
+import type { GrowthChart, MaintenanceRollup, SlideProps, WorkforceRollup } from '../reportTypes';
 import {
   C, SectionTitle, SlidePage, StatCard, ValueBar, SplitBar, DarkPanel, ReportImage, EmptyBlock, CARD_SHADOW, numOrDash, dash,
 } from '../reportPrimitives';
@@ -237,44 +237,121 @@ export function S12WorkforceTillDate({ data }: SlideProps) {
 }
 
 /* --------------------- Slide 13: Expected Plant Growth --------------------- */
+/** Months-axis height timeline: a tree at each milestone + a yellow "now" arrow
+ * at the report date's interpolated height. Mirrors the operator's reference chart. */
+function GrowthChartSvg({ g }: { g: GrowthChart }) {
+  // PL/PR leave horizontal room so the first/last milestone tree canopies (drawn
+  // centered on the axis ends) don't clip against the viewBox edges.
+  const PL = 56, PR = 612, PT = 26, PB = 300;
+  const maxM = g.max_months || 36;
+  const maxF = g.max_feet || 14;
+  const mx = (m: number) => PL + (m / maxM) * (PR - PL);
+  const fy = (f: number) => PB - (f / maxF) * (PB - PT);
+  const maxYear = Math.round(maxM / 12);
+
+  const feetTicks: number[] = [];
+  for (let f = 0; f <= maxF; f += 2) feetTicks.push(f);
+  const monthStep = maxM > 48 ? 6 : 3;
+  const monthTicks: number[] = [];
+  for (let m = 0; m <= maxM; m += monthStep) monthTicks.push(m);
+
+  const tree = (cx: number, midFeet: number, key: string) => {
+    const top = fy(midFeet);
+    const th = PB - top;
+    const ry = Math.min(th * 0.4, 12 + midFeet * 2.0);
+    const rx = ry * 0.82;
+    const cyc = top + ry;
+    const tw = Math.max(4, ry * 0.26);
+    return (
+      <g key={key}>
+        <rect x={cx - tw / 2} y={cyc} width={tw} height={Math.max(0, PB - cyc)} fill="#7a4a22" rx={1} />
+        <ellipse cx={cx} cy={cyc} rx={rx} ry={ry} fill="#3f9d5e" />
+        <ellipse cx={cx - rx * 0.5} cy={cyc + ry * 0.15} rx={rx * 0.55} ry={ry * 0.6} fill="#4cae6b" />
+        <ellipse cx={cx + rx * 0.5} cy={cyc + ry * 0.15} rx={rx * 0.55} ry={ry * 0.6} fill="#4cae6b" />
+      </g>
+    );
+  };
+
+  const ax = mx(g.current_months);
+  const ay = fy(g.current_feet ?? 0);
+  const headH = 16;
+  const mid = (PT + PB) / 2;
+
+  return (
+    <svg viewBox="0 0 680 400" width="100%" style={{ display: 'block', flex: 1, minHeight: 0 }}>
+      {feetTicks.map((f) => (
+        <g key={`f${f}`}>
+          <line x1={PL} y1={fy(f)} x2={PR} y2={fy(f)} stroke={C.line} strokeWidth={1} />
+          <text x={PL - 8} y={fy(f) + 3} textAnchor="end" fontSize={11} fill={C.muted}>{f}</text>
+        </g>
+      ))}
+      <line x1={PL} y1={PT} x2={PL} y2={PB} stroke={C.muted} strokeWidth={1.5} />
+      <polygon points={`${PL},${PT - 8} ${PL - 4},${PT} ${PL + 4},${PT}`} fill={C.muted} />
+      <line x1={PL} y1={PB} x2={PR + 6} y2={PB} stroke={C.muted} strokeWidth={1.5} />
+      <polygon points={`${PR + 14},${PB} ${PR + 6},${PB - 4} ${PR + 6},${PB + 4}`} fill={C.muted} />
+      <text x={14} y={mid} textAnchor="middle" fontSize={11} fill={C.muted} transform={`rotate(-90 14 ${mid})`}>Height (Feet)</text>
+      {monthTicks.map((m) => (
+        <g key={`m${m}`}>
+          <line x1={mx(m)} y1={PB} x2={mx(m)} y2={PB + 4} stroke={C.muted} strokeWidth={1} />
+          <text x={mx(m)} y={PB + 17} textAnchor="middle" fontSize={11} fill={C.muted}>{m}</text>
+        </g>
+      ))}
+      {Array.from({ length: maxYear }, (_, i) => i + 1).map((yr) => (
+        <line key={`yb${yr}`} x1={mx(yr * 12)} y1={PT} x2={mx(yr * 12)} y2={PB + 24} stroke="#cfd8dd" strokeWidth={1} strokeDasharray="4 4" />
+      ))}
+      {Array.from({ length: maxYear }, (_, i) => i + 1).map((yr) => (
+        <text key={`yl${yr}`} x={mx((yr - 0.5) * 12)} y={PB + 40} textAnchor="middle" fontSize={12} fill={C.ink}>Year {yr}</text>
+      ))}
+      <text x={(PL + PR) / 2} y={PB + 62} textAnchor="middle" fontSize={12} fill={C.muted}>Months since plantation</text>
+      {g.milestones.map((m) => tree(mx(m.months), m.midFeet, `t${m.year}`))}
+      {g.current_feet != null && (
+        <g>
+          <rect x={ax - 4.5} y={ay + headH - 2} width={9} height={Math.max(0, PB - (ay + headH - 2))} fill="#FFE600" stroke="#C9A400" strokeWidth={1.2} />
+          <polygon points={`${ax},${ay} ${ax - 11},${ay + headH} ${ax + 11},${ay + headH}`} fill="#FFE600" stroke="#C9A400" strokeWidth={1.2} strokeLinejoin="round" />
+          <text x={ax} y={ay - 6} textAnchor="middle" fontSize={11} fill="#8a6d00">now</text>
+        </g>
+      )}
+    </svg>
+  );
+}
+
 export function S13Growth({ data }: SlideProps) {
   const { meta, computed } = data;
-  const ms = computed.growth_milestones;
-  const maxH = Math.max(1, ...ms.map((m) => { const n = parseFloat(m.range); return Number.isFinite(n) ? n : 0; }));
+  const g = computed.growth;
+  const cards = g
+    ? [...g.milestones, ...(g.existing ? [g.existing] : [])].sort((a, b) => a.months - b.months)
+    : [];
   return (
     <SlidePage meta={meta}>
       <SectionTitle eyebrow="Growth Report">Expected Plant Growth</SectionTitle>
-      <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: 22, flex: 1, minHeight: 0 }}>
-        <div style={{ border: `1px solid ${C.line}`, borderRadius: 14, padding: '16px 18px', display: 'flex', flexDirection: 'column' }}>
-          <strong style={{ fontSize: 14, color: C.ink, marginBottom: 14 }}>Visual Height Progression</strong>
-          <div style={{ flex: 1, display: 'flex', alignItems: 'flex-end', gap: 18, padding: '0 8px 8px', minHeight: 0 }}>
-            {ms.map((m) => {
-              const h = parseFloat(m.range); const px = Number.isFinite(h) ? Math.max(14, (h / maxH) * 300) : 14;
-              return (
-                <div key={m.label} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-end', gap: 6 }}>
-                  <div style={{ fontSize: 11, color: C.muted }}>{m.range}</div>
-                  <div style={{ width: '58%', height: px, background: m.current ? C.green : '#bfe3cf', borderRadius: '8px 8px 0 0' }} />
-                  <div style={{ fontSize: 11, fontWeight: 700, color: C.ink }}>{m.label}</div>
+      {!g ? (
+        <EmptyBlock label="No growth data" height={280} />
+      ) : (
+        <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: 22, flex: 1, minHeight: 0 }}>
+          <div style={{ border: `1px solid ${C.line}`, borderRadius: 14, padding: '14px 16px', display: 'flex', flexDirection: 'column' }}>
+            <strong style={{ fontSize: 14, color: C.ink, marginBottom: 8 }}>Visual Height Progression</strong>
+            <GrowthChartSvg g={g} />
+            {g.band_label && (
+              <div style={{ fontSize: 12, color: C.muted, marginTop: 4 }}>
+                {g.elapsed_months} months since plantation · {g.band_label}
+                {g.current_feet != null ? ` · current ≈ ${Math.round(g.current_feet * 10) / 10} ft` : ''}
+              </div>
+            )}
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 9 }}>
+            <div style={{ fontSize: 11.5, textTransform: 'uppercase', color: C.muted }}>Key Milestones</div>
+            {cards.map((m) => (
+              <div key={`${m.label}-${m.months}`} style={{ border: `1px solid ${m.current ? '#e6b800' : C.line}`, background: m.current ? '#FFE600' : '#fff', color: C.ink, borderRadius: 12, padding: '11px 14px', boxShadow: m.current ? '0 2px 8px rgba(230,184,0,.3)' : CARD_SHADOW }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <strong style={{ fontSize: 14, color: m.current ? '#5c4900' : C.ink, fontWeight: m.current ? 800 : 700 }}>{m.label}</strong>
+                  <span style={{ fontWeight: 800, color: m.current ? '#5c4900' : C.ink }}>{m.range}</span>
                 </div>
-              );
-            })}
-            {ms.length === 0 && <EmptyBlock label="No growth data" height={180} />}
+                <div style={{ fontSize: 12, color: m.current ? '#7a5f00' : C.muted, marginTop: 4 }}>{m.date}</div>
+              </div>
+            ))}
           </div>
         </div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          <div style={{ fontSize: 11.5, textTransform: 'uppercase', color: C.muted }}>Key Milestones</div>
-          {ms.map((m) => (
-            <div key={m.label} className={m.current ? 'rpt-dark' : undefined} style={{ border: `1px solid ${m.current ? C.green : C.line}`, background: m.current ? `linear-gradient(135deg,${C.dark},${C.dark2})` : '#fff', color: m.current ? '#fff' : C.ink, borderRadius: 14, padding: '14px 16px', boxShadow: m.current ? 'none' : CARD_SHADOW }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <strong style={{ fontSize: 15, color: m.current ? C.green : C.ink }}>{m.label}</strong><span style={{ fontWeight: 800 }}>{m.range}</span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4, fontSize: 12, color: m.current ? 'rgba(255,255,255,.6)' : C.muted }}>
-                <span>{m.date}</span>{m.current && computed.current_height_label && <span style={{ background: C.green, color: C.dark, borderRadius: 999, padding: '2px 10px', fontWeight: 700 }}>Current: {computed.current_height_label}</span>}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
+      )}
     </SlidePage>
   );
 }

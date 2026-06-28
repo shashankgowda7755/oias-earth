@@ -80,10 +80,26 @@ export interface WorkforceRollup {
 }
 
 export interface GrowthMilestone {
-  label: string;
-  range: string;
-  date: string;
-  current: boolean;
+  label: string;       // "Year 0", "End of Year 1", … or "Existing growth"
+  range: string;       // "6–8 Feet"
+  date: string;        // "Jun 2025" — anchored to plantation month + year offset
+  year: number;        // milestone year (0,1,2,3…); -1 for the injected "Existing growth" row
+  months: number;      // months from plantation (0,12,24,36…)
+  midFeet: number;     // (min+max)/2 — drives chart bar/tree height
+  current: boolean;    // true only for the injected "Existing growth" row
+}
+
+/** Slide-13 growth chart: months-axis timeline + interpolated current position.
+ * All milestones are shown (none hidden); the yellow arrow marks the report date. */
+export interface GrowthChart {
+  milestones: GrowthMilestone[];     // all target milestones, year-ordered
+  existing: GrowthMilestone | null;  // injected current row (interpolated height)
+  elapsed_months: number;            // actual months plantation → report-period end
+  current_months: number;            // clamped 0..max_months (arrow x-position)
+  current_feet: number | null;       // interpolated height at current_months
+  max_months: number;                // last milestone months (axis ceiling)
+  max_feet: number;                  // height-axis ceiling (rounded up)
+  band_label: string;                // "between Year 1 and Year 2"
 }
 
 /** Slide-9 forest-value blocks (₹). 100% and 75%-survival variants. */
@@ -117,9 +133,8 @@ export interface ComputedReport {
   maintenance_tilldate: MaintenanceRollup | null;
   workforce_quarter: WorkforceRollup | null;
   workforce_tilldate: WorkforceRollup | null;
-  growth_milestones: GrowthMilestone[];
-  /** Current height label for slide 13 (from latest actual_height_range). */
-  current_height_label: string | null;
+  /** Slide 13 growth chart — all milestones + interpolated current position. */
+  growth: GrowthChart | null;
   site_master_plan: SiteMasterPlan | null;
   /** Per-box species placement (granular grid layout) for the Site Master Plan. */
   site_plan_boxes?: BoxSpeciesBreakdown[];

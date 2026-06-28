@@ -20,6 +20,7 @@ import type {
   ApproxValueBlock,
   BoxSpeciesBreakdown,
   ComputedReport,
+  GrowthChart,
   GrowthMilestone,
   MaintenanceRollup,
   ReportMeta,
@@ -183,35 +184,117 @@ function workforceRollup(entries: MaintenanceWorkforceQuarter[], year: number, q
   };
 }
 
-function growthMilestones(p: FullForestPayload, fy: number, q: number): GrowthMilestone[] {
-  const targets = (p.plant_growth_data?.target_height_range ?? []).slice().sort((a, b) => a.year - b.year);
-  if (targets.length === 0) return [];
-  // Milestone month is anchored to the plantation month (PDF shows "Apr – 25" etc.),
-  // not hardcoded December. No plantation date → date is blank, never guessed.
-  const plantD = p.plantation_date ? new Date(p.plantation_date) : null;
-  // "Current" milestone = the forest's actual project year at the report period
-  // (calendar year of the quarter − plantation year), clamped to the target set.
-  // Not hardcoded Year 0 — an established forest shouldn't read as a fresh plant.
-  const maxYear = targets[targets.length - 1]!.year;
-  const projYear = plantD ? Math.max(0, Math.min(maxYear, fqCalYear(fy, q) - plantD.getFullYear())) : 0;
-  // Saplings won't exceed ~30 ft in the 3-yr project window; clamp so a data
-  // typo (e.g. "84" for "14") can never render an absurd height.
-  const ft = (v: number): number => Math.max(0, Math.min(30, v));
-  return targets.map((t) => {
-    const label = t.year === 0 ? 'Year 0' : `End of Year ${t.year}`;
-    const range = t.min != null && t.max != null ? `${ft(t.min)}–${ft(t.max)} Feet` : '—';
-    const date = plantD ? `${MONTHS[plantD.getMonth()]}- ${plantD.getFullYear() + t.year}` : '—';
-    return { label, range, date, current: t.year === projYear };
-  });
+/** Plantation month + N months → "Jun 2025". */
+function growthDateLabel(plantD: Date | null, monthsFromPlant: number): string {
+  if (!plantD) return '—';
+  const d = new Date(plantD.getFullYear(), plantD.getMonth() + monthsFromPlant, 1);
+  return `${MONTHS[d.getMonth()]} ${d.getFullYear()}`;
 }
 
-function currentHeightLabel(p: FullForestPayload): string | null {
-  const actuals = (p.plant_growth_data?.actual_height_range ?? []).slice().sort(
-    (a, b) => a.year - b.year || a.quarter - b.quarter,
-  );
-  const last = actuals[actuals.length - 1];
-  if (!last || last.min == null || last.max == null) return null;
-  return `${last.min}–${last.max} Feet`;
+/** Linear-interpolate height (midFeet) across the milestone curve at `months`. */
+function interpGrowthFeet(ms: GrowthMilestone[], months: number): number | null {
+  if (ms.length === 0) return null;
+  const first = ms[0]!;
+  const last = ms[ms.length - 1]!;
+  if (months <= first.months) return first.midFeet;
+  if (months >= last.months) return last.midFeet;
+  for (let i = 0; i < ms.length - 1; i++) {
+    const a = ms[i]!;
+    const b = ms[i + 1]!;
+    if (months >= a.months && months <= b.months) {
+      const span = b.months - a.months;
+      const t = span > 0 ? (months - a.months) / span : 0;
+      return a.midFeet + t * (b.midFeet - a.midFeet);
+    }
+  }
+  return last.midFeet;
+}
+
+/**
+ * Slide-13 growth chart. Milestones are anchored to the plantation month and
+ * carried for the full project (none hidden). The report period's end month is
+ * the "as of" date: months elapsed → arrow x-position; height is INTERPOLATED
+ * across the per-forest target curve (actual_height_range is not used here).
+ */
+function buildGrowth(p: FullForestPayload, fy: number, q: number): GrowthChart | null {
+  const targets = (p.plant_growth_data?.target_height_range ?? [])
+    .filter(t => t.min != null && t.max != null)
+    .slice()
+    .sort((a, b) => a.year - b.year);
+  if (targets.length === 0) return null;
+
+  const ft = (v: number): number => Math.max(0, Math.min(50, v));
+  const plantD = p.plantation_date ? new Date(p.plantation_date) : null;
+
+  // Report-period end month (fiscal quarter end) is the "as of" reference.
+  // FQ_START_MONTH: Q1→3(Apr), Q2→6(Jul), Q3→9(Oct), Q4→0(Jan)
+  const reportEndMonthIdx = (FQ_START_MONTH[q] ?? 0) + 2; // 0-indexed
+  const reportCalYear = fqCalYear(fy, q);
+
+  const maxYear = targets[targets.length - 1]!.year;
+  const maxMonths = Math.max(12, maxYear * 12);
+
+  // Months elapsed from plantation → report-period end.
+  let elapsed = 0;
+  if (plantD) {
+    elapsed = (reportCalYear - plantD.getFullYear()) * 12
+      + (reportEndMonthIdx - plantD.getMonth());
+  }
+  const currentMonths = Math.max(0, Math.min(maxMonths, elapsed));
+
+  // All milestones, year-ordered. Nothing hidden.
+  const milestones: GrowthMilestone[] = targets.map(t => {
+    const lo = ft(t.min!);
+    const hi = ft(t.max!);
+    return {
+      label: t.year === 0 ? 'Year 0' : `End of Year ${t.year}`,
+      range: `${lo}–${hi} Feet`,
+      date: growthDateLabel(plantD, t.year * 12),
+      year: t.year,
+      months: t.year * 12,
+      midFeet: (lo + hi) / 2,
+      current: false,
+    };
+  });
+
+  const currentFeet = interpGrowthFeet(milestones, currentMonths);
+  const maxHi = Math.max(...targets.map(t => ft(t.max!)));
+  const maxFeet = Math.max(2, Math.ceil(maxHi / 2) * 2);
+
+  // Injected "Existing growth" row — always interpolated.
+  const existing: GrowthMilestone | null = plantD ? {
+    label: 'Existing growth',
+    range: currentFeet != null ? `${Math.round(currentFeet * 10) / 10} Feet` : '—',
+    date: growthDateLabel(plantD, currentMonths),
+    year: -1,
+    months: currentMonths,
+    midFeet: currentFeet ?? 0,
+    current: true,
+  } : null;
+
+  // Band label for the readout.
+  let band = '';
+  if (elapsed <= 0) band = 'At plantation';
+  else if (elapsed >= maxMonths) band = `Project complete (Year ${maxYear}+)`;
+  else {
+    for (let i = 0; i < milestones.length - 1; i++) {
+      if (elapsed >= milestones[i]!.months && elapsed < milestones[i + 1]!.months) {
+        band = `Between Year ${milestones[i]!.year} and Year ${milestones[i + 1]!.year}`;
+        break;
+      }
+    }
+  }
+
+  return {
+    milestones,
+    existing,
+    elapsed_months: elapsed,
+    current_months: currentMonths,
+    current_feet: currentFeet,
+    max_months: maxMonths,
+    max_feet: maxFeet,
+    band_label: band,
+  };
 }
 
 function siteMasterPlan(p: FullForestPayload): SiteMasterPlan | null {
@@ -302,8 +385,7 @@ export function computeReport(p: FullForestPayload, year: number, quarter: numbe
     maintenance_tilldate: maintenanceRollup(p.maintenance_workforce ?? [], year, quarter, true),
     workforce_quarter: workforceRollup(p.maintenance_workforce ?? [], year, quarter, false),
     workforce_tilldate: workforceRollup(p.maintenance_workforce ?? [], year, quarter, true),
-    growth_milestones: growthMilestones(p, year, quarter),
-    current_height_label: currentHeightLabel(p),
+    growth: buildGrowth(p, year, quarter),
     site_master_plan: siteMasterPlan(p),
     site_plan_boxes: sitePlanBoxes(p),
   };
