@@ -2535,7 +2535,7 @@ async function forestWeather(req: Request, res: Response): Promise<void> {
  * can be pre-filled without manual lookup.
  */
 async function cityStats(req: Request, res: Response): Promise<void> {
-  const { city, state, country = 'India' } = req.query as Record<string, string>;
+  const { city, state } = req.query as Record<string, string>;
   if (!city?.trim()) { res.status(400).json({ error: 'city is required' }); return; }
 
   const numFromAmount = (v: any): number | null => {
