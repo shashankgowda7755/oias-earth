@@ -14,7 +14,8 @@
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "dev"],
       "cwd": "app/client",
-      "port": 5199
+      "port": 5199,
+      "autoPort": true
     }
   ]
 }
