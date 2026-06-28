@@ -49,7 +49,6 @@ export default function ReportForestQuarterly() {
   }, []);
   const [menuOpen, setMenuOpen] = useState(false);
   const [sendMsg, setSendMsg] = useState('');
-  const [manageMode, setManageMode] = useState(false);
 
   const sendFromViewer = async () => {
     if (id === 'preview' || sendMsg) return;
@@ -176,13 +175,10 @@ export default function ReportForestQuarterly() {
               ) : null}
             </div>
           ) : null}
-          {isAdmin && !isPreview ? (
-            <button
-              onClick={() => setManageMode((m) => !m)}
-              style={{ background: manageMode ? C.green : '#fff', color: manageMode ? '#fff' : C.ink, border: `1px solid ${manageMode ? C.green : C.line}`, borderRadius: 8, padding: '0 12px', height: 34, fontSize: 13, fontWeight: 600, cursor: 'pointer' }}
-            >
-              ☑ Manage Slides {skipped.size > 0 ? `(${skipped.size} hidden)` : ''}
-            </button>
+          {isAdmin && !isPreview && skipped.size > 0 ? (
+            <span style={{ fontSize: 12, color: C.amber, fontWeight: 600 }}>
+              {skipped.size} slide{skipped.size > 1 ? 's' : ''} hidden
+            </span>
           ) : null}
           <span style={{ color: C.muted, fontSize: 13 }}>
             {data.meta.client_name ? `${data.meta.client_name} · ` : ''}{data.forest.forest_name} · {data.meta.quarter_label} {data.meta.year}
@@ -212,17 +208,26 @@ export default function ReportForestQuarterly() {
       <div style={{ padding: '22px 16px 60px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
         {SLIDES.map((Slide, i) => {
           const isSkipped = skipped.has(i);
-          if (isSkipped && !manageMode) return null;
+          if (isSkipped) {
+            if (isAdmin && !isPreview) {
+              return (
+                <div key={i} id={`rpt-slide-${i}`} className="no-print"
+                  style={{ width: '100%', maxWidth: 1100, margin: '0 auto 8px', border: `1px dashed ${C.line}`, borderRadius: 10, padding: '14px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#fff' }}>
+                  <span style={{ color: C.muted, fontSize: 13 }}>Slide {i + 1} — {SLIDE_TITLES[i]} (hidden from report)</span>
+                  <button onClick={() => toggleSkip(i)} style={{ fontSize: 12, color: C.green, background: 'none', border: 'none', cursor: 'pointer', fontWeight: 600 }}>+ Restore</button>
+                </div>
+              );
+            }
+            return null;
+          }
           return (
-            <div key={i} id={`rpt-slide-${i}`} style={{ scrollMarginTop: 64, width: '100%', display: 'flex', justifyContent: 'center', position: 'relative', opacity: isSkipped ? 0.4 : 1 }}>
+            <div key={i} id={`rpt-slide-${i}`} style={{ scrollMarginTop: 64, width: '100%', display: 'flex', justifyContent: 'center', position: 'relative' }}>
               <Slide data={data} />
-              {manageMode && (
-                <button
-                  onClick={() => toggleSkip(i)}
-                  style={{ position: 'absolute', top: 12, right: 12, background: isSkipped ? C.amber : '#fff', color: isSkipped ? '#fff' : C.muted, border: `1px solid ${isSkipped ? C.amber : C.line}`, borderRadius: 8, padding: '6px 12px', fontSize: 13, fontWeight: 700, cursor: 'pointer', zIndex: 5, boxShadow: '0 2px 8px rgba(0,0,0,.1)' }}
-                >
-                  {isSkipped ? '+ Include slide' : '✕ Skip this slide'}
-                </button>
+              {isAdmin && !isPreview && (
+                <div className="no-print" style={{ position: 'absolute', top: 10, right: 10, zIndex: 5, background: 'rgba(255,255,255,.92)', borderRadius: 6, padding: '4px 10px', fontSize: 12, display: 'flex', alignItems: 'center', gap: 6, border: `1px solid ${C.line}`, boxShadow: '0 1px 4px rgba(0,0,0,.08)' }}>
+                  <input type="checkbox" id={`skip-${i}`} checked={false} onChange={() => toggleSkip(i)} style={{ cursor: 'pointer' }} />
+                  <label htmlFor={`skip-${i}`} style={{ cursor: 'pointer', color: C.muted }}>Hide from report</label>
+                </div>
               )}
             </div>
           );
