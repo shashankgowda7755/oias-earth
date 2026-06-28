@@ -277,14 +277,19 @@ export function S05AreaPopulation({ data }: SlideProps) {
       <div style={{ marginTop: 20, flex: 1, minHeight: 0 }}>
         <div style={{ fontSize: 11.5, textTransform: 'uppercase', letterSpacing: '.06em', color: C.muted, marginBottom: 10 }}>Timeline of urban change</div>
         <div style={{ display: 'flex', gap: 14 }}>
-          {(ap?.google_earth_image?.length ? ap.google_earth_image : [{}, {}, {}]).map((g, i) => (
+          {(ap?.google_earth_image?.length ? ap.google_earth_image : [{}, {}, {}]).map((g, i) => {
+            // The PFA "Aerial / map" slot stores a bare URL string; the editor may
+            // store an object. Handle both so the photo always renders.
+            const gi = (typeof g === 'string' ? { image: g } : (g ?? {})) as { image?: string; year?: string | number; population?: number };
+            return (
             <div key={i} style={{ flex: 1 }}>
-              <ReportImage src={g.image} height={150} label="Earth image" />
+              <ReportImage src={gi.image} height={150} label="Earth image" />
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, marginTop: 6 }}>
-                <strong style={{ color: C.ink }}>{dash(g.year)}</strong><span style={{ color: C.muted }}>pop {numOrDash(g.population)}</span>
+                <strong style={{ color: C.ink }}>{dash(gi.year)}</strong><span style={{ color: C.muted }}>pop {numOrDash(gi.population)}</span>
               </div>
             </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </SlidePage>
