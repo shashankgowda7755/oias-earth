@@ -103,6 +103,26 @@ export async function updateForestReportData(
   return (res.data?.data ?? res.data) as { id: string; updated: number };
 }
 
+/**
+ * Atomic per-ITEM edit of a report list column (gallery, maintenance, soil pH,
+ * temperature, progress, env indicators, sponsor/dashboard/report images).
+ * Safe for many editors on the same list — the server mutates just this item
+ * under a row lock, so concurrent adds/edits/deletes don't clobber each other.
+ *
+ *  - add     → saveReportListItem(id, col, null, item)
+ *  - update  → saveReportListItem(id, col, {year,quarter}, item)   (match keys)
+ *  - delete  → saveReportListItem(id, col, {year,quarter}, null)
+ */
+export async function saveReportListItem(
+  forestId: string,
+  column: string,
+  match: Record<string, unknown> | null,
+  item: Record<string, unknown> | null,
+): Promise<{ column: string; op: string; length: number }> {
+  const res = await api.post(`/forest/${forestId}/report-data/list-item`, { column, match, item });
+  return (res.data?.data ?? res.data) as { column: string; op: string; length: number };
+}
+
 /** Auto-derived weather for a forest's fiscal quarter (Open-Meteo). */
 export interface ForestWeather {
   available: boolean;
