@@ -2321,6 +2321,85 @@ async function updateForestReportData(req: Request, res: Response): Promise<void
 }
 
 /* ------------------------------------------------------------------ */
+/* Per-ITEM list edits (Phase 2 — concurrent-edit safe)                 */
+/*                                                                      */
+/* The whole-column report-data write is last-write-wins WITHIN a jsonb */
+/* array: two people editing the same list (e.g. gallery) clobber each  */
+/* other. This endpoint mutates ONE item atomically under a row lock    */
+/* (SELECT … FOR UPDATE), so concurrent adds/edits/deletes to the same  */
+/* list all survive. Column comes from a static whitelist; item identity */
+/* is matched in JS (never interpolated into SQL).                      */
+/* ------------------------------------------------------------------ */
+
+/** jsonb columns that hold an ARRAY of items, editable item-by-item. */
+const REPORT_LIST_COLUMNS = new Set([
+  'maintenance_workforce', 'soil_ph_level', 'temperature_humidity', 'plantation_progress',
+  'environmental_need_indicators', 'additional_sponsor_logo', 'dashboard_images',
+  'report_images', 'gallery_images',
+]);
+
+type ListItem = Record<string, unknown>;
+
+/** True when every key in `match` equals the item's value (loose, num/str safe). */
+function itemMatches(el: unknown, match: ListItem): boolean {
+  if (!el || typeof el !== 'object') return false;
+  const row = el as ListItem;
+  return Object.entries(match).every(([k, v]) => row[k] === v || String(row[k]) === String(v));
+}
+
+/**
+ * POST /forest/:id/report-data/list-item
+ * body { column, match?, item? }:
+ *   - item present, match finds a row  → merge into that row   (update)
+ *   - item present, no match / no match given → append          (add)
+ *   - item null/omitted, match finds a row → remove it          (delete)
+ * Atomic per item — safe for many editors on the same list.
+ */
+async function listItemReportData(req: Request, res: Response): Promise<void> {
+  const forestId = String(req.params.id);
+  await assertForestAccess(req, forestId);
+  const b = (req.body ?? {}) as { column?: string; match?: ListItem | null; item?: ListItem | null };
+  const column = String(b.column ?? '');
+  if (!REPORT_LIST_COLUMNS.has(column)) throw badRequest(`Unknown or non-list report column: ${column}`);
+  const match = b.match ?? null;
+  const item = b.item ?? null;
+
+  const client = await getClient();
+  try {
+    await client.query('BEGIN');
+    const r = await client.query<{ col: unknown }>(
+      `SELECT ${column} AS col FROM forests WHERE id = $1 FOR UPDATE`,
+      [forestId],
+    );
+    if (r.rowCount === 0) { await client.query('ROLLBACK'); throw notFound('Forest not found'); }
+    const parsed = parseMaybeJson<ListItem[]>(r.rows[0]!.col, []);
+    const arr: ListItem[] = Array.isArray(parsed) ? parsed : [];
+
+    const idx = match ? arr.findIndex((el) => itemMatches(el, match)) : -1;
+    let op: 'added' | 'updated' | 'deleted' | 'noop' = 'noop';
+    if (item === null) {
+      if (idx >= 0) { arr.splice(idx, 1); op = 'deleted'; }
+    } else if (idx >= 0) {
+      arr[idx] = { ...(arr[idx] as ListItem), ...item }; op = 'updated';
+    } else {
+      arr.push(item); op = 'added';
+    }
+
+    await client.query(
+      `UPDATE forests SET ${column} = $2::jsonb, is_updated = TRUE, updated_at = now() WHERE id = $1`,
+      [forestId, JSON.stringify(arr)],
+    );
+    await client.query('COMMIT');
+    res.json({ data: { column, op, length: arr.length } });
+  } catch (err) {
+    await client.query('ROLLBACK').catch(() => undefined);
+    throw err;
+  } finally {
+    client.release();
+  }
+}
+
+/* ------------------------------------------------------------------ */
 /* Weather auto-fill (Open-Meteo) — removes manual weather entry        */
 /* ------------------------------------------------------------------ */
 
@@ -3062,6 +3141,7 @@ forestRouter.post('/report/:id/send', wrap(sendReportEmail));
 forestRouter.post('/forest/:id/send-report', photoUpload.single('pdf'), wrap(sendForestReport));
 forestRouter.get('/forest/:id/weather', wrap(forestWeather));
 forestRouter.post('/forest/:id/report-data', wrap(updateForestReportData));
+forestRouter.post('/forest/:id/report-data/list-item', wrap(listItemReportData));
 forestRouter.post('/forest/upsert', upload.any(), wrap(upsertForest));
 forestRouter.post('/forests/upsert', upload.any(), wrap(upsertForest));
 forestRouter.post('/forest/trees/bulk-import', wrap(bulkImportTrees));
