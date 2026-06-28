@@ -13,6 +13,7 @@
  */
 import { query } from '../db';
 import { notFound } from '../errors';
+export { festivalHolidaysInQuarter } from './holidays';
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 const COUNTED = 0.25;

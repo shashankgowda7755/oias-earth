@@ -26,7 +26,7 @@ export const REPORT_SECTIONS: SectionTabDef[] = [
   { key: 'area', label: 'Area & population', group: 'setup', Component: AreaPopulationSection },
   { key: 'beneficiaries', label: 'Beneficiaries & value', group: 'setup', Component: BeneficiariesValueSection },
   { key: 'maintenance', label: 'Maintenance', group: 'setup', Component: MaintenanceSection },
-  { key: 'growth', label: 'Plant growth', group: 'setup', Component: GrowthSection },
-  { key: 'soiltemp', label: 'Soil pH & temperature', group: 'setup', Component: SoilTempSection },
-  { key: 'media', label: 'Species & media', group: 'setup', Component: MediaSection },
+  { key: 'growth', label: 'Plant growth', group: 'quarterly', Component: GrowthSection },
+  { key: 'soiltemp', label: 'Soil pH & temperature', group: 'quarterly', Component: SoilTempSection },
+  { key: 'media', label: 'Species & media', group: 'quarterly', Component: MediaSection },
 ];

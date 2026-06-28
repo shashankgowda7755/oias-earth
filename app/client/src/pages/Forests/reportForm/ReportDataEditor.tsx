@@ -13,12 +13,22 @@ import type { FullForestPayload } from '../fullTypes';
 import { updateForestReportData } from '../forestApi';
 import { REPORT_SECTIONS } from './registry';
 
+function defaultQuarter(): number {
+  const m = new Date().getMonth();
+  if (m >= 3 && m <= 5) return 1;
+  if (m >= 6 && m <= 8) return 2;
+  if (m >= 9) return 3;
+  return 4;
+}
+
 export default function ReportDataEditor() {
   const { id = '' } = useParams();
   const [draft, setDraft] = useState<FullForestPayload | null>(null);
   const [active, setActive] = useState(REPORT_SECTIONS[0]!.key);
   const [loadErr, setLoadErr] = useState<string | null>(null);
   const [status, setStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+  const [selectedQuarter, setSelectedQuarter] = useState(defaultQuarter);
+  const [showAllSetup, setShowAllSetup] = useState(false);
 
   // Autosave model: we persist ONLY the columns the user actually edited, never
   // the whole payload — so two people editing different sections of the same
@@ -112,33 +122,62 @@ export default function ReportDataEditor() {
 
       <div className="flex flex-1 overflow-hidden">
         <nav className="w-56 shrink-0 overflow-y-auto border-r border-border p-3" aria-label="Report sections">
-          <ul className="space-y-0.5">
-            {REPORT_SECTIONS.map((s, i) => {
-              const prev = REPORT_SECTIONS[i - 1];
-              const showSetupHeader = s.group === 'setup' && prev?.group !== 'setup';
-              return (
-                <li key={s.key}>
-                  {showSetupHeader ? (
-                    <div className="px-3 pb-1 pt-3 text-[11px] font-semibold uppercase tracking-wide text-textSecondary/70">
-                      Setup · enter once
-                    </div>
-                  ) : null}
-                  <button
-                    type="button"
-                    onClick={() => setActive(s.key)}
-                    aria-current={s.key === active ? 'page' : undefined}
-                    className={`w-full rounded-card px-3 py-2 text-left text-sm transition-colors ${s.key === active ? 'bg-white/8 text-textPrimary' : 'text-textSecondary hover:bg-white/5 hover:text-textPrimary'}`}
-                  >
-                    {s.label}
-                  </button>
-                </li>
-              );
-            })}
-          </ul>
+          {(() => {
+            const quarterlySecs = REPORT_SECTIONS.filter((s) => s.group !== 'setup');
+            const setupSecs = REPORT_SECTIONS.filter((s) => s.group === 'setup');
+            const isQ2Plus = selectedQuarter > 1;
+            const navBtn = (s: typeof REPORT_SECTIONS[number]) => (
+              <button
+                key={s.key}
+                type="button"
+                onClick={() => setActive(s.key)}
+                aria-current={s.key === active ? 'page' : undefined}
+                className={`w-full rounded-card px-3 py-2 text-left text-sm transition-colors ${s.key === active ? 'bg-white/8 text-textPrimary' : 'text-textSecondary hover:bg-white/5 hover:text-textPrimary'}`}
+              >
+                {s.label}
+              </button>
+            );
+            return (
+              <ul className="space-y-0.5">
+                {quarterlySecs.map((s) => <li key={s.key}>{navBtn(s)}</li>)}
+                {isQ2Plus && !showAllSetup ? (
+                  <li>
+                    <details>
+                      <summary className="cursor-pointer list-none px-3 pb-1 pt-3 text-[11px] font-semibold uppercase tracking-wide text-textSecondary/70 hover:text-textSecondary">
+                        Setup (carried from Q1) ▸
+                      </summary>
+                      <ul className="mt-1 space-y-0.5">{setupSecs.map((s) => <li key={s.key}>{navBtn(s)}</li>)}</ul>
+                    </details>
+                  </li>
+                ) : (
+                  <>
+                    <li>
+                      <div className="px-3 pb-1 pt-3 text-[11px] font-semibold uppercase tracking-wide text-textSecondary/70">
+                        Setup · enter once
+                      </div>
+                    </li>
+                    {setupSecs.map((s) => <li key={s.key}>{navBtn(s)}</li>)}
+                  </>
+                )}
+              </ul>
+            );
+          })()}
         </nav>
         <main className="flex-1 overflow-y-auto">
+          {selectedQuarter > 1 ? (
+            <div style={{ background: 'rgba(76,175,80,0.07)', borderBottom: '1px solid rgba(76,175,80,0.18)', padding: '9px 24px', display: 'flex', alignItems: 'center', gap: 12, fontSize: 13 }}>
+              <span style={{ color: '#aaa' }}>Q{selectedQuarter}: photos, workforce and growth change each quarter. Setup fields carried from Q1.</span>
+              <button
+                type="button"
+                onClick={() => setShowAllSetup((v) => !v)}
+                style={{ color: '#4caf50', background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 600, padding: 0 }}
+              >
+                {showAllSetup ? '← Hide setup' : 'Show all ▸'}
+              </button>
+            </div>
+          ) : null}
           <div className="mx-auto max-w-3xl space-y-5 px-6 py-6">
-            <ActiveSection draft={draft} patch={patch} />
+            <ActiveSection draft={draft} patch={patch} onQuarterChange={setSelectedQuarter} />
           </div>
         </main>
       </div>

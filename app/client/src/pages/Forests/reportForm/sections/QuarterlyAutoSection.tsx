@@ -15,7 +15,7 @@
  * temperature_humidity, soil_ph_level, plant_growth_data.actual_height_range),
  * upserting the row for the selected (year, quarter).
  */
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { SectionShell, FieldGrid, Num, type SectionProps } from '../kit';
 import { fetchForestWeather, type ForestWeather } from '../../forestApi';
@@ -47,11 +47,13 @@ function defaultFiscal(): { year: number; quarter: number } {
   return { year: d.getFullYear() - 1, quarter: 4 };
 }
 
-export function QuarterlyAutoSection({ draft, patch }: SectionProps) {
+export function QuarterlyAutoSection({ draft, patch, onQuarterChange }: SectionProps) {
   const { id = '' } = useParams();
   const fiscal = defaultFiscal();
   const [year, setYear] = useState(fiscal.year);
   const [quarter, setQuarter] = useState(fiscal.quarter);
+
+  useEffect(() => { onQuarterChange?.(fiscal.quarter); }, []); // sync initial quarter to parent
   const [wx, setWx] = useState<ForestWeather | null>(null);
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
@@ -125,7 +127,7 @@ export function QuarterlyAutoSection({ draft, patch }: SectionProps) {
       >
         <FieldGrid cols={2}>
           <Num label="Project year (FY)" value={year} onChange={(v) => setYear(v ?? fiscal.year)} />
-          <Num label="Quarter (1-4)" value={quarter} onChange={(v) => setQuarter(Math.min(4, Math.max(1, v ?? 1)))} />
+          <Num label="Quarter (1-4)" value={quarter} onChange={(v) => { const q = Math.min(4, Math.max(1, v ?? 1)); setQuarter(q); onQuarterChange?.(q); }} />
         </FieldGrid>
         <div className="mt-3 flex items-center gap-3">
           <button

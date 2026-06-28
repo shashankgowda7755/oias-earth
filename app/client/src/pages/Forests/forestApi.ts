@@ -189,6 +189,31 @@ export async function deleteSponsorLogo(forestId: string, index: number): Promis
   await api.post(`/forest/${forestId}/sponsor-logo/delete`, { index });
 }
 
+export interface CityStatsResult {
+  region_name: string;
+  total_jurisdiction_area: number | null;
+  population: number | null;
+  population_density: number | null;
+  description?: string | null;
+  extract?: string | null;
+  climate?: string | null;
+  soil_type?: string | null;
+  error?: string;
+}
+
+/** GET /forest/city-stats?city=&state=&country= — fetch area/population from Wikipedia/Wikidata. */
+export async function fetchCityStats(
+  city: string,
+  state?: string,
+  country?: string,
+): Promise<CityStatsResult> {
+  const params: Record<string, string> = { city };
+  if (state) params.state = state;
+  if (country) params.country = country;
+  const res = await api.get('/forest/city-stats', { params });
+  return res.data as CityStatsResult;
+}
+
 /** GET /forest/:id/weather?year=&quarter= — derive weather from forest lat/long. */
 export async function fetchForestWeather(
   forestId: string,
