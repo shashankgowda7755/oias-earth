@@ -138,8 +138,9 @@ authRouter.post(
  * TEMPORARY pre-launch convenience. Issues an admin session WITHOUT a password
  * so "click Dashboard → straight in" works while real login is unavailable.
  * Picks the most-recent active SuperAdmin (else Admin). Gated by
- * config.allowDemoLogin (ALLOW_DEMO_LOGIN=false disables → 404). PUBLIC BACKDOOR
- * — remove this route before real launch.
+ * config.allowDemoLogin — DEFAULTS OFF (returns 404); opt in only for a
+ * controlled demo with ALLOW_DEMO_LOGIN=true. PUBLIC BACKDOOR — remove this
+ * route before real launch.
  */
 authRouter.post(
   '/demo-login',

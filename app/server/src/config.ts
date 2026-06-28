@@ -23,9 +23,9 @@ export const config = {
   jwtSecret: required('JWT_SECRET', 'dev-only-change-me-communitree-secret'),
   jwtExpiresIn: process.env.JWT_EXPIRES_IN ?? '7d',
   // TEMPORARY pre-launch convenience: a password-free "demo login" that mints an
-  // admin session (POST /auth/demo-login). PUBLIC BACKDOOR — disable before real
-  // launch by setting ALLOW_DEMO_LOGIN=false. Defaults ON until then.
-  allowDemoLogin: process.env.ALLOW_DEMO_LOGIN !== 'false',
+  // admin session (POST /auth/demo-login). PUBLIC BACKDOOR — defaults OFF. Opt in
+  // explicitly with ALLOW_DEMO_LOGIN=true only for a controlled demo; never on real launch.
+  allowDemoLogin: process.env.ALLOW_DEMO_LOGIN === 'true',
   port: Number(process.env.PORT ?? 4000),
   corsOrigins: (process.env.CORS_ORIGIN ?? 'http://localhost:5173')
     .split(',')
