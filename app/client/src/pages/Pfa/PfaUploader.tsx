@@ -9,7 +9,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useToast } from '@/components/Toast';
 import { fetchForestReport } from '@/lib/publicApi';
-import { uploadReportImage, clearReportImage, uploadSponsorLogo, deleteSponsorLogo } from '../Forests/forestApi';
+import { uploadReportImage, clearReportImage, uploadSponsorLogo, deleteSponsorLogo, satelliteFetch } from '../Forests/forestApi';
 import { fetchForestOptions, type ForestOption } from '../Reports/reportApi';
 
 // `ratio` is the target aspect ratio (width / height) the report slot renders at.
@@ -26,7 +26,6 @@ const SITE_SLOTS: Slot[] = [
   { key: 'impact', label: 'Impact', ratio: 4 / 3 },
   { key: 'permission', label: 'Permission', ratio: 3 / 4 },
   { key: 'layout', label: 'Site layout', ratio: 4 / 3 },
-  { key: 'earth', label: 'Aerial / map', ratio: 1 },
   { key: 'security', label: 'Security', ratio: 4 / 3 },
   { key: 'dashboard', label: 'Dashboard', ratio: 16 / 9 },
 ];
@@ -100,8 +99,6 @@ function seedFromForest(forest: Rec, y: number, q: number): Record<string, strin
   if (byType('project_impact_slide')) out.impact = byType('project_impact_slide')!;
   if (forest.permission_letter) out.permission = String(forest.permission_letter);
   if (forest.site_layout) out.layout = String(forest.site_layout);
-  const earth = (forest.area_population_statistics_details as Rec)?.google_earth_image as unknown[] | undefined;
-  if (Array.isArray(earth) && earth[0]) out.earth = String(earth[0]);
   const sec = (forest.security_and_infrastructure as Rec)?.image_data as { image?: string }[] | undefined;
   if (Array.isArray(sec) && sec[0]?.image) out.security = sec[0].image!;
   const dash = forest.dashboard_images as { image?: string }[] | undefined;
@@ -147,6 +144,13 @@ export default function PfaUploader() {
   const [camSlot, setCamSlot] = useState<Slot | null>(null);
   const [facing, setFacing] = useState<'environment' | 'user'>('environment');
   const [camErr, setCamErr] = useState<string | null>(null);
+  // Slide-5 satellite timeline: 3 aerial images (each { url, year }).
+  const [earth, setEarth] = useState<{ url: string; year: string }[]>([
+    { url: '', year: '' }, { url: '', year: '' }, { url: '', year: '' },
+  ]);
+  const [aerialBusy, setAerialBusy] = useState<number | null>(null);
+  const aerialFile = useRef<HTMLInputElement | null>(null);
+  const aerialIdx = useRef<number>(-1);
 
   useEffect(() => { fetchForestOptions().then(setForests).catch(() => undefined); }, []);
 
@@ -158,6 +162,16 @@ export default function PfaUploader() {
         if (!alive) return;
         const f = (r.forest as Rec) ?? {};
         setStatus(seedFromForest(f, year, quarter));
+        const ge = (f.area_population_statistics_details as Rec)?.google_earth_image as unknown[] | undefined;
+        setEarth([0, 1, 2].map((i) => {
+          const c = Array.isArray(ge) ? ge[i] : undefined;
+          if (typeof c === 'string') return { url: c, year: '' };
+          if (c && typeof c === 'object') {
+            const o = c as { image?: string; year?: string | number };
+            return { url: String(o.image ?? ''), year: o.year != null ? String(o.year) : '' };
+          }
+          return { url: '', year: '' };
+        }));
         const raw = (f.additional_sponsor_logo as { type?: { label?: string; value?: string }; name?: string; logo?: string }[]) ?? [];
         setLogos(raw.map((l, i) => ({
           title: l.type?.label || (l.type?.value === 'initiated_by' ? 'Initiated By' : 'Sponsored By'),
@@ -259,6 +273,40 @@ export default function PfaUploader() {
     }
   };
 
+  // satellite timeline (slide 5)
+  const setAerialYear = (i: number, v: string) => setEarth((e) => e.map((c, j) => (j === i ? { ...c, year: v.replace(/[^0-9]/g, '').slice(0, 4) } : c)));
+  const uploadAerial = async (i: number, file?: File | null) => {
+    if (!file) return;
+    if (!forestId) { toast.error('Pick a forest first.'); return; }
+    setAerialBusy(i);
+    try {
+      const cropped = await cropToRatio(file, 4 / 3);
+      const yr = Number(earth[i]?.year) || undefined;
+      const r = await uploadReportImage(forestId, 'earth', cropped, { index: i, year: yr });
+      setEarth((e) => e.map((c, j) => (j === i ? { ...c, url: r.url } : c)));
+      toast.success(`Satellite ${i + 1} uploaded.`);
+    } catch (e) { toast.error(e instanceof Error ? e.message : 'Upload failed.'); }
+    finally { setAerialBusy(null); }
+  };
+  const clearAerial = async (i: number) => {
+    if (!forestId) return;
+    const prev = earth[i] ?? { url: '', year: '' };
+    setEarth((e) => e.map((c, j) => (j === i ? { ...c, url: '' } : c)));
+    try { await clearReportImage(forestId, 'earth', { index: i }); }
+    catch (e) { setEarth((ee) => ee.map((c, j) => (j === i ? prev : c))); toast.error(e instanceof Error ? e.message : 'Delete failed.'); }
+  };
+  const autoSat = async () => {
+    if (!forestId) { toast.error('Pick a forest first.'); return; }
+    setAerialBusy(0);
+    try {
+      const yr = Number(earth[0]?.year) || undefined;
+      const r = await satelliteFetch(forestId, 0, yr);
+      setEarth((e) => e.map((c, j) => (j === 0 ? { url: r.url, year: String(r.year) } : c)));
+      toast.success('Current satellite fetched.');
+    } catch (e) { toast.error(e instanceof Error ? e.message : 'Fetch failed — set the forest map location first.'); }
+    finally { setAerialBusy(null); }
+  };
+
   // logos
   const patchLogo = (i: number, p: Partial<LogoRow>) => setLogos((ls) => ls.map((r, j) => (j === i ? { ...r, ...p } : r)));
   const addSponsor = () => setLogos((ls) => [...ls, { title: 'Sponsored By', name: '', value: 'sponsored_by', serverIndex: -1 }]);
@@ -317,6 +365,7 @@ export default function PfaUploader() {
     <div className="min-h-screen bg-appbg text-textPrimary">
       <input ref={fileInput} type="file" accept="image/*" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (fileSlot.current) stage(fileSlot.current, f); e.target.value = ''; }} />
       <input ref={logoInput} type="file" accept="image/*" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f && logoIdx.current >= 0) persistLogo(logoIdx.current, f); e.target.value = ''; }} />
+      <input ref={aerialFile} type="file" accept="image/*" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f && aerialIdx.current >= 0) uploadAerial(aerialIdx.current, f); e.target.value = ''; }} />
 
       {/* always-available install notification */}
       {!standalone && !bannerHidden ? (
@@ -389,6 +438,31 @@ export default function PfaUploader() {
             <div className="grid grid-cols-2 gap-3">
               {(page === 'site' ? SITE_SLOTS : QUARTER_SLOTS).map((s) => <Tile key={s.key} slot={s} />)}
             </div>
+            {page === 'site' ? (
+              <div className="mt-5 rounded-card border border-border bg-surface p-4">
+                <div className="mb-1 flex items-center justify-between">
+                  <span className="text-sm font-semibold">Satellite imagery</span>
+                  <span className="text-[11px] text-textSecondary">slide 5 · up to 3</span>
+                </div>
+                <p className="mb-3 text-xs text-textSecondary">Timeline of urban change. Auto-fetch the current view; add older years from Google Earth. Type the year, then add the image.</p>
+                <button type="button" onClick={autoSat} disabled={aerialBusy !== null} className="mb-3 flex w-full items-center justify-center gap-2 rounded-button border border-primary/60 py-2.5 text-sm font-semibold text-primary disabled:opacity-50">
+                  <i className={`ti ${aerialBusy === 0 ? 'ti-loader-2' : 'ti-satellite'}`} aria-hidden="true" /> Auto-fetch current
+                </button>
+                <div className="space-y-2">
+                  {earth.map((c, i) => (
+                    <div key={i} className="flex items-center gap-2">
+                      <button type="button" onClick={() => { aerialIdx.current = i; aerialFile.current?.click(); }} className="relative flex h-14 w-20 flex-none items-center justify-center overflow-hidden rounded-button border border-border bg-appbg">
+                        {c.url ? <img src={c.url} alt="" className="absolute inset-0 h-full w-full object-cover" /> : null}
+                        <i className={`ti ${aerialBusy === i ? 'ti-loader-2' : c.url ? 'ti-circle-check' : 'ti-photo-plus'} relative z-10 text-lg ${c.url ? 'text-white' : 'text-textSecondary'}`} aria-hidden="true" />
+                      </button>
+                      <input value={c.year} onChange={(e) => setAerialYear(i, e.target.value)} inputMode="numeric" placeholder="Year" className="w-16 flex-none rounded-button border border-border bg-appbg px-2 py-2 text-center text-sm" />
+                      <span className="flex-1 text-xs text-textSecondary">Satellite {i + 1}{c.url ? ' · added' : ''}</span>
+                      {c.url ? <button type="button" onClick={() => clearAerial(i)} aria-label="Delete" className="flex-none p-1 text-textSecondary hover:text-danger"><i className="ti ti-trash" aria-hidden="true" /></button> : null}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : null}
           </main>
         </>
       ) : null}

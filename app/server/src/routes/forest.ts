@@ -3030,7 +3030,7 @@ function upsertQ(
   return list;
 }
 
-async function applyImageSlot(id: string, slot: ImgSlot, url: string, year?: number, quarter?: number): Promise<void> {
+async function applyImageSlot(id: string, slot: ImgSlot, url: string, year?: number, quarter?: number, index?: number): Promise<void> {
   // sponsor_logo: nothing to write server-side — the URL is saved into the
   // additional_sponsor_logo[] row client-side via the editor's autosave.
   if (slot === 'sponsor_logo') return;
@@ -3055,9 +3055,18 @@ async function applyImageSlot(id: string, slot: ImgSlot, url: string, year?: num
     return saveJsonb(id, 'dashboard_images', [...(Array.isArray(arr) ? arr : []), { name: '', description: '', image: url }]);
   }
   if (slot === 'earth') {
+    // Slide-5 "Timeline of urban change" = up to 3 satellite images, each
+    // { image, year?, population? }. Write/replace at `index` (default append).
     const cur = ((await loadJsonb(id, 'area_population_statistics_details')) as { google_earth_image?: unknown[] } | null) ?? {};
-    const img = Array.isArray(cur.google_earth_image) ? [...cur.google_earth_image] : [];
-    return saveJsonb(id, 'area_population_statistics_details', { ...cur, google_earth_image: [...img, url] });
+    const arr = Array.isArray(cur.google_earth_image) ? [...cur.google_earth_image] : [];
+    const i = Number.isInteger(index) ? (index as number) : arr.length;
+    while (arr.length <= i) arr.push({});
+    const cell = arr[i];
+    const prev: Record<string, unknown> = typeof cell === 'string'
+      ? { image: cell }
+      : (cell && typeof cell === 'object' ? (cell as Record<string, unknown>) : {});
+    arr[i] = { ...prev, image: url, ...(year != null ? { year } : {}) };
+    return saveJsonb(id, 'area_population_statistics_details', { ...cur, google_earth_image: arr });
   }
   // per-quarter slots
   const y = year ?? new Date().getFullYear();
@@ -3085,7 +3094,7 @@ async function applyImageSlot(id: string, slot: ImgSlot, url: string, year?: num
  *  drop the slide_type entry; arrays (security/dashboard/earth) → remove the
  *  entry matching `url` (or the first); per-quarter → null that field in the
  *  quarter row. Mirrors applyImageSlot's storage layout. */
-async function clearImageSlot(id: string, slot: ImgSlot, year?: number, quarter?: number, url?: string): Promise<void> {
+async function clearImageSlot(id: string, slot: ImgSlot, year?: number, quarter?: number, url?: string, index?: number): Promise<void> {
   if (slot === 'permission') return void (await query(`UPDATE forests SET permission_letter = NULL, is_updated = TRUE, updated_at = now() WHERE id = $1`, [id]));
   if (slot === 'layout') return void (await query(`UPDATE forests SET site_layout = NULL, is_updated = TRUE, updated_at = now() WHERE id = $1`, [id]));
   if (slot === 'cover' || slot === 'content' || slot === 'impact') {
@@ -3106,8 +3115,16 @@ async function clearImageSlot(id: string, slot: ImgSlot, year?: number, quarter?
   }
   if (slot === 'earth') {
     const cur = ((await loadJsonb(id, 'area_population_statistics_details')) as { google_earth_image?: unknown[] } | null) ?? {};
-    const img = Array.isArray(cur.google_earth_image) ? cur.google_earth_image : [];
-    return saveJsonb(id, 'area_population_statistics_details', { ...cur, google_earth_image: url ? img.filter((e) => e !== url) : img.slice(1) });
+    const arr = Array.isArray(cur.google_earth_image) ? [...cur.google_earth_image] : [];
+    let next: unknown[];
+    if (Number.isInteger(index) && (index as number) >= 0 && (index as number) < arr.length) {
+      next = arr.map((e, j) => (j === index ? {} : e)); // empty the slot, keep positions
+    } else if (url) {
+      next = arr.filter((e) => e !== url && !(e && typeof e === 'object' && (e as { image?: string }).image === url));
+    } else {
+      next = arr.slice(1);
+    }
+    return saveJsonb(id, 'area_population_statistics_details', { ...cur, google_earth_image: next });
   }
   const y = year ?? new Date().getFullYear();
   const q = quarter && quarter >= 1 && quarter <= 4 ? quarter : Math.floor(new Date().getMonth() / 3) + 1;
@@ -3134,10 +3151,11 @@ async function clearImageSlot(id: string, slot: ImgSlot, year?: number, quarter?
 async function clearReportImage(req: Request, res: Response): Promise<void> {
   const id = String(req.params.id);
   if (!WX_UUID_RE.test(id)) throw notFound('Forest not found');
-  const b = (req.body ?? {}) as { slot?: string; year?: number; quarter?: number; url?: string };
+  const b = (req.body ?? {}) as { slot?: string; year?: number; quarter?: number; url?: string; index?: number };
   const slot = b.slot as ImgSlot;
   if (!REPORT_IMAGE_SLOTS.includes(slot)) { res.status(400).json({ error: true, message: 'Unknown slot' }); return; }
-  await clearImageSlot(id, slot, b.year, b.quarter, b.url);
+  const cIdx = Number(b.index);
+  await clearImageSlot(id, slot, b.year, b.quarter, b.url, Number.isInteger(cIdx) ? cIdx : undefined);
   res.json({ data: { ok: true, slot, cleared: true } });
 }
 
@@ -3206,6 +3224,8 @@ async function uploadReportImage(req: Request, res: Response): Promise<void> {
   if (!REPORT_IMAGE_SLOTS.includes(slot)) { res.status(400).json({ error: true, message: `Unknown slot. One of: ${REPORT_IMAGE_SLOTS.join(', ')}` }); return; }
   const year = Number((req.body as { year?: unknown })?.year) || undefined;
   const quarter = Number((req.body as { quarter?: unknown })?.quarter) || undefined;
+  const idxRaw = Number((req.body as { index?: unknown })?.index);
+  const index = Number.isInteger(idxRaw) ? idxRaw : undefined;
 
   const exists = await query(`SELECT 1 FROM forests WHERE id = $1`, [id]);
   if (exists.rowCount === 0) throw notFound('Forest not found');
@@ -3213,8 +3233,48 @@ async function uploadReportImage(req: Request, res: Response): Promise<void> {
   const ext = (file.originalname.split('.').pop() || 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '') || 'jpg';
   const key = `forests/${id}/${slot}-${Date.now()}.${ext}`;
   const url = await putObject(key, file.buffer, file.mimetype || 'image/jpeg');
-  await applyImageSlot(id, slot, url, year, quarter);
-  res.json({ data: { ok: true, url, slot } });
+  await applyImageSlot(id, slot, url, year, quarter, index);
+  res.json({ data: { ok: true, url, slot, index } });
+}
+
+/**
+ * POST /forest/:id/satellite-fetch { index?, year? } — auto-pull a CURRENT
+ * satellite image for the forest's lat/long from Esri World Imagery (free, no
+ * key) and store it into google_earth_image[index] (default 0) with the given
+ * year (default current). Feeds slide 5's "Timeline of urban change".
+ */
+async function fetchSatellite(req: Request, res: Response): Promise<void> {
+  const id = String(req.params.id);
+  if (!WX_UUID_RE.test(id)) throw notFound('Forest not found');
+  if (!storageReady()) { res.status(503).json({ error: true, message: 'Photo storage not configured.' }); return; }
+  const r = await query<{ lat: string | null; lng: string | null }>(
+    `SELECT forest_geo_lat AS lat, forest_geo_long AS lng FROM forests WHERE id = $1`, [id]);
+  const row = r.rows[0];
+  if (!row) throw notFound('Forest not found');
+  const lat = Number(row.lat), lng = Number(row.lng);
+  if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
+    res.status(400).json({ error: true, message: 'Forest has no latitude/longitude — set the map location first.' });
+    return;
+  }
+  const idxRaw = Number((req.body as { index?: unknown })?.index);
+  const index = Number.isInteger(idxRaw) && idxRaw >= 0 ? idxRaw : 0;
+  const yearRaw = Number((req.body as { year?: unknown })?.year);
+  const year = Number.isInteger(yearRaw) ? yearRaw : new Date().getFullYear();
+  const d = 0.012; // ~1.3 km half-box around the point
+  const exportUrl = `https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/export?bbox=${lng - d},${lat - d},${lng + d},${lat + d}&bboxSR=4326&imageSR=3857&size=900,675&format=jpg&f=image`;
+  let buf: Buffer;
+  try {
+    const resp = await fetch(exportUrl);
+    if (!resp.ok) { res.status(502).json({ error: true, message: `Satellite source returned ${resp.status}` }); return; }
+    buf = Buffer.from(await resp.arrayBuffer());
+  } catch {
+    res.status(502).json({ error: true, message: 'Could not reach the satellite imagery service.' });
+    return;
+  }
+  const key = `forests/${id}/satellite-${Date.now()}.jpg`;
+  const url = await putObject(key, buf, 'image/jpeg');
+  await applyImageSlot(id, 'earth', url, year, undefined, index);
+  res.json({ data: { ok: true, url, index, year } });
 }
 
 /* ------------------------------------------------------------------ */
@@ -3223,6 +3283,7 @@ async function uploadReportImage(req: Request, res: Response): Promise<void> {
 
 forestRouter.post('/forest/:id/report-image', photoUpload.single('photo'), wrap(uploadReportImage));
 forestRouter.post('/forest/:id/report-image/clear', wrap(clearReportImage));
+forestRouter.post('/forest/:id/satellite-fetch', wrap(fetchSatellite));
 forestRouter.post('/forest/:id/sponsor-logo', photoUpload.single('logo'), wrap(uploadSponsorLogo));
 forestRouter.post('/forest/:id/sponsor-logo/delete', wrap(deleteSponsorLogo));
 forestRouter.post('/email-log/list', wrap(emailLogList));

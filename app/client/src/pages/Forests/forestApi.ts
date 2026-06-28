@@ -146,9 +146,23 @@ export interface ForestWeather {
 export async function clearReportImage(
   forestId: string,
   slot: string,
-  opts?: { year?: number; quarter?: number; url?: string },
+  opts?: { year?: number; quarter?: number; url?: string; index?: number },
 ): Promise<void> {
   await api.post(`/forest/${forestId}/report-image/clear`, { slot, ...opts });
+}
+
+/** PFA: auto-fetch a CURRENT satellite image (Esri) for the forest's lat/long
+ *  into google_earth_image[index]. Returns the stored URL. */
+export async function satelliteFetch(
+  forestId: string,
+  index = 0,
+  year?: number,
+): Promise<{ url: string; index: number; year: number }> {
+  const { data } = await api.post(`/forest/${forestId}/satellite-fetch`, {
+    index,
+    ...(year != null ? { year } : {}),
+  });
+  return (data?.data ?? data) as { url: string; index: number; year: number };
 }
 
 /** PFA uploader: POST a report photo to a slot; returns the stored URL. */
@@ -156,13 +170,14 @@ export async function uploadReportImage(
   forestId: string,
   slot: string,
   file: File,
-  opts?: { year?: number; quarter?: number },
+  opts?: { year?: number; quarter?: number; index?: number },
 ): Promise<{ url: string; slot: string }> {
   const fd = new FormData();
   fd.append('photo', file);
   fd.append('slot', slot);
   if (opts?.year) fd.append('year', String(opts.year));
   if (opts?.quarter) fd.append('quarter', String(opts.quarter));
+  if (opts?.index != null) fd.append('index', String(opts.index));
   const { data } = await api.post(`/forest/${forestId}/report-image`, fd, {
     headers: { 'Content-Type': 'multipart/form-data' },
   });
