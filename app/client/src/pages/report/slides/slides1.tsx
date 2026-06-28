@@ -133,8 +133,7 @@ const tocRows = (area: string): [string, string][] => [
   ['Site Master Plan', '14'], ['Description: Soil pH Level', '15'], ['Description: Temperature', '16'],
   [`Environmental Need Indicators of ${area}`, '17'], ['Saplings Planted & Species Inventory', '18'],
   ['Score Card With GRI Framework Integration', '19'], ['Site Security & Infrastructure', '20'],
-  ['Transforming Landscapes: Plantation Progress', '21'],
-  ['Photo Gallery', '22'],
+  ['Photo Gallery', '21'],
 ];
 export function S02Contents({ data }: SlideProps) {
   const { meta, forest } = data;
