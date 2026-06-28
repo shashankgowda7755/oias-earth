@@ -2545,20 +2545,22 @@ async function cityStats(req: Request, res: Response): Promise<void> {
 
   // 1. Find the city as a WIKIDATA ENTITY (structured), not a Wikipedia text
   //    search — the old text search matched unrelated pages (e.g. "… elections").
-  const searchTerm = encodeURIComponent([city.trim(), state?.trim()].filter(Boolean).join(' '));
+  // wbsearchentities matches LABELS, so search the city name ALONE (a combined
+  // "City State" string matches nothing). State is used to disambiguate below.
+  const searchTerm = encodeURIComponent(city.trim());
   const searchResp = await fetch(
-    `https://www.wikidata.org/w/api.php?action=wbsearchentities&search=${searchTerm}&language=en&type=item&limit=10&format=json&origin=*`,
+    `https://www.wikidata.org/w/api.php?action=wbsearchentities&search=${searchTerm}&language=en&type=item&limit=15&format=json&origin=*`,
     { signal: AbortSignal.timeout(8000) },
   );
   if (!searchResp.ok) { res.status(502).json({ error: 'Wikidata search failed' }); return; }
   const searchJson = (await searchResp.json()) as any;
-  const candidateIds: string[] = (searchJson?.search ?? []).map((s: any) => s.id).filter(Boolean).slice(0, 10);
+  const candidateIds: string[] = (searchJson?.search ?? []).map((s: any) => s.id).filter(Boolean).slice(0, 15);
   if (candidateIds.length === 0) { res.json({ error: 'City not found', region_name: city.trim() }); return; }
 
-  // 2. Pull claims/labels/sitelinks; pick the candidate that is a settlement
-  //    (P31 ∈ settlement types) AND has a population (P1082).
+  // 2. Pull claims/labels/sitelinks/descriptions; keep candidates that are a
+  //    settlement (P31 ∈ settlement types) AND have a population (P1082).
   const entsResp = await fetch(
-    `https://www.wikidata.org/w/api.php?action=wbgetentities&ids=${candidateIds.join('|')}&props=claims|labels|sitelinks&languages=en&format=json&origin=*`,
+    `https://www.wikidata.org/w/api.php?action=wbgetentities&ids=${candidateIds.join('|')}&props=claims|labels|sitelinks|descriptions&languages=en&format=json&origin=*`,
     { signal: AbortSignal.timeout(8000) },
   );
   const entsJson = (await entsResp.json()) as any;
@@ -2566,11 +2568,11 @@ async function cityStats(req: Request, res: Response): Promise<void> {
   const SETTLEMENT = new Set(['Q515', 'Q486972', 'Q1549591', 'Q15284', 'Q3957', 'Q1093829', 'Q1637706', 'Q2074737', 'Q702492', 'Q1066984', 'Q5119', 'Q12076836']);
   const p31ids = (e: any): string[] => (e?.claims?.P31 ?? []).map((c: any) => c?.mainsnak?.datavalue?.value?.id).filter(Boolean);
   const hasPop = (e: any): boolean => (e?.claims?.P1082 ?? []).length > 0;
-  let entity: any = null;
-  for (const id of candidateIds) {
-    const e = ents[id];
-    if (e && hasPop(e) && p31ids(e).some((q) => SETTLEMENT.has(q))) { entity = e; break; }
-  }
+  const descOf = (e: any): string => String(e?.descriptions?.en?.value ?? '').toLowerCase();
+  const settlements = candidateIds.map((id) => ents[id]).filter((e) => e && hasPop(e) && p31ids(e).some((q) => SETTLEMENT.has(q)));
+  const st = (state ?? '').trim().toLowerCase();
+  // Prefer a settlement whose description mentions the given state, else the first.
+  let entity: any = (st ? settlements.find((e) => descOf(e).includes(st)) : null) ?? settlements[0] ?? null;
   if (!entity) entity = candidateIds.map((id) => ents[id]).find((e) => e && hasPop(e)) ?? null;
   if (!entity) { res.json({ error: 'No population data found', region_name: city.trim() }); return; }
 
@@ -2590,7 +2592,15 @@ async function cityStats(req: Request, res: Response): Promise<void> {
     .sort((a, b) => (b.year ?? 0) - (a.year ?? 0));
 
   const population = numFromAmount(pickClaim('P1082')) ?? (population_by_year[0]?.population ?? null);
-  const area_km2 = numFromAmount(pickClaim('P2046'));
+  // Area: P2046 carries a unit (km², m², or hectare). Normalise to km².
+  const areaVal = pickClaim('P2046');
+  let area_km2 = numFromAmount(areaVal);
+  if (area_km2 != null) {
+    const unit = String(areaVal?.unit ?? '');
+    if (unit.endsWith('Q25343')) area_km2 = area_km2 / 1e6;       // square metre
+    else if (unit.endsWith('Q35852')) area_km2 = area_km2 / 100;  // hectare
+    else if (area_km2 > 1e5) area_km2 = area_km2 / 1e6;           // unit missing but value looks like m²
+  }
   const density =
     numFromAmount(pickClaim('P1539')) ??
     (population && area_km2 ? Math.round(population / area_km2) : null);
