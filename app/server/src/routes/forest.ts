@@ -2915,6 +2915,9 @@ const photoUpload = multer({ storage: multer.memoryStorage(), limits: { fileSize
 const REPORT_IMAGE_SLOTS = [
   'cover', 'content', 'impact', 'permission', 'layout',
   'security', 'progress', 'soil_meter', 'temp_inside', 'temp_outside', 'earth', 'dashboard', 'gallery',
+  // sponsor_logo: stores the file + returns a URL; the logo itself is persisted
+  // client-side into additional_sponsor_logo[].logo, so applyImageSlot no-ops.
+  'sponsor_logo',
 ] as const;
 type ImgSlot = (typeof REPORT_IMAGE_SLOTS)[number];
 const SLIDE_TYPE: Record<string, string> = { cover: 'first_slide', content: 'content_slide', impact: 'project_impact_slide' };
@@ -2941,6 +2944,9 @@ function upsertQ(
 }
 
 async function applyImageSlot(id: string, slot: ImgSlot, url: string, year?: number, quarter?: number): Promise<void> {
+  // sponsor_logo: nothing to write server-side — the URL is saved into the
+  // additional_sponsor_logo[] row client-side via the editor's autosave.
+  if (slot === 'sponsor_logo') return;
   if (slot === 'permission') return void (await query(`UPDATE forests SET permission_letter = $2, is_updated = TRUE, updated_at = now() WHERE id = $1`, [id, url]));
   if (slot === 'layout') return void (await query(`UPDATE forests SET site_layout = $2, is_updated = TRUE, updated_at = now() WHERE id = $1`, [id, url]));
   if (slot === 'cover' || slot === 'content' || slot === 'impact') {

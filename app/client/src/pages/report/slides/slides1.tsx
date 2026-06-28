@@ -38,6 +38,24 @@ function LogoCard({ caption, name, logo }: { caption: string; name?: string; log
 const findLogo = (data: SlideProps['data'], value: string) =>
   (data.forest.additional_sponsor_logo ?? []).find((l) => l.type?.value === value);
 
+/**
+ * Cover text is data-driven (any forest name / description length), so the
+ * headline + eyebrow auto-size to the content — a long description shrinks to
+ * fit the cover instead of overflowing, a short one stays large.
+ */
+function fitHeadline(text: string | null | undefined): number {
+  const n = (text ?? '').trim().length;
+  if (n > 80) return 26;
+  if (n > 60) return 30;
+  if (n > 44) return 36;
+  if (n > 30) return 42;
+  return 46;
+}
+function fitEyebrow(text: string | null | undefined): number {
+  const n = (text ?? '').trim().length;
+  return n > 40 ? 16 : n > 26 ? 19 : 22;
+}
+
 /* ----------------------------- Slide 1: Cover ----------------------------- */
 export function S01Cover({ data }: SlideProps) {
   const { meta, forest, computed } = data;
@@ -63,11 +81,17 @@ export function S01Cover({ data }: SlideProps) {
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 36, flex: 1 }}>
         <div style={{ display: 'flex', flexDirection: 'column' }}>
-          {meta.client_name && <div style={{ fontSize: 30, fontWeight: 800, color: C.green }}>{meta.client_name}</div>}
-          <h1 style={{ fontSize: 44, lineHeight: 1.08, fontWeight: 800, color: C.ink, margin: '4px 0 0' }}>{dash(forest.forest_name)}</h1>
+          {/* Forest name = small eyebrow; description = the big green headline.
+              No client/sponsor name on the cover — the sponsor shows only in the
+              "Sponsored by" logo card below. */}
           {forest.forest_desc ? (
-            <p style={{ fontSize: 15, color: C.body, lineHeight: 1.5, margin: '12px 0 0', maxWidth: 460 }}>{forest.forest_desc}</p>
-          ) : null}
+            <>
+              <div style={{ fontSize: fitEyebrow(forest.forest_name), fontWeight: 800, color: C.ink, letterSpacing: '.01em' }}>{dash(forest.forest_name)}</div>
+              <h1 style={{ fontSize: fitHeadline(forest.forest_desc), lineHeight: 1.06, fontWeight: 800, color: C.green, margin: '6px 0 0', maxWidth: 540 }}>{forest.forest_desc}</h1>
+            </>
+          ) : (
+            <h1 style={{ fontSize: fitHeadline(forest.forest_name), lineHeight: 1.06, fontWeight: 800, color: C.ink, margin: '4px 0 0', maxWidth: 540 }}>{dash(forest.forest_name)}</h1>
+          )}
 
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginTop: 22 }}>
             {pill(`${meta.quarter_label} Quarterly Report`)}

@@ -2,7 +2,6 @@ import {
   SectionShell,
   FieldGrid,
   Txt,
-  Url,
   Img,
   Sel,
   RepeatableRows,
@@ -265,7 +264,13 @@ export function MediaSection({ draft, patch }: SectionProps) {
                 options={SPONSOR_LOGO_TYPE_OPTIONS}
               />
               <Txt label="Name" value={row.name} onChange={(v) => update({ name: v })} />
-              <Url label="Logo" value={row.logo} onChange={(v) => update({ logo: v })} />
+              <Img
+                label="Logo"
+                value={row.logo}
+                onChange={(v) => update({ logo: v })}
+                forestId={forestId}
+                slot="sponsor_logo"
+              />
             </FieldGrid>
           )}
         />
