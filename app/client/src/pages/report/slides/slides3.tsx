@@ -1,10 +1,13 @@
 /**
  * Slides 15–22: Soil pH, Temperature, Environmental Indicators, Species
- * Inventory, Score Card (GRI), Site Security, Plantation Progress, Thank You.
+ * Inventory, Score Card (GRI), Site Security, per-fiscal-year Photo Gallery,
+ * Thank You.
  */
 import { useEffect, useState } from 'react';
+import type { CSSProperties } from 'react';
 import QRCode from 'qrcode';
 import type { SlideProps } from '../reportTypes';
+import { fiscalYearLabel } from '@/lib/fiscal';
 import {
   C, SectionTitle, SlidePage, ReportImage, EmptyBlock, DarkPanel, Pill, CARD_SHADOW,
   dash, numOrDash, fmtDate, enumLabel,
@@ -284,51 +287,59 @@ export function S20Security({ data }: SlideProps) {
   );
 }
 
-/* --------------------- Slide 22: Photo Gallery (one per quarter) --------------------- */
-export function S21bGallery({ data }: SlideProps) {
-  const { meta, forest } = data;
-  const gallery = (forest.gallery_images ?? []).filter((g) => g && g.image);
-  const sorted = [...gallery].sort((a, b) => (Number(a.year) - Number(b.year)) || (Number(a.quarter) - Number(b.quarter)));
-  // Dashboard images are also surfaced here (no quarter — labelled by name).
-  const dashImgs = (forest.dashboard_images ?? [])
-    .filter((d) => d && d.image)
-    .map((d) => ({ image: d.image, caption: d.name || d.description }));
-  type GCell = { image?: string; year?: number; quarter?: number; caption?: string };
-  const cellsData: GCell[] = [...sorted, ...dashImgs];
-  // Empty-safe: show 4 placeholders when there are no photos yet.
-  const cells: GCell[] = cellsData.length ? cellsData : [{}, {}, {}, {}];
-  const cols = Math.min(4, Math.max(2, Math.ceil(Math.sqrt(cells.length))));
-  return (
-    <SlidePage meta={meta}>
-      <SectionTitle eyebrow="One photo per quarter">Photo Gallery</SectionTitle>
-      <div style={{ display: 'grid', gridTemplateColumns: `repeat(${cols}, 1fr)`, gap: 14, flex: 1, minHeight: 0 }}>
-        {cells.map((g, i) => (
-          <div key={i} style={{ display: 'flex', flexDirection: 'column', minHeight: 0 }}>
-            <ReportImage src={g.image} label={g.year && g.quarter ? `Q${g.quarter} ${g.year}` : 'Gallery photo'} style={{ flex: 1, minHeight: 0 }} />
-            <div style={{ fontSize: 12.5, color: C.muted, marginTop: 6, textAlign: 'center' }}>
-              {g.year && g.quarter ? `Q${g.quarter} ${g.year}${g.caption ? ` · ${g.caption}` : ''}` : (g.caption || '—')}
-            </div>
-          </div>
-        ))}
-      </div>
-    </SlidePage>
-  );
-}
+/* --------------------- Photo Gallery (one dynamic page per fiscal year) --------------------- */
 
-/* --------------------- Slide 21: Plantation Progress --------------------- */
-export function S21Progress({ data }: SlideProps) {
-  const { meta, forest } = data;
-  const pp = pickQuarter(forest.plantation_progress, meta.year, meta.quarter);
+/** Calendar year a fiscal quarter falls in (Indian FY, Apr-start): Q4 (Jan–Mar)
+ * lands in the next calendar year, Q1–Q3 in the fiscal year itself. */
+const calendarYearOfQuarter = (fyYear: number, q?: number): number => (q === 4 ? fyYear + 1 : fyYear);
+
+type GalleryPhoto = { quarter?: number; image?: string; caption?: string };
+
+/**
+ * One Photo Gallery page for a single fiscal year. The grid ADAPTS to the photo
+ * count (1..4) so cells always fill the slide with no empty placeholders:
+ *   1 → one full-bleed cell
+ *   2 → two equal columns, full height
+ *   3 → top cell spanning both columns + two cells below
+ *   4 → 2×2 grid
+ * Each cell crops-to-fill via <ReportImage> (object-cover) with a small caption.
+ */
+export function GalleryYearPage({ data, fyYear, photos }: { data: SlideProps['data']; fyYear: number; photos: GalleryPhoto[] }) {
+  const { meta } = data;
+  const cells = photos.slice(0, 4);
+  const n = cells.length;
+  // Grid template per count. n=3 puts the first cell across both columns.
+  const grid: CSSProperties =
+    n <= 1
+      ? { gridTemplateColumns: '1fr', gridTemplateRows: '1fr' }
+      : n === 2
+        ? { gridTemplateColumns: '1fr 1fr', gridTemplateRows: '1fr' }
+        : n === 3
+          ? { gridTemplateColumns: '1fr 1fr', gridTemplateRows: '1fr 1fr' }
+          : { gridTemplateColumns: '1fr 1fr', gridTemplateRows: '1fr 1fr' };
+  const caption = (p: GalleryPhoto): string => {
+    if (p.caption && p.caption.trim()) return p.caption.trim();
+    if (p.quarter) return `Q${p.quarter} ${calendarYearOfQuarter(fyYear, p.quarter)}`;
+    return '—';
+  };
   return (
     <SlidePage meta={meta}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <SectionTitle>Transforming Landscapes: Plantation Progress - {meta.year}</SectionTitle>
-      </div>
-      <div style={{ display: 'flex', gap: 10, marginTop: -8, marginBottom: 12 }}>
-        <Pill style={{ padding: '8px 16px', fontSize: 13 }}>Year {meta.year}</Pill>
-        <Pill style={{ padding: '8px 16px', fontSize: 13 }}>Quarter {meta.quarter} {meta.year}</Pill>
-      </div>
-      <ReportImage src={pp?.image} label={`Plantation progress · ${meta.quarter_label} ${meta.year}`} style={{ flex: 1, minHeight: 0 }} />
+      <SectionTitle eyebrow="Annual photos">Photo Gallery — {fiscalYearLabel(fyYear)}</SectionTitle>
+      {n === 0 ? (
+        <EmptyBlock label="No photos for this year yet" height={200} />
+      ) : (
+        <div style={{ display: 'grid', gap: 14, flex: 1, minHeight: 0, ...grid }}>
+          {cells.map((p, i) => (
+            <div
+              key={i}
+              style={{ display: 'flex', flexDirection: 'column', minHeight: 0, ...(n === 3 && i === 0 ? { gridColumn: '1 / span 2' } : {}) }}
+            >
+              <ReportImage src={p.image} label={caption(p)} style={{ flex: 1, minHeight: 0 }} />
+              <div style={{ fontSize: 12.5, color: C.muted, marginTop: 6, textAlign: 'center' }}>{caption(p)}</div>
+            </div>
+          ))}
+        </div>
+      )}
     </SlidePage>
   );
 }

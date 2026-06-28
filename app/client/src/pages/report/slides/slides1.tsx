@@ -55,10 +55,8 @@ function fitHeadline(text: string | null | undefined): number {
 /* ----------------------------- Slide 1: Cover ----------------------------- */
 export function S01Cover({ data }: SlideProps) {
   const { meta, forest, computed } = data;
-  // Cover hero: the report's first-slide image, falling back to the first
-  // dashboard image when no dedicated cover image was uploaded.
-  const hero = forest.report_images?.find((r) => r.slide_type === 'first_slide')?.image
-    ?? forest.dashboard_images?.[0]?.image;
+  // Cover hero: the report's first-slide cover image only.
+  const hero = forest.report_images?.find((r) => r.slide_type === 'first_slide')?.image;
   const initiated = findLogo(data, 'initiated_by');
   const sponsors = (forest.additional_sponsor_logo ?? []).filter((l) => l.type?.value !== 'initiated_by');
   const logoCards: { caption: string; name?: string; logo?: string }[] = [
@@ -309,8 +307,7 @@ const SDG = [
   ['9', 'Industry', '#fd6925'], ['13', 'Climate Action', '#3f7e44'], ['15', 'Life on Land', '#56c02b'], ['17', 'Partnerships', '#19486a'],
 ];
 export function S06ProjectImpact({ data }: SlideProps) {
-  const { meta, forest } = data;
-  const img = forest.report_images?.find((r) => r.slide_type === 'project_impact_slide')?.image;
+  const { meta } = data;
   return (
     <SlidePage meta={meta}>
       <SectionTitle eyebrow="Impact Report">Project Impact And Outcome</SectionTitle>
@@ -324,20 +321,17 @@ export function S06ProjectImpact({ data }: SlideProps) {
           </div>
         ))}
       </div>
-      <div style={{ display: 'grid', gridTemplateColumns: '0.8fr 1.2fr', gridTemplateRows: 'minmax(0, 1fr)', gap: 22, marginTop: 22, flex: 1, minHeight: 0 }}>
-        <ReportImage src={img} label="Impact image" style={{ height: '100%' }} />
-        <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-          <div style={{ fontSize: 20, color: C.body, lineHeight: 1.5 }}>
-            The plantation has led to <span style={{ color: C.green, fontWeight: 700 }}>significant ecological improvements</span>, including enhanced green cover, biodiversity growth, and carbon sequestration.
-          </div>
-          <div style={{ fontSize: 11.5, textTransform: 'uppercase', letterSpacing: '.06em', color: C.muted, margin: '20px 0 10px' }}>Sustainable Development Goals</div>
-          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-            {SDG.map(([n, name, col]) => (
-              <div key={n} style={{ width: 76, height: 76, borderRadius: 8, background: col, color: '#fff', padding: 8, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-                <span style={{ fontSize: 16, fontWeight: 800 }}>{n}</span><span style={{ fontSize: 9.5, fontWeight: 700, lineHeight: 1.1 }}>{name}</span>
-              </div>
-            ))}
-          </div>
+      <div style={{ maxWidth: 760, marginTop: 22, paddingTop: 22, borderTop: `1px solid ${C.line}`, textAlign: 'left' }}>
+        <div style={{ fontSize: 20, color: C.body, lineHeight: 1.5 }}>
+          The plantation has led to <span style={{ color: C.green, fontWeight: 700 }}>significant ecological improvements</span>, including enhanced green cover, biodiversity growth, and carbon sequestration.
+        </div>
+        <div style={{ fontSize: 11.5, textTransform: 'uppercase', letterSpacing: '.06em', color: C.muted, margin: '20px 0 10px' }}>Sustainable Development Goals</div>
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+          {SDG.map(([n, name, col]) => (
+            <div key={n} style={{ width: 76, height: 76, borderRadius: 8, background: col, color: '#fff', padding: 8, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+              <span style={{ fontSize: 16, fontWeight: 800 }}>{n}</span><span style={{ fontSize: 9.5, fontWeight: 700, lineHeight: 1.1 }}>{name}</span>
+            </div>
+          ))}
         </div>
       </div>
     </SlidePage>

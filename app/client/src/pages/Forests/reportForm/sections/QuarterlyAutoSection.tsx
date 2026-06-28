@@ -80,12 +80,11 @@ export function QuarterlyAutoSection({ draft, patch, onQuarterChange }: SectionP
   // Per-quarter photos (same slots as the PFA app). Each uploads to storage AND
   // writes the URL into the draft's (year,quarter) row so it autosaves + the
   // report reads it. Mirrors the PFA "This quarter" page inside the editor.
-  const progressRow = findRow(draft.plantation_progress, year, quarter);
   const galleryRow = findRow(draft.gallery_images, year, quarter);
   const insideImg = (tempRow?.inside_plantation as { image?: string })?.image;
   const outsideImg = (tempRow?.outside_plantation as { image?: string })?.image;
 
-  const setQuarterImg = (col: 'soil_ph_level' | 'plantation_progress' | 'gallery_images', key: string, v: string) =>
+  const setQuarterImg = (col: 'soil_ph_level' | 'gallery_images', key: string, v: string) =>
     patch({ [col]: upsertRow(draft[col], year, quarter, (r) => ({ ...r, [key]: v })) } as Partial<typeof draft>);
   const setSideImg = (side: 'inside_plantation' | 'outside_plantation', v: string) =>
     patch({
@@ -190,10 +189,9 @@ export function QuarterlyAutoSection({ draft, patch, onQuarterChange }: SectionP
       >
         <FieldGrid cols={2}>
           <Img label="Soil pH meter photo" value={phRow?.meter_image as string | undefined} onChange={(v) => setQuarterImg('soil_ph_level', 'meter_image', v)} forestId={id} slot="soil_meter" year={year} quarter={quarter} />
-          <Img label="Plantation progress photo" value={progressRow?.image as string | undefined} onChange={(v) => setQuarterImg('plantation_progress', 'image', v)} forestId={id} slot="progress" year={year} quarter={quarter} />
           <Img label="Inside-plantation photo" value={insideImg} onChange={(v) => setSideImg('inside_plantation', v)} forestId={id} slot="temp_inside" year={year} quarter={quarter} />
           <Img label="Outside-plantation photo" value={outsideImg} onChange={(v) => setSideImg('outside_plantation', v)} forestId={id} slot="temp_outside" year={year} quarter={quarter} />
-          <Img label="Gallery photo" value={galleryRow?.image as string | undefined} onChange={(v) => setQuarterImg('gallery_images', 'image', v)} forestId={id} slot="gallery" year={year} quarter={quarter} />
+          <Img label="Quarterly photo" value={galleryRow?.image as string | undefined} onChange={(v) => setQuarterImg('gallery_images', 'image', v)} forestId={id} slot="gallery" year={year} quarter={quarter} />
         </FieldGrid>
       </SectionShell>
     </>

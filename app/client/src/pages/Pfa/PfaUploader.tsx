@@ -23,18 +23,15 @@ type Page = 'pick' | 'menu' | 'site' | 'quarter' | 'sponsors';
 const SITE_SLOTS: Slot[] = [
   { key: 'cover', label: 'Cover', ratio: 4 / 3 },
   { key: 'content', label: 'Contents', ratio: 4 / 3 },
-  { key: 'impact', label: 'Impact', ratio: 4 / 3 },
   { key: 'permission', label: 'Permission', ratio: 3 / 4 },
   { key: 'layout', label: 'Site layout', ratio: 4 / 3 },
   { key: 'security', label: 'Security', ratio: 4 / 3 },
-  { key: 'dashboard', label: 'Dashboard', ratio: 16 / 9 },
 ];
 const QUARTER_SLOTS: Slot[] = [
   { key: 'soil_meter', label: 'Soil meter', perQuarter: true, ratio: 1 },
   { key: 'temp_inside', label: 'Inside', perQuarter: true, ratio: 4 / 3 },
   { key: 'temp_outside', label: 'Outside', perQuarter: true, ratio: 4 / 3 },
-  { key: 'progress', label: 'Progress', perQuarter: true, ratio: 4 / 3 },
-  { key: 'gallery', label: 'Gallery', perQuarter: true, ratio: 4 / 3 },
+  { key: 'gallery', label: 'Quarterly photo', perQuarter: true, ratio: 4 / 3 },
 ];
 
 /** Human label for an aspect ratio (4/3 -> "4:3"). Best-effort, falls back to 2dp. */
@@ -86,6 +83,47 @@ function defaultFiscal(): { year: number; quarter: number } {
   return { year: d.getFullYear() - 1, quarter: 4 };
 }
 
+// --- Fiscal-quarter helpers (Indian FY, Apr-start) -------------------------
+// Mirrors reportCompute.ts conventions: Q1 Apr–Jun, Q2 Jul–Sep, Q3 Oct–Dec,
+// Q4 Jan–Mar. `year` is the FISCAL year (the Apr it starts in); Q4's calendar
+// months fall in the next calendar year. Kept inline so this page stays
+// self-contained (no shared @/lib/fiscal module yet).
+type FQ = { year: number; quarter: number };
+const FQ_MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const FQ_START_MONTH: Record<number, number> = { 1: 3, 2: 6, 3: 9, 4: 0 };
+
+/** Fiscal year+quarter that a calendar Date falls into. */
+function fiscalQuarterOf(d: Date): FQ {
+  const m = d.getMonth();
+  if (m >= 3 && m <= 5) return { year: d.getFullYear(), quarter: 1 };
+  if (m >= 6 && m <= 8) return { year: d.getFullYear(), quarter: 2 };
+  if (m >= 9) return { year: d.getFullYear(), quarter: 3 };
+  return { year: d.getFullYear() - 1, quarter: 4 };
+}
+
+/** Human period label for a fiscal year+quarter, e.g. "Apr – Jun 25". */
+function quarterPeriodLabel(year: number, q: number): string {
+  const startMonth = FQ_START_MONTH[q] ?? 0;
+  const calYear = q === 4 ? year + 1 : year;
+  return `${FQ_MONTHS[startMonth]} – ${FQ_MONTHS[startMonth + 2]} ${String(calYear).slice(-2)}`;
+}
+
+/** Ascending list of fiscal quarters from `from`'s quarter up to `to`'s quarter (inclusive). */
+function quartersFrom(from: Date, to: Date): FQ[] {
+  const a = fiscalQuarterOf(from);
+  const b = fiscalQuarterOf(to);
+  const out: FQ[] = [];
+  let y = a.year, q = a.quarter;
+  // Cap iterations defensively so a bad date can never spin forever.
+  for (let guard = 0; guard < 400; guard++) {
+    out.push({ year: y, quarter: q });
+    if (y === b.year && q === b.quarter) break;
+    if (y > b.year || (y === b.year && q >= b.quarter)) break;
+    q += 1; if (q > 4) { q = 1; y += 1; }
+  }
+  return out;
+}
+
 type Rec = Record<string, unknown>;
 const pickQ = (arr: unknown, y: number, q: number): Rec | undefined =>
   Array.isArray(arr) ? (arr as Rec[]).find((r) => Number(r.year) === y && Number(r.quarter) === q) : undefined;
@@ -96,20 +134,15 @@ function seedFromForest(forest: Rec, y: number, q: number): Record<string, strin
   const byType = (t: string) => ri.find((r) => r.slide_type === t)?.image;
   if (byType('first_slide')) out.cover = byType('first_slide')!;
   if (byType('content_slide')) out.content = byType('content_slide')!;
-  if (byType('project_impact_slide')) out.impact = byType('project_impact_slide')!;
   if (forest.permission_letter) out.permission = String(forest.permission_letter);
   if (forest.site_layout) out.layout = String(forest.site_layout);
   const sec = (forest.security_and_infrastructure as Rec)?.image_data as { image?: string }[] | undefined;
   if (Array.isArray(sec) && sec[0]?.image) out.security = sec[0].image!;
-  const dash = forest.dashboard_images as { image?: string }[] | undefined;
-  if (Array.isArray(dash) && dash[0]?.image) out.dashboard = dash[0].image!;
   const soil = pickQ(forest.soil_ph_level, y, q);
   if (soil?.meter_image) out.soil_meter = String(soil.meter_image);
   const th = pickQ(forest.temperature_humidity, y, q);
   if ((th?.inside_plantation as Rec)?.image) out.temp_inside = String((th!.inside_plantation as Rec).image);
   if ((th?.outside_plantation as Rec)?.image) out.temp_outside = String((th!.outside_plantation as Rec).image);
-  const prog = pickQ(forest.plantation_progress, y, q);
-  if (prog?.image) out.progress = String(prog.image);
   const gal = pickQ(forest.gallery_images, y, q);
   if (gal?.image) out.gallery = String(gal.image);
   return out;
@@ -122,6 +155,9 @@ export default function PfaUploader() {
   const [forestId, setForestId] = useState('');
   const [year, setYear] = useState(fiscal.year);
   const [quarter, setQuarter] = useState(fiscal.quarter);
+  // plantation_date from the loaded forest payload — drives the quarter picker
+  // range. null until a forest loads (or if absent/invalid → picker fallback).
+  const [plantationDate, setPlantationDate] = useState<Date | null>(null);
   const [page, setPage] = useState<Page>('pick');
   const [status, setStatus] = useState<Record<string, string>>({});
   const [logos, setLogos] = useState<LogoRow[]>([]);
@@ -158,13 +194,17 @@ export default function PfaUploader() {
   useEffect(() => { fetchForestOptions().then(setForests).catch(() => undefined); }, []);
 
   useEffect(() => {
-    if (!forestId) { setStatus({}); setLogos([]); return; }
+    if (!forestId) { setStatus({}); setLogos([]); setPlantationDate(null); return; }
     let alive = true;
     fetchForestReport(forestId, year, quarter)
       .then((r) => {
         if (!alive) return;
         const f = (r.forest as Rec) ?? {};
         setStatus(seedFromForest(f, year, quarter));
+        // plantation_date drives the quarter picker range. Parse defensively;
+        // missing/invalid → null so the picker uses its ~2-year fallback.
+        const pd = f.plantation_date != null ? new Date(String(f.plantation_date)) : null;
+        setPlantationDate(pd && !Number.isNaN(pd.getTime()) ? pd : null);
         const ge = (f.area_population_statistics_details as Rec)?.google_earth_image as unknown[] | undefined;
         setEarth([0, 1, 2].map((i) => {
           const c = Array.isArray(ge) ? ge[i] : undefined;
@@ -190,6 +230,23 @@ export default function PfaUploader() {
   const count = (slots: Slot[]) => slots.filter((s) => isUrl(status[s.key])).length;
   const filled = count(SITE_SLOTS) + count(QUARTER_SLOTS);
   const total = SITE_SLOTS.length + QUARTER_SLOTS.length;
+
+  // Quarter picker options: fiscal quarters from plantation date → now (ascending).
+  // Fallback (no/invalid plantation_date): last ~2 years up to current quarter.
+  const today = new Date();
+  const pickerStart = plantationDate ?? new Date(today.getFullYear() - 2, today.getMonth(), today.getDate());
+  const quarters = quartersFrom(pickerStart, today);
+
+  // When a forest's plantation_date loads, default the selection to the LAST
+  // quarter in the list (the current one) so uploads target the live quarter.
+  useEffect(() => {
+    if (!plantationDate) return;
+    const last = quarters[quarters.length - 1];
+    if (!last) return;
+    setYear(last.year);
+    setQuarter(last.quarter);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [plantationDate]);
 
   const stopStream = () => { streamRef.current?.getTracks().forEach((t) => t.stop()); streamRef.current = null; };
   const closeCam = () => { stopStream(); setCamSlot(null); setCamErr(null); };
@@ -414,16 +471,17 @@ export default function PfaUploader() {
                 {forests.map((f) => <option key={f.value} value={f.value}>{f.label}</option>)}
               </select>
             </label>
-            <div className="mt-3 grid grid-cols-2 gap-3">
-              <label className="text-sm"><span className="mb-1 block text-textSecondary">FY year</span>
-                <select value={year} onChange={(e) => setYear(Number(e.target.value))} className="w-full rounded-button border border-border bg-surface px-3 py-3 text-sm">
-                  {[fiscal.year - 1, fiscal.year, fiscal.year + 1].map((y) => <option key={y} value={y}>{y}</option>)}
-                </select></label>
-              <label className="text-sm"><span className="mb-1 block text-textSecondary">Quarter</span>
-                <select value={quarter} onChange={(e) => setQuarter(Number(e.target.value))} className="w-full rounded-button border border-border bg-surface px-3 py-3 text-sm">
-                  {[1, 2, 3, 4].map((q) => <option key={q} value={q}>Q{q}</option>)}
-                </select></label>
-            </div>
+            <label className="mt-3 block text-sm"><span className="mb-1 block text-textSecondary">Fiscal quarter</span>
+              <select
+                value={`${year}-${quarter}`}
+                onChange={(e) => { const [y, q] = e.target.value.split('-'); setYear(Number(y)); setQuarter(Number(q)); }}
+                className="w-full rounded-button border border-border bg-surface px-3 py-3 text-sm"
+              >
+                {quarters.map(({ year: y, quarter: q }) => (
+                  <option key={`${y}-${q}`} value={`${y}-${q}`}>Q{q} · {quarterPeriodLabel(y, q)}</option>
+                ))}
+              </select>
+            </label>
             <button type="button" disabled={!forestId} onClick={() => setPage('menu')} className="mt-5 w-full rounded-button bg-primary py-3 text-sm font-semibold text-black disabled:opacity-50">Continue →</button>
           </main>
         </>
@@ -467,7 +525,7 @@ export default function PfaUploader() {
             {page === 'site' ? (
               <div className="mt-5 rounded-card border border-border bg-surface p-4">
                 <div className="mb-1 flex items-center justify-between">
-                  <span className="text-sm font-semibold">Satellite imagery</span>
+                  <span className="text-sm font-semibold">Aerial / map</span>
                   <span className="text-[11px] text-textSecondary">slide 5 · up to 3</span>
                 </div>
                 <p className="mb-3 text-xs text-textSecondary">Timeline of urban change. Auto-fetch real satellite imagery (no key) — blank/black frames are skipped automatically. Or add your own; type the year first.</p>

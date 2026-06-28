@@ -10,7 +10,7 @@ import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
 import { buildPreviewReport } from './reportFixture';
 import { downloadReportPdf, renderReportPdfBlob } from './reportDownload';
 import { C, FONT, REPORT_PRINT_CSS } from './reportPrimitives';
-import { SLIDES, SLIDE_TITLES } from './slides';
+import { buildSlides } from './slides';
 import type { ForestReportData } from './reportTypes';
 import { fetchForestReport } from '@/lib/publicApi';
 
@@ -90,8 +90,11 @@ export default function ReportForestQuarterly() {
   const [dl, setDl] = useState('');
   const [cur, setCur] = useState(0);
 
+  // Dynamic slide list (per-fiscal-year gallery pages auto-fit the photo count).
+  const slides = useMemo(() => (data ? buildSlides(data) : []), [data]);
+
   const goTo = (i: number) => {
-    const n = Math.max(0, Math.min(SLIDES.length - 1, i));
+    const n = Math.max(0, Math.min(slides.length - 1, i));
     setCur(n);
     document.getElementById(`rpt-slide-${n}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
@@ -129,14 +132,16 @@ export default function ReportForestQuarterly() {
   const preview = useMemo(() => buildPreviewReport(previewSrc), [previewSrc]);
   const year = sp.get('year') ? Number(sp.get('year')) : undefined;
   const quarter = sp.get('quarter') ? Number(sp.get('quarter')) : undefined;
+  // Skip persistence keyed by STABLE slide id (so per-year gallery pages stay
+  // individually hide-able across re-renders, even as the slide order shifts).
   const skipKey = `rpt-skip-${id}-${year ?? 0}-${quarter ?? 0}`;
-  const [skipped, setSkipped] = useState<Set<number>>(() => {
-    try { return new Set(JSON.parse(localStorage.getItem(skipKey) ?? '[]')); } catch { return new Set(); }
+  const [skipped, setSkipped] = useState<Set<string>>(() => {
+    try { return new Set<string>(JSON.parse(localStorage.getItem(skipKey) ?? '[]')); } catch { return new Set<string>(); }
   });
-  const toggleSkip = (i: number) => {
+  const toggleSkip = (sid: string) => {
     setSkipped((prev) => {
       const next = new Set(prev);
-      next.has(i) ? next.delete(i) : next.add(i);
+      next.has(sid) ? next.delete(sid) : next.add(sid);
       localStorage.setItem(skipKey, JSON.stringify([...next]));
       return next;
     });
@@ -189,10 +194,10 @@ export default function ReportForestQuarterly() {
         <div className="no-print" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
           <button onClick={() => goTo(cur - 1)} disabled={cur === 0} aria-label="Previous section" style={{ background: '#fff', border: `1px solid ${C.line}`, borderRadius: 8, width: 30, height: 30, cursor: cur === 0 ? 'default' : 'pointer', color: C.ink, opacity: cur === 0 ? 0.4 : 1 }}>◀</button>
           <select value={cur} onChange={(e) => goTo(Number(e.target.value))} aria-label="Jump to section" style={{ border: `1px solid ${C.line}`, borderRadius: 8, padding: '6px 10px', fontSize: 13, color: C.ink, background: '#fff', maxWidth: 200 }}>
-            {SLIDE_TITLES.map((t, i) => <option key={i} value={i}>{i + 1}. {t}{skipped.has(i) ? ' (skipped)' : ''}</option>)}
+            {slides.map((s, i) => <option key={s.id} value={i}>{i + 1}. {s.title}{skipped.has(s.id) ? ' (skipped)' : ''}</option>)}
           </select>
-          <button onClick={() => goTo(cur + 1)} disabled={cur === SLIDES.length - 1} aria-label="Next section" style={{ background: '#fff', border: `1px solid ${C.line}`, borderRadius: 8, width: 30, height: 30, cursor: cur === SLIDES.length - 1 ? 'default' : 'pointer', color: C.ink, opacity: cur === SLIDES.length - 1 ? 0.4 : 1 }}>▶</button>
-          <span style={{ fontSize: 12, color: C.faint, minWidth: 42, textAlign: 'center' }}>{cur + 1} / {SLIDES.length}</span>
+          <button onClick={() => goTo(cur + 1)} disabled={cur === slides.length - 1} aria-label="Next section" style={{ background: '#fff', border: `1px solid ${C.line}`, borderRadius: 8, width: 30, height: 30, cursor: cur === slides.length - 1 ? 'default' : 'pointer', color: C.ink, opacity: cur === slides.length - 1 ? 0.4 : 1 }}>▶</button>
+          <span style={{ fontSize: 12, color: C.faint, minWidth: 42, textAlign: 'center' }}>{cur + 1} / {slides.length}</span>
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -206,27 +211,27 @@ export default function ReportForestQuarterly() {
       </div>
 
       <div style={{ padding: '22px 16px 60px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-        {SLIDES.map((Slide, i) => {
-          const isSkipped = skipped.has(i);
+        {slides.map((s, i) => {
+          const isSkipped = skipped.has(s.id);
           if (isSkipped) {
             if (isAdmin && !isPreview) {
               return (
-                <div key={i} id={`rpt-slide-${i}`} className="no-print"
+                <div key={s.id} id={`rpt-slide-${i}`} className="no-print"
                   style={{ width: '100%', maxWidth: 1100, margin: '0 auto 8px', border: `1px dashed ${C.line}`, borderRadius: 10, padding: '14px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#fff' }}>
-                  <span style={{ color: C.muted, fontSize: 13 }}>Slide {i + 1} — {SLIDE_TITLES[i]} (hidden from report)</span>
-                  <button onClick={() => toggleSkip(i)} style={{ fontSize: 12, color: C.green, background: 'none', border: 'none', cursor: 'pointer', fontWeight: 600 }}>+ Restore</button>
+                  <span style={{ color: C.muted, fontSize: 13 }}>Slide {i + 1} — {s.title} (hidden from report)</span>
+                  <button onClick={() => toggleSkip(s.id)} style={{ fontSize: 12, color: C.green, background: 'none', border: 'none', cursor: 'pointer', fontWeight: 600 }}>+ Restore</button>
                 </div>
               );
             }
             return null;
           }
           return (
-            <div key={i} id={`rpt-slide-${i}`} style={{ scrollMarginTop: 64, width: '100%', display: 'flex', justifyContent: 'center', position: 'relative' }}>
-              <Slide data={data} />
+            <div key={s.id} id={`rpt-slide-${i}`} style={{ scrollMarginTop: 64, width: '100%', display: 'flex', justifyContent: 'center', position: 'relative' }}>
+              {s.node}
               {isAdmin && !isPreview && (
                 <div className="no-print" style={{ position: 'absolute', top: 10, right: 10, zIndex: 5, background: 'rgba(255,255,255,.92)', borderRadius: 6, padding: '4px 10px', fontSize: 12, display: 'flex', alignItems: 'center', gap: 6, border: `1px solid ${C.line}`, boxShadow: '0 1px 4px rgba(0,0,0,.08)' }}>
-                  <input type="checkbox" id={`skip-${i}`} checked={false} onChange={() => toggleSkip(i)} style={{ cursor: 'pointer' }} />
-                  <label htmlFor={`skip-${i}`} style={{ cursor: 'pointer', color: C.muted }}>Hide from report</label>
+                  <input type="checkbox" id={`skip-${s.id}`} checked={false} onChange={() => toggleSkip(s.id)} style={{ cursor: 'pointer' }} />
+                  <label htmlFor={`skip-${s.id}`} style={{ cursor: 'pointer', color: C.muted }}>Hide from report</label>
                 </div>
               )}
             </div>
