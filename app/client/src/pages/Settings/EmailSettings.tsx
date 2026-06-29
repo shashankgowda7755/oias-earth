@@ -198,7 +198,7 @@ export default function EmailSettings() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [cfg, setCfg] = useState<EmailConfig>({
-    display_name: 'OIAS Earth',
+    display_name: 'COMMUNITREE',
     from_address: '',
     reply_to: '',
     to_emails: [],
@@ -211,7 +211,7 @@ export default function EmailSettings() {
         const d = data?.data;
         if (d) {
           setCfg({
-            display_name: d.display_name ?? 'OIAS Earth',
+            display_name: d.display_name ?? 'COMMUNITREE',
             from_address: d.from_address ?? '',
             reply_to: d.reply_to ?? '',
             to_emails: d.to_emails ?? [],
@@ -281,7 +281,7 @@ export default function EmailSettings() {
           <div className="col-span-2">
             <label className="block text-sm text-textSecondary mb-1" htmlFor="ec-reply">Reply-to <span className="text-xs text-textSecondary">(optional)</span></label>
             <input id="ec-reply" type="email" value={cfg.reply_to} onChange={(e) => set('reply_to')(e.target.value)}
-              placeholder="hello@oiasearth.com"
+              placeholder="hello@communitree.co.in"
               className="w-full rounded-button border border-border bg-appbg px-3 py-2 text-sm text-textPrimary focus:border-primary focus:outline-none" />
           </div>
         </div>
@@ -297,7 +297,7 @@ export default function EmailSettings() {
           emails={cfg.to_emails}
           onAdd={addEmail('to_emails')}
           onRemove={removeEmail('to_emails')}
-          placeholder="director@oiasearth.com"
+          placeholder="director@communitree.co.in"
         />
       </div>
 
@@ -311,7 +311,7 @@ export default function EmailSettings() {
           emails={cfg.cc_emails}
           onAdd={addEmail('cc_emails')}
           onRemove={removeEmail('cc_emails')}
-          placeholder="team@oiasearth.com"
+          placeholder="team@communitree.co.in"
         />
       </div>
 

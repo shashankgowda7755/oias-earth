@@ -1,5 +1,5 @@
 /**
- * Shared TypeScript types for the OIAS Earth / OIAS Earth admin rebuild.
+ * Shared TypeScript types for the COMMUNITREE / COMMUNITREE admin rebuild.
  *
  * SOURCE OF TRUTH
  * ---------------

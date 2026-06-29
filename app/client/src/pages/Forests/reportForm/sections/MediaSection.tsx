@@ -244,7 +244,7 @@ export function MediaSection({ draft, patch }: SectionProps) {
 
       <SectionShell
         title="Additional Sponsor Logos"
-        desc="Organisation logos shown on report pages. 'Sponsored By' logo appears top-right on every slide. 'Initiated By' is the CommuniTREE logo shown bottom-right."
+        desc="Organisation logos shown on report pages. 'Sponsored By' logo appears top-right on every slide. 'Initiated By' is the COMMUNITREE logo shown bottom-right."
       >
         <RepeatableRows
           label="Sponsor logos"

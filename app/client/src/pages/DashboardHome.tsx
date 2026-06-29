@@ -3,7 +3,7 @@
  * KPI tiles (forests / trees / geo-tagged / survival), a large live-map tile
  * (HeartbeatMap), a recent-forests list (click → public forest matrix), quick
  * actions (jump to a section / live map), and a reports shortcut. All real data
- * from fetchForestsMap. OIAS dark + lime. Collapses to one column on mobile.
+ * from fetchForestsMap. COMMUNITREE dark + lime. Collapses to one column on mobile.
  */
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';

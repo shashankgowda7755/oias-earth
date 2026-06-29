@@ -1,6 +1,6 @@
 # Forests module — notes, divergences & open questions
 
-Faithful rebuild of the OIAS Earth "Forests" section, reconciled to the
+Faithful rebuild of the COMMUNITREE "Forests" section, reconciled to the
 **confirmed** contracts (`spec/write_contracts.md`,
 `spec/communitree_admin_spec.json` screens.Forests + flows "Create Forest
 (2-step wizard)", and `client/CONTRACTS.md`). Everything marked **inferred** is

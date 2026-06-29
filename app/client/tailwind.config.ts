@@ -11,7 +11,7 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // OIAS Earth "Living Instrument" system — dark ink canvas, bio-lime accent.
+        // COMMUNITREE "Living Instrument" system — dark ink canvas, bio-lime accent.
         // Admin reuses the same tokens as the public theme (earth.css) so the
         // whole platform is one identity (and clean-room vs the incumbent's MUI look).
         primary: {

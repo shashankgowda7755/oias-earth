@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-workbook-to-import — turn the canonical "OIAS Earth Forest Trees Upload" workbook
+workbook-to-import — turn the canonical "COMMUNITREE Forest Trees Upload" workbook
 (tabs: Sponsor Sample, Forest Sample, Tree Sample, Gifter Sample, Species Master)
 into normalized JSON our APIs ingest:
   { sponsor, forest, species[], trees[] }   where trees[] is bulk_tree_gift_sheet shape.

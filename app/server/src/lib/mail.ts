@@ -33,7 +33,7 @@ function esc(s: string): string {
 export async function sendGiftEmail(input: GiftEmailInput): Promise<{ id?: string }> {
   if (!process.env.RESEND_API_KEY) throw new Error('email not configured — set RESEND_API_KEY (resend.com)');
   const resend = new Resend(process.env.RESEND_API_KEY);
-  const from = process.env.RESEND_FROM || 'OIAS Earth <onboarding@resend.dev>';
+  const from = process.env.RESEND_FROM || 'COMMUNITREE <onboarding@resend.dev>';
   const name = input.recipientName?.trim() || 'Friend';
   const species = input.species || 'a sapling';
   const note = input.message?.trim()
@@ -41,7 +41,7 @@ export async function sendGiftEmail(input: GiftEmailInput): Promise<{ id?: strin
     : '';
   const html = `
   <div style="font-family:-apple-system,Segoe UI,Roboto,sans-serif;max-width:560px;margin:0 auto;color:#16282e">
-    <div style="background:#16282e;color:#b6ff3c;padding:18px 22px;border-radius:12px 12px 0 0;font-weight:700">🌳 OIAS Earth</div>
+    <div style="background:#16282e;color:#b6ff3c;padding:18px 22px;border-radius:12px 12px 0 0;font-weight:700">🌳 COMMUNITREE</div>
     <div style="border:1px solid #e2e7e3;border-top:none;border-radius:0 0 12px 12px;padding:22px">
       <p style="font-size:16px">Hi ${esc(name)},</p>
       <p>A <strong>${esc(species)}</strong> ${input.treeUid ? `(<span style="font-family:monospace">${esc(input.treeUid)}</span>)` : ''} has been planted in your name${input.forestName ? ` at <strong>${esc(input.forestName)}</strong>` : ''}.</p>
@@ -67,7 +67,7 @@ export async function sendGiftEmail(input: GiftEmailInput): Promise<{ id?: strin
 
 /* ------------------------------------------------------------------ */
 /* Quarterly report email (Resend) — supports CC + a PDF attachment.   */
-/* Sends from the verified OIAS Earth domain (RESEND_FROM). Never       */
+/* Sends from the verified COMMUNITREE domain (RESEND_FROM). Never       */
 /* throws on a send failure (returns {ok:false}) so a bad send can't    */
 /* 500 a route. Every attempt is written to the Sent inbox (email_log).        */
 /* ------------------------------------------------------------------ */
@@ -95,7 +95,7 @@ export async function sendReportMail(input: ReportMailInput): Promise<ReportMail
   } else {
     try {
       const resend = new Resend(process.env.RESEND_API_KEY);
-      const from = process.env.RESEND_FROM || 'OIAS Earth <onboarding@resend.dev>';
+      const from = process.env.RESEND_FROM || 'COMMUNITREE <onboarding@resend.dev>';
       const { data, error } = await resend.emails.send({
         from,
         to: input.to,

@@ -1,5 +1,5 @@
 /**
- * Vercel serverless entry point for the CommuniTREE admin platform.
+ * Vercel serverless entry point for the COMMUNITREE admin platform.
  *
  * Backend selection (mirrors app/server/src/db.ts):
  *   - DATABASE_URL set   -> real Postgres (Neon). Data PERSISTS across cold starts.

@@ -1,7 +1,7 @@
-# OIAS Earth Admin — Backend (server + db)
+# COMMUNITREE Admin — Backend (server + db)
 
 Express + TypeScript + `pg` API and PostgreSQL schema for the
-"OIAS Earth" / OIAS Earth admin rebuild. Reproduces the observed REST
+"COMMUNITREE" / COMMUNITREE admin rebuild. Reproduces the observed REST
 contract (snake_case list responses, RAW-token auth header) standardised on the
 REST layer.
 

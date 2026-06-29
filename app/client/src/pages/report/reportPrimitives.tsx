@@ -150,13 +150,13 @@ export function SlideHeader({ meta }: { meta: ReportMeta }) {
   );
 }
 
-/** CommuniTREE-style footer wordmark (matches the PDF footer). */
+/** COMMUNITREE-style footer wordmark (matches the PDF footer). */
 export function ReportFooter({ meta }: { meta?: ReportMeta } = {}) {
   return (
     <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', marginTop: 'auto', paddingTop: 10 }}>
       <div style={{ textAlign: 'center', lineHeight: 1 }}>
         {meta?.communitree_logo ? (
-          <img src={meta.communitree_logo} alt="CommuniTREE" style={{ height: 32, objectFit: 'contain' }} />
+          <img src={meta.communitree_logo} alt="COMMUNITREE" style={{ height: 32, objectFit: 'contain' }} />
         ) : (
           <>
             <div style={{ fontSize: 17, fontWeight: 800, letterSpacing: '.04em', color: '#2f6b3f' }}>

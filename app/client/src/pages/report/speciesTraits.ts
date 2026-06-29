@@ -1,6 +1,6 @@
 /**
  * Species functional-trait catalog (slide-18 icons), generated from the
- * CommuniTREE "Species Master" upload sheet (96 species). Keyed by lowercased
+ * COMMUNITREE "Species Master" upload sheet (96 species). Keyed by lowercased
  * scientific name AND common name. Live reports read traits from
  * master_plantspecies via the server; this client table makes the fixture
  * PREVIEW faithful (the preview has no DB join). Keep in sync with

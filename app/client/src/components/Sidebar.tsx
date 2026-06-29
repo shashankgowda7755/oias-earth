@@ -138,9 +138,9 @@ export function Sidebar({ active, onTabChange }: SidebarProps) {
     <aside className="flex h-screen w-56 shrink-0 flex-col bg-navbar">
       {/* Brand */}
       <div className="flex h-16 items-center gap-2.5 border-b border-white/10 px-4">
-        <img src="/oias-mark.svg" alt="" aria-hidden="true" className="h-7 w-7" />
+        <img src="/communitree-mark.svg" alt="" aria-hidden="true" className="h-7 w-7" />
         <span className="font-serif text-lg font-semibold tracking-tight text-textPrimary">
-          OIAS Earth
+          COMMUNITREE
         </span>
       </div>
 

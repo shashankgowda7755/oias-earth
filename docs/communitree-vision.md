@@ -1,6 +1,6 @@
-# OIAS Earth — Living Proof Venture (vision + build status)
+# COMMUNITREE — Living Proof Venture (vision + build status)
 
-Working title: **OIAS Earth** · Brand: **OIAS Earth** (https://oiasearth.com/)
+Working title: **COMMUNITREE** · Brand: **COMMUNITREE** (https://communitree.co.in/)
 Source: venture blueprint v1, 2026-06-11.
 
 ## Thesis

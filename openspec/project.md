@@ -1,4 +1,4 @@
-# Project — Be The Tree Hugger / OIAS Earth (communitree-rebuild)
+# Project — Be The Tree Hugger / COMMUNITREE (communitree-rebuild)
 
 ## Mission
 A tree-planting **living-proof + dMRV** platform. Competitors sell a *birth

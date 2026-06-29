@@ -1,6 +1,6 @@
 # Client Shared-System Contracts
 
-Authoritative public API for the OIAS Earth admin **frontend shell**. Module
+Authoritative public API for the COMMUNITREE admin **frontend shell**. Module
 agents (Users, Sponsors, Employees, Forests, Reports, Jobs) build their section
 inside `src/pages/<Section>/index.tsx` and consume ONLY what is documented here.
 Do not edit anything outside your `src/pages/<Section>/` directory.

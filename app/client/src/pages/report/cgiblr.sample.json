@@ -29,7 +29,7 @@
     }
   ],
   "additional_sponsor_logo": [
-    { "type": { "label": "Initiated By", "value": "initiated_by" }, "name": "CommuniTREE", "logo": "" },
+    { "type": { "label": "Initiated By", "value": "initiated_by" }, "name": "COMMUNITREE", "logo": "" },
     { "type": { "label": "Sponsored By", "value": "sponsored_by" }, "name": "CGI", "logo": "" }
   ],
   "land_ownership": { "name": "Bangalore University", "agreement_status": "" },

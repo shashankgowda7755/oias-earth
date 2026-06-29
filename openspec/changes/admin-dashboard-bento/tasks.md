@@ -6,7 +6,7 @@
 - [x] 1.1 Add `app/client/src/pages/DashboardHome.tsx` default-exporting `DashboardHome({ onOpenTab })`
 - [x] 1.2 Fetch forests on mount via `fetchForestsMap()`; track `loading`; ignore late results after unmount
 - [x] 1.3 Lay out a 4-column CSS grid (`bento-grid`, `gridAutoRows: minmax(84px, auto)`, `gap: 12`) with variable tile spans
-- [x] 1.4 OIAS dark + lime tile styling (shared `T.tile` / `T.tileBg`); accent color `#b6ff3c`
+- [x] 1.4 COMMUNITREE dark + lime tile styling (shared `T.tile` / `T.tileBg`); accent color `#b6ff3c`
 
 ## 2. KPI tiles
 

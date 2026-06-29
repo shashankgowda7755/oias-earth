@@ -65,7 +65,7 @@ export default function Login() {
   if (autoTrying) {
     return (
       <main className="flex min-h-screen flex-col items-center justify-center gap-4 bg-appbg px-4">
-        <img src="/oias-mark.svg" alt="" aria-hidden="true" className="h-12 w-12" />
+        <img src="/communitree-mark.svg" alt="" aria-hidden="true" className="h-12 w-12" />
         <p className="text-sm text-textSecondary">Signing you in…</p>
         <button
           type="button"
@@ -82,8 +82,8 @@ export default function Login() {
     <main className="flex min-h-screen items-center justify-center bg-appbg px-4">
       <div className="w-full max-w-sm rounded-card bg-surface p-8 shadow-card">
         <div className="mb-6 flex flex-col items-center gap-2">
-          <img src="/oias-mark.svg" alt="" aria-hidden="true" className="h-12 w-12" />
-          <span className="font-serif text-2xl font-semibold tracking-tight text-textPrimary">OIAS Earth</span>
+          <img src="/communitree-mark.svg" alt="" aria-hidden="true" className="h-12 w-12" />
+          <span className="font-serif text-2xl font-semibold tracking-tight text-textPrimary">COMMUNITREE</span>
         </div>
 
         <h1 className="mb-6 text-center text-xl font-semibold text-textPrimary">

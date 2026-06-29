@@ -37,7 +37,7 @@
 [07:39] So, we are not entering the latitude or longitude directly. We will just enter the coordinate. We'll just mark the coordinate from here.
 [07:49] Itself from the Google Maps. I'm looking for Elkhart. Okay. Okay. I hope this is our site. I think you are correct.
 [08:04] Ok. Thank you. Okay. So you just mark a point. The whole forest is being, so wherever you feel, which is relevant to that.
-[08:19] You just select that coordinate and then you enter. It will get the lat and long automatically, where this would also help in the geotagging part for the oiasearth's team, if we are geotagging and then the basic addresses.
+[08:19] You just select that coordinate and then you enter. It will get the lat and long automatically, where this would also help in the geotagging part for the communitreeearth's team, if we are geotagging and then the basic addresses.
 [08:35] So, this will be filled as a dropdown.
 [08:45] Now, we are having it as a textbox. So, that was for the first screen. So, now, we have the saplings which is being planted.
 [08:59] For example, there might be 100 saplings or 200 saplings where we have converted them. Convert them into boxes. For example, on that particular forest, if we have.

@@ -1,5 +1,5 @@
 /**
- * Single axios instance + typed helpers for the OIAS Earth admin REST layer.
+ * Single axios instance + typed helpers for the COMMUNITREE admin REST layer.
  *
  * AUTH CONTRACT (CONFIRMED by live test, see spec/write_contracts.md):
  *   - Every /api/v1 call sends the RAW JWT in `Authorization` with NO
@@ -37,7 +37,7 @@ export const API_BASE_URL = '/api/v1';
 
 /**
  * Auth service base. The original ran on a separate host
- * (dev-auth.oiasearth.com). In the rebuild the Express server exposes the
+ * (dev-auth.communitree.co.in). In the rebuild the Express server exposes the
  * same path under the proxied /api/v1, so we default to that. Override with
  * VITE_AUTH_BASE_URL if the auth service is split out again.
  */

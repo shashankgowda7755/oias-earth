@@ -446,7 +446,7 @@ export default function PfaUploader() {
       {!standalone && !bannerHidden ? (
         <div className="flex items-center gap-3 border-b border-primary/30 bg-primary/10 px-4 py-2.5">
           <i className="ti ti-download text-lg text-primary" aria-hidden="true" />
-          <span className="flex-1 text-xs text-textPrimary">Install the OIAS PFA app for quick full-screen uploads.</span>
+          <span className="flex-1 text-xs text-textPrimary">Install the COMMUNITREE PFA app for quick full-screen uploads.</span>
           <button type="button" onClick={installApp} className="rounded-button bg-primary px-3 py-1.5 text-xs font-semibold text-black">Install</button>
           <button type="button" aria-label="Dismiss" onClick={() => setBannerHidden(true)} className="text-textSecondary"><i className="ti ti-x" aria-hidden="true" /></button>
         </div>

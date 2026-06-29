@@ -71,7 +71,7 @@ export default function ReportSponsor() {
             <div style={{ color: muted, fontSize: 13 }}>{[sponsor.industry, sponsor.headquarters].filter(Boolean).join(' · ')}</div>
           </div>
           <div style={{ textAlign: 'right', fontSize: 12, color: muted }}>
-            <div style={{ fontWeight: 700, color: ink }}>OIAS Earth</div>
+            <div style={{ fontWeight: 700, color: ink }}>COMMUNITREE</div>
             <div>Generated {today}</div>
           </div>
         </div>

@@ -17,7 +17,7 @@ export default defineConfig({
       injectRegister: 'auto',
       includeAssets: ['leaf.svg'],
       manifest: {
-        name: 'OIAS Earth — Field',
+        name: 'COMMUNITREE — Field',
         short_name: 'BTTH Field',
         description: 'Offline field capture: GPS, photo and visit logging for planters.',
         theme_color: '#16282e',

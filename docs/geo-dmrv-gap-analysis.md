@@ -1,6 +1,6 @@
 # Geo-tagging / location-proof / dMRV — landscape mapped to our platform
 
-Source: the global geo-tagging/dMRV landscape brief. This maps its requirements + systemic gaps to what OIAS Earth has, and what to build.
+Source: the global geo-tagging/dMRV landscape brief. This maps its requirements + systemic gaps to what COMMUNITREE has, and what to build.
 
 ## Status against the doc's 5 systemic gaps
 | # | Systemic gap (doc) | Our status | Action |
@@ -16,8 +16,8 @@ Source: the global geo-tagging/dMRV landscape brief. This maps its requirements 
 - **EXIF/photo + timestamp** ✅ (visit photos). Now SHA-256 hashed for reuse detection.
 - **Satellite remote sensing** ⏳ basemap only (Esri tiles); NOT yet used for verification (NDVI change-detection) — roadmap.
 - **Drone/LiDAR** ❌ not us (out of scope short-term).
-- **QR/unique IDs** ✅ `tree_unique_id`; QR plaque is in the OIAS vision (not built).
-- **Blockchain anchoring** ⏳ roadmap (Arweave/Polygon in OIAS vision; not built).
+- **QR/unique IDs** ✅ `tree_unique_id`; QR plaque is in the COMMUNITREE vision (not built).
+- **Blockchain anchoring** ⏳ roadmap (Arweave/Polygon in COMMUNITREE vision; not built).
 - **FOAM/radio proof-of-location** ❌ out of scope (infra-heavy).
 - **Cell/WiFi/IP** ❌ not used.
 
@@ -38,9 +38,9 @@ Source: the global geo-tagging/dMRV landscape brief. This maps its requirements 
 1. **Surface integrity flags** in admin + public (e.g., "photo verified unique", hide/flag suspect captures from public proof + carbon totals).
 2. **Satellite NDVI cross-check** — temporal-consistency: confirm reported planting/growth against EO change-detection; flag ghost plantations (doc's top fraud mode). Heaviest verification win.
 3. **EUDR polygon capture** — let a forest store a boundary polygon (GeoJSON), not just a centre; export as polygon for >4ha.
-4. **Blockchain anchoring** — monthly Merkle root of the ledger to Polygon/Arweave (OIAS vision) → immutable audit (doc: Veritree/Cardano pattern).
+4. **Blockchain anchoring** — monthly Merkle root of the ledger to Polygon/Arweave (COMMUNITREE vision) → immutable audit (doc: Veritree/Cardano pattern).
 5. **Device/photo provenance** — in-app-camera-only with sealed EXIF + device attestation; optional image-to-GPS verification for high-value claims.
 6. **Multi-registry / interoperable asset IDs** — stable feature IDs across exports (toward the doc's "interoperable asset graph").
 
 ## Honest position
-We already match best-in-class on **survival monitoring, offline smallholder UX, and transparent methodology** — the three gaps most platforms fail. With GeoJSON + the integrity layer now in, the remaining differentiators are **satellite cross-check** and **on-chain anchoring**, both already on the OIAS roadmap.
+We already match best-in-class on **survival monitoring, offline smallholder UX, and transparent methodology** — the three gaps most platforms fail. With GeoJSON + the integrity layer now in, the remaining differentiators are **satellite cross-check** and **on-chain anchoring**, both already on the COMMUNITREE roadmap.

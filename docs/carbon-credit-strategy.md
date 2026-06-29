@@ -17,7 +17,7 @@ Researched 2026 (6-agent swarm + synthesis). How a tree on our platform becomes 
 `carbon_offset_per_day × age_days` is **linear** while real sequestration is an **S-curve** — it over-credits saplings, under-credits mid-life trees, and throws away the measured DBH we already store. No registry certifies a flat daily rate. Replace with the measured-allometry, stock-change pipeline above. Keep the linear rate only as a labelled "pre-measurement estimate" before a tree's first DBH reading.
 
 ## Recommended path (two-track)
-- **Launch on Plan Vivo (PV Climate)** — lowest barrier, built for distributed smallholder/NGO plots, India precedent (Khasi Hills), ex-ante issuance (early cash), ≥60% community-revenue rule fits OIAS Earth. Lower price/liquidity.
+- **Launch on Plan Vivo (PV Climate)** — lowest barrier, built for distributed smallholder/NGO plots, India precedent (Khasi Hills), ex-ante issuance (early cash), ≥60% community-revenue rule fits COMMUNITREE. Lower price/liquidity.
 - **Build the data product to Verra VM0047 (ARR, census-based) spec** — purpose-built for GPS-identified counted trees, ICVCM-approved (A-rated ~$24–40/t band). Our monthly DBH+photo+survival **exceeds** its monitoring minimum. Migrate/dual-list to Verra as volume grows.
 - **NOT** India CCTS as the foreign path — domestic only (~$2–6/t), foreign sale largely blocked, requires start ≥ 1 Jan 2025, exclusivity (can't also be in Verra). Future domestic-buyer channel only.
 - **Hard rule:** only **post-1-Jan-2025 plantings** are reliably creditable.
@@ -35,7 +35,7 @@ Researched 2026 (6-agent swarm + synthesis). How a tree on our platform becomes 
 4. **No baseline/additionality** — historical satellite land-cover per site at start date; matched control plots / performance benchmark.
 5. **No permanence apparatus** — per-site land-tenure/carbon-rights agreements (highest hard-fail risk on community/farmer land), 40-yr management+monitoring plan, configurable buffer %, AFOLU NPRT.
 6. **No uncertainty stats** — 90% CI per batch + ≥10% deduction + independent re-measure QA.
-7. **Fraud surface** — server-side EXIF/GPS validation, photo-hash dedup, append-only audit log, in-app-camera-only capture (pull forward from OIAS roadmap), optional Merkle anchor.
+7. **Fraud surface** — server-side EXIF/GPS validation, photo-hash dedup, append-only audit log, in-app-camera-only capture (pull forward from COMMUNITREE roadmap), optional Merkle anchor.
 8. **Legacy cohort** — segment post-1-Jan-2025 registrable pool vs legacy marketing-only via `planting_date`.
 9. **Indian legal/tax** — Section-8/for-profit SPV for carbon sales; foreign sales as export of services (FEMA, not FCRA); GST + 12A counsel; carbon-rights contracts BEFORE first sale.
 

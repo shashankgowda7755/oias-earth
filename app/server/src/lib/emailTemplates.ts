@@ -74,7 +74,7 @@ const REPORT_QUARTERLY: EmailTemplate = {
     `<div style="width:30px;height:30px;background:#c8813a;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;">`,
     `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L8 8H4l4 4-2 6 6-3 6 3-2-6 4-4h-4z"/><line x1="12" y1="17" x2="12" y2="22"/></svg>`,
     `</div>`,
-    `<span style="font-size:16px;font-weight:700;color:#f5e6c8;letter-spacing:.02em;">OIAS Earth</span>`,
+    `<span style="font-size:16px;font-weight:700;color:#f5e6c8;letter-spacing:.02em;">COMMUNITREE</span>`,
     `</div>`,
 
     /* hero */
@@ -127,7 +127,7 @@ const REPORT_QUARTERLY: EmailTemplate = {
     /* signature */
     `<div style="background:#fff;padding:18px 32px;border-top:1px solid #f0e8d8;">`,
     `<div style="font-size:14px;color:#2d1f0e;font-style:italic;margin-bottom:6px;">For a greener future,</div>`,
-    `<div style="font-size:11px;color:#a89080;font-family:Arial,sans-serif;margin-bottom:0;">OIAS Earth Team &middot; reports@oiasearth.com &middot; {{footer_credit}}</div>`,
+    `<div style="font-size:11px;color:#a89080;font-family:Arial,sans-serif;margin-bottom:0;">COMMUNITREE Team &middot; reports@communitree.co.in &middot; {{footer_credit}}</div>`,
     `</div>`,
 
     /* footer stats */
@@ -137,7 +137,7 @@ const REPORT_QUARTERLY: EmailTemplate = {
     `<div style="flex:1;text-align:center;border-left:1px solid #e8ddd0;"><div style="font-size:18px;font-weight:700;color:#2d1f0e;font-family:Arial,sans-serif;">12+</div><div style="font-size:10px;color:#b8a090;font-family:Arial,sans-serif;text-transform:uppercase;letter-spacing:.06em;">Cities</div></div>`,
     `<div style="flex:1;text-align:center;border-left:1px solid #e8ddd0;"><div style="font-size:18px;font-weight:700;color:#2d1f0e;font-family:Arial,sans-serif;">17</div><div style="font-size:10px;color:#b8a090;font-family:Arial,sans-serif;text-transform:uppercase;letter-spacing:.06em;">SDG Goals</div></div>`,
     `</div>`,
-    `<div style="text-align:center;font-size:11px;color:#b8a090;font-family:Arial,sans-serif;margin-top:12px;">www.oiasearth.com &middot; Chennai, Tamil Nadu, India</div>`,
+    `<div style="text-align:center;font-size:11px;color:#b8a090;font-family:Arial,sans-serif;margin-top:12px;">www.communitree.co.in &middot; Chennai, Tamil Nadu, India</div>`,
     `</div>`,
 
     `</div>`, /* /wrapper */

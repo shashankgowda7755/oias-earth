@@ -846,7 +846,7 @@ interface BulkRow {
  *   - upsert forest_trees on (forest_id, tree_unique_id) with species + height/
  *     dia/planted_on + computed age/oxygen/carbon + cert URL
  *   - if a gift recipient is present, upsert a gift_forest_plants row and set
- *     the tree cert URL https://oiasearth.com/tree/<fuid>/<tuid>
+ *     the tree cert URL https://communitree.co.in/tree/<fuid>/<tuid>
  * Returns {inserted, updated, gifts, errors:[{row, message}]}.
  */
 async function bulkImportTrees(req: Request, res: Response): Promise<void> {
@@ -2680,7 +2680,7 @@ async function buildReportEmail(opts: {
     report_url: url,
     sponsor_kicker: sponsor ? `${sponsor.toUpperCase()} · QUARTERLY FOREST REPORT` : 'QUARTERLY FOREST REPORT',
     subject_prefix: sponsor ? `${sponsor} · ` : '',
-    footer_credit: `Initiated by CommuniTREE${sponsor ? ` · Sponsored by ${sponsor}` : ''} · Sent via OIAS Earth`,
+    footer_credit: `Initiated by COMMUNITREE${sponsor ? ` · Sponsored by ${sponsor}` : ''} · Sent via COMMUNITREE`,
   };
   return { subject: renderText(tpl.subject, vars), html: renderHtml(tpl.html, vars), cc: tpl.cc ?? [] };
 }
@@ -2703,7 +2703,7 @@ async function loadEmailConfig(forestId: string): Promise<{
   const f = fc.rows[0];
   return {
     fromAddress: g?.from_address || '',
-    displayName: g?.display_name || 'OIAS Earth',
+    displayName: g?.display_name || 'COMMUNITREE',
     replyTo: g?.reply_to ?? null,
     globalTo: g?.to_emails ?? [],
     globalCc: g?.cc_emails ?? [],

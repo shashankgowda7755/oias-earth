@@ -90,7 +90,7 @@ export default function PwaInstallPrompt() {
       <div style={{ maxWidth: 520, margin: '0 auto', display: 'flex', alignItems: 'center', gap: 14 }}>
         <img src="/pfa-icon.svg" alt="" width={44} height={44} style={{ borderRadius: 12, flexShrink: 0 }} />
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontWeight: 600, fontSize: 15 }}>Install the OIAS PFA app</div>
+          <div style={{ fontWeight: 600, fontSize: 15 }}>Install the COMMUNITREE PFA app</div>
           <div style={{ fontSize: 13, color: '#9fb3a8', marginTop: 2 }}>
             {iosHint
               ? 'Tap the Share icon, then “Add to Home Screen”.'

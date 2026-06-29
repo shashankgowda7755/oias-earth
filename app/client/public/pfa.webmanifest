@@ -1,6 +1,6 @@
 {
-  "name": "OIAS PFA — Photo Upload",
-  "short_name": "OIAS PFA",
+  "name": "COMMUNITREE PFA — Photo Upload",
+  "short_name": "COMMUNITREE PFA",
   "description": "Capture and upload forest report photos: select a forest, snap or pick photos per slot, they attach to that forest's report.",
   "id": "/pfa",
   "start_url": "/pfa",

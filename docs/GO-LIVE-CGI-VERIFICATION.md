@@ -105,7 +105,7 @@ Legend: ✔ yes · ✗ no · — n/a. "Saved (editor)" = path B (the main field-
 
 ## Security (separate, act now)
 **Exposed GitHub token** in git remote `shashank`:
-`https://ghp_…@github.com/shashankgowda7755/oias-earth.git` = live push access for anyone reading the config.
+`https://ghp_…@github.com/shashankgowda7755/communitree-earth.git` = live push access for anyone reading the config.
 **Fix:** rotate the token, then `git remote remove shashank` (re-add without the token if needed).
 
 ---

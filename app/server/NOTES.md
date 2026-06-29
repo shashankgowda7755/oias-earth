@@ -100,7 +100,7 @@ the spec did not capture (`openQuestions[5]`). We return distinct
 ## 8. Auth folded into Postgres
 
 **Documented deviation:** The original split auth onto a separate
-`dev-auth.oiasearth.com` host whose user/credentials table we could not
+`dev-auth.communitree.co.in` host whose user/credentials table we could not
 introspect. For a self-contained local rebuild we store `username` +
 `password_hash` on `user_profiles` and sign/verify JWTs with one shared
 `JWT_SECRET`. `password_hash` is never returned by any endpoint.

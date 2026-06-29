@@ -31,7 +31,7 @@ operator to the next thing in one click.
   (`TabNav.tsx`), render `DashboardHome` when `active === 'Home'` and seed the
   initial state to `'Home'` (`Dashboard.tsx`), and give it a sidebar icon +
   entry (`Sidebar.tsx`). `DashboardHome` receives `setActive` as `onOpenTab`.
-- **OIAS dark + lime theme**, responsive: the grid collapses to a single column
+- **COMMUNITREE dark + lime theme**, responsive: the grid collapses to a single column
   (and tiles to span 1) below 760px via a scoped media query.
 
 Status: already implemented and deployed. This change is the retroactive spec of

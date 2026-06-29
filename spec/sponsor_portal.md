@@ -8,9 +8,9 @@ Same app + URL as the SuperAdmin admin (`admin.bethetreehugger.co`), but the UI 
 - Data layer: this portal is **GraphQL-driven** (PostGraphile `/graphql`), unlike the SuperAdmin portal which uses the REST `/api/v1/<entity>/list` endpoints. On load it pulls a large (~1.6MB) GraphQL response (all trees + geo for the map).
 
 ## Shell
-- Header: CommuniTREE leaf + "Be The Tree Hugger" (left), forest selector "PNB ▾" (center), sponsor logo avatar w/ dropdown (right).
+- Header: COMMUNITREE leaf + "Be The Tree Hugger" (left), forest selector "PNB ▾" (center), sponsor logo avatar w/ dropdown (right).
 - Tabs: only **Dashboard** and **Trees** (vs 6 tabs for SuperAdmin). No management tabs (no Users/Sponsors/Employees/Reports/Jobs).
-- Co-branded: PNB sponsor logo shown alongside CommuniTREE.
+- Co-branded: PNB sponsor logo shown alongside COMMUNITREE.
 
 ## Screen: Dashboard (geo + impact reporting)
 - KPI cards row: **Oxygen generated** (1,678.75 KT), **Carbon offset** (928.30 KT), **Trees planted** (10,800), **Species planted** (8), **Average age** (1.9 yrs), **Tree alive** (10,800), **Trees drying** (0). Each with an icon.

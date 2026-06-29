@@ -5,7 +5,7 @@ TBD - created by archiving change resend-email-overhaul. Update Purpose after ar
 ## Requirements
 ### Requirement: Single-provider outbound email
 The system SHALL send all outbound email (quarterly reports and gift-tree
-certificates) through Resend from the verified OIAS Earth sending domain, with no
+certificates) through Resend from the verified COMMUNITREE sending domain, with no
 secondary provider.
 
 #### Scenario: Report sent via Resend

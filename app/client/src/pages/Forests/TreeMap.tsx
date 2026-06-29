@@ -47,7 +47,7 @@ export interface TreeMapProps {
   onSelectTree?: (t: MapTree) => void;
 }
 
-// Fallback view: roughly centre of India (most OIAS Earth forests are there).
+// Fallback view: roughly centre of India (most COMMUNITREE forests are there).
 const DEFAULT_CENTER: [number, number] = [11.0, 78.0];
 const DEFAULT_ZOOM = 5;
 

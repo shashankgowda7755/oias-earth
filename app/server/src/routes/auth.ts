@@ -3,7 +3,7 @@
  *
  * POST /api/v1/auth/login  {username, password} -> {token, user}
  *
- * The original auth lived on a separate host (dev-auth.oiasearth.com) and
+ * The original auth lived on a separate host (dev-auth.communitree.co.in) and
  * the success body's `user` object shape was not captured (spec openQuestions).
  * We return token + a user object containing exactly what the client persists
  * to localStorage (token, role, profileId, userDetails). The JWT is signed with

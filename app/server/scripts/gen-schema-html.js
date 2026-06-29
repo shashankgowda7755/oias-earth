@@ -25,7 +25,7 @@ const domainsJson = JSON.stringify(DOMAINS);
 
 const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>OIAS Earth — Live Data Schema</title>
+<title>COMMUNITREE — Live Data Schema</title>
 <style>
   :root{--ink:#16282e;--ink2:#0f1d22;--paper:#0d1518;--card:#13242a;--line:rgba(255,255,255,.1);--lime:#b6ff3c;--muted:#8aa0a3;--amber:#e8a33d;--fk:#5ec8ff}
   *{box-sizing:border-box}
@@ -54,7 +54,7 @@ const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"/>
   .legend{display:flex;gap:14px;flex-wrap:wrap;color:var(--muted);font-size:11px;margin-top:6px}
 </style></head><body>
 <header>
-  <h1>🌳 OIAS Earth — Live Data Schema</h1>
+  <h1>🌳 COMMUNITREE — Live Data Schema</h1>
   <span class="meta" id="counts"></span>
   <input id="q" placeholder="search table / column…" />
   <label class="tog"><input type="checkbox" id="legacy"/> show legacy/empty tables</label>

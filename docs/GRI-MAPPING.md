@@ -1,6 +1,6 @@
-# CommuniTREE → GRI Mapping Spec
+# COMMUNITREE → GRI Mapping Spec
 
-**Purpose:** map every data point CommuniTREE already captures to the GRI disclosure it
+**Purpose:** map every data point COMMUNITREE already captures to the GRI disclosure it
 satisfies, so forest reports and sponsor exports can be GRI-aligned without inventing data.
 
 **Target standards (2026 reporting):**
@@ -8,7 +8,7 @@ satisfies, so forest reports and sponsor exports can be GRI-aligned without inve
 - **GRI 101: Biodiversity 2024** — *live standard, effective 1 Jan 2026. Replaces the retired GRI 304.*
 - **GRI 305: Emissions 2016** — current.
 
-> **Honesty rule.** CommuniTREE CO₂ figures are **estimated, verification-ready removals**, not
+> **Honesty rule.** COMMUNITREE CO₂ figures are **estimated, verification-ready removals**, not
 > issued carbon credits. GRI permits disclosing estimates *with a methodology note*. Never label
 > them "credits" in a GRI context. Removals are disclosed as ecosystem-service / supplementary
 > context, NOT as a GRI 305-1/2/3 emissions reduction.
@@ -28,7 +28,7 @@ Everything below maps to topics 1 and 2 (the defensible CSR story today).
 
 ## 2. Climate — GRI 305: Emissions 2016
 
-| GRI code | Disclosure | CommuniTREE source | Status |
+| GRI code | Disclosure | COMMUNITREE source | Status |
 |---|---|---|---|
 | 305-5 (context) | Reduction of GHG emissions | n/a — we *remove*, not reduce operational emissions | reframe as removal |
 | **Removals (supplementary)** | Estimated CO₂e sequestered | `agbKg` → `CARBON_FRACTION` → ×`CO2_PER_C`, grossed by `ROOT_SHOOT`; method tag `CARBON_METHOD` (`lib/carbon.ts`) | ✅ computed per tree |
@@ -43,7 +43,7 @@ Everything below maps to topics 1 and 2 (the defensible CSR story today).
 
 ## 3. Biodiversity — GRI 101: Biodiversity 2024
 
-| GRI 101 code | Disclosure | CommuniTREE source | Status |
+| GRI 101 code | Disclosure | COMMUNITREE source | Status |
 |---|---|---|---|
 | 101-2 | Management of biodiversity impacts | plantation strategy, species selection, monitoring cadence | ✅ |
 | 101-4 | Identification of biodiversity impacts | site location, plantation_date, baseline land use | ⚠️ baseline land-use not stored explicitly |
@@ -61,7 +61,7 @@ Everything below maps to topics 1 and 2 (the defensible CSR story today).
 
 - Only `irrigation_method` captured; **no water volume**.
 - Decision: either add a `water_used_litres` field per visit, **or** declare 303 *not material*
-  for rain-fed/low-irrigation sites (defensible for most CommuniTREE forests).
+  for rain-fed/low-irrigation sites (defensible for most COMMUNITREE forests).
 
 ---
 
@@ -69,7 +69,7 @@ Everything below maps to topics 1 and 2 (the defensible CSR story today).
 
 | GRI 2 code | Source | Status |
 |---|---|---|
-| 2-1 Organizational details | CommuniTREE org + OIAS Earth | ✅ |
+| 2-1 Organizational details | COMMUNITREE org + COMMUNITREE | ✅ |
 | 2-6 Activities, value chain | forest/sponsor model | ✅ |
 | 2-28 Membership associations | n/a | — |
 | 2-29 Stakeholder engagement | sponsors, planters, monitoring | ✅ |
@@ -86,7 +86,7 @@ Everything below maps to topics 1 and 2 (the defensible CSR story today).
 | Baseline land-use | 101-4 | low | add one field at forest creation |
 | Policy / ABS narrative | 101-1/101-3 | none (copy) | org-level boilerplate, not per-forest |
 
-**Verdict:** CommuniTREE can produce a **defensible GRI 101 (biodiversity) + GRI 305 (removal
+**Verdict:** COMMUNITREE can produce a **defensible GRI 101 (biodiversity) + GRI 305 (removal
 context)** disclosure *today* from existing data. 101-7 (state change via survival ring + species
 + photos) and quantified CO₂ removal are the two strongest, sponsor-ready disclosures.
 
