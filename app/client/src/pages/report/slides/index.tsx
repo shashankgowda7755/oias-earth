@@ -59,7 +59,7 @@ function galleryByProjectYear(data: SlideProps['data']): { py: number; photos: G
     const diff = quarterOrdinal({ year: cell.year, quarter: cell.quarter } as FQ) - base;
     const py = Math.max(1, Math.floor(diff / 4) + 1);
     const pq = (((diff % 4) + 4) % 4) + 1;
-    const cap = cell.caption?.trim() || `Q${pq} · ${quarterPeriodLabel(cell.year, cell.quarter)}`;
+    const cap = cell.caption?.trim() || `Q${cell.quarter} · ${quarterPeriodLabel(cell.year, cell.quarter)}`;
     const list = years.get(py) ?? [];
     list.push({ pq, photo: { image: cell.image, caption: cap } });
     years.set(py, list);

@@ -510,7 +510,7 @@ export default function PfaUploader() {
                 className="w-full rounded-button border border-border bg-surface px-3 py-3 text-sm"
               >
                 {quarters.map(({ year: y, quarter: q }, i) => (
-                  <option key={`${y}-${q}`} value={`${y}-${q}`}>Year {Math.floor(i / 4) + 1} · Q{(i % 4) + 1} · {quarterPeriodLabel(y, q)}</option>
+                  <option key={`${y}-${q}`} value={`${y}-${q}`}>Year {Math.floor(i / 4) + 1} · Q{q} · {quarterPeriodLabel(y, q)}</option>
                 ))}
               </select>
             </label>
@@ -636,7 +636,7 @@ export default function PfaUploader() {
                     <span className="text-xs text-textSecondary">{filledInYear}/{yearQs.length}</span>
                   </div>
                   <div className="grid grid-cols-2 gap-3">
-                    {yearQs.map((fq, qi) => {
+                    {yearQs.map((fq) => {
                       const key = `${fq.year}-${fq.quarter}`;
                       const url = galleryByQ[key];
                       const busy = qBusy === key;
@@ -650,7 +650,7 @@ export default function PfaUploader() {
                             {url ? <img src={url} alt="" className="absolute inset-0 h-full w-full bg-surface object-cover opacity-90" /> : null}
                             <span className="relative z-10 flex flex-col items-center gap-1">
                               <i className={`ti ${busy ? 'ti-loader-2' : url ? 'ti-circle-check' : 'ti-camera'} text-[22px] ${url ? 'text-primary' : 'text-textSecondary'}`} aria-hidden="true" />
-                              <span className={`text-[11px] ${url ? 'rounded bg-black/55 px-1.5 py-0.5 text-white' : 'text-textSecondary'}`}>Q{qi + 1} · {quarterPeriodLabel(fq.year, fq.quarter)}</span>
+                              <span className={`text-[11px] ${url ? 'rounded bg-black/55 px-1.5 py-0.5 text-white' : 'text-textSecondary'}`}>Q{fq.quarter} · {quarterPeriodLabel(fq.year, fq.quarter)}</span>
                             </span>
                           </button>
                           {url ? <button type="button" aria-label="Delete" onClick={() => bulkGalleryDelete(fq)} className="absolute right-1 top-1 z-20 rounded-full bg-black/60 p-1 text-white hover:bg-danger"><i className="ti ti-trash text-xs" aria-hidden="true" /></button> : null}
