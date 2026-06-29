@@ -10,6 +10,7 @@ import { Link } from 'react-router-dom';
 import { useToast } from '@/components/Toast';
 import { fetchForestReport } from '@/lib/publicApi';
 import { uploadReportImage, clearReportImage, uploadSponsorLogo, deleteSponsorLogo, satelliteFetch } from '../Forests/forestApi';
+import { fiscalQuarterOf, quarterPeriodLabel, quartersFrom, type FQ } from '@/lib/fiscal';
 import { fetchForestOptions, type ForestOption } from '../Reports/reportApi';
 
 // `ratio` is the target aspect ratio (width / height) the report slot renders at.
@@ -75,53 +76,8 @@ async function cropToRatio(file: File, ratio: number): Promise<File> {
   }
 }
 
-function defaultFiscal(): { year: number; quarter: number } {
-  const d = new Date(); const m = d.getMonth();
-  if (m >= 3 && m <= 5) return { year: d.getFullYear(), quarter: 1 };
-  if (m >= 6 && m <= 8) return { year: d.getFullYear(), quarter: 2 };
-  if (m >= 9) return { year: d.getFullYear(), quarter: 3 };
-  return { year: d.getFullYear() - 1, quarter: 4 };
-}
-
-// --- Fiscal-quarter helpers (Indian FY, Apr-start) -------------------------
-// Mirrors reportCompute.ts conventions: Q1 Apr–Jun, Q2 Jul–Sep, Q3 Oct–Dec,
-// Q4 Jan–Mar. `year` is the FISCAL year (the Apr it starts in); Q4's calendar
-// months fall in the next calendar year. Kept inline so this page stays
-// self-contained (no shared @/lib/fiscal module yet).
-type FQ = { year: number; quarter: number };
-const FQ_MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-const FQ_START_MONTH: Record<number, number> = { 1: 3, 2: 6, 3: 9, 4: 0 };
-
-/** Fiscal year+quarter that a calendar Date falls into. */
-function fiscalQuarterOf(d: Date): FQ {
-  const m = d.getMonth();
-  if (m >= 3 && m <= 5) return { year: d.getFullYear(), quarter: 1 };
-  if (m >= 6 && m <= 8) return { year: d.getFullYear(), quarter: 2 };
-  if (m >= 9) return { year: d.getFullYear(), quarter: 3 };
-  return { year: d.getFullYear() - 1, quarter: 4 };
-}
-
-/** Human period label for a fiscal year+quarter, e.g. "Apr – Jun 25". */
-function quarterPeriodLabel(year: number, q: number): string {
-  const startMonth = FQ_START_MONTH[q] ?? 0;
-  const calYear = q === 4 ? year + 1 : year;
-  return `${FQ_MONTHS[startMonth]} – ${FQ_MONTHS[startMonth + 2]} ${String(calYear).slice(-2)}`;
-}
-
-/** Ascending list of fiscal quarters from `from`'s quarter up to `to`'s quarter (inclusive). */
-function quartersFrom(from: Date, to: Date): FQ[] {
-  const a = fiscalQuarterOf(from);
-  const b = fiscalQuarterOf(to);
-  const out: FQ[] = [];
-  let y = a.year, q = a.quarter;
-  // Cap iterations defensively so a bad date can never spin forever.
-  for (let guard = 0; guard < 400; guard++) {
-    out.push({ year: y, quarter: q });
-    if (y === b.year && q === b.quarter) break;
-    if (y > b.year || (y === b.year && q >= b.quarter)) break;
-    q += 1; if (q > 4) { q = 1; y += 1; }
-  }
-  return out;
+function defaultFiscal(): FQ {
+  return fiscalQuarterOf(new Date());
 }
 
 type Rec = Record<string, unknown>;
