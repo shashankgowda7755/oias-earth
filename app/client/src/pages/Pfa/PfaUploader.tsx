@@ -108,6 +108,9 @@ export default function PfaUploader() {
   const fiscal = defaultFiscal();
   const [forests, setForests] = useState<ForestOption[]>([]);
   const [forestId, setForestId] = useState('');
+  // Searchable forest picker (combobox): type to filter by name, code or number.
+  const [forestQuery, setForestQuery] = useState('');
+  const [forestOpen, setForestOpen] = useState(false);
   const [year, setYear] = useState(fiscal.year);
   const [quarter, setQuarter] = useState(fiscal.quarter);
   // plantation_date from the loaded forest payload — drives the quarter picker
@@ -435,6 +438,17 @@ export default function PfaUploader() {
 
   const forestName = forests.find((f) => f.value === forestId)?.label ?? 'Forest';
 
+  // Filter the forest list by the search box (name / code / number / label).
+  const needle = forestQuery.trim().toLowerCase();
+  const forestMatches = !needle
+    ? forests
+    : forests.filter((f) =>
+        f.name.toLowerCase().includes(needle) ||
+        f.code.toLowerCase().includes(needle) ||
+        f.number.toLowerCase().includes(needle) ||
+        f.label.toLowerCase().includes(needle),
+      );
+
   return (
     <div className="min-h-screen bg-appbg text-textPrimary">
       <input ref={fileInput} type="file" accept="image/*" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (fileSlot.current) stage(fileSlot.current, f); e.target.value = ''; }} />
@@ -457,12 +471,38 @@ export default function PfaUploader() {
         <>
           <TopBar title="Photo uploader" />
           <main className="mx-auto max-w-md px-4 py-6">
-            <label className="text-sm"><span className="mb-1 block text-textSecondary">Forest</span>
-              <select value={forestId} onChange={(e) => setForestId(e.target.value)} className="w-full rounded-button border border-border bg-surface px-3 py-3 text-sm">
-                <option value="">Select a forest…</option>
-                {forests.map((f) => <option key={f.value} value={f.value}>{f.label}</option>)}
-              </select>
-            </label>
+            <div className="text-sm"><span className="mb-1 block text-textSecondary">Forest</span>
+              <div className="relative">
+                <i className="ti ti-search pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-textSecondary" aria-hidden="true" />
+                <input
+                  type="text"
+                  value={forestQuery}
+                  onChange={(e) => { setForestQuery(e.target.value); setForestOpen(true); if (forestId) setForestId(''); }}
+                  onFocus={() => setForestOpen(true)}
+                  onBlur={() => setTimeout(() => setForestOpen(false), 150)}
+                  placeholder="Search by name, code or number…"
+                  className="w-full rounded-button border border-border bg-surface py-3 pl-9 pr-3 text-sm"
+                />
+                {forestOpen ? (
+                  <ul className="absolute z-30 mt-1 max-h-72 w-full overflow-auto rounded-card border border-border bg-surface shadow-lg">
+                    {forestMatches.length === 0 ? (
+                      <li className="px-3 py-3 text-sm text-textSecondary">No forests match “{forestQuery}”.</li>
+                    ) : forestMatches.slice(0, 50).map((f) => (
+                      <li key={f.value}>
+                        <button
+                          type="button"
+                          onMouseDown={(e) => { e.preventDefault(); setForestId(f.value); setForestQuery(f.label); setForestOpen(false); }}
+                          className={`flex w-full flex-col items-start gap-0.5 px-3 py-2.5 text-left hover:bg-white/5 ${f.value === forestId ? 'bg-primary/10' : ''}`}
+                        >
+                          <span className="text-sm text-textPrimary">{f.name}</span>
+                          <span className="text-[11px] text-textSecondary">{[f.code, f.number].filter(Boolean).join(' · ') || '—'}</span>
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                ) : null}
+              </div>
+            </div>
             <label className="mt-3 block text-sm"><span className="mb-1 block text-textSecondary">Quarter</span>
               <select
                 value={`${year}-${quarter}`}

@@ -88,6 +88,10 @@ export async function sendReport(
 export interface ForestOption {
   value: string;
   label: string;
+  /** Searchable fields so the picker can match by name, code or number. */
+  name: string;
+  code: string; // forest_internal_id (e.g. CGICGI57)
+  number: string; // forest_unique_id
 }
 
 export async function fetchForestOptions(): Promise<ForestOption[]> {
@@ -97,5 +101,8 @@ export async function fetchForestOptions(): Promise<ForestOption[]> {
     label: f.forest_unique_id
       ? `${f.forest_name} (${f.forest_unique_id})`
       : f.forest_name,
+    name: f.forest_name ?? '',
+    code: f.forest_internal_id ?? '',
+    number: f.forest_unique_id ?? '',
   }));
 }
