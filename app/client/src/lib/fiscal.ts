@@ -59,3 +59,23 @@ export function fiscalYearLabel(year: number): string {
   const endTwo = String((start + 1) % 100).padStart(2, '0');
   return `FY ${start}–${endTwo}`;
 }
+
+/** Monotonic ordinal for a fiscal quarter (for diffing / project-year math). */
+export function quarterOrdinal(fq: FQ): number {
+  return fq.year * 4 + (fq.quarter - 1);
+}
+
+/**
+ * PROJECT year a fiscal quarter belongs to, counted from the plantation date.
+ * The quarter that contains the plantation date is Year 1; every 4 consecutive
+ * quarters after that is the next project year. Returns >= 1.
+ */
+export function projectYearOf(plantation: Date, fq: FQ): number {
+  const diff = quarterOrdinal(fq) - quarterOrdinal(fiscalQuarterOf(plantation));
+  return Math.max(1, Math.floor(diff / 4) + 1);
+}
+
+/** Human label for a project year, e.g. "Year 1". */
+export function projectYearLabel(py: number): string {
+  return `Year ${py}`;
+}

@@ -1,7 +1,7 @@
 /** Ordered slide list for the quarterly forest report, built per-report. */
 import type { ReactNode } from 'react';
 import type { SlideProps } from '../reportTypes';
-import { fiscalYearLabel } from '@/lib/fiscal';
+import { projectYearLabel, quarterOrdinal, fiscalQuarterOf, quarterPeriodLabel, type FQ } from '@/lib/fiscal';
 import { S01Cover, S02Contents, S03OsrLand, S04Permission, S05AreaPopulation, S06ProjectImpact, S07Beneficiaries } from './slides1';
 import { S08ValueFlow, S09ApproxValue, S10Maintenance, S11WorkforceQuarter, S12WorkforceTillDate, S13Growth, S14SiteMasterPlan } from './slides2';
 import { S15SoilPh, S16Temperature, S17EnvIndicators, S18Species, S19ScoreCard, S20Security, S22Thanks, GalleryYearPage } from './slides3';
@@ -13,18 +13,17 @@ export interface ReportSlide {
   node: ReactNode;
 }
 
-/** One gallery photo within a fiscal year (after folding gallery + progress). */
-type GalleryPhoto = { quarter?: number; image?: string; caption?: string };
+/** One gallery photo within a project year (caption precomputed). */
+type GalleryPhoto = { image?: string; caption?: string };
 
 /**
- * Build the per-(year,quarter) gallery photos, grouped by fiscal year.
- *
- * For each (year, quarter): prefer the gallery_images photo; if that quarter has
- * no gallery photo but plantation_progress has one, fold the progress image in.
- * One photo per (year, quarter). Returns fiscal years (ascending) each with
- * their quarters sorted ascending.
+ * Build per-(year,quarter) gallery photos grouped by PROJECT year — counted from
+ * the plantation date, every 4 consecutive quarters = one project year (Year 1,
+ * Year 2 …). For each cell: prefer gallery_images; fold in plantation_progress
+ * where the gallery has nothing. Returns project years ascending, each with its
+ * photos in quarter order and captions like "Q2 · Jul – Sep 25".
  */
-function galleryByFiscalYear(data: SlideProps['data']): { year: number; photos: GalleryPhoto[] }[] {
+function galleryByProjectYear(data: SlideProps['data']): { py: number; photos: GalleryPhoto[] }[] {
   const { forest } = data;
   // key = `${year}-${quarter}` → chosen photo.
   const byCell = new Map<string, { year: number; quarter: number; image?: string; caption?: string }>();
@@ -44,20 +43,31 @@ function galleryByFiscalYear(data: SlideProps['data']): { year: number; photos: 
     if (!byCell.has(key)) byCell.set(key, { year, quarter, image: p.image });
   }
 
-  // Group cells by fiscal year.
-  const years = new Map<number, GalleryPhoto[]>();
-  for (const cell of byCell.values()) {
-    const list = years.get(cell.year) ?? [];
-    list.push({ quarter: cell.quarter, image: cell.image, caption: cell.caption });
-    years.set(cell.year, list);
+  const cells = [...byCell.values()];
+  if (cells.length === 0) return [];
+
+  // Base ordinal = the plantation quarter (Year 1 Q1). Fall back to the earliest
+  // photo so it still groups sensibly when no plantation date is set.
+  const plant = forest.plantation_date ? new Date(String(forest.plantation_date)) : null;
+  const base = plant && !Number.isNaN(plant.getTime())
+    ? quarterOrdinal(fiscalQuarterOf(plant))
+    : Math.min(...cells.map((c) => quarterOrdinal({ year: c.year, quarter: c.quarter } as FQ)));
+
+  // Group cells by project year; remember the project-quarter (1..4) for ordering + caption.
+  const years = new Map<number, { pq: number; photo: GalleryPhoto }[]>();
+  for (const cell of cells) {
+    const diff = quarterOrdinal({ year: cell.year, quarter: cell.quarter } as FQ) - base;
+    const py = Math.max(1, Math.floor(diff / 4) + 1);
+    const pq = (((diff % 4) + 4) % 4) + 1;
+    const cap = cell.caption?.trim() || `Q${pq} · ${quarterPeriodLabel(cell.year, cell.quarter)}`;
+    const list = years.get(py) ?? [];
+    list.push({ pq, photo: { image: cell.image, caption: cap } });
+    years.set(py, list);
   }
 
   return [...years.entries()]
     .sort((a, b) => a[0] - b[0])
-    .map(([year, photos]) => ({
-      year,
-      photos: photos.sort((a, b) => (a.quarter ?? 0) - (b.quarter ?? 0)),
-    }));
+    .map(([py, arr]) => ({ py, photos: arr.sort((a, b) => a.pq - b.pq).map((x) => x.photo) }));
 }
 
 /**
@@ -92,18 +102,18 @@ export function buildSlides(data: SlideProps['data']): ReportSlide[] {
     { id: 'security', title: 'Site Security', node: <S20Security data={data} /> },
   ];
 
-  const galleryYears = galleryByFiscalYear(data);
+  const galleryYears = galleryByProjectYear(data);
   const gallerySlides: ReportSlide[] = galleryYears.length
-    ? galleryYears.map(({ year, photos }) => ({
-        id: `gallery-${year}`,
-        title: `Photo Gallery — ${fiscalYearLabel(year)}`,
-        node: <GalleryYearPage data={data} fyYear={year} photos={photos} />,
+    ? galleryYears.map(({ py, photos }) => ({
+        id: `gallery-y${py}`,
+        title: `Photo Gallery — ${projectYearLabel(py)}`,
+        node: <GalleryYearPage data={data} title={projectYearLabel(py)} photos={photos} />,
       }))
     : [
         {
           id: 'gallery',
           title: 'Photo Gallery',
-          node: <GalleryYearPage data={data} fyYear={data.meta.year} photos={[]} />,
+          node: <GalleryYearPage data={data} photos={[]} />,
         },
       ];
 

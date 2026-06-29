@@ -10,7 +10,7 @@ import { Link } from 'react-router-dom';
 import { useToast } from '@/components/Toast';
 import { fetchForestReport } from '@/lib/publicApi';
 import { uploadReportImage, clearReportImage, uploadSponsorLogo, deleteSponsorLogo, satelliteFetch } from '../Forests/forestApi';
-import { fiscalQuarterOf, quarterPeriodLabel, quartersFrom, type FQ } from '@/lib/fiscal';
+import { fiscalQuarterOf, quarterPeriodLabel, quartersFrom, projectYearLabel, type FQ } from '@/lib/fiscal';
 import { fetchForestOptions, type ForestOption } from '../Reports/reportApi';
 
 // `ratio` is the target aspect ratio (width / height) the report slot renders at.
@@ -19,7 +19,7 @@ import { fetchForestOptions, type ForestOption } from '../Reports/reportApi';
 // at render time. Keep these in sync with the slide render boxes.
 interface Slot { key: string; label: string; perQuarter?: boolean; ratio: number }
 interface LogoRow { id: string; title: string; name: string; value: 'sponsored_by' | 'initiated_by'; logo?: string; serverIndex: number }
-type Page = 'pick' | 'menu' | 'site' | 'quarter' | 'sponsors';
+type Page = 'pick' | 'menu' | 'site' | 'quarter' | 'qphotos' | 'sponsors';
 
 const SITE_SLOTS: Slot[] = [
   { key: 'cover', label: 'Cover', ratio: 4 / 3 },
@@ -32,7 +32,6 @@ const QUARTER_SLOTS: Slot[] = [
   { key: 'soil_meter', label: 'Soil meter', perQuarter: true, ratio: 1 },
   { key: 'temp_inside', label: 'Inside', perQuarter: true, ratio: 4 / 3 },
   { key: 'temp_outside', label: 'Outside', perQuarter: true, ratio: 4 / 3 },
-  { key: 'gallery', label: 'Quarterly photo', perQuarter: true, ratio: 4 / 3 },
 ];
 
 /** Human label for an aspect ratio (4/3 -> "4:3"). Best-effort, falls back to 2dp. */
@@ -146,17 +145,30 @@ export default function PfaUploader() {
   const [aerialBusy, setAerialBusy] = useState<number | null>(null);
   const aerialFile = useRef<HTMLInputElement | null>(null);
   const aerialIdx = useRef<number>(-1);
+  // Quarterly photos (bulk): one gallery photo per fiscal (year,quarter), keyed
+  // `${year}-${quarter}`. Lets the operator backfill every quarter in one place.
+  const [galleryByQ, setGalleryByQ] = useState<Record<string, string>>({});
+  const [qBusy, setQBusy] = useState<string | null>(null);
+  const qFileInput = useRef<HTMLInputElement | null>(null);
+  const qFileTarget = useRef<FQ | null>(null);
 
   useEffect(() => { fetchForestOptions().then(setForests).catch(() => undefined); }, []);
 
   useEffect(() => {
-    if (!forestId) { setStatus({}); setLogos([]); setPlantationDate(null); return; }
+    if (!forestId) { setStatus({}); setLogos([]); setPlantationDate(null); setGalleryByQ({}); return; }
     let alive = true;
     fetchForestReport(forestId, year, quarter)
       .then((r) => {
         if (!alive) return;
         const f = (r.forest as Rec) ?? {};
         setStatus(seedFromForest(f, year, quarter));
+        // All quarter gallery photos (full array) for the bulk "Quarterly photos" page.
+        const gimgs = Array.isArray(f.gallery_images) ? (f.gallery_images as Rec[]) : [];
+        const gmap: Record<string, string> = {};
+        for (const g of gimgs) {
+          if (g?.image && g.year != null && g.quarter != null) gmap[`${g.year}-${g.quarter}`] = String(g.image);
+        }
+        setGalleryByQ(gmap);
         // plantation_date drives the quarter picker range. Parse defensively;
         // missing/invalid → null so the picker uses its ~2-year fallback.
         const pd = f.plantation_date != null ? new Date(String(f.plantation_date)) : null;
@@ -340,6 +352,29 @@ export default function PfaUploader() {
     finally { setAerialBusy(null); }
   };
 
+  // Quarterly photos (bulk) — upload/replace/delete a gallery photo for any (year,quarter).
+  const bulkGalleryUpload = async (fq: FQ, file?: File | null) => {
+    if (!file) return;
+    if (!forestId) { toast.error('Pick a forest first.'); return; }
+    const key = `${fq.year}-${fq.quarter}`;
+    setQBusy(key);
+    try {
+      const cropped = await cropToRatio(file, 4 / 3);
+      const r = await uploadReportImage(forestId, 'gallery', cropped, { year: fq.year, quarter: fq.quarter });
+      setGalleryByQ((m) => ({ ...m, [key]: r.url }));
+      toast.success('Quarterly photo uploaded.');
+    } catch (e) { toast.error(e instanceof Error ? e.message : 'Upload failed.'); }
+    finally { setQBusy(null); }
+  };
+  const bulkGalleryDelete = async (fq: FQ) => {
+    if (!forestId) return;
+    const key = `${fq.year}-${fq.quarter}`;
+    const prev = galleryByQ[key];
+    setGalleryByQ((m) => { const n = { ...m }; delete n[key]; return n; });
+    try { await clearReportImage(forestId, 'gallery', { year: fq.year, quarter: fq.quarter }); toast.success('Quarterly photo removed.'); }
+    catch (e) { setGalleryByQ((m) => ({ ...m, [key]: prev ?? '' })); toast.error(e instanceof Error ? e.message : 'Delete failed.'); }
+  };
+
   // logos
   const patchLogo = (i: number, p: Partial<LogoRow>) => setLogos((ls) => ls.map((r, j) => (j === i ? { ...r, ...p } : r)));
   const addSponsor = () => setLogos((ls) => [...ls, { id: crypto.randomUUID(), title: 'Sponsored By', name: '', value: 'sponsored_by', serverIndex: -1 }]);
@@ -405,6 +440,7 @@ export default function PfaUploader() {
       <input ref={fileInput} type="file" accept="image/*" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (fileSlot.current) stage(fileSlot.current, f); e.target.value = ''; }} />
       <input ref={logoInput} type="file" accept="image/*" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f && logoIdx.current >= 0) persistLogo(logoIdx.current, f); e.target.value = ''; }} />
       <input ref={aerialFile} type="file" accept="image/*" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f && aerialIdx.current >= 0) uploadAerial(aerialIdx.current, f); e.target.value = ''; }} />
+      <input ref={qFileInput} type="file" accept="image/*" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f && qFileTarget.current) bulkGalleryUpload(qFileTarget.current, f); e.target.value = ''; }} />
 
       {/* always-available install notification */}
       {!standalone && !bannerHidden ? (
@@ -427,14 +463,14 @@ export default function PfaUploader() {
                 {forests.map((f) => <option key={f.value} value={f.value}>{f.label}</option>)}
               </select>
             </label>
-            <label className="mt-3 block text-sm"><span className="mb-1 block text-textSecondary">Fiscal quarter</span>
+            <label className="mt-3 block text-sm"><span className="mb-1 block text-textSecondary">Quarter</span>
               <select
                 value={`${year}-${quarter}`}
                 onChange={(e) => { const [y, q] = e.target.value.split('-'); setYear(Number(y)); setQuarter(Number(q)); }}
                 className="w-full rounded-button border border-border bg-surface px-3 py-3 text-sm"
               >
-                {quarters.map(({ year: y, quarter: q }) => (
-                  <option key={`${y}-${q}`} value={`${y}-${q}`}>Q{q} · {quarterPeriodLabel(y, q)}</option>
+                {quarters.map(({ year: y, quarter: q }, i) => (
+                  <option key={`${y}-${q}`} value={`${y}-${q}`}>Year {Math.floor(i / 4) + 1} · Q{(i % 4) + 1} · {quarterPeriodLabel(y, q)}</option>
                 ))}
               </select>
             </label>
@@ -455,6 +491,7 @@ export default function PfaUploader() {
             {[
               { p: 'site' as Page, icon: 'ti-building-community', label: 'Site photos', sub: 'Enter once', n: count(SITE_SLOTS), of: SITE_SLOTS.length },
               { p: 'quarter' as Page, icon: 'ti-calendar', label: 'This quarter', sub: `Q${quarter} ${year}`, n: count(QUARTER_SLOTS), of: QUARTER_SLOTS.length },
+              { p: 'qphotos' as Page, icon: 'ti-photo', label: 'Quarterly photos', sub: 'All quarters · one each', n: quarters.filter((fq) => galleryByQ[`${fq.year}-${fq.quarter}`]).length, of: quarters.length },
               { p: 'sponsors' as Page, icon: 'ti-building-store', label: 'Sponsors & logos', sub: `${logos.length} added`, n: logos.filter((l) => l.logo).length, of: logos.length },
             ].map((row) => (
               <button key={row.p} type="button" onClick={() => setPage(row.p)} className="mb-2.5 flex w-full items-center gap-3 rounded-card border border-border bg-surface px-4 py-4 text-left hover:border-primary/50">
@@ -542,6 +579,52 @@ export default function PfaUploader() {
         </>
       ) : null}
 
+      {/* PAGE: quarterly photos (bulk — one gallery photo per quarter, by project year) */}
+      {page === 'qphotos' ? (
+        <>
+          <TopBar title="Quarterly photos" onBack={() => setPage('menu')} />
+          <main className="mx-auto max-w-md px-4 py-5">
+            <p className="mb-3 text-xs text-textSecondary">One photo per quarter, grouped by project year. Tap to add or replace; trash to remove. These feed the report's yearly photo gallery.</p>
+            {quarters.length === 0 ? <p className="text-sm text-textSecondary">No quarters yet — set the forest's plantation date first.</p> : null}
+            {Array.from({ length: Math.ceil(quarters.length / 4) }, (_, yi) => {
+              const yearQs = quarters.slice(yi * 4, yi * 4 + 4);
+              const filledInYear = yearQs.filter((fq) => galleryByQ[`${fq.year}-${fq.quarter}`]).length;
+              return (
+                <div key={yi} className="mb-5">
+                  <div className="mb-2 flex items-center justify-between">
+                    <span className="text-sm font-semibold">{projectYearLabel(yi + 1)}</span>
+                    <span className="text-xs text-textSecondary">{filledInYear}/{yearQs.length}</span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    {yearQs.map((fq, qi) => {
+                      const key = `${fq.year}-${fq.quarter}`;
+                      const url = galleryByQ[key];
+                      const busy = qBusy === key;
+                      return (
+                        <div key={key} className="relative">
+                          <button
+                            type="button"
+                            onClick={() => { qFileTarget.current = fq; qFileInput.current?.click(); }}
+                            className={`relative flex aspect-square w-full flex-col items-center justify-center gap-1.5 overflow-hidden rounded-card border p-2 text-center transition-colors ${url ? 'border-transparent bg-primary/10' : 'border-border hover:border-primary/60'}`}
+                          >
+                            {url ? <img src={url} alt="" className="absolute inset-0 h-full w-full bg-surface object-cover opacity-90" /> : null}
+                            <span className="relative z-10 flex flex-col items-center gap-1">
+                              <i className={`ti ${busy ? 'ti-loader-2' : url ? 'ti-circle-check' : 'ti-camera'} text-[22px] ${url ? 'text-primary' : 'text-textSecondary'}`} aria-hidden="true" />
+                              <span className={`text-[11px] ${url ? 'rounded bg-black/55 px-1.5 py-0.5 text-white' : 'text-textSecondary'}`}>Q{qi + 1} · {quarterPeriodLabel(fq.year, fq.quarter)}</span>
+                            </span>
+                          </button>
+                          {url ? <button type="button" aria-label="Delete" onClick={() => bulkGalleryDelete(fq)} className="absolute right-1 top-1 z-20 rounded-full bg-black/60 p-1 text-white hover:bg-danger"><i className="ti ti-trash text-xs" aria-hidden="true" /></button> : null}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })}
+          </main>
+        </>
+      ) : null}
+
       {/* sticky capture bar on photo pages */}
       {page === 'site' || page === 'quarter' ? (
         <div className="sticky bottom-0 z-20 border-t border-border bg-appbg/95 px-4 py-3 backdrop-blur">
@@ -619,6 +702,7 @@ export default function PfaUploader() {
               { p: 'menu' as Page, icon: 'ti-home', label: 'Home', ct: '' },
               { p: 'site' as Page, icon: 'ti-building-community', label: 'Site photos', ct: `${count(SITE_SLOTS)}/${SITE_SLOTS.length}` },
               { p: 'quarter' as Page, icon: 'ti-calendar', label: 'This quarter', ct: `${count(QUARTER_SLOTS)}/${QUARTER_SLOTS.length}` },
+              { p: 'qphotos' as Page, icon: 'ti-photo', label: 'Quarterly photos', ct: `${quarters.filter((fq) => galleryByQ[`${fq.year}-${fq.quarter}`]).length}/${quarters.length}` },
               { p: 'sponsors' as Page, icon: 'ti-building-store', label: 'Sponsors & logos', ct: `${logos.filter((l) => l.logo).length}/${logos.length}` },
             ]).map((r) => (
               <button key={r.p} type="button" onClick={() => go(r.p)} className={`flex w-full items-center gap-3 px-4 py-3.5 text-left text-sm ${page === r.p ? 'bg-primary/15 text-primary' : 'text-textPrimary hover:bg-white/5'}`}>

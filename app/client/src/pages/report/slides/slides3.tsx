@@ -7,7 +7,6 @@ import { useEffect, useState } from 'react';
 import type { CSSProperties } from 'react';
 import QRCode from 'qrcode';
 import type { SlideProps } from '../reportTypes';
-import { fiscalYearLabel } from '@/lib/fiscal';
 import {
   C, SectionTitle, SlidePage, ReportImage, EmptyBlock, DarkPanel, Pill, CARD_SHADOW,
   dash, numOrDash, fmtDate, enumLabel,
@@ -287,24 +286,21 @@ export function S20Security({ data }: SlideProps) {
   );
 }
 
-/* --------------------- Photo Gallery (one dynamic page per fiscal year) --------------------- */
+/* --------------------- Photo Gallery (one dynamic page per project year) --------------------- */
 
-/** Calendar year a fiscal quarter falls in (Indian FY, Apr-start): Q4 (Jan–Mar)
- * lands in the next calendar year, Q1–Q3 in the fiscal year itself. */
-const calendarYearOfQuarter = (fyYear: number, q?: number): number => (q === 4 ? fyYear + 1 : fyYear);
-
-type GalleryPhoto = { quarter?: number; image?: string; caption?: string };
+export type GalleryPhoto = { image?: string; caption?: string };
 
 /**
- * One Photo Gallery page for a single fiscal year. The grid ADAPTS to the photo
+ * One Photo Gallery page (a single project year). The grid ADAPTS to the photo
  * count (1..4) so cells always fill the slide with no empty placeholders:
  *   1 → one full-bleed cell
  *   2 → two equal columns, full height
  *   3 → top cell spanning both columns + two cells below
  *   4 → 2×2 grid
- * Each cell crops-to-fill via <ReportImage> (object-cover) with a small caption.
+ * Each cell crops-to-fill via <ReportImage> (object-cover). The title + per-photo
+ * captions are precomputed by buildSlides.
  */
-export function GalleryYearPage({ data, fyYear, photos }: { data: SlideProps['data']; fyYear: number; photos: GalleryPhoto[] }) {
+export function GalleryYearPage({ data, title, photos }: { data: SlideProps['data']; title?: string; photos: GalleryPhoto[] }) {
   const { meta } = data;
   const cells = photos.slice(0, 4);
   const n = cells.length;
@@ -314,17 +310,11 @@ export function GalleryYearPage({ data, fyYear, photos }: { data: SlideProps['da
       ? { gridTemplateColumns: '1fr', gridTemplateRows: '1fr' }
       : n === 2
         ? { gridTemplateColumns: '1fr 1fr', gridTemplateRows: '1fr' }
-        : n === 3
-          ? { gridTemplateColumns: '1fr 1fr', gridTemplateRows: '1fr 1fr' }
-          : { gridTemplateColumns: '1fr 1fr', gridTemplateRows: '1fr 1fr' };
-  const caption = (p: GalleryPhoto): string => {
-    if (p.caption && p.caption.trim()) return p.caption.trim();
-    if (p.quarter) return `Q${p.quarter} ${calendarYearOfQuarter(fyYear, p.quarter)}`;
-    return '—';
-  };
+        : { gridTemplateColumns: '1fr 1fr', gridTemplateRows: '1fr 1fr' };
+  const caption = (p: GalleryPhoto): string => (p.caption && p.caption.trim() ? p.caption.trim() : '—');
   return (
     <SlidePage meta={meta}>
-      <SectionTitle eyebrow="Annual photos">Photo Gallery — {fiscalYearLabel(fyYear)}</SectionTitle>
+      <SectionTitle eyebrow="Annual photos">Photo Gallery{title ? ` — ${title}` : ''}</SectionTitle>
       {n === 0 ? (
         <EmptyBlock label="No photos for this year yet" height={200} />
       ) : (
