@@ -18,6 +18,8 @@ export type ToastSeverity = 'success' | 'error' | 'info';
 export interface ToastOptions {
   /** auto-dismiss after ms. Default 4000. Pass 0 to require manual close. */
   duration?: number;
+  /** optional inline action (e.g. Undo). Clicking it runs onClick then dismisses. */
+  action?: { label: string; onClick: () => void };
 }
 
 interface ToastItem {
@@ -25,6 +27,7 @@ interface ToastItem {
   message: string;
   severity: ToastSeverity;
   duration: number;
+  action?: { label: string; onClick: () => void };
 }
 
 export interface ToastApi {
@@ -54,7 +57,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     (message: string, severity: ToastSeverity = 'info', opts?: ToastOptions) => {
       const id = ++idRef.current;
       const duration = opts?.duration ?? 4000;
-      setToasts((prev) => [...prev, { id, message, severity, duration }]);
+      setToasts((prev) => [...prev, { id, message, severity, duration, action: opts?.action }]);
       if (duration > 0) {
         window.setTimeout(() => dismiss(id), duration);
       }
@@ -87,14 +90,25 @@ export function ToastProvider({ children }: { children: ReactNode }) {
             className={`pointer-events-auto flex min-w-[280px] max-w-md items-center justify-between gap-4 rounded-button px-4 py-3 text-sm shadow-card animate-toast-in ${SEVERITY_STYLES[t.severity]}`}
           >
             <span>{t.message}</span>
-            <button
-              type="button"
-              onClick={() => dismiss(t.id)}
-              aria-label="Dismiss notification"
-              className="text-white/80 hover:text-white"
-            >
-              &times;
-            </button>
+            <div className="flex items-center gap-3">
+              {t.action ? (
+                <button
+                  type="button"
+                  onClick={() => { t.action!.onClick(); dismiss(t.id); }}
+                  className="font-semibold text-white underline-offset-2 hover:underline"
+                >
+                  {t.action.label}
+                </button>
+              ) : null}
+              <button
+                type="button"
+                onClick={() => dismiss(t.id)}
+                aria-label="Dismiss notification"
+                className="text-white/80 hover:text-white"
+              >
+                &times;
+              </button>
+            </div>
           </div>
         ))}
       </div>

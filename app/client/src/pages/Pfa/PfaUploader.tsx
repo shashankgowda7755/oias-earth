@@ -8,15 +8,16 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useToast } from '@/components/Toast';
+import CropModal from '@/components/CropModal';
 import { fetchForestReport } from '@/lib/publicApi';
 import { uploadReportImage, clearReportImage, uploadSponsorLogo, deleteSponsorLogo, satelliteFetch } from '../Forests/forestApi';
 import { fiscalQuarterOf, quarterPeriodLabel, quartersFrom, projectYearLabel, type FQ } from '@/lib/fiscal';
 import { fetchForestOptions, type ForestOption } from '../Reports/reportApi';
 
 // `ratio` is the target aspect ratio (width / height) the report slot renders at.
-// Every capture (camera or file) is centre-cropped to this ratio before upload,
-// so what the operator frames is exactly what the report shows — no surprise crop
-// at render time. Keep these in sync with the slide render boxes.
+// Every capture (camera or file) opens the interactive crop modal locked to this
+// ratio, so what the operator frames is exactly what the report shows — no surprise
+// crop at render time. Keep these in sync with the slide render boxes.
 interface Slot { key: string; label: string; perQuarter?: boolean; ratio: number }
 interface LogoRow { id: string; title: string; name: string; value: 'sponsored_by' | 'initiated_by'; logo?: string; serverIndex: number }
 type Page = 'pick' | 'menu' | 'site' | 'quarter' | 'qphotos' | 'sponsors';
@@ -39,40 +40,6 @@ function ratioLabel(r: number): string {
   const known: [number, string][] = [[16 / 9, '16:9'], [4 / 3, '4:3'], [3 / 2, '3:2'], [1, '1:1'], [3 / 4, '3:4'], [2 / 3, '2:3'], [9 / 16, '9:16']];
   const hit = known.find(([v]) => Math.abs(v - r) < 0.01);
   return hit ? hit[1] : r.toFixed(2);
-}
-
-/**
- * Centre-crop an image File to a target aspect ratio and re-encode as JPEG.
- * Crops the longer axis (never stretches), so the subject the operator framed in
- * the centre is preserved. Falls back to the original file on any decode error.
- */
-async function cropToRatio(file: File, ratio: number): Promise<File> {
-  const url = URL.createObjectURL(file);
-  try {
-    const img = await new Promise<HTMLImageElement>((res, rej) => {
-      const im = new Image();
-      im.onload = () => res(im);
-      im.onerror = rej;
-      im.src = url;
-    });
-    const iw = img.naturalWidth, ih = img.naturalHeight;
-    if (!iw || !ih) return file;
-    let sw = iw, sh = ih, sx = 0, sy = 0;
-    if (iw / ih > ratio) { sw = Math.round(ih * ratio); sx = Math.round((iw - sw) / 2); }
-    else if (iw / ih < ratio) { sh = Math.round(iw / ratio); sy = Math.round((ih - sh) / 2); }
-    const canvas = document.createElement('canvas');
-    canvas.width = sw; canvas.height = sh;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return file;
-    ctx.drawImage(img, sx, sy, sw, sh, 0, 0, sw, sh);
-    const blob: Blob | null = await new Promise((res) => canvas.toBlob((b) => res(b), 'image/jpeg', 0.92));
-    if (!blob) return file;
-    return new File([blob], file.name.replace(/\.\w+$/, '') + '.jpg', { type: 'image/jpeg' });
-  } catch {
-    return file;
-  } finally {
-    URL.revokeObjectURL(url);
-  }
 }
 
 function defaultFiscal(): FQ {
@@ -119,7 +86,9 @@ export default function PfaUploader() {
   const [page, setPage] = useState<Page>('pick');
   const [status, setStatus] = useState<Record<string, string>>({});
   const [logos, setLogos] = useState<LogoRow[]>([]);
-  const [pending, setPending] = useState<{ slot: Slot; url: string; file: File } | null>(null);
+  // Interactive crop request: capture (file / camera / aerial / gallery) opens
+  // the CropModal; on confirm, onResult uploads the cropped File.
+  const [crop, setCrop] = useState<{ src: string; file: File; ratio: number; label: string; onResult: (f: File) => void } | null>(null);
   const [sheet, setSheet] = useState<Slot | null>(null);
   const [view, setView] = useState<Slot | null>(null); // filled-photo preview
   const [navOpen, setNavOpen] = useState(false);
@@ -259,14 +228,18 @@ export default function PfaUploader() {
     else toast.success('Open your browser menu → “Install app” / “Add to Home screen”.');
   };
 
-  const stage = async (slot: Slot, file?: File | null) => {
-    if (!file) return;
-    // Centre-crop to the slot's target ratio so the preview + upload match the
-    // report render box exactly (capture once, at the ratio we want).
-    const cropped = await cropToRatio(file, slot.ratio);
-    setPending((p) => { if (p) URL.revokeObjectURL(p.url); return { slot, url: URL.createObjectURL(cropped), file: cropped }; });
+  // Open the interactive crop modal for a raw capture. The modal previews the
+  // image with a crop box locked to `ratio`; on confirm it hands back a cropped
+  // JPEG File to `onResult`.
+  const openCrop = (file: File, ratio: number, label: string, onResult: (f: File) => void) => {
+    setCrop((c) => { if (c) URL.revokeObjectURL(c.src); return { src: URL.createObjectURL(file), file, ratio, label, onResult }; });
   };
-  const clearPending = () => setPending((p) => { if (p) URL.revokeObjectURL(p.url); return null; });
+  const closeCrop = () => setCrop((c) => { if (c) URL.revokeObjectURL(c.src); return null; });
+
+  const stage = (slot: Slot, file?: File | null) => {
+    if (!file) return;
+    openCrop(file, slot.ratio, slot.label, (cropped) => { closeCrop(); uploadCropped(slot, cropped); });
+  };
 
   const snap = () => {
     const v = videoRef.current; const slot = camSlot;
@@ -277,11 +250,9 @@ export default function PfaUploader() {
     canvas.toBlob((blob) => { if (!blob) return; stage(slot, new File([blob], `${slot.key}-${Date.now()}.jpg`, { type: 'image/jpeg' })); closeCam(); }, 'image/jpeg', 0.92);
   };
 
-  const commit = async () => {
-    if (!pending || !forestId) { if (!forestId) toast.error('Pick a forest first.'); return; }
-    const { slot, file } = pending;
+  const uploadCropped = async (slot: Slot, file: File) => {
+    if (!forestId) { toast.error('Pick a forest first.'); return; }
     setStatus((s) => ({ ...s, [slot.key]: 'uploading' }));
-    clearPending();
     try {
       const r = await uploadReportImage(forestId, slot.key, file, slot.perQuarter ? { year, quarter } : undefined);
       setStatus((s) => ({ ...s, [slot.key]: r.url }));
@@ -292,40 +263,80 @@ export default function PfaUploader() {
     }
   };
 
-  const deletePhoto = async (slot: Slot) => {
+  // Deferred delete with an Undo toast: clear the UI immediately but hold the
+  // server call behind a 5s timer so the operator can undo a mis-tap. Tapping
+  // Undo cancels the timer + restores; letting it lapse fires the real delete
+  // (rolling back the UI if the server rejects). Timers are keyed so deletes on
+  // different slots don't clobber each other. Shared by every photo section.
+  const deleteTimers = useRef<Map<string, number>>(new Map());
+  const deferWithUndo = (
+    key: string,
+    optimistic: () => void,
+    restore: () => void,
+    serverCall: () => Promise<void>,
+    label: string,
+  ) => {
+    const existing = deleteTimers.current.get(key);
+    if (existing) window.clearTimeout(existing);
+    optimistic();
+    const id = window.setTimeout(() => {
+      deleteTimers.current.delete(key);
+      serverCall().catch((e) => { restore(); toast.error(e instanceof Error ? e.message : 'Delete failed.'); });
+    }, 5000);
+    deleteTimers.current.set(key, id);
+    toast.success(label, {
+      duration: 5000,
+      action: {
+        label: 'Undo',
+        onClick: () => {
+          const t = deleteTimers.current.get(key);
+          if (t) window.clearTimeout(t);
+          deleteTimers.current.delete(key);
+          restore();
+        },
+      },
+    });
+  };
+
+  const requestDelete = (slot: Slot) => {
     setView(null);
     const prev = status[slot.key];
-    setStatus((s) => ({ ...s, [slot.key]: '' }));
-    try {
-      await clearReportImage(forestId, slot.key, slot.perQuarter ? { year, quarter } : undefined);
-      toast.success(`${slot.label} removed.`);
-    } catch (e) {
-      setStatus((s) => ({ ...s, [slot.key]: prev ?? '' }));
-      toast.error(e instanceof Error ? e.message : 'Delete failed.');
-    }
+    deferWithUndo(
+      `report:${slot.key}`,
+      () => setStatus((s) => ({ ...s, [slot.key]: '' })),
+      () => setStatus((s) => ({ ...s, [slot.key]: prev ?? '' })),
+      () => clearReportImage(forestId, slot.key, slot.perQuarter ? { year, quarter } : undefined),
+      `${slot.label} removed`,
+    );
   };
 
   // satellite timeline (slide 5)
   const setAerialYear = (i: number, v: string) => setEarth((e) => e.map((c, j) => (j === i ? { ...c, year: v.replace(/[^0-9]/g, '').slice(0, 4) } : c)));
-  const uploadAerial = async (i: number, file?: File | null) => {
+  const uploadAerial = (i: number, file?: File | null) => {
     if (!file) return;
     if (!forestId) { toast.error('Pick a forest first.'); return; }
-    setAerialBusy(i);
-    try {
-      const cropped = await cropToRatio(file, 4 / 3);
-      const yr = Number(earth[i]?.year) || undefined;
-      const r = await uploadReportImage(forestId, 'earth', cropped, { index: i, year: yr });
-      setEarth((e) => e.map((c, j) => (j === i ? { ...c, url: r.url } : c)));
-      toast.success(`Satellite ${i + 1} uploaded.`);
-    } catch (e) { toast.error(e instanceof Error ? e.message : 'Upload failed.'); }
-    finally { setAerialBusy(null); }
+    openCrop(file, 4 / 3, `Satellite ${i + 1}`, async (cropped) => {
+      closeCrop();
+      setAerialBusy(i);
+      try {
+        const yr = Number(earth[i]?.year) || undefined;
+        const r = await uploadReportImage(forestId, 'earth', cropped, { index: i, year: yr });
+        setEarth((e) => e.map((c, j) => (j === i ? { ...c, url: r.url } : c)));
+        toast.success(`Satellite ${i + 1} uploaded.`);
+      } catch (e) { toast.error(e instanceof Error ? e.message : 'Upload failed.'); }
+      finally { setAerialBusy(null); }
+    });
   };
-  const clearAerial = async (i: number) => {
+  const clearAerial = (i: number) => {
     if (!forestId) return;
     const prev = earth[i] ?? { url: '', year: '' };
-    setEarth((e) => e.map((c, j) => (j === i ? { ...c, url: '' } : c)));
-    try { await clearReportImage(forestId, 'earth', { index: i }); }
-    catch (e) { setEarth((ee) => ee.map((c, j) => (j === i ? prev : c))); toast.error(e instanceof Error ? e.message : 'Delete failed.'); }
+    deferWithUndo(
+      `aerial:${i}`,
+      () => setEarth((e) => e.map((c, j) => (j === i ? { ...c, url: '' } : c))),
+      () => setEarth((e) => e.map((c, j) => (j === i ? prev : c))),
+      () => clearReportImage(forestId, 'earth', { index: i }),
+      `Satellite ${i + 1} removed`,
+    );
   };
   const autoSat = async () => {
     if (!forestId) { toast.error('Pick a forest first.'); return; }
@@ -356,26 +367,32 @@ export default function PfaUploader() {
   };
 
   // Quarterly photos (bulk) — upload/replace/delete a gallery photo for any (year,quarter).
-  const bulkGalleryUpload = async (fq: FQ, file?: File | null) => {
+  const bulkGalleryUpload = (fq: FQ, file?: File | null) => {
     if (!file) return;
     if (!forestId) { toast.error('Pick a forest first.'); return; }
     const key = `${fq.year}-${fq.quarter}`;
-    setQBusy(key);
-    try {
-      const cropped = await cropToRatio(file, 4 / 3);
-      const r = await uploadReportImage(forestId, 'gallery', cropped, { year: fq.year, quarter: fq.quarter });
-      setGalleryByQ((m) => ({ ...m, [key]: r.url }));
-      toast.success('Quarterly photo uploaded.');
-    } catch (e) { toast.error(e instanceof Error ? e.message : 'Upload failed.'); }
-    finally { setQBusy(null); }
+    openCrop(file, 4 / 3, `Q${fq.quarter} ${fq.year}`, async (cropped) => {
+      closeCrop();
+      setQBusy(key);
+      try {
+        const r = await uploadReportImage(forestId, 'gallery', cropped, { year: fq.year, quarter: fq.quarter });
+        setGalleryByQ((m) => ({ ...m, [key]: r.url }));
+        toast.success('Quarterly photo uploaded.');
+      } catch (e) { toast.error(e instanceof Error ? e.message : 'Upload failed.'); }
+      finally { setQBusy(null); }
+    });
   };
-  const bulkGalleryDelete = async (fq: FQ) => {
+  const bulkGalleryDelete = (fq: FQ) => {
     if (!forestId) return;
-    const key = `${fq.year}-${fq.quarter}`;
-    const prev = galleryByQ[key];
-    setGalleryByQ((m) => { const n = { ...m }; delete n[key]; return n; });
-    try { await clearReportImage(forestId, 'gallery', { year: fq.year, quarter: fq.quarter }); toast.success('Quarterly photo removed.'); }
-    catch (e) { setGalleryByQ((m) => ({ ...m, [key]: prev ?? '' })); toast.error(e instanceof Error ? e.message : 'Delete failed.'); }
+    const mapKey = `${fq.year}-${fq.quarter}`;
+    const prev = galleryByQ[mapKey];
+    deferWithUndo(
+      `gallery:${mapKey}`,
+      () => setGalleryByQ((m) => { const n = { ...m }; delete n[mapKey]; return n; }),
+      () => setGalleryByQ((m) => (prev ? { ...m, [mapKey]: prev } : m)),
+      () => clearReportImage(forestId, 'gallery', { year: fq.year, quarter: fq.quarter }),
+      'Quarterly photo removed',
+    );
   };
 
   // logos
@@ -395,11 +412,17 @@ export default function PfaUploader() {
     persistChain.current.set(row.id, next);
     return next;
   };
-  const removeSponsor = async (i: number) => {
+  const removeSponsor = (i: number) => {
     const row = logos[i]; if (!row) return;
+    const prevLogos = logos;
     persistChain.current.delete(row.id);
-    try { if (row.serverIndex >= 0) await deleteSponsorLogo(forestId, row.serverIndex, row.id); } catch { /* ignore */ }
-    setLogos((ls) => ls.filter((_, j) => j !== i).map((r) => (row.serverIndex >= 0 && r.serverIndex > row.serverIndex ? { ...r, serverIndex: r.serverIndex - 1 } : r)));
+    deferWithUndo(
+      `sponsor:${row.id}`,
+      () => setLogos((ls) => ls.filter((_, j) => j !== i).map((r) => (row.serverIndex >= 0 && r.serverIndex > row.serverIndex ? { ...r, serverIndex: r.serverIndex - 1 } : r))),
+      () => setLogos(prevLogos),
+      async () => { if (row.serverIndex >= 0) await deleteSponsorLogo(forestId, row.serverIndex, row.id); },
+      'Logo removed',
+    );
   };
 
   const Tile = ({ slot }: { slot: Slot }) => {
@@ -407,17 +430,20 @@ export default function PfaUploader() {
     const url = isUrl(st) ? st : null;
     const uploading = st === 'uploading';
     return (
-      <button
-        type="button"
-        onClick={() => (url ? setView(slot) : setSheet(slot))}
-        className={`relative flex aspect-square flex-col items-center justify-center gap-1.5 overflow-hidden rounded-card border p-2 text-center transition-colors ${url ? 'border-transparent bg-primary/10' : 'border-border hover:border-primary/60'}`}
-      >
-        {url ? <img src={url} alt="" className="absolute inset-0 h-full w-full bg-surface object-cover opacity-90" /> : null}
-        <span className="relative z-10 flex flex-col items-center gap-1">
-          <i className={`ti ${uploading ? 'ti-loader-2' : url ? 'ti-circle-check' : 'ti-camera'} text-[22px] ${url ? 'text-primary' : 'text-textSecondary'}`} aria-hidden="true" />
-          <span className={`text-[11px] ${url ? 'rounded bg-black/55 px-1.5 py-0.5 text-white' : 'text-textSecondary'}`}>{slot.label}</span>
-        </span>
-      </button>
+      <div className="relative">
+        <button
+          type="button"
+          onClick={() => (url ? setView(slot) : setSheet(slot))}
+          className={`relative flex aspect-square w-full flex-col items-center justify-center gap-1.5 overflow-hidden rounded-card border p-2 text-center transition-colors ${url ? 'border-transparent bg-primary/10' : 'border-border hover:border-primary/60'}`}
+        >
+          {url ? <img src={url} alt="" className="absolute inset-0 h-full w-full bg-surface object-cover opacity-90" /> : null}
+          <span className="relative z-10 flex flex-col items-center gap-1">
+            <i className={`ti ${uploading ? 'ti-loader-2' : url ? 'ti-circle-check' : 'ti-camera'} text-[22px] ${url ? 'text-primary' : 'text-textSecondary'}`} aria-hidden="true" />
+            <span className={`text-[11px] ${url ? 'rounded bg-black/55 px-1.5 py-0.5 text-white' : 'text-textSecondary'}`}>{slot.label}</span>
+          </span>
+        </button>
+        {url ? <button type="button" aria-label={`Delete ${slot.label}`} onClick={() => requestDelete(slot)} className="absolute right-1 top-1 z-20 rounded-full bg-black/60 p-1 text-white hover:bg-danger"><i className="ti ti-trash text-xs" aria-hidden="true" /></button> : null}
+      </div>
     );
   };
 
@@ -696,7 +722,7 @@ export default function PfaUploader() {
           </div>
           <div className="flex gap-3 p-4" onClick={(e) => e.stopPropagation()}>
             <button type="button" onClick={() => { const s = view; setView(null); setSheet(s); }} className="flex-1 rounded-button border border-white/40 py-3 text-sm text-white"><i className="ti ti-refresh" aria-hidden="true" /> Replace</button>
-            <button type="button" onClick={() => deletePhoto(view)} className="flex-1 rounded-button bg-danger py-3 text-sm font-semibold text-white"><i className="ti ti-trash" aria-hidden="true" /> Delete</button>
+            <button type="button" onClick={() => requestDelete(view)} className="flex-1 rounded-button bg-danger py-3 text-sm font-semibold text-white"><i className="ti ti-trash" aria-hidden="true" /> Delete</button>
           </div>
         </div>
       ) : null}
@@ -716,7 +742,7 @@ export default function PfaUploader() {
             <>
               <div className="relative flex max-h-[68vh] items-center justify-center">
                 <video ref={videoRef} autoPlay playsInline muted className="max-h-[68vh] w-auto max-w-full rounded-card bg-black" />
-                {/* Framing guide: the box the photo is centre-cropped to on capture. */}
+                {/* Framing guide: a rough aim for the slot ratio. After capture the crop modal opens for fine adjustment. */}
                 <div aria-hidden className="pointer-events-none absolute inset-0 m-auto rounded-card border-2 border-primary/90" style={{ aspectRatio: String(camSlot.ratio), boxShadow: '0 0 0 9999px rgba(0,0,0,0.35)' }} />
               </div>
               <div className="mt-2 text-xs text-white/70">Framing {ratioLabel(camSlot.ratio)} — fills the {camSlot.label.toLowerCase()} slot exactly</div>
@@ -759,16 +785,16 @@ export default function PfaUploader() {
         </div>
       ) : null}
 
-      {/* preview before upload */}
-      {pending ? (
-        <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/90 p-4">
-          <div className="mb-2 text-sm text-white/90">{pending.slot.label}</div>
-          <img src={pending.url} alt="preview" className="max-h-[68vh] max-w-full rounded-card object-contain" />
-          <div className="mt-5 flex w-full max-w-sm gap-3">
-            <button type="button" onClick={() => { const s = pending.slot; clearPending(); setCamSlot(s); }} className="flex-1 rounded-button border border-white/40 py-3 text-sm text-white"><i className="ti ti-refresh" aria-hidden="true" /> Retake</button>
-            <button type="button" onClick={commit} className="flex-1 rounded-button bg-primary py-3 text-sm font-semibold text-black"><i className="ti ti-upload" aria-hidden="true" /> Upload</button>
-          </div>
-        </div>
+      {/* interactive crop before upload */}
+      {crop ? (
+        <CropModal
+          src={crop.src}
+          file={crop.file}
+          ratio={crop.ratio}
+          label={crop.label}
+          onCancel={closeCrop}
+          onConfirm={crop.onResult}
+        />
       ) : null}
     </div>
   );
