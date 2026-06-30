@@ -2307,8 +2307,12 @@ async function updateForestReportData(req: Request, res: Response): Promise<void
   }
   for (const c of REPORT_UPDATE_JSONB) {
     if (Object.prototype.hasOwnProperty.call(b, c)) {
+      // Never NULL-wipe a jsonb column from this debounced editor path: a stale or
+      // empty draft must not erase stored data. Explicit clears go via the atomic
+      // list-item endpoint. Skip null/undefined entirely.
+      if (b[c] == null) continue;
       sets.push(`${c} = $${i++}::jsonb`);
-      vals.push(b[c] == null ? null : JSON.stringify(b[c]));
+      vals.push(JSON.stringify(b[c]));
     }
   }
   if (sets.length === 0) {

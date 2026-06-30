@@ -82,14 +82,7 @@ INSERT INTO forests (
   10000, '2023-06-29', 3, 'Sipcot,Orgadam',
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -103,14 +96,7 @@ INSERT INTO forests (
   700, '2023-07-01', 3, 'Lady willingdon college, Triplicane',
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -124,14 +110,7 @@ INSERT INTO forests (
   1500, '2023-07-04', 3, 'HafezPet, Railway Station, Hyderabad',
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -145,14 +124,7 @@ INSERT INTO forests (
   1000, '2023-07-12', 3, 'Bangalore University',
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -166,14 +138,7 @@ INSERT INTO forests (
   300, '2023-10-28', 3, 'Chakaravana, Bangalore University',
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -187,14 +152,7 @@ INSERT INTO forests (
   5000, '2023-11-18', 3, 'Elcot , sholinganallur',
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -208,14 +166,7 @@ INSERT INTO forests (
   NULL, '2023-12-16', 3, 'Elcot , sholinganallur',
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -229,14 +180,7 @@ INSERT INTO forests (
   45000, '2023-12-16', 3, 'Elcot, Vilankurichi',
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -250,14 +194,7 @@ INSERT INTO forests (
   25000, '2023-12-16', 3, 'ELcot, Vadapalanji',
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -271,14 +208,7 @@ INSERT INTO forests (
   25000, '2024-02-17', 3, 'Elcot , sholinganallur',
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -292,14 +222,7 @@ INSERT INTO forests (
   25000, '2024-03-14', 3, 'ELcot, Vadapalanji',
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -313,14 +236,7 @@ INSERT INTO forests (
   1500, '2024-04-15', 3, 'Elcot , sholinganallur',
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -334,14 +250,7 @@ INSERT INTO forests (
   30000, '2024-04-25', 3, 'Kandigai',
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -355,14 +264,7 @@ INSERT INTO forests (
   6500, '2024-04-25', 3, 'Chithalapakkam',
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -376,14 +278,7 @@ INSERT INTO forests (
   12000, '2024-07-13', 3, 'University Of Madras',
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -397,14 +292,7 @@ INSERT INTO forests (
   500, '2024-07-13', 3, 'Law college, Bangalore University',
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -418,14 +306,7 @@ INSERT INTO forests (
   500, '2024-07-13', 3, 'Hafez Pet Railway Station',
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -439,14 +320,7 @@ INSERT INTO forests (
   250, '2024-08-01', 3, 'Devarkulam',
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -460,14 +334,7 @@ INSERT INTO forests (
   2000, '2024-08-01', 3, 'Gangaikondan',
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -481,14 +348,7 @@ INSERT INTO forests (
   3570, '2024-08-01', 3, 'Radhapuram',
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -502,14 +362,7 @@ INSERT INTO forests (
   1000, '2024-09-16', 3, 'Matrimony Site',
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -523,14 +376,7 @@ INSERT INTO forests (
   1000, '2024-09-21', 3, 'Elcot',
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -544,14 +390,7 @@ INSERT INTO forests (
   NULL, '2024-09-21', 3, 'Bangalore University',
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -565,14 +404,7 @@ INSERT INTO forests (
   NULL, '2024-09-21', 3, 'HafezPet, Railway Station, Hyderabad',
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -586,14 +418,7 @@ INSERT INTO forests (
   1000, '2024-09-21', 3, 'Gurgon',
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -607,14 +432,7 @@ INSERT INTO forests (
   1000, '2024-10-05', 3, 'Paranur',
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -628,14 +446,7 @@ INSERT INTO forests (
   1000, '2024-11-16', 3, 'Kolathur, Chennai',
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -649,14 +460,7 @@ INSERT INTO forests (
   4000, '2024-11-16', 3, 'ELCOT, Kovai',
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -670,14 +474,7 @@ INSERT INTO forests (
   2000, '2024-12-07', 3, 'Matrimony Site, Chennai',
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -691,14 +488,7 @@ INSERT INTO forests (
   2000, '2024-12-12', 3, 'Tirunelveli',
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -712,14 +502,7 @@ INSERT INTO forests (
   200, '2024-12-20', 3, 'Anjur Village',
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -733,14 +516,7 @@ INSERT INTO forests (
   5000, '2025-01-04', 3, 'Matrimony Site',
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -754,14 +530,7 @@ INSERT INTO forests (
   5000, '2025-01-05', 3, 'Elcot solingnallur',
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -775,14 +544,7 @@ INSERT INTO forests (
   5000, '2025-01-10', 3, 'Kondamangalam',
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -796,14 +558,7 @@ INSERT INTO forests (
   5000, '2025-12-02', 3, 'Sitalapakkam Govt School',
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -817,14 +572,7 @@ INSERT INTO forests (
   500, '2025-03-24', 3, 'Gurukulam Trust children school Kovalam',
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -838,14 +586,7 @@ INSERT INTO forests (
   NULL, '2025-03-24', 3, 'Hope foundation school kalpakkam',
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -859,14 +600,7 @@ INSERT INTO forests (
   200, '2025-03-24', 3, 'vilvarayanallur vkm high school',
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -880,14 +614,7 @@ INSERT INTO forests (
   250, '2025-03-24', 3, 'gurkulam boys high school Mahuradhagam',
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -901,14 +628,7 @@ INSERT INTO forests (
   1600, '2025-03-24', 3, 'cheyyar aringnar anna govt arts college',
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -922,14 +642,7 @@ INSERT INTO forests (
   NULL, '2025-05-31', 3, 'Chennai - 2.0 Park',
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -943,14 +656,7 @@ INSERT INTO forests (
   NULL, '2025-05-31', 3, 'Hyderabad - Risala Bazar',
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -964,14 +670,7 @@ INSERT INTO forests (
   120, '2025-05-31', 3, 'Pune - Krushnaji Khanduji Ghule Vidyalaya',
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -985,14 +684,7 @@ INSERT INTO forests (
   5000, '2025-06-05', 3, 'Madras University',
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -1006,14 +698,7 @@ INSERT INTO forests (
   30000, '2025-06-05', 3, 'ELCOT',
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -1027,14 +712,7 @@ INSERT INTO forests (
   30000, '2025-06-24', 3, 'Elcot',
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -1048,14 +726,7 @@ INSERT INTO forests (
   15, '2025-06-28', 3, 'Mumbai - RA Colony',
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -1069,14 +740,7 @@ INSERT INTO forests (
   NULL, '2025-06-28', 3, NULL,
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -1090,14 +754,7 @@ INSERT INTO forests (
   1000, '2025-07-05', 3, 'Elcot',
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -1111,14 +768,7 @@ INSERT INTO forests (
   NULL, '2025-07-05', 3, 'Hyderabad',
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -1132,14 +782,7 @@ INSERT INTO forests (
   1000, '2025-07-12', 3, 'Victoria Hospital',
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -1153,14 +796,7 @@ INSERT INTO forests (
   1000, '2025-07-06', 3, 'Elcot, Chennai',
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -1174,14 +810,7 @@ INSERT INTO forests (
   242, '2025-07-06', 3, NULL,
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -1195,14 +824,7 @@ INSERT INTO forests (
   910, '2025-07-06', 3, NULL,
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -1216,14 +838,7 @@ INSERT INTO forests (
   242, '2025-07-23', 3, NULL,
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -1237,14 +852,7 @@ INSERT INTO forests (
   242, '2025-07-25', 3, 'Madras University',
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -1258,14 +866,7 @@ INSERT INTO forests (
   242, '2025-07-29', 3, 'Elcot',
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -1279,14 +880,7 @@ INSERT INTO forests (
   242, '2025-07-30', 3, 'Elcot',
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -1300,14 +894,7 @@ INSERT INTO forests (
   242, '2025-08-01', 3, 'Pu College',
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -1321,14 +908,7 @@ INSERT INTO forests (
   75, '2025-08-05', 3, 'Elcot',
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -1342,14 +922,7 @@ INSERT INTO forests (
   100, '2025-08-06', 3, 'Elcot',
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -1363,14 +936,7 @@ INSERT INTO forests (
   500, '2025-08-09', 3, 'Pu College',
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -1384,14 +950,7 @@ INSERT INTO forests (
   500, '2025-08-09', 3, 'Matrimony Park',
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -1405,14 +964,7 @@ INSERT INTO forests (
   500, '2025-08-12', 3, 'Astronomy College',
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -1426,14 +978,7 @@ INSERT INTO forests (
   200, '2025-08-23', 3, 'Devanahalli',
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -1447,14 +992,7 @@ INSERT INTO forests (
   10000, '2025-08-23', 3, 'Matrimony Park',
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -1468,14 +1006,7 @@ INSERT INTO forests (
   2000, '2025-08-23', 3, 'Devanahalli',
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -1489,14 +1020,7 @@ INSERT INTO forests (
   300, '2025-08-30', 3, 'Madras University, Guindy',
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -1510,14 +1034,7 @@ INSERT INTO forests (
   500, '2025-09-03', 3, 'Pu College',
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -1531,14 +1048,7 @@ INSERT INTO forests (
   1000, '2025-09-05', 3, 'Gurugram',
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -1552,14 +1062,7 @@ INSERT INTO forests (
   400, '2025-09-05', 3, NULL,
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -1573,14 +1076,7 @@ INSERT INTO forests (
   100, '2025-09-06', 3, 'Kondamangalam',
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -1594,14 +1090,7 @@ INSERT INTO forests (
   200, '2025-09-06', 3, 'Pu College',
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -1615,14 +1104,7 @@ INSERT INTO forests (
   10000, '2025-09-09', 3, 'Manali',
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -1636,14 +1118,7 @@ INSERT INTO forests (
   50, '2025-09-13', 3, 'K.R. Garden',
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -1657,14 +1132,7 @@ INSERT INTO forests (
   50, '2025-09-13', 3, 'Kondamangalam',
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -1678,14 +1146,7 @@ INSERT INTO forests (
   200, '2025-09-13', 3, 'Gurugram',
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -1699,14 +1160,7 @@ INSERT INTO forests (
   500, '2025-09-13', 3, 'KR Garden - Hyderabad',
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -1720,14 +1174,7 @@ INSERT INTO forests (
   200, '2025-09-17', 3, 'Pu College',
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -1741,14 +1188,7 @@ INSERT INTO forests (
   100, '2025-09-25', 3, 'Mauli',
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -1762,14 +1202,7 @@ INSERT INTO forests (
   NULL, '2025-10-09', 3, NULL,
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -1783,14 +1216,7 @@ INSERT INTO forests (
   5000, '2025-10-11', 3, 'Matrimony Park',
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -1804,14 +1230,7 @@ INSERT INTO forests (
   2000, '2025-10-17', 3, NULL,
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -1825,14 +1244,7 @@ INSERT INTO forests (
   5000, '2025-10-25', 3, 'KR Garden',
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -1846,14 +1258,7 @@ INSERT INTO forests (
   50, '2025-11-01', 3, 'Manur',
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -1867,14 +1272,7 @@ INSERT INTO forests (
   NULL, '2025-11-13', 3, NULL,
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -1888,14 +1286,7 @@ INSERT INTO forests (
   200, '2025-11-15', 3, NULL,
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -1909,14 +1300,7 @@ INSERT INTO forests (
   100, '2025-11-17', 3, 'Vaiyapuri Park',
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -1930,14 +1314,7 @@ INSERT INTO forests (
   NULL, '2025-11-26', 3, 'Govt School',
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -1951,14 +1328,7 @@ INSERT INTO forests (
   1000, '2025-11-27', 3, NULL,
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -1972,14 +1342,7 @@ INSERT INTO forests (
   300, '2025-12-01', 3, 'Bangalore',
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -1993,14 +1356,7 @@ INSERT INTO forests (
   NULL, '2025-12-14', 3, 'Bangalore - Devanahalli',
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -2014,14 +1370,7 @@ INSERT INTO forests (
   NULL, '2026-01-24', 3, 'Chennai',
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -2035,14 +1384,7 @@ INSERT INTO forests (
   NULL, '2026-01-24', 3, 'Bangalore',
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -2056,14 +1398,7 @@ INSERT INTO forests (
   NULL, '2026-01-24', 3, 'Hyderabad',
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -2077,14 +1412,7 @@ INSERT INTO forests (
   NULL, '2026-01-17', 3, 'Pune',
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -2098,14 +1426,7 @@ INSERT INTO forests (
   NULL, '2026-01-24', 3, 'Mumbai',
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -2119,14 +1440,7 @@ INSERT INTO forests (
   NULL, '2025-12-20', 3, 'Trivandrum',
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -2140,14 +1454,7 @@ INSERT INTO forests (
   NULL, '2026-01-31', 3, 'Chennai',
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -2161,14 +1468,7 @@ INSERT INTO forests (
   NULL, '2026-01-25', 3, 'Chennai',
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -2182,14 +1482,7 @@ INSERT INTO forests (
   NULL, '2026-03-14', 3, 'Chennai',
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -2203,14 +1496,7 @@ INSERT INTO forests (
   NULL, '2026-01-28', 3, 'Bangalore',
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -2224,14 +1510,7 @@ INSERT INTO forests (
   NULL, '2026-03-17', 3, 'Bangalore',
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -2245,14 +1524,7 @@ INSERT INTO forests (
   NULL, '2026-03-30', 3, 'Gurugram',
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -2266,14 +1538,7 @@ INSERT INTO forests (
   NULL, '2026-03-27', 3, 'Bangalore',
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -2287,14 +1552,7 @@ INSERT INTO forests (
   NULL, '2026-03-14', 3, 'Mumbai',
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 INSERT INTO forests (
   forest_name, forest_internal_id, forest_unique_id,
   forest_address, forest_city, forest_state, forest_country,
@@ -2308,14 +1566,7 @@ INSERT INTO forests (
   NULL, '2026-03-28', 3, 'Rajasthan',
   NULL, NULL,
   TRUE, FALSE
-) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO UPDATE SET
-  forest_name     = EXCLUDED.forest_name,
-  forest_city     = EXCLUDED.forest_city,
-  forest_state    = EXCLUDED.forest_state,
-  forest_address  = EXCLUDED.forest_address,
-  total_trees     = COALESCE(EXCLUDED.total_trees, forests.total_trees),
-  plantation_date = COALESCE(EXCLUDED.plantation_date, forests.plantation_date),
-  updated_at      = now();
+) ON CONFLICT (forest_internal_id) WHERE forest_internal_id IS NOT NULL DO NOTHING;
 
 -- ============================================================
 -- FOREST ↔ SPONSOR LINKS

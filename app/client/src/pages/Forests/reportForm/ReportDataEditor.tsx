@@ -21,6 +21,41 @@ function defaultQuarter(): number {
   return 4;
 }
 
+/**
+ * jsonb columns that hold an ARRAY of keyed rows. On save these are 3-way merged
+ * (baseline ↔ draft ↔ live server) so a stale editor snapshot can NEVER erase rows
+ * added by another path (the PFA uploader, another tab) — while still honouring the
+ * operator's own adds / edits / deletes. Rows are matched by (year,quarter) or
+ * slide_type. Non-keyed columns fall back to the draft value (whole write).
+ */
+const LIST_COLS = new Set<string>([
+  'maintenance_workforce', 'soil_ph_level', 'temperature_humidity', 'plantation_progress',
+  'environmental_need_indicators', 'dashboard_images', 'report_images', 'gallery_images',
+]);
+
+function rowKey(it: unknown): string | null {
+  if (!it || typeof it !== 'object') return null;
+  const r = it as Record<string, unknown>;
+  if (r.year != null && r.quarter != null) return `yq:${r.year}-${r.quarter}`;
+  if (r.slide_type != null) return `st:${String(r.slide_type)}`;
+  return null;
+}
+
+/** Start from the LIVE server array, then apply the operator's diff (draft vs the
+ *  baseline they loaded): their deletes drop rows, their adds/edits upsert by key.
+ *  Rows present on the server but unknown to this editor are preserved. If any row
+ *  lacks a stable key, fall back to the draft array (can't merge safely). */
+function mergeList(baseline: unknown, draft: unknown, server: unknown): Record<string, unknown>[] {
+  const toArr = (x: unknown): Record<string, unknown>[] => (Array.isArray(x) ? (x as Record<string, unknown>[]) : []);
+  const base = toArr(baseline), cur = toArr(draft), srv = toArr(server);
+  if ([...base, ...cur, ...srv].some((r) => rowKey(r) == null)) return cur;
+  const out = new Map<string, Record<string, unknown>>();
+  for (const r of srv) out.set(rowKey(r)!, r);
+  for (const b of base) { const k = rowKey(b)!; if (!cur.some((c) => rowKey(c) === k)) out.delete(k); }
+  for (const c of cur) out.set(rowKey(c)!, c);
+  return [...out.values()];
+}
+
 export default function ReportDataEditor() {
   const { id = '' } = useParams();
   const [draft, setDraft] = useState<FullForestPayload | null>(null);
@@ -37,26 +72,57 @@ export default function ReportDataEditor() {
   draftRef.current = draft;
   const pendingRef = useRef<Set<keyof FullForestPayload>>(new Set());
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // The report as it was loaded / last saved — the baseline for 3-way list merges.
+  const baselineRef = useRef<FullForestPayload | null>(null);
 
   useEffect(() => {
     let alive = true;
     fetchForestReport(id)
-      .then((r) => { if (alive) setDraft({ ...(r.forest as FullForestPayload), id }); })
+      .then((r) => {
+        if (!alive) return;
+        const forest = { ...(r.forest as FullForestPayload), id };
+        setDraft(forest);
+        baselineRef.current = forest;
+      })
       .catch((e) => { if (alive) setLoadErr(e instanceof Error ? e.message : 'Failed to load forest'); });
     return () => { alive = false; };
   }, [id]);
 
-  /** Persist only the pending (edited) columns. Re-queues on failure for retry. */
+  /** Persist only the pending (edited) columns. Keyed list columns are 3-way merged
+   *  against the LIVE server state so a stale draft can't erase rows added elsewhere
+   *  (PFA uploader / another tab). Re-queues on failure for retry. */
   const flush = useCallback(async () => {
     const keys = [...pendingRef.current];
     const d = draftRef.current;
     if (keys.length === 0 || !d) return;
     pendingRef.current = new Set();
-    const body: Partial<FullForestPayload> = {};
-    for (const k of keys) (body as Record<string, unknown>)[k as string] = d[k];
     setStatus('saving');
     try {
+      // Re-fetch live state only when a keyed list column is being saved.
+      const needsMerge = keys.some((k) => LIST_COLS.has(k as string));
+      let server: FullForestPayload | null = null;
+      if (needsMerge) {
+        try { server = (await fetchForestReport(id)).forest as FullForestPayload; } catch { server = null; }
+      }
+      const base = baselineRef.current;
+      const body: Partial<FullForestPayload> = {};
+      for (const k of keys) {
+        const ks = k as string;
+        if (LIST_COLS.has(ks) && server) {
+          (body as Record<string, unknown>)[ks] = mergeList(
+            (base as Record<string, unknown> | null)?.[ks],
+            (d as Record<string, unknown>)[ks],
+            (server as Record<string, unknown>)[ks],
+          );
+        } else {
+          (body as Record<string, unknown>)[ks] = (d as Record<string, unknown>)[ks];
+        }
+      }
       await updateForestReportData(id, body);
+      // Advance the baseline + reflect merged columns back into the draft so the
+      // next save diffs correctly and the UI shows rows that were merged in.
+      baselineRef.current = { ...(baselineRef.current as object), ...body } as FullForestPayload;
+      setDraft((cur) => (cur ? { ...cur, ...body } : cur));
       setStatus(pendingRef.current.size ? 'saving' : 'saved');
     } catch {
       for (const k of keys) pendingRef.current.add(k); // keep for retry
