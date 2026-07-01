@@ -6,7 +6,7 @@
  * `update` setter, and (Step 1) the async picker loaders. No data fetching here
  * — the wizard owns state; the AutocompleteField components fetch on demand.
  */
-import { useEffect, type ReactNode } from 'react';
+import { useEffect, useRef, type ReactNode } from 'react';
 import {
   AutocompleteField,
   DateField,
@@ -242,9 +242,16 @@ export function Step2Grid({ form, errors, update }: StepProps) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [form.sponsor_labels]);
 
-  // Re-run auto-fill whenever inputs change (skips overridden boxes, skips edit mode).
+  // On EDIT, don't clobber the boxes hydrated from the saved forest on first
+  // render — but DO regenerate when the user changes the mix/grid afterwards.
+  // (Save is now a non-destructive diff, so regenerating no longer erases tree
+  // history.) A forest opened with no boxes behaves like create (auto-fills).
+  const skipAutoFill = useRef(isEdit && Object.keys(form.boxes).length > 0);
+
+  // Re-run auto-fill whenever inputs change (skips overridden boxes).
   useEffect(() => {
-    if (isEdit || !gridReady || totalTrees <= 0 || !form.client_code || !form.forest_code) return;
+    if (!gridReady || totalTrees <= 0 || !form.client_code || !form.forest_code) return;
+    if (skipAutoFill.current) { skipAutoFill.current = false; return; }
     const filled = autoFillBoxes({
       totalTrees,
       speciesMix: form.species_mix,
