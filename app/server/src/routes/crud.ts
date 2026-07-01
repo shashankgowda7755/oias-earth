@@ -538,8 +538,18 @@ async function genericDelete(req: Request, res: Response, cfg: EntityConfig): Pr
       [id]
     );
     // Proof timelines (+ their assets), carbon ledger, tour hotspots, and the
-    // other per-tree tables all FK forest_trees — detach them too, else the tree
-    // DELETE trips those FKs (was a 500 whenever a tree had a proof photo/visit).
+    // other per-tree tables all FK forest_trees — detach in dependency order
+    // (was a 500 whenever a tree had a proof photo/visit). The carbon ledger FKs
+    // forest_trees AND forest_plant_timelines AND forests, so it goes FIRST
+    // (before the timelines it references).
+    await query(
+      `DELETE FROM forest_tree_carbon_ledger
+        WHERE forest_id = $1
+           OR tree_id IN (SELECT id FROM forest_trees WHERE forest_id = $1)
+           OR timeline_id IN (SELECT id FROM forest_plant_timelines
+                WHERE plant_id IN (SELECT id FROM forest_trees WHERE forest_id = $1))`,
+      [id]
+    );
     await query(
       `DELETE FROM forest_plant_timeline_assets
         WHERE timeline_id IN (SELECT id FROM forest_plant_timelines
@@ -549,11 +559,6 @@ async function genericDelete(req: Request, res: Response, cfg: EntityConfig): Pr
     await query(
       `DELETE FROM forest_plant_timelines
         WHERE plant_id IN (SELECT id FROM forest_trees WHERE forest_id = $1)`,
-      [id]
-    );
-    await query(
-      `DELETE FROM forest_tree_carbon_ledger
-        WHERE tree_id IN (SELECT id FROM forest_trees WHERE forest_id = $1)`,
       [id]
     );
     await query(
