@@ -13,12 +13,22 @@ import { cropToRatio, canvasToJpegFile, outSize } from '@/lib/cropImage';
 // Type-only query (no eager runtime import — Cropper.js is loaded lazily below).
 type CropperCtor = (typeof import('cropperjs'))['default'];
 type CropperInstance = InstanceType<CropperCtor>;
+type CropperSelection = NonNullable<ReturnType<CropperInstance['getCropperSelection']>>;
 let _CropperClass: CropperCtor | null = null;
 let _loadPromise: Promise<CropperCtor> | null = null;
 async function ensureCropper(): Promise<CropperCtor> {
   if (_CropperClass) return _CropperClass;
   if (!_loadPromise) _loadPromise = import('cropperjs').then((m) => (_CropperClass = m.default));
   return _loadPromise;
+}
+
+// Frame the selection box at `ratio`, centred on the image. Kept LOCKED to the
+// ratio so the initial box sits correctly on the image (a NaN/free aspect here
+// would re-frame to the whole canvas, incl. the letterbox). The lock is released
+// to free aspect on the first resize-handle grab — see the pointerdown listener.
+function frameToRatio(sel: CropperSelection, ratio: number) {
+  sel.aspectRatio = ratio;
+  sel.$reset();
 }
 
 interface Props {
@@ -42,6 +52,7 @@ export default function CropModal({ src, file, ratio, label, onCancel, onConfirm
   useEffect(() => {
     let cancelled = false;
     let cropper: CropperInstance | null = null;
+    let detachGrab: (() => void) | null = null;
     (async () => {
       try {
         const Cropper = await ensureCropper();
@@ -64,11 +75,23 @@ export default function CropModal({ src, file, ratio, label, onCancel, onConfirm
         if (cancelled) return;
         const sel = cropper.getCropperSelection();
         if (sel) {
-          sel.aspectRatio = ratio;
           sel.initialCoverage = 0.9;
           sel.movable = true;
           sel.resizable = true;
-          sel.$reset();
+          frameToRatio(sel, ratio);
+          // Release the aspect lock on the first resize-handle grab: from then on
+          // edge handles resize a single axis (left/right → width, top/bottom →
+          // height) and corners resize both. Capture phase so it runs before
+          // Cropper reads the aspect ratio for the drag.
+          const host = hostRef.current;
+          const onGrab = (e: Event) => {
+            const t = e.target as Element | null;
+            if (t && t.tagName === 'CROPPER-HANDLE' && (t.getAttribute('action') || '').endsWith('-resize')) {
+              sel.aspectRatio = NaN;
+            }
+          };
+          host?.addEventListener('pointerdown', onGrab, true);
+          detachGrab = () => host?.removeEventListener('pointerdown', onGrab, true);
         }
         setReady(true);
       } catch {
@@ -81,20 +104,27 @@ export default function CropModal({ src, file, ratio, label, onCancel, onConfirm
     })();
     return () => {
       cancelled = true;
+      detachGrab?.();
       cropper?.destroy();
       cropperRef.current = null;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [src, ratio]);
 
-  const reset = () => cropperRef.current?.getCropperSelection()?.$reset();
+  const reset = () => {
+    const sel = cropperRef.current?.getCropperSelection();
+    if (sel) frameToRatio(sel, ratio);
+  };
 
   const confirm = async () => {
     const sel = cropperRef.current?.getCropperSelection();
     if (!sel) { onConfirm(await cropToRatio(file, ratio)); return; }
     setBusy(true);
     try {
-      const { width, height } = outSize(ratio);
+      // Export at the box the operator actually drew (free aspect), capped to
+      // the long edge — not the fixed slot ratio.
+      const aspect = sel.width && sel.height ? sel.width / sel.height : ratio;
+      const { width, height } = outSize(aspect);
       const canvas = await sel.$toCanvas({ width, height });
       onConfirm(await canvasToJpegFile(canvas, file.name));
     } catch {
@@ -118,7 +148,7 @@ export default function CropModal({ src, file, ratio, label, onCancel, onConfirm
           </div>
         ) : null}
       </div>
-      <div className="text-center text-xs text-white/70">Drag to move · pinch / scroll to zoom the crop box</div>
+      <div className="text-center text-xs text-white/70">Drag edges for width / height · corners to resize · Reset for the slot ratio</div>
       <div className="flex gap-3 p-4">
         <button type="button" onClick={onCancel} className="flex-1 rounded-button border border-white/40 py-3 text-sm text-white">Cancel</button>
         <button type="button" onClick={reset} className="rounded-button border border-white/40 px-4 py-3 text-sm text-white"><i className="ti ti-arrow-back-up" aria-hidden="true" /> Reset</button>
