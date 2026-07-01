@@ -26,11 +26,11 @@ empty mix (not a fabricated one).
 
 ### Requirement: Species entered on an existing forest are saved
 
-Entering or changing species in the Quick-Entry Species Mix on an EXISTING
-forest SHALL persist. Providing the total, the species mix and the grid config
-MUST regenerate the planting so the change is submitted; the regeneration MUST
-NOT clobber the boxes hydrated on open before the user makes a change, and the
-save MUST go through the non-destructive diff so existing proof history is
+The wizard SHALL persist species entered or changed in the Quick-Entry Species
+Mix on an existing forest. Providing the total, the species mix and the grid
+config MUST regenerate the planting so the change is submitted; the regeneration
+MUST NOT clobber the boxes hydrated on open before the user makes a change, and
+the save MUST go through the non-destructive diff so existing proof history is
 preserved.
 
 #### Scenario: Add a species while editing
