@@ -463,6 +463,9 @@ export interface ForestFullRecord {
   sponsors: { id: string; sponsor_name: string; sponsor_logo: string | null }[];
   employees: { id: string; name: string }[];
   box_data: ForestFullBox[];
+  /** Forest-wide species totals (with names) straight from the trees — populated
+   *  even when the forest has no boxes. Used to hydrate the edit Species Mix. */
+  species_summary?: { species_id: number; count: number; species_common_name: string | null }[];
   site_manager_id: string | null;
   user_role_id: string | null;
   [key: string]: unknown;

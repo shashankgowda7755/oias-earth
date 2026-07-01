@@ -163,18 +163,27 @@ function fullToForm(full: ForestFullRecord): ForestFormState {
   // so opening an edit shows the species that were entered. The wizard's Species
   // Mix reads `species_mix`; previously only the per-box `boxes` were hydrated, so
   // edit showed "No species" even though the trees existed.
-  const mix = new Map<string, { label: string; count: number }>();
-  for (const b of full.box_data ?? []) {
-    for (const s of b.species_data ?? []) {
-      const key = String(s.species_id);
-      const prev = mix.get(key) ?? { label: s.species_common_name || `Species #${s.species_id}`, count: 0 };
-      prev.count += Number(s.count) || 0;
-      mix.set(key, prev);
-    }
-  }
-  const species_mix = [...mix.entries()].map(([species_id, v]) => ({
-    species_id, species_label: v.label, count: String(v.count),
+  // Prefer the forest-wide species summary (populated even when a forest has no
+  // boxes); fall back to aggregating the per-box species.
+  let species_mix = (full.species_summary ?? []).map((s) => ({
+    species_id: String(s.species_id),
+    species_label: s.species_common_name || `Species #${s.species_id}`,
+    count: String(s.count),
   }));
+  if (species_mix.length === 0) {
+    const mix = new Map<string, { label: string; count: number }>();
+    for (const b of full.box_data ?? []) {
+      for (const s of b.species_data ?? []) {
+        const key = String(s.species_id);
+        const prev = mix.get(key) ?? { label: s.species_common_name || `Species #${s.species_id}`, count: 0 };
+        prev.count += Number(s.count) || 0;
+        mix.set(key, prev);
+      }
+    }
+    species_mix = [...mix.entries()].map(([species_id, v]) => ({
+      species_id, species_label: v.label, count: String(v.count),
+    }));
+  }
   const mixTotal = species_mix.reduce((n, s) => n + (Number(s.count) || 0), 0);
 
   return {

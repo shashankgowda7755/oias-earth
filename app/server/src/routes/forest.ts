@@ -949,7 +949,7 @@ async function getForestFull(req: Request, res: Response): Promise<void> {
       column_position: number | null;
     }>(
       `SELECT id, "row", "column", prefix, start, tree_to_tree_distance, row_position, column_position
-         FROM forest_boxes WHERE forest_id = $1 AND is_active = TRUE ORDER BY "row", "column"`,
+         FROM forest_boxes WHERE forest_id = $1 AND is_active IS NOT FALSE ORDER BY "row", "column"`,
       [id]
     )
   ).rows;
@@ -973,12 +973,28 @@ async function getForestFull(req: Request, res: Response): Promise<void> {
     box_data.push({ ...b, species_data: species });
   }
 
+  // Forest-WIDE species summary straight from the trees (with names), so the
+  // edit form's global "Species Mix" populates even when a forest has trees but
+  // no forest_boxes rows (bulk-imported forests) — box_data would be empty then.
+  const species_summary = (
+    await query<{ species_id: number; count: number; species_common_name: string | null }>(
+      `SELECT ft.master_plant_species_id AS species_id, COUNT(*)::int AS count,
+              COALESCE(MAX(mp.common_name), MAX(mp.species_name), MIN(ft.forest_tree_name)) AS species_common_name
+         FROM forest_trees ft
+         LEFT JOIN master_plantspecies mp ON mp.id = ft.master_plant_species_id
+        WHERE ft.forest_id = $1 AND ft.is_active = TRUE
+        GROUP BY ft.master_plant_species_id`,
+      [id]
+    )
+  ).rows;
+
   res.json({
     data: {
       ...forest,
       sponsors,
       employees,
       box_data,
+      species_summary,
       site_manager_id: employees[0]?.id ?? null,
       user_role_id: access[0]?.user_role_id ?? null,
     },
