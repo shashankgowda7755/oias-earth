@@ -13,7 +13,8 @@ import { cropToRatio, canvasToJpegFile, outSize } from '@/lib/cropImage';
 // Type-only query (no eager runtime import — Cropper.js is loaded lazily below).
 type CropperCtor = (typeof import('cropperjs'))['default'];
 type CropperInstance = InstanceType<CropperCtor>;
-type CropperSelection = NonNullable<ReturnType<CropperInstance['getCropperSelection']>>;
+type CropperImage = NonNullable<ReturnType<CropperInstance['getCropperImage']>>;
+type CropperCanvas = NonNullable<ReturnType<CropperInstance['getCropperCanvas']>>;
 let _CropperClass: CropperCtor | null = null;
 let _loadPromise: Promise<CropperCtor> | null = null;
 async function ensureCropper(): Promise<CropperCtor> {
@@ -22,13 +23,33 @@ async function ensureCropper(): Promise<CropperCtor> {
   return _loadPromise;
 }
 
-// Frame the selection box at `ratio`, centred on the image. Kept LOCKED to the
-// ratio so the initial box sits correctly on the image (a NaN/free aspect here
-// would re-frame to the whole canvas, incl. the letterbox). The lock is released
-// to free aspect on the first resize-handle grab — see the pointerdown listener.
-function frameToRatio(sel: CropperSelection, ratio: number) {
+// Image bounds in cropper-canvas-local coordinates — the same space as
+// selection.x/y/width/height. Lets us keep the crop box inside the photo.
+function imageBox(image: CropperImage | null, canvasEl: CropperCanvas | null) {
+  if (!image || !canvasEl) return null;
+  const cr = canvasEl.getBoundingClientRect();
+  const ir = image.getBoundingClientRect();
+  return { x: ir.left - cr.left, y: ir.top - cr.top, w: ir.width, h: ir.height };
+}
+
+// Frame the selection at `ratio` as the largest rectangle of that ratio that
+// fits ENTIRELY inside the image, centred — so the default crop never spills
+// into the letterbox (which would export as black bars). Falls back to
+// Cropper's own reset if the image geometry isn't measurable yet.
+// Keep the box a hair (1px) inside the image on every side so its edge samples
+// image pixels, not the transparent letterbox just past the raster boundary
+// (which would export as a black hairline).
+const EDGE_MARGIN = 1;
+
+function frameToRatio(cropper: CropperInstance, ratio: number) {
+  const sel = cropper.getCropperSelection();
+  if (!sel) return;
   sel.aspectRatio = ratio;
-  sel.$reset();
+  const box = imageBox(cropper.getCropperImage(), cropper.getCropperCanvas());
+  if (!box || box.w <= 0 || box.h <= 0) { sel.$reset(); return; }
+  const bw = box.w - 2 * EDGE_MARGIN, bh = box.h - 2 * EDGE_MARGIN;
+  const w = Math.min(bw, bh * ratio), h = w / ratio;
+  sel.$change(box.x + EDGE_MARGIN + (bw - w) / 2, box.y + EDGE_MARGIN + (bh - h) / 2, w, h, ratio, true);
 }
 
 interface Props {
@@ -78,20 +99,38 @@ export default function CropModal({ src, file, ratio, label, onCancel, onConfirm
           sel.initialCoverage = 0.9;
           sel.movable = true;
           sel.resizable = true;
-          frameToRatio(sel, ratio);
+          frameToRatio(cropper, ratio);
+          // Keep the crop box inside the photo: reject any move/resize that would
+          // push it past the image edge, so the export never has empty (black)
+          // margins. Covers both drag-to-move and edge/corner resizing.
+          const clamp = (e: Event) => {
+            const d = (e as CustomEvent).detail as { x: number; y: number; width: number; height: number };
+            const box = imageBox(cropper!.getCropperImage(), cropper!.getCropperCanvas());
+            if (!box) return;
+            // Same 1px inset as the initial frame, with a half-pixel tolerance so
+            // legit moves up to the safe edge aren't rejected as jitter.
+            const min = EDGE_MARGIN - 0.5;
+            if (d.x < box.x + min || d.y < box.y + min || d.x + d.width > box.x + box.w - min || d.y + d.height > box.y + box.h - min) {
+              e.preventDefault();
+            }
+          };
+          sel.addEventListener('change', clamp);
           // Release the aspect lock on the first resize-handle grab: from then on
           // edge handles resize a single axis (left/right → width, top/bottom →
           // height) and corners resize both. Capture phase so it runs before
           // Cropper reads the aspect ratio for the drag.
           const host = hostRef.current;
           const onGrab = (e: Event) => {
-            const t = e.target as Element | null;
-            if (t && t.tagName === 'CROPPER-HANDLE' && (t.getAttribute('action') || '').endsWith('-resize')) {
+            const el = e.target as Element | null;
+            if (el && el.tagName === 'CROPPER-HANDLE' && (el.getAttribute('action') || '').endsWith('-resize')) {
               sel.aspectRatio = NaN;
             }
           };
           host?.addEventListener('pointerdown', onGrab, true);
-          detachGrab = () => host?.removeEventListener('pointerdown', onGrab, true);
+          detachGrab = () => {
+            host?.removeEventListener('pointerdown', onGrab, true);
+            sel.removeEventListener('change', clamp);
+          };
         }
         setReady(true);
       } catch {
@@ -112,8 +151,7 @@ export default function CropModal({ src, file, ratio, label, onCancel, onConfirm
   }, [src, ratio]);
 
   const reset = () => {
-    const sel = cropperRef.current?.getCropperSelection();
-    if (sel) frameToRatio(sel, ratio);
+    if (cropperRef.current) frameToRatio(cropperRef.current, ratio);
   };
 
   const confirm = async () => {
