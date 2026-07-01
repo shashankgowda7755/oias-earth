@@ -151,7 +151,7 @@ function fullToForm(full: ForestFullRecord): ForestFormState {
       start: startStr,
       species: (b.species_data ?? []).map((s) => ({
         species_id: String(s.species_id),
-        species_label: `Species #${s.species_id}`,
+        species_label: s.species_common_name || `Species #${s.species_id}`,
         count: String(s.count),
       })),
     };

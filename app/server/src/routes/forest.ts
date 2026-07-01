@@ -949,17 +949,24 @@ async function getForestFull(req: Request, res: Response): Promise<void> {
       column_position: number | null;
     }>(
       `SELECT id, "row", "column", prefix, start, tree_to_tree_distance, row_position, column_position
-         FROM forest_boxes WHERE forest_id = $1 ORDER BY "row", "column"`,
+         FROM forest_boxes WHERE forest_id = $1 AND is_active = TRUE ORDER BY "row", "column"`,
       [id]
     )
   ).rows;
 
   const box_data: Record<string, unknown>[] = [];
   for (const b of boxRows) {
+    // Active trees only (soft-deleted ones must not inflate the count), and JOIN
+    // the species catalog so the edit form shows the real name, not "Species #id".
     const species = (
-      await query<{ species_id: number; count: number; planted_on: string | null }>(
-        `SELECT master_plant_species_id AS species_id, COUNT(*)::int AS count, MIN(planted_on) AS planted_on
-           FROM forest_trees WHERE box_id = $1 GROUP BY master_plant_species_id`,
+      await query<{ species_id: number; count: number; planted_on: string | null; species_common_name: string | null }>(
+        `SELECT ft.master_plant_species_id AS species_id, COUNT(*)::int AS count,
+                MIN(ft.planted_on) AS planted_on,
+                COALESCE(MAX(mp.common_name), MAX(mp.species_name), MIN(ft.forest_tree_name)) AS species_common_name
+           FROM forest_trees ft
+           LEFT JOIN master_plantspecies mp ON mp.id = ft.master_plant_species_id
+          WHERE ft.box_id = $1 AND ft.is_active = TRUE
+          GROUP BY ft.master_plant_species_id`,
         [b.id]
       )
     ).rows;

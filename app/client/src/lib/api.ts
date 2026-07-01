@@ -450,7 +450,7 @@ export interface ForestFullBox {
   tree_to_tree_distance: string | number | null;
   row_position: number | null;
   column_position: number | null;
-  species_data: { species_id: number; count: number; planted_on: string | null }[];
+  species_data: { species_id: number; count: number; planted_on: string | null; species_common_name?: string | null }[];
 }
 
 /**
