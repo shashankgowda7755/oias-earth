@@ -376,19 +376,11 @@ async function upsertForest(req: Request, res: Response): Promise<void> {
       // (gift_forest_plants / donor_trees FK forest_trees), otherwise the tree
       // DELETE trips their foreign keys. When box_data is omitted we leave the
       // boxes/trees (and their timelines/gifts/ledger) completely untouched.
+      // Grid update is a NON-DESTRUCTIVE diff now (diffBoxesAndTrees): trees are
+      // added or soft-deactivated, never hard-deleted, so proof timelines / gifts
+      // / donor links / carbon ledger survive. Only the display clusters (a pure
+      // aggregate) are cleared and rebuilt.
       if (rebuildBoxes) {
-        await client.query(
-          `DELETE FROM gift_forest_plants
-            WHERE gift_tree_id IN (SELECT id FROM forest_trees WHERE forest_id = $1)`,
-          [forestId]
-        );
-        await client.query(
-          `DELETE FROM donor_trees
-            WHERE tree_id IN (SELECT id FROM forest_trees WHERE forest_id = $1)`,
-          [forestId]
-        );
-        await client.query(`DELETE FROM forest_trees WHERE forest_id = $1`, [forestId]);
-        await client.query(`DELETE FROM forest_boxes WHERE forest_id = $1`, [forestId]);
         await client.query(`DELETE FROM forest_clusters WHERE forest_id = $1`, [forestId]);
       }
       if (rebuildSponsors) {
@@ -451,15 +443,10 @@ async function upsertForest(req: Request, res: Response): Promise<void> {
     // --- boxes + trees from box_data[] (only when supplied; see rebuildBoxes) ---
     let stats: GenStats = { boxes: 0, trees: 0, species: 0, oxygen: 0, carbon: 0 };
     if (rebuildBoxes) {
-      stats = await generateBoxesAndTrees(
-        client,
-        forestId,
-        forestUniqueId,
-        boxData,
-        centerLat,
-        centerLng,
-        actor
-      );
+      // CREATE materialises fresh; UPDATE diffs (never destroys tree history).
+      stats = isCreate
+        ? await generateBoxesAndTrees(client, forestId, forestUniqueId, boxData, centerLat, centerLng, actor)
+        : await diffBoxesAndTrees(client, forestId, forestUniqueId, boxData, centerLat, centerLng, actor);
 
       // One representative cluster centred on the forest (live job builds many).
       if (Number.isFinite(centerLat) && Number.isFinite(centerLng) && (centerLat || centerLng)) {
@@ -679,6 +666,192 @@ async function generateBoxesAndTrees(
     species: speciesSeen.size,
     oxygen: Math.round(oxygenSum * 1000) / 1000,
     carbon: Math.round(carbonSum * 1000) / 1000,
+  };
+}
+
+/**
+ * NON-DESTRUCTIVE grid update (edit). Unlike generateBoxesAndTrees (which wipes +
+ * rebuilds, for CREATE only), this DIFFS the submitted box_data against what
+ * exists and never hard-deletes a tree — so proof-photo timelines, gifts, donor
+ * links and the carbon ledger all survive an edit:
+ *   - box matched by (row,column): update its scalars.
+ *   - species count increased: reactivate soft-deleted trees first, then INSERT.
+ *   - species count decreased / species or box removed: soft-delete
+ *     (is_active = FALSE) the surplus — the rows (and their history) stay.
+ * Every count/report/map query already filters is_active = TRUE, so a
+ * soft-deleted tree correctly drops out of all totals.
+ */
+async function diffBoxesAndTrees(
+  client: DbClient,
+  forestId: string,
+  forestUniqueId: string,
+  boxData: BoxData[],
+  centerLat: number,
+  centerLng: number,
+  actor: string | null
+): Promise<GenStats> {
+  const now = new Date();
+  const speciesRate = new Map<number, { o2: number; co: number }>();
+  const rateOf = async (sid: number): Promise<{ o2: number; co: number }> => {
+    const hit = speciesRate.get(sid);
+    if (hit) return hit;
+    const r = await client.query<{ oxygen_per_day: number | null; carbon_offset_per_day: number | null }>(
+      `SELECT oxygen_per_day, carbon_offset_per_day FROM master_plantspecies WHERE id = $1`, [sid]);
+    const rate = { o2: Number(r.rows[0]?.oxygen_per_day) || 0, co: Number(r.rows[0]?.carbon_offset_per_day) || 0 };
+    speciesRate.set(sid, rate);
+    return rate;
+  };
+
+  // Existing boxes (active + inactive), keyed by "row,column".
+  const exBoxes = await client.query<{ id: string; row: number | null; column: number | null }>(
+    `SELECT id, "row", "column" FROM forest_boxes WHERE forest_id = $1`, [forestId]);
+  const boxByRC = new Map<string, string>();
+  for (const b of exBoxes.rows) boxByRC.set(`${b.row},${b.column}`, b.id);
+  const seenBoxIds = new Set<string>();
+
+  // A tree is PROTECTED (never soft-deleted) if it carries any proof/history:
+  // a plant timeline (proof photos), a gift, a donor link, a carbon-ledger row,
+  // or a 360-tour hotspot. Surplus removal only ever touches history-free trees.
+  const NO_HISTORY = `
+    AND NOT EXISTS (SELECT 1 FROM forest_plant_timelines pt WHERE pt.plant_id = forest_trees.id)
+    AND NOT EXISTS (SELECT 1 FROM gift_forest_plants g WHERE g.gift_tree_id = forest_trees.id)
+    AND NOT EXISTS (SELECT 1 FROM donor_trees d WHERE d.tree_id = forest_trees.id)
+    AND NOT EXISTS (SELECT 1 FROM forest_tree_carbon_ledger cl WHERE cl.tree_id = forest_trees.id)
+    AND NOT EXISTS (SELECT 1 FROM scene_hotspots sh WHERE sh.tree_id = forest_trees.id)`;
+
+  for (let bIdx = 0; bIdx < boxData.length; bIdx++) {
+    const box = boxData[bIdx]!;
+    const prefix = box.prefix ?? '';
+    const startToken = box.start ?? 1;
+    const startNum = Number(startToken) || 1;
+    const padW = startWidth(startToken);
+    const ttd = num(box.tree_to_tree_distance ?? box.treeToTreeDistance);
+    const rc = `${intOrNull(box.row)},${intOrNull(box.column)}`;
+
+    let boxId: string;
+    const existingId = boxByRC.get(rc);
+    if (existingId) {
+      boxId = existingId;
+      await client.query(
+        `UPDATE forest_boxes SET row_position = $2, column_position = $3, prefix = $4,
+           start = $5, tree_to_tree_distance = $6, is_active = TRUE, updated_by = $7 WHERE id = $1`,
+        [boxId, intOrNull(box.row_position ?? box.rowPosition), intOrNull(box.column_position ?? box.columnPosition),
+         prefix, String(startToken), ttd, actor]);
+    } else {
+      const r = await client.query<{ id: string }>(
+        `INSERT INTO forest_boxes
+           (forest_id, "row", "column", row_position, column_position, prefix, start, tree_to_tree_distance, is_active, created_by, updated_by)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,TRUE,$9,$9) RETURNING id`,
+        [forestId, intOrNull(box.row), intOrNull(box.column), intOrNull(box.row_position ?? box.rowPosition),
+         intOrNull(box.column_position ?? box.columnPosition), prefix, String(startToken), ttd, actor]);
+      boxId = r.rows[0]!.id;
+    }
+    seenBoxIds.add(boxId);
+
+    // Active tree counts per species in this box.
+    const exTrees = await client.query<{ sid: number; active: number }>(
+      `SELECT master_plant_species_id AS sid, COUNT(*) FILTER (WHERE is_active = TRUE)::int AS active
+         FROM forest_trees WHERE box_id = $1 GROUP BY master_plant_species_id`, [boxId]);
+    const activeBySid = new Map<number, number>();
+    for (const t of exTrees.rows) activeBySid.set(Number(t.sid), Number(t.active));
+    // Next tree number = max trailing-digit suffix in the box + 1 (prefix-safe).
+    const maxRow = await client.query<{ m: string | null }>(
+      `SELECT MAX(substring(tree_unique_id from '[0-9]+$')::bigint) AS m FROM forest_trees WHERE box_id = $1`, [boxId]);
+    let nextNum = Math.max(startNum, Number(maxRow.rows[0]?.m ?? 0) + 1);
+
+    const payloadSids = new Set<number>();
+    for (const sp of (box.species_data ?? box.speciesData ?? [])) {
+      const sid = Number(sp.species_id ?? sp.speciesId);
+      if (!Number.isFinite(sid) || sid <= 0) continue;
+      payloadSids.add(sid);
+      const want = Math.max(0, Math.trunc(Number(sp.count) || 0));
+      const have = activeBySid.get(sid) ?? 0;
+
+      if (want > have) {
+        let need = want - have;
+        // Reactivate previously soft-deleted trees of this species first.
+        const react = await client.query<{ id: string }>(
+          `SELECT id FROM forest_trees WHERE box_id = $1 AND master_plant_species_id = $2 AND is_active = FALSE
+             ORDER BY created_at LIMIT $3`, [boxId, sid, need]);
+        if (react.rows.length) {
+          await client.query(`UPDATE forest_trees SET is_active = TRUE, updated_by = $2 WHERE id = ANY($1)`,
+            [react.rows.map(r => r.id), actor]);
+          need -= react.rows.length;
+        }
+        if (need > 0) {
+          const plantedOn = sp.planted_on ?? sp.plantedOn ?? null;
+          const days = ageDays(plantedOn, now);
+          const { o2, co } = await rateOf(sid);
+          const oxy = treeOxygen(o2, days);
+          const carb = treeCarbon(co, days);
+          const height = sp.height !== undefined ? String(sp.height) : null;
+          const dia = (sp.diameter ?? sp.dia) !== undefined ? String(sp.diameter ?? sp.dia) : null;
+          const name = sp.species_common_name ?? null;
+          for (let i = 0; i < need; i++) {
+            const treeUniqueId = `${prefix}${padTreeNumber(nextNum, padW)}`;
+            const geo = spreadTreeGeo(centerLat, centerLng, bIdx, nextNum);
+            nextNum++;
+            await client.query(
+              `INSERT INTO forest_trees
+                 (forest_id, box_id, master_plant_species_id, tree_unique_id,
+                  forest_tree_name, forest_tree_height, forest_tree_dia, forest_tree_age,
+                  forest_tree_oxygen, forest_tree_carbonoffset,
+                  forest_tree_geo_lat, forest_tree_geo_long, planted_on, tree_url,
+                  is_display, is_active, created_by, updated_by)
+               VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,TRUE,TRUE,$15,$15)`,
+              [forestId, boxId, sid, treeUniqueId, name, height, dia, days, String(oxy), String(carb),
+               geo.lat, geo.lng, plantedOn, treeCertUrl(forestUniqueId, treeUniqueId), actor]);
+          }
+        }
+      } else if (want < have) {
+        // Soft-delete the surplus (history-free only, newest first). If there
+        // aren't enough history-free trees, the count stays higher — proof is
+        // never hidden.
+        const del = await client.query<{ id: string }>(
+          `SELECT id FROM forest_trees WHERE box_id = $1 AND master_plant_species_id = $2 AND is_active = TRUE
+             ${NO_HISTORY} ORDER BY created_at DESC LIMIT $3`, [boxId, sid, have - want]);
+        if (del.rows.length) {
+          await client.query(`UPDATE forest_trees SET is_active = FALSE, updated_by = $2 WHERE id = ANY($1)`,
+            [del.rows.map(r => r.id), actor]);
+        }
+      }
+    }
+    // Species present in the box but dropped from the payload → soft-delete.
+    for (const [sid, have] of activeBySid) {
+      if (!payloadSids.has(sid) && have > 0) {
+        await client.query(
+          `UPDATE forest_trees SET is_active = FALSE, updated_by = $3
+             WHERE box_id = $1 AND master_plant_species_id = $2 AND is_active = TRUE ${NO_HISTORY}`, [boxId, sid, actor]);
+      }
+    }
+  }
+
+  // Boxes removed from the payload → soft-delete their trees + the box.
+  for (const [rc, bid] of boxByRC) {
+    void rc;
+    if (!seenBoxIds.has(bid)) {
+      await client.query(`UPDATE forest_trees SET is_active = FALSE, updated_by = $2 WHERE box_id = $1 AND is_active = TRUE ${NO_HISTORY}`, [bid, actor]);
+      // Only retire the box once it has no active (proof-bearing) trees left.
+      await client.query(
+        `UPDATE forest_boxes SET is_active = FALSE, updated_by = $2 WHERE id = $1
+           AND NOT EXISTS (SELECT 1 FROM forest_trees WHERE box_id = $1 AND is_active = TRUE)`, [bid, actor]);
+    }
+  }
+
+  // Totals from ACTIVE trees only (matches every report/map query).
+  const tot = await client.query<{ trees: number; species: number; oxy: string; carb: string }>(
+    `SELECT COUNT(*)::int AS trees, COUNT(DISTINCT master_plant_species_id)::int AS species,
+       COALESCE(SUM(forest_tree_oxygen::numeric),0) AS oxy,
+       COALESCE(SUM(forest_tree_carbonoffset::numeric),0) AS carb
+       FROM forest_trees WHERE forest_id = $1 AND is_active = TRUE`, [forestId]);
+  const bc = await client.query<{ c: number }>(
+    `SELECT COUNT(*)::int AS c FROM forest_boxes WHERE forest_id = $1 AND is_active = TRUE`, [forestId]);
+  return {
+    boxes: Number(bc.rows[0]?.c ?? 0),
+    trees: Number(tot.rows[0]?.trees ?? 0),
+    species: Number(tot.rows[0]?.species ?? 0),
+    oxygen: Math.round(Number(tot.rows[0]?.oxy ?? 0) * 1000) / 1000,
+    carbon: Math.round(Number(tot.rows[0]?.carb ?? 0) * 1000) / 1000,
   };
 }
 

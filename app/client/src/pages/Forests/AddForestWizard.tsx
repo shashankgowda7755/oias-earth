@@ -127,8 +127,10 @@ export function buildForestValues(f: ForestFormState): UpsertValues {
     project_period: num(f.project_period),
     plantation_date: f.plantation_date.trim() || undefined,
 
-    // Per-box planting layout (creates forest_boxes + forest_trees). Create-only.
-    box_data: !f.id && configuredBoxes.length ? JSON.stringify(configuredBoxes) : undefined,
+    // Per-box planting layout. On CREATE it materialises forest_boxes + trees; on
+    // EDIT the server diffs it (adds / soft-deactivates trees, never destroys
+    // proof history) — so grid + species edits are captured too.
+    box_data: configuredBoxes.length ? JSON.stringify(configuredBoxes) : undefined,
 
     // Tree ID generation fields
     client_code: f.client_code.trim() || undefined,
