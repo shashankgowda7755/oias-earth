@@ -159,6 +159,24 @@ function fullToForm(full: ForestFullRecord): ForestFormState {
 
   const planted = str(full.plantation_date);
 
+  // Rebuild the Quick-Entry "Species Mix" (global) + total from the saved boxes,
+  // so opening an edit shows the species that were entered. The wizard's Species
+  // Mix reads `species_mix`; previously only the per-box `boxes` were hydrated, so
+  // edit showed "No species" even though the trees existed.
+  const mix = new Map<string, { label: string; count: number }>();
+  for (const b of full.box_data ?? []) {
+    for (const s of b.species_data ?? []) {
+      const key = String(s.species_id);
+      const prev = mix.get(key) ?? { label: s.species_common_name || `Species #${s.species_id}`, count: 0 };
+      prev.count += Number(s.count) || 0;
+      mix.set(key, prev);
+    }
+  }
+  const species_mix = [...mix.entries()].map(([species_id, v]) => ({
+    species_id, species_label: v.label, count: String(v.count),
+  }));
+  const mixTotal = species_mix.reduce((n, s) => n + (Number(s.count) || 0), 0);
+
   return {
     ...emptyForestForm(),
     id: full.id,
@@ -191,6 +209,8 @@ function fullToForm(full: ForestFullRecord): ForestFormState {
     project_period: str(full.project_period),
     plantation_date: planted ? planted.slice(0, 10) : '',
     boxes,
+    species_mix,
+    total_trees: str(full.total_trees) || (mixTotal ? String(mixTotal) : ''),
   };
 }
 
