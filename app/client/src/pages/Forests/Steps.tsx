@@ -95,19 +95,19 @@ export function Step1Basic({
             {...err(errors, 'forest_internal_id')}
           />
           <TextField
-            label="City" required placeholder="Enter City"
+            label="City" placeholder="Enter City"
             value={form.forest_city}
             onChange={(v) => update('forest_city', v)}
             {...err(errors, 'forest_city')}
           />
           <TextField
-            label="State" required placeholder="Enter State"
+            label="State" placeholder="Enter State"
             value={form.forest_state}
             onChange={(v) => update('forest_state', v)}
             {...err(errors, 'forest_state')}
           />
           <TextField
-            label="Country" required placeholder="Enter Country"
+            label="Country" placeholder="Enter Country"
             value={form.forest_country}
             onChange={(v) => update('forest_country', v)}
             {...err(errors, 'forest_country')}
@@ -154,7 +154,7 @@ export function Step1Basic({
       <SubHeading>Assignments</SubHeading>
       <Grid>
         <AutocompleteField
-          label="Site Manager" required placeholder="Search Site Manager…"
+          label="Site Manager" placeholder="Search Site Manager…"
           value={form.site_manager_id}
           onChange={(id, opt) => {
             update('site_manager_id', id);
@@ -169,7 +169,7 @@ export function Step1Basic({
           {...err(errors, 'site_manager_id')}
         />
         <AutocompleteField
-          label="User" required placeholder="Search User…"
+          label="User" placeholder="Search User…"
           value={form.user_id}
           onChange={(id, opt) => {
             update('user_id', id);
@@ -185,7 +185,7 @@ export function Step1Basic({
         />
         <div className="sm:col-span-2">
           <MultiAutocompleteField
-            label="Sponsor" required
+            label="Sponsor"
             value={form.sponsor_ids}
             labels={form.sponsor_labels}
             onChange={(ids, labels) => {
@@ -288,7 +288,6 @@ export function Step2Grid({ form, errors, update }: StepProps) {
       <Grid>
         <TextField
           label="Total Saplings to Plant"
-          required
           type="number"
           inputMode="numeric"
           value={form.total_trees}
@@ -303,7 +302,6 @@ export function Step2Grid({ form, errors, update }: StepProps) {
         <div className="flex items-end gap-1">
           <TextField
             label="Client Code"
-            required
             value={form.client_code}
             onChange={(v) => update('client_code', v.toUpperCase().replace(/[^A-Z]/g, '').slice(0, 5))}
             {...err(errors, 'client_code')}
@@ -311,7 +309,6 @@ export function Step2Grid({ form, errors, update }: StepProps) {
           />
           <TextField
             label="Forest Code"
-            required
             value={form.forest_code}
             onChange={(v) => update('forest_code', v.toUpperCase().replace(/[^A-Z]/g, '').slice(0, 5))}
             {...err(errors, 'forest_code')}
@@ -390,29 +387,29 @@ export function Step2Grid({ form, errors, update }: StepProps) {
       {/* Grid Config (existing fields) */}
       <SubHeading>Grid Configuration</SubHeading>
       <Grid>
-        <TextField label="Box Rows" required type="number" inputMode="numeric"
+        <TextField label="Box Rows" type="number" inputMode="numeric"
           value={form.box_rows} onChange={(v) => update('box_rows', v)} {...err(errors, 'box_rows')} />
-        <TextField label="Box Column" required type="number" inputMode="numeric"
+        <TextField label="Box Column" type="number" inputMode="numeric"
           value={form.box_column} onChange={(v) => update('box_column', v)} {...err(errors, 'box_column')} />
-        <TextField label="Box to Box Distance (ft)" required type="number" inputMode="numeric"
+        <TextField label="Box to Box Distance (ft)" type="number" inputMode="numeric"
           value={form.box_to_box_distance} onChange={(v) => update('box_to_box_distance', v)} {...err(errors, 'box_to_box_distance')} />
-        <TextField label="Tree Rows" required type="number" inputMode="numeric"
+        <TextField label="Tree Rows" type="number" inputMode="numeric"
           value={form.tree_row} onChange={(v) => update('tree_row', v)} {...err(errors, 'tree_row')} />
-        <TextField label="Tree Column" required type="number" inputMode="numeric"
+        <TextField label="Tree Column" type="number" inputMode="numeric"
           value={form.tree_column} onChange={(v) => update('tree_column', v)} {...err(errors, 'tree_column')} />
-        <TextField label="Tree to Tree Distance (ft)" required type="number" inputMode="numeric"
+        <TextField label="Tree to Tree Distance (ft)" type="number" inputMode="numeric"
           value={form.tree_to_tree_distance} onChange={(v) => update('tree_to_tree_distance', v)} {...err(errors, 'tree_to_tree_distance')} />
-        <TextField label="Direction Angle" required type="number" inputMode="numeric"
+        <TextField label="Direction Angle" type="number" inputMode="numeric"
           value={form.direction_angle} onChange={(v) => update('direction_angle', v)} {...err(errors, 'direction_angle')} />
-        <TextField label="Boundary Gap (ft)" required type="number" inputMode="numeric"
+        <TextField label="Boundary Gap (ft)" type="number" inputMode="numeric"
           value={form.boundary_gap} onChange={(v) => update('boundary_gap', v)} {...err(errors, 'boundary_gap')} />
-        <TextField label="Pathway Spacing (ft)" required type="number" inputMode="numeric"
+        <TextField label="Pathway Spacing (ft)" type="number" inputMode="numeric"
           value={form.pathway_spacing} onChange={(v) => update('pathway_spacing', v)} {...err(errors, 'pathway_spacing')} />
-        <TextField label="Project Site" required placeholder="Enter Project Site"
+        <TextField label="Project Site" placeholder="Enter Project Site"
           value={form.project_site} onChange={(v) => update('project_site', v)} {...err(errors, 'project_site')} />
-        <TextField label="Project Period (years)" required type="number" inputMode="numeric"
+        <TextField label="Project Period (years)" type="number" inputMode="numeric"
           value={form.project_period} onChange={(v) => update('project_period', v)} {...err(errors, 'project_period')} />
-        <DateField label="Plantation Date" required
+        <DateField label="Plantation Date"
           value={form.plantation_date} onChange={(v) => update('plantation_date', v)} {...err(errors, 'plantation_date')} />
       </Grid>
 

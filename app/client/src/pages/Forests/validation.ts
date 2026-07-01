@@ -4,14 +4,13 @@
  * Each validator returns a FieldErrors map (empty == valid). Next is gated on
  * the current step; final Save re-validates every step.
  *
- * Required fields (CONFIRMED via live walk-through — spec flows
- * "Create Forest (2-step wizard)" + screens.Forests dataCollected; the `*`
- * markers list these as required, address/description optional):
- *   - Step 1: forest_name, forest_internal_id, city, state, country,
- *     coordinates (lat+long), Site Manager, Sponsor (>=1), User.
- *   - Step 2: box_rows, box_column, box_to_box_distance, tree_row, tree_column,
- *     tree_to_tree_distance, direction_angle, boundary_gap, pathway_spacing,
- *     project_site, project_period, plantation_date — all required.
+ * Required fields = the minimal safe core only, so operators who don't yet have
+ * the rest of the data can still create/advance a forest:
+ *   - Step 1: forest_name, forest_internal_id, coordinates (lat + long).
+ *   - Step 2: none required.
+ * Every other field is OPTIONAL. A value that IS entered is still format-checked
+ * (a typed grid count must be a positive integer, a typed lat must be in range),
+ * but a blank never blocks Next/Save.
  */
 import type { FieldErrors, ForestFormState, StepKey } from './types';
 
@@ -29,12 +28,22 @@ function positiveIntError(v: string): string | undefined {
   return undefined;
 }
 
+/** Optional positive-integer: blank is allowed; a typed value must be valid. */
+function optionalPositiveInt(v: string): string | undefined {
+  return isBlank(v) ? undefined : positiveIntError(v);
+}
+
 /** Non-negative number check for distances/angles/gaps. */
 function nonNegativeNumberError(v: string): string | undefined {
   if (isBlank(v)) return REQUIRED;
   const n = Number(v);
   if (!Number.isFinite(n) || n < 0) return 'Enter a valid number (0 or more).';
   return undefined;
+}
+
+/** Optional non-negative number: blank is allowed; a typed value must be valid. */
+function optionalNonNegativeNumber(v: string): string | undefined {
+  return isBlank(v) ? undefined : nonNegativeNumberError(v);
 }
 
 function validLat(v: string): boolean {
@@ -48,30 +57,30 @@ function validLong(v: string): boolean {
 
 function validateBasic(f: ForestFormState): FieldErrors {
   const e: FieldErrors = {};
+  // Core identity — kept required so forests stay identifiable + dedup-safe.
   if (isBlank(f.forest_name)) e.forest_name = REQUIRED;
   if (isBlank(f.forest_internal_id)) e.forest_internal_id = REQUIRED;
-  if (isBlank(f.forest_city)) e.forest_city = REQUIRED;
-  if (isBlank(f.forest_state)) e.forest_state = REQUIRED;
-  if (isBlank(f.forest_country)) e.forest_country = REQUIRED;
 
-  // Coordinates required (Google Places pick) per the flow's condition.
+  // Coordinates required (map + the server rejects create without them).
   if (isBlank(f.forest_geo_lat)) e.forest_geo_lat = REQUIRED;
   else if (!validLat(f.forest_geo_lat)) e.forest_geo_lat = 'Latitude must be between -90 and 90.';
   if (isBlank(f.forest_geo_long)) e.forest_geo_long = REQUIRED;
   else if (!validLong(f.forest_geo_long)) e.forest_geo_long = 'Longitude must be between -180 and 180.';
 
-  // site_manager_id and user_id are optional (server accepts without them)
+  // city / state / country + site_manager / user / sponsors are all OPTIONAL.
   return e;
 }
 
 function validateGrid(f: ForestFormState): FieldErrors {
+  // All Step-2 fields are OPTIONAL. Only report an error when a value is entered
+  // but malformed — a blank never blocks.
   const e: FieldErrors = {};
 
   const posInt: (keyof ForestFormState)[] = [
-    'box_rows', 'box_column', 'tree_row', 'tree_column',
+    'box_rows', 'box_column', 'tree_row', 'tree_column', 'total_trees', 'project_period',
   ];
   for (const k of posInt) {
-    const msg = positiveIntError(f[k] as string);
+    const msg = optionalPositiveInt(f[k] as string);
     if (msg) e[k] = msg;
   }
 
@@ -80,25 +89,11 @@ function validateGrid(f: ForestFormState): FieldErrors {
     'direction_angle', 'boundary_gap', 'pathway_spacing',
   ];
   for (const k of nonNeg) {
-    const msg = nonNegativeNumberError(f[k] as string);
+    const msg = optionalNonNegativeNumber(f[k] as string);
     if (msg) e[k] = msg;
   }
 
-  if (isBlank(f.project_site)) e.project_site = REQUIRED;
-
-  const ppMsg = positiveIntError(f.project_period);
-  if (ppMsg) e.project_period = ppMsg;
-
-  if (isBlank(f.plantation_date)) e.plantation_date = REQUIRED;
-
-  // Tree setup
-  const ttMsg = positiveIntError(f.total_trees);
-  if (ttMsg) e.total_trees = ttMsg;
-  if (f.total_trees.trim() && Number(f.total_trees) > 0) {
-    if (isBlank(f.client_code)) e.client_code = REQUIRED;
-    if (isBlank(f.forest_code)) e.forest_code = REQUIRED;
-  }
-
+  // project_site, plantation_date, client_code, forest_code: optional (no checks).
   return e;
 }
 
