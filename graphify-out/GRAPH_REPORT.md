@@ -1,16 +1,16 @@
-# Graph Report - sad-snyder-14d095  (2026-06-29)
+# Graph Report - infallible-nobel-10e712  (2026-07-02)
 
 ## Corpus Check
-- 342 files · ~982,670 words
+- 367 files · ~994,963 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 3772 nodes · 5576 edges · 327 communities (265 shown, 62 thin omitted)
+- 4012 nodes · 5948 edges · 342 communities (282 shown, 60 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS · INFERRED: 1 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `8b2d5a5e`
+- Built from commit: `4141d643`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -330,16 +330,31 @@
 - [[_COMMUNITY_Community 312|Community 312]]
 - [[_COMMUNITY_Community 313|Community 313]]
 - [[_COMMUNITY_Community 314|Community 314]]
+- [[_COMMUNITY_Community 315|Community 315]]
 - [[_COMMUNITY_Community 316|Community 316]]
 - [[_COMMUNITY_Community 317|Community 317]]
 - [[_COMMUNITY_Community 318|Community 318]]
 - [[_COMMUNITY_Community 319|Community 319]]
+- [[_COMMUNITY_Community 320|Community 320]]
 - [[_COMMUNITY_Community 321|Community 321]]
 - [[_COMMUNITY_Community 322|Community 322]]
 - [[_COMMUNITY_Community 323|Community 323]]
 - [[_COMMUNITY_Community 324|Community 324]]
 - [[_COMMUNITY_Community 325|Community 325]]
 - [[_COMMUNITY_Community 326|Community 326]]
+- [[_COMMUNITY_Community 329|Community 329]]
+- [[_COMMUNITY_Community 330|Community 330]]
+- [[_COMMUNITY_Community 331|Community 331]]
+- [[_COMMUNITY_Community 332|Community 332]]
+- [[_COMMUNITY_Community 333|Community 333]]
+- [[_COMMUNITY_Community 334|Community 334]]
+- [[_COMMUNITY_Community 335|Community 335]]
+- [[_COMMUNITY_Community 336|Community 336]]
+- [[_COMMUNITY_Community 337|Community 337]]
+- [[_COMMUNITY_Community 338|Community 338]]
+- [[_COMMUNITY_Community 339|Community 339]]
+- [[_COMMUNITY_Community 340|Community 340]]
+- [[_COMMUNITY_Community 341|Community 341]]
 
 ## God Nodes (most connected - your core abstractions)
 1. `body` - 55 edges
@@ -356,24 +371,24 @@
 ## Surprising Connections (you probably didn't know these)
 - `S07Beneficiaries()` --calls--> `pad2()`  [INFERRED]
   app/client/src/pages/report/slides/slides1.tsx → app/server/src/lib/holidays.ts
-- `Planters()` --calls--> `useToast()`  [EXTRACTED]
-  app/client/src/pages/Planters.tsx → app/client/src/components/Toast.tsx
-- `GeoTagSectionProps` --references--> `FullForestPayload`  [EXTRACTED]
-  app/client/src/pages/Forests/GeoTagSection.tsx → app/client/src/pages/Forests/fullTypes.ts
-- `TabDef` --references--> `FullForestPayload`  [EXTRACTED]
-  app/client/src/pages/Forests/ForestDetailView.tsx → app/client/src/pages/Forests/fullTypes.ts
-- `ForestDetailViewProps` --references--> `FullForestPayload`  [EXTRACTED]
-  app/client/src/pages/Forests/ForestDetailView.tsx → app/client/src/pages/Forests/fullTypes.ts
+- `serveSceneImage()` --calls--> `notFound()`  [EXTRACTED]
+  app/server/src/routes/public.ts → app/server/src/errors.ts
+- `sponsorReportCsv()` --calls--> `notFound()`  [EXTRACTED]
+  app/server/src/routes/public.ts → app/server/src/errors.ts
+- `Login()` --calls--> `useAuth()`  [EXTRACTED]
+  app/client/src/pages/Login.tsx → app/client/src/auth/AuthContext.tsx
+- `Jobs()` --calls--> `useToast()`  [EXTRACTED]
+  app/client/src/pages/Jobs/index.tsx → app/client/src/components/Toast.tsx
 
-## Communities (327 total, 62 thin omitted)
+## Communities (342 total, 60 thin omitted)
 
 ### Community 0 - "Community 0"
-Cohesion: 0.05
-Nodes (77): listEmailLog(), listDefaultTemplates(), mailReady(), ALLOWED_TOUR_HOSTS, ALIASES, resolveSpeciesId(), addHotspot(), addLink() (+69 more)
+Cohesion: 0.10
+Nodes (45): defaultTemplate(), mailReady(), deleteUser(), entitySingular(), genericDelete(), addHotspot(), addLink(), adminCreatePlanter() (+37 more)
 
 ### Community 1 - "Community 1"
-Cohesion: 0.05
-Nodes (47): Request, requireAuth(), AuditEntry, auditWrites(), clientIp(), recordAudit(), authRouter, body (+39 more)
+Cohesion: 0.06
+Nodes (37): Request, requireAuth(), AuditEntry, auditWrites(), clientIp(), recordAudit(), authRouter, body (+29 more)
 
 ### Community 2 - "Community 2"
 Cohesion: 0.04
@@ -384,31 +399,31 @@ Cohesion: 0.09
 Nodes (42): additional_sponsor_logo, boundary_gap, box_columns, box_data, box_rows, box_to_box_distance, climate, climate_other (+34 more)
 
 ### Community 4 - "Community 4"
-Cohesion: 0.10
-Nodes (38): FullForestPayload, approxValue(), buildGrowth(), buildMeta(), computeReport(), daysInQuarter(), DEFAULT_GROWTH_TARGETS, FQ_START_MONTH (+30 more)
+Cohesion: 0.11
+Nodes (33): MaintenanceWorkforceQuarter, approxValue(), buildGrowth(), computeReport(), daysInQuarter(), DEFAULT_GROWTH_TARGETS, FQ_START_MONTH, fqCalYear() (+25 more)
 
 ### Community 5 - "Community 5"
 Cohesion: 0.05
-Nodes (40): ApiError, AuditColumns, DateOnlyString, Employee, EmployeeListRow, FlatListResponse, Forest, ForestCluster (+32 more)
+Nodes (39): ApiError, AuditColumns, DateOnlyString, Employee, EmployeeListRow, FlatListResponse, Forest, ForestCluster (+31 more)
 
 ### Community 6 - "Community 6"
 Cohesion: 0.05
-Nodes (40): dependencies, axios, html2canvas, idb-keyval, jspdf, leaflet, leaflet.markercluster, @photo-sphere-viewer/core (+32 more)
+Nodes (41): dependencies, axios, cropperjs, html2canvas, idb-keyval, jspdf, leaflet, leaflet.markercluster (+33 more)
 
 ### Community 7 - "Community 7"
-Cohesion: 0.05
+Cohesion: 0.10
 Nodes (39): additional_sponsor_logo, box_columns, box_data, box_rows, box_to_box_distance, climate, climate_other, dashboard_images (+31 more)
 
 ### Community 8 - "Community 8"
-Cohesion: 0.05
-Nodes (54): AddButton(), AddButtonProps, ButtonProps, ButtonVariant, FilterButton(), FilterButtonProps, VARIANT_CLASSES, ConfirmDialog() (+46 more)
+Cohesion: 0.06
+Nodes (44): AddButton(), AddButtonProps, ButtonProps, ButtonVariant, FilterButton(), FilterButtonProps, VARIANT_CLASSES, ConfirmDialog() (+36 more)
 
 ### Community 9 - "Community 9"
 Cohesion: 0.08
-Nodes (42): ListParams, DialogState, Reports(), createReport(), deleteReport(), fetchForestOptions(), ForestOption, getReportRecipient() (+34 more)
+Nodes (45): listEntity(), ListParams, normalizePagination(), DialogState, Reports(), createReport(), deleteReport(), fetchForestOptions() (+37 more)
 
 ### Community 10 - "Community 10"
-Cohesion: 0.05
+Cohesion: 0.10
 Nodes (37): additional_sponsor_logo, box_columns, box_data, box_rows, box_to_box_distance, climate, climate_other, dashboard_images (+29 more)
 
 ### Community 11 - "Community 11"
@@ -416,40 +431,40 @@ Cohesion: 0.05
 Nodes (36): 1. Entity types — `@/types/entities`, 2. API helpers — `@/lib/api`, 3. Auth — `@/auth/AuthContext`, `@/auth/ProtectedRoute`, 4. Shared components — `@/components`, 5. What your section module must export, 6. Reference: column sets + write fields per section, 7. Open questions (carry as TODO comments referencing the spec), 8. Design tokens (Tailwind theme — `tailwind.config.ts`) (+28 more)
 
 ### Community 12 - "Community 12"
-Cohesion: 0.05
+Cohesion: 0.06
 Nodes (36): dependencies, bcryptjs, cors, dotenv, @electric-sql/pglite, express, jsonwebtoken, multer (+28 more)
 
 ### Community 13 - "Community 13"
-Cohesion: 0.09
-Nodes (35): ImpactTermValues, pad2(), DarkPanel(), dash(), numOrDash(), SlidePage(), SlideProps, GalleryPhoto (+27 more)
+Cohesion: 0.19
+Nodes (14): dash(), numOrDash(), LogoCard(), S03OsrLand(), S04Permission(), S05AreaPopulation(), S07Beneficiaries(), kg() (+6 more)
 
 ### Community 14 - "Community 14"
 Cohesion: 0.16
-Nodes (22): fetchCityStats(), Dt(), FieldGrid(), Img(), Num(), RepeatableRows(), SectionProps, SectionShell() (+14 more)
+Nodes (23): fetchCityStats(), uploadReportImage(), Dt(), FieldGrid(), Img(), Num(), RepeatableRows(), SectionProps (+15 more)
 
 ### Community 15 - "Community 15"
 Cohesion: 0.05
-Nodes (36): ActualHeightRange, AdditionalSponsorLogo, AgreementStatus, AreaPopulationStatistics, AuthorizationDetails, Beneficiaries, BoxData, Climate (+28 more)
+Nodes (36): ActualHeightRange, AdditionalSponsorLogo, AGREEMENT_STATUS_LABELS, AgreementStatus, AreaPopulationStatistics, AuthorizationDetails, Beneficiaries, BoxData (+28 more)
 
 ### Community 16 - "Community 16"
-Cohesion: 0.09
-Nodes (31): Backend, detectBackend(), putObject(), storageBackend(), storageReady(), bodyId(), collectColumns(), EMPLOYEE (+23 more)
+Cohesion: 0.10
+Nodes (30): Backend, detectBackend(), putObject(), storageBackend(), storageReady(), bodyId(), collectColumns(), EMPLOYEE (+22 more)
 
 ### Community 17 - "Community 17"
-Cohesion: 0.08
-Nodes (33): agbKg(), netCo2eKg(), oxygenKg(), treeCo2eKg(), sendReportMail(), ALLOWED_HOSTS, hostMatch(), isAllowedEmbedUrl() (+25 more)
+Cohesion: 0.10
+Nodes (23): agbKg(), netCo2eKg(), oxygenKg(), treeCo2eKg(), ALLOWED_HOSTS, hostMatch(), isAllowedEmbedUrl(), isAllowedPanoUrl() (+15 more)
 
 ### Community 18 - "Community 18"
 Cohesion: 0.12
-Nodes (23): satelliteFetch(), fiscalQuarterOf(), FQ, FQ_MONTHS, FQ_START_MONTH, projectYearLabel(), projectYearOf(), quarterOrdinal() (+15 more)
+Nodes (22): fiscalQuarterOf(), FQ, FQ_MONTHS, FQ_START_MONTH, projectYearLabel(), projectYearOf(), quarterOrdinal(), quarterPeriodLabel() (+14 more)
 
 ### Community 19 - "Community 19"
 Cohesion: 0.12
-Nodes (15): CityStatsResult, clearReportImage(), deleteSponsorLogo(), flattenFullPayload(), forestUpsertFull(), parseForestJson(), ParseResult, SCALAR_KEYS (+7 more)
+Nodes (17): CityStatsResult, clearReportImage(), deleteSponsorLogo(), fetchForestWeather(), flattenFullPayload(), forestUpsertFull(), ForestWeather, parseForestJson() (+9 more)
 
 ### Community 20 - "Community 20"
-Cohesion: 0.18
-Nodes (13): AuthContext, AuthContextValue, AuthProvider(), demoLogin(), login(), LoginResponse, AuthSession, clearSession() (+5 more)
+Cohesion: 0.09
+Nodes (30): AuthContext, AuthContextValue, useAuth(), ProtectedRoute(), AppHeader(), initialsOf(), appendScalar(), asMessageString() (+22 more)
 
 ### Community 21 - "Community 21"
 Cohesion: 0.06
@@ -457,19 +472,19 @@ Nodes (30): ADDED Requirements, Requirement: Absent data renders blank, never fa
 
 ### Community 22 - "Community 22"
 Cohesion: 0.12
-Nodes (24): ForestSponsorSummary, ReportForestSummary, RoleRow, UserRow, UserSummary, Avatar(), displayName(), errorMessage() (+16 more)
+Nodes (23): ReportForestSummary, RoleRow, UserRow, UserSummary, Avatar(), displayName(), errorMessage(), initials() (+15 more)
 
 ### Community 23 - "Community 23"
-Cohesion: 0.11
-Nodes (24): updateEntity(), DialogMode, Sponsors(), initials(), SponsorAvatar(), SponsorForm(), SponsorFormProps, EMPTY_SPONSOR_FORM (+16 more)
+Cohesion: 0.10
+Nodes (25): createEntity(), deleteEntity(), DialogMode, Sponsors(), initials(), SponsorAvatar(), SponsorForm(), SponsorFormProps (+17 more)
 
 ### Community 24 - "Community 24"
 Cohesion: 0.11
 Nodes (17): allocateSpecies(), buildPlantingLayout(), gridInPolygon(), LayoutStyle, LL, PlantingOpts, pointInPolygon(), SPECIES_PALETTE (+9 more)
 
 ### Community 25 - "Community 25"
-Cohesion: 0.17
-Nodes (16): cacheForests(), cacheTrees(), enqueue(), getCachedForests(), getCachedTrees(), getQueue(), PendingCapture, removeFromQueue() (+8 more)
+Cohesion: 0.11
+Nodes (24): fetchMyForests(), fetchTrees(), FieldForest, FieldTree, submitVisit(), VisitPayload, cacheForests(), cacheTrees() (+16 more)
 
 ### Community 26 - "Community 26"
 Cohesion: 0.09
@@ -481,7 +496,7 @@ Nodes (26): allCorners, bCentre, bearing(), blkTrees, BLOCKS, box, brg, buildGri
 
 ### Community 28 - "Community 28"
 Cohesion: 0.11
-Nodes (23): Breadcrumb(), ClientMark(), ConicRing(), fmtDate(), photoIcon(), PhotoPlaceholder(), ReportFooter(), ReportImage() (+15 more)
+Nodes (22): Breadcrumb(), ClientMark(), ConicRing(), enumLabel(), photoIcon(), PhotoPlaceholder(), Pill(), ReportFooter() (+14 more)
 
 ### Community 29 - "Community 29"
 Cohesion: 0.10
@@ -492,8 +507,8 @@ Cohesion: 0.08
 Nodes (25): compilerOptions, allowSyntheticDefaultImports, declaration, esModuleInterop, forceConsistentCasingInFileNames, lib, module, moduleResolution (+17 more)
 
 ### Community 31 - "Community 31"
-Cohesion: 0.11
-Nodes (23): createEntity(), errorText(), DialogMode, Species(), SpeciesForm(), SpeciesFormProps, EMPTY_SPECIES_FORM, hasErrors() (+15 more)
+Cohesion: 0.12
+Nodes (22): ApiError, updateEntity(), DialogMode, Species(), SpeciesForm(), SpeciesFormProps, EMPTY_SPECIES_FORM, hasErrors() (+14 more)
 
 ### Community 32 - "Community 32"
 Cohesion: 0.08
@@ -504,16 +519,16 @@ Cohesion: 0.08
 Nodes (24): ADDED Requirements, Requirement: Forest markers are survival-tinted ring-badge pins, Requirement: Forests without a real boundary use a synthetic footprint, Requirement: Layout toggle and zoom-gated reveal on the forest page, Requirement: Maps use a keyless satellite basemap, Requirement: Matrix is sized to the real sapling total, Requirement: Per-forest tree map renders a species matrix, not a point cloud, Requirement: Saplings are coloured by species composition (+16 more)
 
 ### Community 34 - "Community 34"
-Cohesion: 0.16
-Nodes (17): AutocompleteOption, autoFillBoxes(), AutoFillParams, distributeSpecies(), MultiAutocompleteField(), MultiAutocompleteFieldProps, err(), Step1Basic() (+9 more)
+Cohesion: 0.18
+Nodes (12): AutocompleteField(), AutocompleteOption, loadSpeciesOptions(), MultiAutocompleteField(), MultiAutocompleteFieldProps, err(), Step1Basic(), Step1Props (+4 more)
 
 ### Community 35 - "Community 35"
-Cohesion: 0.08
-Nodes (21): AuditPnb, Carbon, Dashboard, EmailSettings, Field, ForestPage, ForestTourPage, Landing (+13 more)
+Cohesion: 0.06
+Nodes (27): AuthProvider(), ErrorBoundary, Props, State, installDomGuard(), AuditPnb, Carbon, Dashboard (+19 more)
 
 ### Community 36 - "Community 36"
-Cohesion: 0.17
-Nodes (22): buildForestReport(), currentHeightLabel(), daysInQuarter(), DEFAULT_GROWTH_TARGETS, FOREST_JSONB, FOREST_SCALARS, FQ_START_MONTH, fqCalYear() (+14 more)
+Cohesion: 0.10
+Nodes (34): festivalHolidaysInQuarter(), FQ_START_MONTH, getStateHolidays(), NATIONAL, pad2(), STATE_EXTRA, buildForestReport(), buildGrowthChart() (+26 more)
 
 ### Community 37 - "Community 37"
 Cohesion: 0.09
@@ -521,19 +536,19 @@ Nodes (23): first_name, id, forest_name, forest_unique_id, id, sample, CreatedBy
 
 ### Community 38 - "Community 38"
 Cohesion: 0.09
-Nodes (29): ActiveBadge(), AvatarCell(), RowActions(), TextCell(), toInitials(), EmployeeFormDialog(), EmployeeFormDialogProps, TouchedMap (+21 more)
+Nodes (30): ActiveBadge(), AvatarCell(), RowActions(), TextCell(), toInitials(), EmployeeFormDialog(), EmployeeFormDialogProps, TouchedMap (+22 more)
 
 ### Community 39 - "Community 39"
-Cohesion: 0.17
-Nodes (15): Button(), JobDetailDialog(), JobDetailDialogProps, JsonViewer(), JsonViewerProps, StatusBadge(), StatusBadgeProps, Tone (+7 more)
+Cohesion: 0.16
+Nodes (16): Column, Jobs(), JobDetailDialog(), JobDetailDialogProps, JsonViewer(), JsonViewerProps, StatusBadge(), StatusBadgeProps (+8 more)
 
 ### Community 40 - "Community 40"
-Cohesion: 0.05
-Nodes (55): addHotspot(), addLink(), addPanorama(), createScene(), deleteHotspot(), deleteLink(), deletePanorama(), deleteScene() (+47 more)
+Cohesion: 0.06
+Nodes (54): addHotspot(), addLink(), addPanorama(), createScene(), deleteHotspot(), deleteLink(), deletePanorama(), deleteScene() (+46 more)
 
 ### Community 41 - "Community 41"
-Cohesion: 0.20
-Nodes (17): ageDays(), D2R(), destPoint(), padTreeNumber(), projectFromCamera(), R2D(), round3(), spreadTreeGeo() (+9 more)
+Cohesion: 0.18
+Nodes (22): ageDays(), D2R(), destPoint(), padTreeNumber(), projectFromCamera(), R2D(), round3(), spreadTreeGeo() (+14 more)
 
 ### Community 42 - "Community 42"
 Cohesion: 0.11
@@ -544,11 +559,11 @@ Cohesion: 0.12
 Nodes (21): first_name, id, sample, sample, sample, contact_no, created_at, created_by (+13 more)
 
 ### Community 44 - "Community 44"
-Cohesion: 0.17
-Nodes (15): byYearQuarter(), DataGrid(), EmptySection(), Field(), FieldGrid(), fmt(), humanize(), quarterLabel() (+7 more)
+Cohesion: 0.18
+Nodes (14): byYearQuarter(), DataGrid(), EmptySection(), Field(), FieldGrid(), fmt(), humanize(), quarterLabel() (+6 more)
 
 ### Community 45 - "Community 45"
-Cohesion: 0.12
+Cohesion: 0.11
 Nodes (21): 1. Database — create + migrate + seed, 2. Server (API on :4000), 3. Client (Vite dev server on :5173), 4. Default login (from `db/migrations/002_seed.sql`), code:bash (# create the database (default name: communitree)), code:bash (cd app/server), code:bash (cd app/client), code:bash (# client) (+13 more)
 
 ### Community 46 - "Community 46"
@@ -560,12 +575,12 @@ Cohesion: 0.10
 Nodes (21): sample, average_age, box_column, box_rows, forest_address, forest_carbonoffset, forest_city, forest_country (+13 more)
 
 ### Community 48 - "Community 48"
-Cohesion: 0.16
-Nodes (10): fetchMyForests(), fetchTrees(), FieldForest, FieldTree, submitVisit(), VisitPayload, api, Flag (+2 more)
+Cohesion: 0.09
+Nodes (22): ADDED Requirements, Requirement: Backdated quarter picker with fiscal labels, Requirement: Bulk backfill of quarterly photos by project year, Requirement: Discoverable remove and replace with undo, Requirement: Interactive crop on every capture, Requirement: Merged single quarterly photo, Requirement: Searchable forest picker, Scenario: Backfill an old quarter (+14 more)
 
 ### Community 49 - "Community 49"
-Cohesion: 0.17
-Nodes (9): ErrorBoundary, Props, State, initialsOf(), NAV_ICONS, Sidebar(), SidebarProps, SectionTab (+1 more)
+Cohesion: 0.08
+Nodes (14): initialsOf(), NAV_ICONS, Sidebar(), SidebarProps, SECTION_TABS, SectionTab, TabNav(), TabNavProps (+6 more)
 
 ### Community 50 - "Community 50"
 Cohesion: 0.10
@@ -576,11 +591,11 @@ Cohesion: 0.09
 Nodes (21): code:block1 (/graphify                                             # full), code:bash (if [ ! -f graphify-out/.graphify_python ]; then), code:bash (graphify cluster-only .), code:bash (graphify explain "NODE_NAME"), code:bash ($(cat graphify-out/.graphify_python) -m graphify save-result), code:bash ($(cat graphify-out/.graphify_python) -c "), code:bash (python3 -m graphify.watch INPUT_PATH --debounce 3), code:bash (graphify hook install    # install) (+13 more)
 
 ### Community 52 - "Community 52"
-Cohesion: 0.19
-Nodes (11): DEFAULT_TEMPLATES, defaultTemplate(), EmailTemplate, getTemplate(), renderHtml(), renderText(), REPORT_QUARTERLY, TemplateRow (+3 more)
+Cohesion: 0.05
+Nodes (61): DEFAULT_TEMPLATES, EmailTemplate, getTemplate(), listDefaultTemplates(), renderHtml(), renderText(), REPORT_QUARTERLY, TemplateRow (+53 more)
 
 ### Community 53 - "Community 53"
-Cohesion: 0.13
+Cohesion: 0.12
 Nodes (19): Auth contract (reproduced from the original), Build / typecheck, code:block1 (app/), code:bash (cd app/server), code:bash (curl localhost:4000/health        # {"ok":true,...,"db":"pgl), code:bash (cp .env.example .env          # then UNCOMMENT + edit DATABA), code:bash (npm run build && npm start    # production build (prestart r), COMMUNITREE Admin — Backend (server + db) (+11 more)
 
 ### Community 54 - "Community 54"
@@ -591,13 +606,17 @@ Nodes (18): fields, list, sample, carbonOffsetPerDay, commonName, id, isActive, 
 Cohesion: 0.15
 Nodes (10): esc(), forestIcon(), HeartbeatMap(), HeartbeatMapProps, INDIA_CENTER, fetchForestsMap(), fetchSponsor(), ForestPin (+2 more)
 
+### Community 56 - "Community 56"
+Cohesion: 0.12
+Nodes (15): ADDED Requirements, Requirement: Debounced report save never NULL-wipes a column, Requirement: Report edits never erase data saved by another path, Requirement: Seed and import migrations never overwrite existing forests on cold start, Scenario: Baseline advances after each save, Scenario: Empty body updates nothing, Scenario: First run still imports new forests, Scenario: No DO UPDATE remains in the import (+7 more)
+
 ### Community 57 - "Community 57"
 Cohesion: 0.14
 Nodes (17): Check for context, code:block1 (┌─────────────────────────────────────────┐), code:bash (openspec list --json), code:block3 (User: I'm thinking about adding real-time collaboration), code:block4 (User: The auth system is a mess), code:block5 (User: /opsx:explore add-auth-system), code:block6 (User: Should we use Postgres or SQLite?), code:block7 (## What We Figured Out) (+9 more)
 
 ### Community 58 - "Community 58"
-Cohesion: 0.11
-Nodes (17): Requirement: CC resolution on report sends, Requirement: Report PDF attachment, Requirement: Sent inbox (send log), Requirement: Single-provider outbound email, Requirement: Tracked editable templates, Scenario: Admin views the inbox, Scenario: DB override wins over code default, Scenario: Every attempt is logged (+9 more)
+Cohesion: 0.06
+Nodes (31): Requirement: CC resolution on report sends, Requirement: Report PDF attachment, Requirement: Sent inbox (send log), Requirement: Single-provider outbound email, Requirement: Tracked editable templates, Scenario: Admin views the inbox, Scenario: DB override wins over code default, Scenario: Every attempt is logged (+23 more)
 
 ### Community 59 - "Community 59"
 Cohesion: 0.13
@@ -608,28 +627,28 @@ Cohesion: 0.11
 Nodes (16): ADDED Requirements, Requirement: Admin shell defaults to a summarizing HOME landing, Requirement: HOME embeds the live map and recent forests, Requirement: HOME routes to sections, the map, and reports in one click, Requirement: HOME shows live platform KPIs, Scenario: Admin signs in and lands on HOME, Scenario: HOME collapses on mobile, Scenario: KPIs reflect the loaded dataset (+8 more)
 
 ### Community 61 - "Community 61"
-Cohesion: 0.06
-Nodes (37): useToast(), CreateFromJsonDialog(), CreateFromJsonDialogProps, rowToFullPayload(), summarizePayload(), fmtDate(), Forests(), rowToForm() (+29 more)
+Cohesion: 0.08
+Nodes (23): Button(), useToast(), CreateFromJsonDialog(), CreateFromJsonDialogProps, rowToFullPayload(), summarizePayload(), fmtDate(), Forests() (+15 more)
 
 ### Community 62 - "Community 62"
-Cohesion: 0.17
-Nodes (13): AddForestWizard(), buildForestValues(), compact(), num(), loadEmployeeOptions(), loadSponsorOptions(), loadUserOptions(), SpeciesRecord (+5 more)
+Cohesion: 0.15
+Nodes (15): AddForestWizard(), buildForestValues(), compact(), num(), loadEmployeeOptions(), loadSponsorOptions(), loadUserOptions(), SpeciesRecord (+7 more)
 
 ### Community 63 - "Community 63"
 Cohesion: 0.13
 Nodes (19): MODIFIED Requirements, Requirement: Map-driven place geocoding for forest location, Scenario: Append a corner by tapping, Scenario: Delete a vertex, Scenario: Import a boundary from KML or GeoJSON, Scenario: Insert a vertex on an edge, Scenario: Live area and perimeter while editing, Scenario: Move a vertex by dragging (+11 more)
 
 ### Community 64 - "Community 64"
-Cohesion: 0.17
-Nodes (12): createdAt, established_year, headquarters, industry, sponsor_forest_logo, sponsor_logo, sponsor_name, sponsor_og_image_url (+4 more)
+Cohesion: 0.12
+Nodes (17): createdAt, established_year, headquarters, industry, sponsor_forest_logo, sponsor_logo, sponsor_name, sponsor_og_image_url (+9 more)
 
 ### Community 65 - "Community 65"
-Cohesion: 0.13
-Nodes (14): ImpactSection(), MaintenanceSection(), PlantationProgressSection(), PlantGrowthSection(), PopulationSection(), ReportImagesSection(), SecuritySection(), SoilPhSection() (+6 more)
+Cohesion: 0.15
+Nodes (12): ImpactSection(), MaintenanceSection(), PlantationProgressSection(), PlantGrowthSection(), PopulationSection(), ReportImagesSection(), SecuritySection(), SoilPhSection() (+4 more)
 
 ### Community 66 - "Community 66"
-Cohesion: 0.20
-Nodes (14): loadSpeciesOptions(), BoxGrid(), EditBoxDialog(), EditBoxDialogProps, fullToForm(), boxCapacity(), BoxConfig, boxKey() (+6 more)
+Cohesion: 0.24
+Nodes (12): AddForestWizardProps, BoxGrid(), BoxGridProps, EditBoxDialog(), EditBoxDialogProps, boxCapacity(), BoxConfig, boxKey() (+4 more)
 
 ### Community 67 - "Community 67"
 Cohesion: 0.12
@@ -640,8 +659,8 @@ Cohesion: 0.12
 Nodes (15): API, Build-on (already shipped this session), Capture workflow, Data model (migration 014), Deferred, Frontend, Hard blocker (all 4 lenses), Must-fix before build (+7 more)
 
 ### Community 69 - "Community 69"
-Cohesion: 0.12
-Nodes (15): employee/list, count, rec0Keys, status, topKeys, jobs/list, count, rec0Keys (+7 more)
+Cohesion: 0.09
+Nodes (25): employee/list, count, rec0Keys, status, topKeys, forest/list, count, rec0Keys (+17 more)
 
 ### Community 70 - "Community 70"
 Cohesion: 0.12
@@ -656,8 +675,8 @@ Cohesion: 0.18
 Nodes (10): CarbonSummary, fetchCarbonSummary(), fetchLeaderboard(), LeaderRow, lookup(), LookupResult, SceneLink, SponsorForest (+2 more)
 
 ### Community 73 - "Community 73"
-Cohesion: 0.32
-Nodes (6): fetchForestWeather(), ForestWeather, defaultFiscal(), findRow(), QuarterlyAutoSection(), Row
+Cohesion: 0.13
+Nodes (14): ADDED Requirements, Requirement: Gallery captions use the real fiscal quarter, Requirement: Gallery layout auto-fits the photo count, Requirement: Legacy plantation progress folds into the gallery, Requirement: Photo Gallery is one page per project year, Scenario: Auto caption for a January-March photo, Scenario: Entered caption preserved, Scenario: Four or more photos in a year (+6 more)
 
 ### Community 74 - "Community 74"
 Cohesion: 0.10
@@ -680,7 +699,7 @@ Cohesion: 0.13
 Nodes (15): email, firstName, imageUrl, lastName, mobile, role, roleId, user_role_id (+7 more)
 
 ### Community 79 - "Community 79"
-Cohesion: 0.29
+Cohesion: 0.25
 Nodes (6): Architecture (3 layers), Build status (on communitree-rebuild.vercel.app), COMMUNITREE — Living Proof Venture (vision + build status), Guardrails, Revenue engines (one verified dataset), Thesis
 
 ### Community 80 - "Community 80"
@@ -688,8 +707,8 @@ Cohesion: 0.21
 Nodes (9): li(), ShareBar(), Tone, wa(), x(), fetchTreeProof(), TreeProof, fmtDate() (+1 more)
 
 ### Community 81 - "Community 81"
-Cohesion: 0.18
-Nodes (14): EmptyBlock(), enumLabel(), Pill(), SectionTitle(), GalleryPhoto, PH_COLORS, pickQuarter(), pos() (+6 more)
+Cohesion: 0.12
+Nodes (24): DarkPanel(), fmtDate(), ReportImage(), SlideProps, GalleryPhoto, ReportSlide, SLIDE_IDS, S06ProjectImpact() (+16 more)
 
 ### Community 82 - "Community 82"
 Cohesion: 0.17
@@ -704,8 +723,8 @@ Cohesion: 0.14
 Nodes (12): 0. Who is building what (context), 1. The three real deliverables, 2. Time logic — quarterly, 3-year, but the quarter definition is UNSETTLED, 3. The box-grid model (confirmed in detail), 4. Audience + branding, 5. Map to OUR `communitree-rebuild` build, 6. Methodology / integrity notes (carry forward), 7. Recommended next step (decision needed — see chat) (+4 more)
 
 ### Community 85 - "Community 85"
-Cohesion: 0.19
-Nodes (10): forestTreesList(), countTotal(), PageParams, parsePageParams(), AUDIT_CATEGORY_SQL, filters, Handler, { limit, offset, page, search } (+2 more)
+Cohesion: 0.11
+Nodes (20): forestTreesList(), countTotal(), PageParams, parsePageParams(), AUDIT_CATEGORY_SQL, filters, Handler, { limit, offset, page, search } (+12 more)
 
 ### Community 86 - "Community 86"
 Cohesion: 0.09
@@ -720,19 +739,23 @@ Cohesion: 0.24
 Nodes (12): BOUNDARY, clean(), { Client }, dbhAt(), heightAt(), main(), PETS, pick() (+4 more)
 
 ### Community 89 - "Community 89"
-Cohesion: 0.29
-Nodes (6): Requirement: Growth heights are shown as entered, not capped, Scenario: Negative height floored, Scenario: Tree taller than the old 30 ft cap, MODIFIED Requirements, Scenario: Manual curve overrides the default, Scenario: No targets entered → auto-render from plantation date
+Cohesion: 0.22
+Nodes (9): Requirement: Growth heights are shown as entered, not capped, Scenario: Negative height floored, Scenario: Tree taller than the old 30 ft cap, MODIFIED Requirements, Scenario: Manual curve overrides the default, Scenario: No targets entered → auto-render from plantation date, Requirement: Growth heights are shown as entered, not capped, Scenario: Negative height floored (+1 more)
+
+### Community 90 - "Community 90"
+Cohesion: 0.20
+Nodes (10): CropperCanvas, CropperCtor, CropperImage, CropperInstance, frameToRatio(), imageBox(), Props, canvasToJpegFile() (+2 more)
 
 ### Community 91 - "Community 91"
 Cohesion: 0.18
 Nodes (10): entities, ForestAssert, ForestPlantTimelineAsset, OrderPaymentModesMaster, SaplingOrderAddress, entityCount, columns, columns (+2 more)
 
 ### Community 92 - "Community 92"
-Cohesion: 0.33
+Cohesion: 0.43
 Nodes (5): Capabilities, Impact, Modified Capabilities, What Changes, Why
 
 ### Community 93 - "Community 93"
-Cohesion: 0.17
+Cohesion: 0.15
 Nodes (11): Decisions already taken (from you), Field-by-field: can it be entered + saved + rendered?, Field gaps to decide (no input exists today), Go-live checklist (storage-first), Go-Live Field & Storage Check — CGI / Forest Quarterly Report, Security (separate, act now), Still to test on a real DB/prod (logic verified, needs running stack), STORAGE BUGS (fix before go-live) (+3 more)
 
 ### Community 94 - "Community 94"
@@ -740,7 +763,7 @@ Cohesion: 0.22
 Nodes (11): Check for context, code:block1 (┌─────────────────────────────────────────┐), code:bash (openspec list --json), Ending Discovery, Guardrails, OpenSpec Awareness, The Stance, What You Don't Have To Do (+3 more)
 
 ### Community 95 - "Community 95"
-Cohesion: 0.17
+Cohesion: 0.15
 Nodes (11): 10. Dual DB backend — embedded PGlite vs node-postgres, 1. RAW token (no `Bearer`) + 500 on bad token, 2. employee/list pagination shape, 3. Writes: REST upsert/delete (CONFIRMED via live test), 4. Delete is a HARD delete (CONFIRMED), 5. User creation is two statements, not a transaction, 6. Forest creation = 2-step wizard fan-out (CONFIRMED + IMPLEMENTED), 7. filter_limit contents (+3 more)
 
 ### Community 96 - "Community 96"
@@ -748,19 +771,19 @@ Cohesion: 0.15
 Nodes (11): 10. Quarterly-session operator skill, 1. Guided entry point (kill raw JSON), 2. Quarter-aware editor (Q1 full; Q2–Q4 delta), 3. Inline photo upload (reuse existing slots), 4. Persisted, labelled weather, 5. Maximal derivation, 6. Value-flow auto-compute (BLOCKED on operator Excel), 7. Validation (+3 more)
 
 ### Community 97 - "Community 97"
-Cohesion: 0.24
-Nodes (10): fmt(), geocodeSearch(), INDIA_CENTER, LocationPicker(), LocationPickerProps, NomAddr, partsOf(), pinIcon (+2 more)
+Cohesion: 0.21
+Nodes (11): TextField(), fmt(), geocodeSearch(), INDIA_CENTER, LocationPicker(), LocationPickerProps, NomAddr, partsOf() (+3 more)
 
 ### Community 98 - "Community 98"
-Cohesion: 0.20
-Nodes (15): AddForestWizardProps, BoxGridProps, StepProps, FieldErrors, ForestFormState, isBlank(), nonNegativeNumberError(), positiveIntError() (+7 more)
+Cohesion: 0.33
+Nodes (12): isBlank(), nonNegativeNumberError(), optionalNonNegativeNumber(), optionalPositiveInt(), positiveIntError(), validateAll(), validateBasic(), validateGrid() (+4 more)
 
 ### Community 99 - "Community 99"
-Cohesion: 0.18
-Nodes (11): forest_value_flow_impact_report, long_term, medium_term, carbon_sequestration, land_value, oxygen_generated, tree_value, carbon_sequestration (+3 more)
+Cohesion: 0.12
+Nodes (16): forest_value_flow_impact_report, long_term, medium_term, short_term, carbon_sequestration, land_value, oxygen_generated, tree_value (+8 more)
 
 ### Community 100 - "Community 100"
-Cohesion: 0.33
+Cohesion: 0.29
 Nodes (5): 1. Default curve + auto-render, 2. Quarterly division + current point, 3. Polished card design (Slide 13), 4. Verify + ship, Tasks — auto-growth-default-curve
 
 ### Community 101 - "Community 101"
@@ -772,12 +795,12 @@ Cohesion: 0.17
 Nodes (10): Carbon dMRV Specification, Purpose, Requirement: Allometric carbon, Requirement: Conservative net removals, Requirement: Tamper-evident ledger, Requirements, Scenario: Anchor surfaced publicly, Scenario: Net shown alongside gross (+2 more)
 
 ### Community 103 - "Community 103"
-Cohesion: 0.27
-Nodes (8): EmailLogEntry, EmailLogRow, logEmail(), esc(), GiftEmailInput, ReportMailInput, ReportMailResult, sendGiftEmail()
+Cohesion: 0.21
+Nodes (10): EmailLogEntry, EmailLogRow, listEmailLog(), logEmail(), esc(), GiftEmailInput, ReportMailInput, ReportMailResult (+2 more)
 
 ### Community 104 - "Community 104"
-Cohesion: 0.24
-Nodes (13): applyImageSlot(), clearImageSlot(), clearReportImage(), deleteSponsorLogo(), forestWeather(), loadJsonb(), num(), parseMaybeJson() (+5 more)
+Cohesion: 0.19
+Nodes (11): ImpactTermValues, EmptyBlock(), SlidePage(), StatCard(), ValueBar(), maintCards(), ratio(), S08ValueFlow() (+3 more)
 
 ### Community 105 - "Community 105"
 Cohesion: 0.10
@@ -788,8 +811,8 @@ Cohesion: 0.17
 Nodes (10): Proof-of-Life Specification, Purpose, Requirement: Honest trust signals, Requirement: Survival verdict, Requirement: Visit timeline, Requirements, Scenario: Dead tree shown openly, Scenario: Logging a visit (+2 more)
 
 ### Community 107 - "Community 107"
-Cohesion: 0.18
-Nodes (11): forest_value_flow_impact_report, medium_term, short_term, carbon_sequestration, land_value, oxygen_generated, tree_value, carbon_sequestration (+3 more)
+Cohesion: 0.12
+Nodes (16): forest_value_flow_impact_report, long_term, medium_term, short_term, carbon_sequestration, land_value, oxygen_generated, tree_value (+8 more)
 
 ### Community 108 - "Community 108"
 Cohesion: 0.12
@@ -800,8 +823,8 @@ Cohesion: 0.17
 Nodes (10): Purpose, Requirement: CSR microsite, Requirement: Leaderboard, Requirement: Sponsor portal with tree register, Requirements, Scenario: CSV matches the UI, Scenario: Impact summary, Scenario: No fan-out (+2 more)
 
 ### Community 110 - "Community 110"
-Cohesion: 0.40
-Nodes (5): reports/list, count, rec0Keys, status, topKeys
+Cohesion: 0.18
+Nodes (5): DataTable(), DataTableProps, DEFAULT_ROWS_PER_PAGE, pageWindow(), Pagination()
 
 ### Community 111 - "Community 111"
 Cohesion: 0.22
@@ -829,26 +852,26 @@ Nodes (9): ADDED Requirements, Requirement: Calendar-derivable maintenance count
 
 ### Community 117 - "Community 117"
 Cohesion: 0.20
-Nodes (10): graphqlAuth, login, restAuth, tokenStorage, _meta, authObserved, capturedOn, method (+2 more)
+Nodes (10): _meta, capturedOn, method, sourceUrl, stackObserved, title, backendInferred, database (+2 more)
 
 ### Community 118 - "Community 118"
 Cohesion: 0.22
 Nodes (4): app, fs, MIGRATIONS_DIR, path
 
 ### Community 119 - "Community 119"
-Cohesion: 0.31
-Nodes (5): downloadReportPdf(), renderReportPdfBlob(), C, SLIDE_TITLES, SLIDES
+Cohesion: 0.15
+Nodes (14): ForestDetailViewProps, TabDef, FullForestPayload, GeoTagSectionProps, buildMeta(), downloadReportPdf(), renderReportPdfBlob(), buildPreviewReport() (+6 more)
 
 ### Community 120 - "Community 120"
 Cohesion: 0.20
 Nodes (8): code:bash (# Server), code:block2, Exact commands run, Fixes applied during smoke test, Key output snippets, Notes / non-blocking, PASS/FAIL summary, Smoke Test Results — Embedded PGlite (no external Postgres)
 
 ### Community 121 - "Community 121"
-Cohesion: 0.22
+Cohesion: 0.20
 Nodes (8): Build plan (platform), Data gaps to close (ranked), Economics (the honest part), Fix the methodology (our current math is indefensible), Founder decisions (see chat), Linking each sapling to a carbon credit — strategy, Recommended path (two-track), The link (end to end)
 
 ### Community 122 - "Community 122"
-Cohesion: 0.22
+Cohesion: 0.20
 Nodes (8): 1. Material topics (GRI 3-2), 2. Climate — GRI 305: Emissions 2016, 3. Biodiversity — GRI 101: Biodiversity 2024, 4. Water — GRI 303 (gap), 5. Org context — Universal (GRI 2), 6. Gap summary (what to add for full alignment), COMMUNITREE → GRI Mapping Spec, Phase 2 / 3 (not built yet)
 
 ### Community 123 - "Community 123"
@@ -864,7 +887,7 @@ Cohesion: 0.20
 Nodes (8): ADDED Requirements, Requirement: City area and population statistics can be auto-filled from public data, Requirement: Source waterfall — Wikidata preferred, Wikipedia summary fallback, Scenario: Auto-fill from city name, Scenario: City not found, Scenario: Climate and soil type extracted, Scenario: Wikidata missing area, Scenario: Wikidata returns metro-level population
 
 ### Community 126 - "Community 126"
-Cohesion: 0.36
+Cohesion: 0.31
 Nodes (9): Carbon method (v1-chave2014), Conventions, Mission, Non-negotiable principles (enforce in every change), Project — Be The Tree Hugger / COMMUNITREE (communitree-rebuild), Project — Be The Tree Hugger / OIAS Earth (communitree-rebuild), Public routes (no auth), Roles (+1 more)
 
 ### Community 127 - "Community 127"
@@ -900,11 +923,11 @@ Cohesion: 0.40
 Nodes (4): ADDED Requirements, Requirement: Forest coordinate validity guard, Scenario: Create without coordinates is rejected, Scenario: Garbage coordinates are rejected
 
 ### Community 135 - "Community 135"
-Cohesion: 0.25
+Cohesion: 0.22
 Nodes (7): Geo-tagging / location-proof / dMRV — landscape mapped to our platform, Honest position, Methods table (doc) vs what we use, Roadmap (mapped to doc gaps, ranked), SHIPPED this turn, Standards the doc names — our alignment, Status against the doc's 5 systemic gaps
 
 ### Community 136 - "Community 136"
-Cohesion: 0.39
+Cohesion: 0.33
 Nodes (8): Incumbent teardown — admin.communitree.co.in (corporate sponsor portal), Incumbent teardown — admin.oiasearth.com (corporate sponsor portal), Information architecture (only 2 tabs), Their weaknesses (our openings), Top-1% gap (what to build/polish next, map-first per user ask), What the login is, What they do well (worth matching), Where communitree-rebuild ALREADY beats it
 
 ### Community 137 - "Community 137"
@@ -948,7 +971,7 @@ Cohesion: 0.36
 Nodes (7): fs, main(), migratePglite(), migratePostgres(), MIGRATIONS_DIR, path, readMigrations()
 
 ### Community 147 - "Community 147"
-Cohesion: 0.43
+Cohesion: 0.50
 Nodes (7): dest(), expand_range(), main(), N points on a near-square grid, sp_ft apart, anchored at (lat,lng) going S/E., rows_of(), slug(), spread()
 
 ### Community 148 - "Community 148"
@@ -960,8 +983,8 @@ Cohesion: 0.22
 Nodes (7): API Keys & Third-Party Services — Live Inspection, Auth / secrets posture, Client-side API keys (exposed in the bundle — this is normal for frontend keys), Extra endpoints discovered in the bundle (beyond the admin lists), NOT present (checked explicitly), Security recommendations (your own site), Third-party services (NO secret key on the client)
 
 ### Community 150 - "Community 150"
-Cohesion: 0.40
-Nodes (5): roles/list, count, rec0Keys, status, topKeys
+Cohesion: 0.31
+Nodes (9): autoFillBoxes(), AutoFillParams, distributeSpecies(), boxPrefix(), genBoxLetter(), genClientCode(), genForestCode(), previewTreeIds() (+1 more)
 
 ### Community 151 - "Community 151"
 Cohesion: 0.25
@@ -984,7 +1007,7 @@ Cohesion: 0.36
 Nodes (6): Capabilities, Impact, Modified Capabilities, New Capabilities, What Changes, Why
 
 ### Community 156 - "Community 156"
-Cohesion: 0.29
+Cohesion: 0.36
 Nodes (6): Capabilities, Impact, Modified Capabilities, New Capabilities, What Changes, Why
 
 ### Community 157 - "Community 157"
@@ -996,8 +1019,8 @@ Cohesion: 0.33
 Nodes (6): enumLabel(), LandSection(), num(), OverviewSection(), SpeciesSection(), parseBoundary()
 
 ### Community 159 - "Community 159"
-Cohesion: 0.43
-Nodes (5): useAuth(), ProtectedRoute(), AppHeader(), initialsOf(), Login()
+Cohesion: 0.20
+Nodes (9): ADDED Requirements, Requirement: Editing a forest preserves existing trees and their history, Requirement: Forest delete removes all dependents in FK-safe order, Scenario: Carbon ledger is removed before the timelines it references, Scenario: Decreasing a species count soft-deletes only history-free trees, Scenario: Delete a forest whose trees have proof history, Scenario: Grid edit reaches the diff path, Scenario: Increasing a species count adds only the new trees (+1 more)
 
 ### Community 160 - "Community 160"
 Cohesion: 0.25
@@ -1032,11 +1055,11 @@ Cohesion: 0.25
 Nodes (6): ADDED Requirements, Requirement: Per-forest saplings render as a uniform species matrix clipped to the boundary, Requirement: The per-forest tree view is identical on the public map and the forest page, Scenario: A forest with a saved boundary, Scenario: A forest without a boundary, Scenario: Drill into a forest from the public map
 
 ### Community 168 - "Community 168"
-Cohesion: 0.29
+Cohesion: 0.25
 Nodes (6): Accessibility, Confirmed, Files in this module, Forests module — notes, divergences & open questions, Forests-rich additions (this pass) + GAPS, Open questions / TODOs (cited inline)
 
 ### Community 169 - "Community 169"
-Cohesion: 0.29
+Cohesion: 0.43
 Nodes (6): 1. Bento HOME page, 2. KPI tiles, 3. Live map + recent forests, 4. Quick actions + reports shortcut, 5. Wire HOME as the default section, 6. Responsive + verify
 
 ### Community 170 - "Community 170"
@@ -1108,7 +1131,7 @@ Cohesion: 0.29
 Nodes (7): typography, baseFontSize, bodyWeight, fieldLabel, fontFamily, headingWeight, tableHeader
 
 ### Community 187 - "Community 187"
-Cohesion: 0.29
+Cohesion: 0.43
 Nodes (6): apis, components, dataModel, flows, openQuestions, screens
 
 ### Community 188 - "Community 188"
@@ -1124,7 +1147,7 @@ Cohesion: 0.29
 Nodes (7): environmental_need, google_earth_image, green_cover, population, population_density, total_jurisdiction_area, area_population_statistics_details
 
 ### Community 191 - "Community 191"
-Cohesion: 0.29
+Cohesion: 0.25
 Nodes (6): Implication for the rebuild, Role & scope, Screen: Dashboard (geo + impact reporting), Screen: Trees (geo-tagging register), Shell, Sponsor Portal (role = Admin, forest-scoped) — live inspection (read-only)
 
 ### Community 192 - "Community 192"
@@ -1152,8 +1175,8 @@ Cohesion: 0.33
 Nodes (6): species_details, additional_scope, health, health_other, mortality_rate, other_issues
 
 ### Community 198 - "Community 198"
-Cohesion: 0.40
-Nodes (5): festivalHolidaysInQuarter(), FQ_START_MONTH, getStateHolidays(), NATIONAL, STATE_EXTRA
+Cohesion: 0.20
+Nodes (9): 1. Shared fiscal / project-year helpers (lib/fiscal.ts), 2. PFA — merge quarter photo, drop dead slots, 3. PFA — bulk "Quarterly photos" block (backfill by project year), 4. PFA — backdated, fiscal-labelled quarter picker, 5. Report — per-project-year Photo Gallery, 6. PFA — searchable forest picker, 7. PFA — interactive crop + discoverable remove/replace, 8. Verify (+1 more)
 
 ### Community 199 - "Community 199"
 Cohesion: 0.29
@@ -1172,7 +1195,7 @@ Cohesion: 0.29
 Nodes (5): Core (already set — live), Deploy, Email (certificates / gifting), Environment variables, Object storage (photos + 360 panoramas) — pick ONE backend
 
 ### Community 203 - "Community 203"
-Cohesion: 0.33
+Cohesion: 0.29
 Nodes (5): Divergences / UX improvement proposals (Phase 5), Employees module — notes, Files, Open questions carried (do not invent rules), What this module does
 
 ### Community 204 - "Community 204"
@@ -1248,8 +1271,8 @@ Cohesion: 0.67
 Nodes (3): code:bash (graphify export neo4j), code:bash (graphify export neo4j --push bolt://localhost:7687 --user ne), Step 7 - Neo4j export (only if --neo4j or --neo4j-push flag)
 
 ### Community 224 - "Community 224"
-Cohesion: 0.40
-Nodes (5): short_term, carbon_sequestration, land_value, oxygen_generated, tree_value
+Cohesion: 0.25
+Nodes (6): updateForestReportData(), fetchForestReport(), REPORT_SECTIONS, LIST_COLS, mergeList(), rowKey()
 
 ### Community 225 - "Community 225"
 Cohesion: 0.40
@@ -1288,8 +1311,8 @@ Cohesion: 0.33
 Nodes (4): MODIFIED Requirements, Requirement: The inline report editor uploads photos instead of pasting URLs, Scenario: Storage unavailable, Scenario: Upload a photo from the editor
 
 ### Community 234 - "Community 234"
-Cohesion: 0.40
-Nodes (5): long_term, carbon_sequestration, land_value, oxygen_generated, tree_value
+Cohesion: 0.25
+Nodes (7): MODIFIED Requirements, Requirement: Forest creation requires only a minimal core, Scenario: A typed optional value that is malformed still shows a format error, Scenario: Blank name, internal ID, or location still blocks, Scenario: Blank optional fields do not block advancing or saving, Scenario: Out-of-range coordinates are rejected even though other fields are optional, Scenario: Save with only name, internal ID, and location succeeds
 
 ### Community 235 - "Community 235"
 Cohesion: 0.33
@@ -1304,12 +1327,12 @@ Cohesion: 0.50
 Nodes (4): clean(), { Client }, fs, main()
 
 ### Community 238 - "Community 238"
-Cohesion: 0.40
-Nodes (5): stackObserved, backendInferred, database, dataLayer, frontend
+Cohesion: 0.25
+Nodes (7): Requirement: A forest whose trees carry proof can be deleted, Requirement: Grid and species edits are captured on edit without destroying tree history, Scenario: Decrease a species count with a proof-bearing tree present, Scenario: Delete a forest that has a proof timeline, Scenario: Edit unrelated fields without touching the grid, Scenario: Increase a species count, ADDED Requirements
 
 ### Community 239 - "Community 239"
-Cohesion: 0.40
-Nodes (5): forest/list, count, rec0Keys, status, topKeys
+Cohesion: 0.29
+Nodes (6): Requirement: A forest's species are shown by name when it is opened for edit, Requirement: Species entered on an existing forest are saved, Scenario: Add a species while editing, Scenario: Edit a forest imported without box structure, Scenario: Edit a forest that has species, ADDED Requirements
 
 ### Community 240 - "Community 240"
 Cohesion: 0.40
@@ -1322,6 +1345,10 @@ Nodes (4): Requirement: The admin opens on a bento overview, Scenario: Land on t
 ### Community 242 - "Community 242"
 Cohesion: 0.67
 Nodes (3): BoundaryMap(), BoundaryMapProps, BoundaryPoint
+
+### Community 243 - "Community 243"
+Cohesion: 0.29
+Nodes (6): ADDED Requirements, Requirement: A forest can be reversibly soft-deleted, Requirement: Deleting a forest removes all its tree-level dependents, Scenario: Carbon ledger cannot block the delete, Scenario: Delete a forest whose tree has a logged visit, Scenario: Soft-delete hides a forest from active surfaces
 
 ### Community 244 - "Community 244"
 Cohesion: 0.60
@@ -1419,25 +1446,81 @@ Nodes (3): security_and_infrastructure, description, image_data
 Cohesion: 0.67
 Nodes (3): plant_growth_data, actual_height_range, target_height_range
 
+### Community 315 - "Community 315"
+Cohesion: 0.29
+Nodes (6): Capabilities, Impact, Modified Capabilities, New Capabilities, What Changes, Why
+
+### Community 320 - "Community 320"
+Cohesion: 0.29
+Nodes (6): 1. Relax Step 1 (basic) validation, 2. Relax Step 2 (grid) validation, 3. Remove misleading required markers in the UI, 4. Confirm gating opens without wizard edits, 5. Confirm out-of-scope surfaces are untouched, Tasks — relax-mandatory-fields
+
+### Community 329 - "Community 329"
+Cohesion: 0.33
+Nodes (5): Capabilities, Impact, New Capabilities, What Changes, Why
+
+### Community 330 - "Community 330"
+Cohesion: 0.33
+Nodes (5): 1. Client 3-way merge in the Report Data editor, 2. Server null-skip guard, 3. Migration 027 import-only, 4. Verify, Tasks — non-destructive-report-save
+
+### Community 331 - "Community 331"
+Cohesion: 0.40
+Nodes (4): 1. Non-destructive grid/species diff on edit, 2. FK-safe forest delete cascade, 3. Verify, Tasks — forest-edit-delete-integrity
+
+### Community 332 - "Community 332"
+Cohesion: 0.40
+Nodes (4): Capabilities, Modified Capabilities, What Changes, Why
+
+### Community 333 - "Community 333"
+Cohesion: 0.40
+Nodes (4): Capabilities, New Capabilities, What Changes, Why
+
+### Community 334 - "Community 334"
+Cohesion: 0.40
+Nodes (5): graphqlAuth, login, restAuth, tokenStorage, authObserved
+
+### Community 335 - "Community 335"
+Cohesion: 0.50
+Nodes (3): Pending / Residual (not yet fixed), Shipped, Tasks
+
+### Community 336 - "Community 336"
+Cohesion: 0.50
+Nodes (3): Impact, What Changes, Why
+
+### Community 337 - "Community 337"
+Cohesion: 0.50
+Nodes (3): Notes, Shipped, Tasks
+
+### Community 338 - "Community 338"
+Cohesion: 0.50
+Nodes (3): Impact, What Changes, Why
+
+### Community 339 - "Community 339"
+Cohesion: 0.50
+Nodes (3): Pending, Shipped, Tasks
+
+### Community 340 - "Community 340"
+Cohesion: 0.50
+Nodes (3): Impact, What Changes, Why
+
 ## Knowledge Gaps
-- **1669 isolated node(s):** `maxDuration`, `includeFiles`, `node`, `@electric-sql/pglite`, `bcryptjs` (+1664 more)
+- **1697 isolated node(s):** `maxDuration`, `includeFiles`, `node`, `@electric-sql/pglite`, `bcryptjs` (+1692 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **62 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **60 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `S07Beneficiaries()` connect `Community 13` to `Community 28`?**
-  _High betweenness centrality (0.078) - this node is a cross-community bridge._
-- **Why does `pad2()` connect `Community 13` to `Community 198`?**
-  _High betweenness centrality (0.078) - this node is a cross-community bridge._
-- **Why does `FullForestPayload` connect `Community 4` to `Community 65`, `Community 40`, `Community 8`, `Community 44`, `Community 14`, `Community 15`, `Community 19`, `Community 61`?**
-  _High betweenness centrality (0.028) - this node is a cross-community bridge._
+- **Why does `S07Beneficiaries()` connect `Community 13` to `Community 81`, `Community 28`, `Community 36`?**
+  _High betweenness centrality (0.072) - this node is a cross-community bridge._
+- **Why does `pad2()` connect `Community 36` to `Community 13`?**
+  _High betweenness centrality (0.072) - this node is a cross-community bridge._
+- **Why does `FullForestPayload` connect `Community 119` to `Community 224`, `Community 65`, `Community 4`, `Community 40`, `Community 44`, `Community 14`, `Community 15`, `Community 19`, `Community 61`?**
+  _High betweenness centrality (0.024) - this node is a cross-community bridge._
 - **What connects `maxDuration`, `includeFiles`, `node` to the rest of the system?**
-  _1670 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _1698 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Community 0` be split into smaller, more focused modules?**
-  _Cohesion score 0.05450165612767239 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.10101010101010101 - nodes in this community are weakly interconnected._
 - **Should `Community 1` be split into smaller, more focused modules?**
-  _Cohesion score 0.04858757062146893 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.057624113475177305 - nodes in this community are weakly interconnected._
 - **Should `Community 2` be split into smaller, more focused modules?**
   _Cohesion score 0.043478260869565216 - nodes in this community are weakly interconnected._

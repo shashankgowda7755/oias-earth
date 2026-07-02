@@ -3938,5 +3938,2140 @@
     "mtime": 1782641679.2694564,
     "ast_hash": "47a6b9d9bb897726eb61e5b137da563f",
     "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/vercel.json": {
+    "mtime": 1782980035.7464561,
+    "ast_hash": "1b0ed7549c1d4e4348a761a98ee38017",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/package.json": {
+    "mtime": 1782980035.7080076,
+    "ast_hash": "1744fe8313659c06cb8f081aca42b756",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/server/package.json": {
+    "mtime": 1782980035.2865918,
+    "ast_hash": "3c29f7a22442e0951a6b664ca7b9d3e5",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/server/tsconfig.json": {
+    "mtime": 1782980035.30088,
+    "ast_hash": "c99586973bb3518e3e72a92ba03a56e3",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/server/scripts/pnb-living-proof.js": {
+    "mtime": 1782980035.2907498,
+    "ast_hash": "3dc5ab26d6bf236dfc8507656c544d7f",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/server/scripts/grid-demo-pnb.js": {
+    "mtime": 1782980035.28894,
+    "ast_hash": "ea298c56b0ca6094c4b5e4d9c87e6385",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/server/scripts/seed-demo-scale.js": {
+    "mtime": 1782980035.2913423,
+    "ast_hash": "6a419bbf56fc2d4657f34a4f1799a33e",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/server/scripts/seed-flagship-forest.js": {
+    "mtime": 1782980035.2916887,
+    "ast_hash": "8e2622f323a0a0c294848c16e340c742",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/server/scripts/pnb-room-36.js": {
+    "mtime": 1782980035.2910476,
+    "ast_hash": "eeb0552940908c45556c3221ab2ca601",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/server/scripts/gen-schema-html.js": {
+    "mtime": 1782980035.2884796,
+    "ast_hash": "da6b23afaef5f511c2e4760f53647488",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/server/scripts/anchor-ledger.js": {
+    "mtime": 1782980035.2874293,
+    "ast_hash": "d8e89badf60e830b5188e844629f1488",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/server/scripts/build-carbon-ledger.js": {
+    "mtime": 1782980035.287744,
+    "ast_hash": "0148583abcb199533fee1481c66ca87c",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/server/scripts/import-pnb.js": {
+    "mtime": 1782980035.2901547,
+    "ast_hash": "7522ee173c0eb2b178492df33b1dacb8",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/server/scripts/migrate.js": {
+    "mtime": 1782980035.290361,
+    "ast_hash": "1341747a2c5efef774e71de0bf6d1a81",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/server/scripts/grid-geo.js": {
+    "mtime": 1782980035.2893822,
+    "ast_hash": "9891c119a7a520285cf85839faf45570",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/server/scripts/hash.js": {
+    "mtime": 1782980035.2896142,
+    "ast_hash": "f6f7a7784eba6aa534cd1cdce30ff81f",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/server/scripts/workbook-to-import.py": {
+    "mtime": 1782980035.2919254,
+    "ast_hash": "19a37e99d1341f8b014d074fc99e7f68",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/server/src/errors.ts": {
+    "mtime": 1782980035.2928386,
+    "ast_hash": "12f43c08974280da04f1eefd176039f4",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/server/src/index.ts": {
+    "mtime": 1782980035.2931192,
+    "ast_hash": "8f5e668fe39f05624f5687387bc7cdf7",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/server/src/config.ts": {
+    "mtime": 1782980035.2924206,
+    "ast_hash": "b46200e3b8fa9604641a1c80e15339b4",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/server/src/db.ts": {
+    "mtime": 1782980035.292616,
+    "ast_hash": "f80606d252da0227b106531185268dd8",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/server/src/auth/middleware.ts": {
+    "mtime": 1782980035.2922187,
+    "ast_hash": "231a3d45b2aff7321a95dceed4c8acb6",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/server/src/lib/emailTemplates.ts": {
+    "mtime": 1782980035.2941484,
+    "ast_hash": "d12d435605df054d19f3bd610fe828ab",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/server/src/lib/pano.ts": {
+    "mtime": 1782980035.2952838,
+    "ast_hash": "5b7c65b851bd494e70dea2f29c5f4218",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/server/src/lib/holidays.ts": {
+    "mtime": 1782980035.294793,
+    "ast_hash": "557cccbb21587fe539c359360f8fbfce",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/server/src/lib/emailLog.ts": {
+    "mtime": 1782980035.2938328,
+    "ast_hash": "c986de2793dd9ee3811945742a484572",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/server/src/lib/storage.ts": {
+    "mtime": 1782980035.2963073,
+    "ast_hash": "3301f5dbe053ac08f90525409a9e73b1",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/server/src/lib/carbon.ts": {
+    "mtime": 1782980035.2936263,
+    "ast_hash": "a19a6a981faf3c92d052eb5f3273d7b0",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/server/src/lib/reportData.ts": {
+    "mtime": 1782981023.0005152,
+    "ast_hash": "b423116d1c7587255113c410ab905b96",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/server/src/lib/species.ts": {
+    "mtime": 1782980035.295896,
+    "ast_hash": "0d73bea2b92e2b97990ff1dd3d1ba168",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/server/src/lib/audit.ts": {
+    "mtime": 1782980035.2933507,
+    "ast_hash": "c52f53d5fe59330f019fce8ec2080e71",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/server/src/lib/mail.ts": {
+    "mtime": 1782980035.2950573,
+    "ast_hash": "2882c81cff94786430221ab92a5a1591",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/server/src/lib/geo.ts": {
+    "mtime": 1782980035.2945676,
+    "ast_hash": "91744e3f0f6c0e9b38507d568194b185",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/server/src/routes/crud.ts": {
+    "mtime": 1782980035.2975519,
+    "ast_hash": "35f5847bd24a96890f93c6bb80b020b1",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/server/src/routes/helpers.ts": {
+    "mtime": 1782980035.2996066,
+    "ast_hash": "1a2077bbc04e35848c3caf18df1cf485",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/server/src/routes/emailConfig.ts": {
+    "mtime": 1782980035.2979255,
+    "ast_hash": "54a77a67378472a392eec98300fa7a0e",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/server/src/routes/forest.ts": {
+    "mtime": 1782980035.299327,
+    "ast_hash": "9b57bee002b260475e8d7445a1e70819",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/server/src/routes/lists.ts": {
+    "mtime": 1782980035.3000665,
+    "ast_hash": "a98aaf9aaeea77989cba20ee2decfd41",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/server/src/routes/public.ts": {
+    "mtime": 1782980035.3006601,
+    "ast_hash": "62a265bc9c6832ce52bc8f5b6e695b36",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/server/src/routes/auth.ts": {
+    "mtime": 1782980035.2969196,
+    "ast_hash": "54029b5378b46de9bcd2e46781b8eb0b",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/shared/types.ts": {
+    "mtime": 1782980035.3012056,
+    "ast_hash": "d0c95be2119a75465c62099cb12dcd62",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/db/migrations/020_report_emails.sql": {
+    "mtime": 1782980035.2784595,
+    "ast_hash": "4f5a68eb07dc131d1da50df9038eaebc",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/db/migrations/021_email_templates.sql": {
+    "mtime": 1782980035.2787912,
+    "ast_hash": "925e7d2bc6e69e0333e59ae0cbb7da1a",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/db/migrations/021_gallery_images.sql": {
+    "mtime": 1782980035.2790153,
+    "ast_hash": "24167077421e2a936d9621aeabfc9c70",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/db/migrations/028_rebrand_communitree.sql": {
+    "mtime": 1782980035.2823436,
+    "ast_hash": "bdd8fd94403bde56e6a2268526acfcaf",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/db/migrations/016_tree_geo_modeled.sql": {
+    "mtime": 1782980035.2771623,
+    "ast_hash": "ffb54468d1ed80b0d612334f9a2119f0",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/db/migrations/013_forest_panoramas.sql": {
+    "mtime": 1782980035.2759573,
+    "ast_hash": "96662d49051a1ddff188452cca9e4412",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/db/migrations/002_seed.sql": {
+    "mtime": 1782980035.272194,
+    "ast_hash": "100ea044bea3b2847489ef8f7b302886",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/db/migrations/005_seed_tree_timeline.sql": {
+    "mtime": 1782980035.2735403,
+    "ast_hash": "a05c2eae362eb246d493e0a92cec12bc",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/db/migrations/024_seed_species_extra.sql": {
+    "mtime": 1782980035.2797844,
+    "ast_hash": "39e53be490a25c05c86e529ed64b1096",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/db/migrations/019_audit_log.sql": {
+    "mtime": 1782980035.2781487,
+    "ast_hash": "762d2ce18458c1b3e5b5c6a9aa61ebc2",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/db/migrations/023_email_config.sql": {
+    "mtime": 1782980035.279545,
+    "ast_hash": "587c403d298f91306ebdace5571c035a",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/db/migrations/026_forest_tree_id_codes.sql": {
+    "mtime": 1782980035.2810626,
+    "ast_hash": "e8db656c8cf0a0fb555ee0c3361ef416",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/db/migrations/007_carbon_engine.sql": {
+    "mtime": 1782980035.2741501,
+    "ast_hash": "b637483e882b56403133e05c8066fbf5",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/db/migrations/001_init.sql": {
+    "mtime": 1782980035.2717264,
+    "ast_hash": "f24555a8fe72f8deb3ed969bb683e54d",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/db/migrations/004_seed_species_vandalur.sql": {
+    "mtime": 1782980035.2731538,
+    "ast_hash": "7e419adece33f4fd9818480696f9255b",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/db/migrations/027_bulk_import_180_sites.sql": {
+    "mtime": 1782980035.2819927,
+    "ast_hash": "7dea950dbab6db4234b57986f0b37c39",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/db/migrations/012_forest_is_demo.sql": {
+    "mtime": 1782980035.2756445,
+    "ast_hash": "6a0227d1c499a194db501c314d1056d9",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/db/migrations/011_tree_petname.sql": {
+    "mtime": 1782980035.2752845,
+    "ast_hash": "8a95554b6596896f80e8ee1c743ebd41",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/db/migrations/006_planter_role.sql": {
+    "mtime": 1782980035.2738051,
+    "ast_hash": "1e6c442dbd2ab241d136cb16b445b350",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/db/migrations/003_schema_extend.sql": {
+    "mtime": 1782980035.272641,
+    "ast_hash": "e52ef12f6b0687f9de4a635af04b3f8d",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/db/migrations/008_capture_integrity.sql": {
+    "mtime": 1782980035.2743437,
+    "ast_hash": "5e7c68bc38a3e28a9020c0bbe2f7fafe",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/db/migrations/014_forest_tour.sql": {
+    "mtime": 1782980035.2764187,
+    "ast_hash": "cff64178e9bcf995a5722a6d8eef8242",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/db/migrations/022_email_log.sql": {
+    "mtime": 1782980035.2792304,
+    "ast_hash": "7d2356b8fa9ff2dbc6efd83756ba1c7c",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/db/migrations/018_rebrand_oias.sql": {
+    "mtime": 1782980035.2778482,
+    "ast_hash": "dfaa4dfe47c769c32fb8534c9eb863b5",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/db/migrations/025_remove_demo_forests.sql": {
+    "mtime": 1782980035.2800732,
+    "ast_hash": "bef877dddbbac91bf4a5605ec77530ae",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/db/migrations/017_scene_images.sql": {
+    "mtime": 1782980035.2775142,
+    "ast_hash": "b222a33cf9fd306565c9fac7579f0198",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/db/migrations/015_redact_vendor_names.sql": {
+    "mtime": 1782980035.2767217,
+    "ast_hash": "7af228eb27a1e1657c5070bcb5b546f4",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/db/migrations/009_carbon_anchors.sql": {
+    "mtime": 1782980035.274669,
+    "ast_hash": "f77151a00f5a5f5db16ab6fc0e024fe2",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/db/migrations/010_species_wood_density.sql": {
+    "mtime": 1782980035.2749128,
+    "ast_hash": "6d9fe3134d1f9bf4d3509d1cc8a596c7",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/tailwind.config.ts": {
+    "mtime": 1782980035.2703426,
+    "ast_hash": "3075852e28d8a443184e2e145b18104f",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/package.json": {
+    "mtime": 1782980034.9477808,
+    "ast_hash": "753afa847b9b9424bee132b51817db53",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/tsconfig.json": {
+    "mtime": 1782980035.2708068,
+    "ast_hash": "0a3f195f0526bd5e2cd62405fe65e149",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/vite.config.ts": {
+    "mtime": 1782980035.2710733,
+    "ast_hash": "f22b2f022bd582e30333b4af0cd0ce08",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/postcss.config.js": {
+    "mtime": 1782980034.9484138,
+    "ast_hash": "c735540bb63936a123bc867d950c9f69",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/App.tsx": {
+    "mtime": 1782980035.2084713,
+    "ast_hash": "6e29b72dc516de24bdace492737ed83a",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/main.tsx": {
+    "mtime": 1782980035.2219226,
+    "ast_hash": "a234fc75d55082768fe80611b51da1d2",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/vite-env.d.ts": {
+    "mtime": 1782980035.2700512,
+    "ast_hash": "2e4b35e63f72412b58da845e0b54d3b7",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/types/entities.ts": {
+    "mtime": 1782980035.2698703,
+    "ast_hash": "ef6ff958ee3e0af2ac7d27ba2f5c4155",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/auth/ProtectedRoute.tsx": {
+    "mtime": 1782980035.2093048,
+    "ast_hash": "539010572f454ed68a587c585a2f8cb0",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/auth/AuthContext.tsx": {
+    "mtime": 1782980035.208778,
+    "ast_hash": "075a7545ee05a0c5227859576e437fc5",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/field/fieldApi.ts": {
+    "mtime": 1782980035.218021,
+    "ast_hash": "f2eb25bcde52a1623ebece4ef1039af6",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/field/queue.ts": {
+    "mtime": 1782980035.2183104,
+    "ast_hash": "72a068c74b34ad90cb66009c2a57d6b6",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/components/ConfirmDialog.tsx": {
+    "mtime": 1782980035.2105126,
+    "ast_hash": "736c77230f42f4ac13292d2da1946184",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/components/TabNav.tsx": {
+    "mtime": 1782980035.214615,
+    "ast_hash": "4905f650642e61e2adcd9141eb7e6ae1",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/components/ShareBar.tsx": {
+    "mtime": 1782980035.2134986,
+    "ast_hash": "4ed9403ebc717ed1d63d815089aec4f9",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/components/FormDialog.tsx": {
+    "mtime": 1782980035.2125504,
+    "ast_hash": "12681b6844cc808e0b155d5c8ae30dda",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/components/ForestTour.tsx": {
+    "mtime": 1782980035.2121,
+    "ast_hash": "5125c5187bb3cfa1c391fb5d0fa4b656",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/components/CropModal.tsx": {
+    "mtime": 1782980035.2109666,
+    "ast_hash": "22185cbf05699d7969fe78d48dc0b456",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/components/AppHeader.tsx": {
+    "mtime": 1782980035.2096794,
+    "ast_hash": "82db09f91170b9ab2bdf1200fd62978f",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/components/Buttons.tsx": {
+    "mtime": 1782980035.2102048,
+    "ast_hash": "3c0eb3fd35d0d32212baeb4899c5463c",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/components/DataTable.tsx": {
+    "mtime": 1782980035.2113593,
+    "ast_hash": "4bc8a6dbbb4f0fe24840127bca752ddd",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/components/HeartbeatMap.tsx": {
+    "mtime": 1782980035.2129211,
+    "ast_hash": "e9178ffea65777ac5c16ec1b725d505b",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/components/Sidebar.tsx": {
+    "mtime": 1782980035.2140071,
+    "ast_hash": "5b76e936f9466f8564b5e6b65bd4fb36",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/components/index.ts": {
+    "mtime": 1782980035.2175875,
+    "ast_hash": "fd371fb81f9a594aa88620b018b904f1",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/components/PanoViewer.tsx": {
+    "mtime": 1782980035.2131658,
+    "ast_hash": "d3b1b0759b2d8b96eb1492a734b0275e",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/components/Toast.tsx": {
+    "mtime": 1782980035.2148929,
+    "ast_hash": "f3f87646656f0533a96763eaf3d7172a",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/components/Spinner.tsx": {
+    "mtime": 1782980035.2142708,
+    "ast_hash": "bccde54ce561b21af8d4b3dba6c48e8e",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/components/ErrorBoundary.tsx": {
+    "mtime": 1782980035.2116983,
+    "ast_hash": "5fffe0ab06c0fecc412022b0f95dbd9f",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/components/fields/Fields.tsx": {
+    "mtime": 1782980035.2159936,
+    "ast_hash": "c6375625ca54065baa01e1ac7624a7cd",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/components/fields/fieldStyles.ts": {
+    "mtime": 1782980035.2170937,
+    "ast_hash": "2240de4207cf6a6cf84d859cf2e5d0ef",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/components/fields/MoreFields.tsx": {
+    "mtime": 1782980035.2165053,
+    "ast_hash": "9e0346c1937f2a527056315a9467c1e8",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/components/fields/AutocompleteField.tsx": {
+    "mtime": 1782980035.2154293,
+    "ast_hash": "948a98c48a36da12bdd6530aef724d35",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/lib/domGuard.ts": {
+    "mtime": 1782980035.220224,
+    "ast_hash": "1e04a6c915395ea0049f5f5ef0ef1faf",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/lib/fiscal.ts": {
+    "mtime": 1782980035.2205846,
+    "ast_hash": "027ec40bc921d14de97d038dadeb2b74",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/lib/auth-storage.ts": {
+    "mtime": 1782980035.2193012,
+    "ast_hash": "bd6fe6f431f3a8a5e7f5c467ed806c3f",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/lib/api.ts": {
+    "mtime": 1782980035.2190545,
+    "ast_hash": "7941d265f17944bc1053273d993c92cf",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/lib/cropImage.ts": {
+    "mtime": 1782980035.2198288,
+    "ast_hash": "7c9be7e4e32847d00bffbf904560c592",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/lib/publicApi.ts": {
+    "mtime": 1782980035.2210243,
+    "ast_hash": "67a8bbde4be8efbec33e8d5294f87651",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/Carbon.tsx": {
+    "mtime": 1782980035.223055,
+    "ast_hash": "c7134c83e4bda7fe9d819fefa19b6958",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/Sponsor.tsx": {
+    "mtime": 1782980035.2578323,
+    "ast_hash": "a4186bcf9bb0d1763338180c4a596fcb",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/Login.tsx": {
+    "mtime": 1782980035.2504504,
+    "ast_hash": "745ca7c39a6796f3f9e84618e111a731",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/PublicMap.tsx": {
+    "mtime": 1782980035.252673,
+    "ast_hash": "80086c538014e3342eb1cee7bcd83bf3",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/Dashboard.tsx": {
+    "mtime": 1782980035.2242794,
+    "ast_hash": "95c7a4eeb30b948dcf4954a4150ee2b9",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/Field.tsx": {
+    "mtime": 1782980035.228222,
+    "ast_hash": "238d1ec4ce0f4535fd7f2ae5c1981854",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/Studio.tsx": {
+    "mtime": 1782980035.261838,
+    "ast_hash": "ee683d573016194ec3c1402c7ef64392",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/DashboardHome.tsx": {
+    "mtime": 1782980035.22501,
+    "ast_hash": "94288013241d847f0888c442a9e4c9ee",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/SentEmails.tsx": {
+    "mtime": 1782980035.255256,
+    "ast_hash": "5922690659c15ddef90c0968caabbb15",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/Logs.tsx": {
+    "mtime": 1782980035.2507932,
+    "ast_hash": "420d9637f85103b37203a06e292c594f",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/AuditPnb.tsx": {
+    "mtime": 1782980035.2225378,
+    "ast_hash": "d516c7f4abe786851ac33afbbdfb45df",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/SponsorPortal.tsx": {
+    "mtime": 1782980035.2593882,
+    "ast_hash": "9a8c4cbdf640436cc82134a8ba13f34b",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/Integrity.tsx": {
+    "mtime": 1782980035.247602,
+    "ast_hash": "fb47e5d487e0cd11a6ee9823ebd0a9e6",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/Planters.tsx": {
+    "mtime": 1782980035.2523253,
+    "ast_hash": "4abfedce37e67b74f0b0df8cda90946f",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/ForestPage.tsx": {
+    "mtime": 1782980035.2287536,
+    "ast_hash": "8c2bc0c9b0812672f4cc72d1dff3ddbe",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/ReportSponsor.tsx": {
+    "mtime": 1782980035.2529476,
+    "ast_hash": "6c2e3d0b39a589f907feb8246e9d088f",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/Landing.tsx": {
+    "mtime": 1782980035.2500813,
+    "ast_hash": "2690d554b9cce12bc44bc1657909fe44",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/Verify.tsx": {
+    "mtime": 1782980035.2636,
+    "ast_hash": "71112203b835b12c278a17fd8fc54956",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/ReportTree.tsx": {
+    "mtime": 1782980035.2533202,
+    "ast_hash": "1b7de7be6080e24f22e752b4e125d101",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/TreeProof.tsx": {
+    "mtime": 1782980035.262195,
+    "ast_hash": "980a7c803f05185f2d90ec56f7b219cb",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/ForestTourPage.tsx": {
+    "mtime": 1782980035.2290285,
+    "ast_hash": "7cddd6cf9d1546909df88d610db19bb6",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/Settings/EmailSettings.tsx": {
+    "mtime": 1782980035.2558525,
+    "ast_hash": "4a8541d695eaf9da53a2b466df839714",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/Species/index.tsx": {
+    "mtime": 1782980035.256854,
+    "ast_hash": "b89d4305b4cd0aeb547076eb7f4e73f9",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/Species/SpeciesForm.tsx": {
+    "mtime": 1782980035.2564712,
+    "ast_hash": "98a594400c003a41805a80696f6f8cc8",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/Species/speciesModel.ts": {
+    "mtime": 1782980035.2570553,
+    "ast_hash": "3dbab3d5bb87b12e20cc4f1f83c3eeaf",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/Species/useSpecies.ts": {
+    "mtime": 1782980035.257293,
+    "ast_hash": "a62e9388874f34b0ae380f3ef626fa45",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/Pfa/PfaUploader.tsx": {
+    "mtime": 1782980035.2513795,
+    "ast_hash": "2352c87887e9af6daeec5afdf92f2458",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/Pfa/PwaInstallPrompt.tsx": {
+    "mtime": 1782980035.251741,
+    "ast_hash": "7dab4b182a8aab286db9d8f8b0afb63e",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/Sponsors/index.tsx": {
+    "mtime": 1782980035.2605338,
+    "ast_hash": "f0cde16cfc6794ad81b2817214705a80",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/Sponsors/useSponsors.ts": {
+    "mtime": 1782980035.2611217,
+    "ast_hash": "852cf02f299d969fbac1dc7be76e8fc0",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/Sponsors/sponsorModel.ts": {
+    "mtime": 1782980035.260817,
+    "ast_hash": "84ee519c09b7ba64243ba64233fecf9c",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/Sponsors/SponsorAvatar.tsx": {
+    "mtime": 1782980035.2597103,
+    "ast_hash": "3e323976649b99ab765ecc297eb57f7d",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/Sponsors/SponsorForm.tsx": {
+    "mtime": 1782980035.2601292,
+    "ast_hash": "4d37711c3d82252e4e2c1c7a17924275",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/Forests/boxAutoFill.ts": {
+    "mtime": 1782980035.2362645,
+    "ast_hash": "625929474efb8f95bf242fd639ffe84d",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/Forests/validation.ts": {
+    "mtime": 1782980035.247213,
+    "ast_hash": "acb1f5427428ed300206bc024c87e2f6",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/Forests/Steps.tsx": {
+    "mtime": 1782980035.2346864,
+    "ast_hash": "96948447ebdc61b5a881b75e396cbba4",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/Forests/index.tsx": {
+    "mtime": 1782980035.2388477,
+    "ast_hash": "29961f982ceaa86112713ce7351da21d",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/Forests/matrixLayout.ts": {
+    "mtime": 1782980035.2398973,
+    "ast_hash": "5fbb4700862fd1a1ecd298ca4327d643",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/Forests/CreateFromJsonDialog.tsx": {
+    "mtime": 1782980035.2305286,
+    "ast_hash": "c154ff91a9f6d31eb606a1c34d2b3906",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/Forests/LocationPicker.tsx": {
+    "mtime": 1782980035.2328382,
+    "ast_hash": "77e7770ed6870a36c79d3d1fa8f5f43c",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/Forests/BoxGrid.tsx": {
+    "mtime": 1782980035.2301307,
+    "ast_hash": "16350d4c57c89f8c2259507d5e7f27a1",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/Forests/JsonImportField.tsx": {
+    "mtime": 1782980035.2323334,
+    "ast_hash": "89cc6986d5d51afdc968d16a30e87fcf",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/Forests/geoMeasure.ts": {
+    "mtime": 1782980035.2383592,
+    "ast_hash": "b3555516da4befa94832d2ec39b42739",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/Forests/GeoTagSection.tsx": {
+    "mtime": 1782980035.2321482,
+    "ast_hash": "f4e1791afdbb3259975335eddaf060bc",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/Forests/forestApi.ts": {
+    "mtime": 1782980035.2372005,
+    "ast_hash": "69247ab43b8be2f39da9e31e991b9339",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/Forests/MultiAutocompleteField.tsx": {
+    "mtime": 1782980035.2334898,
+    "ast_hash": "ac749de8c28578087424a37f0cbbc8ec",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/Forests/api.ts": {
+    "mtime": 1782980035.2359056,
+    "ast_hash": "9e67da20cbf378e0cabf4704ec41aa93",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/Forests/EditBoxDialog.tsx": {
+    "mtime": 1782980035.2309482,
+    "ast_hash": "5b7c718a2ffa71f577c58e248171ab20",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/Forests/types.ts": {
+    "mtime": 1782980035.2465067,
+    "ast_hash": "9e3683f2a7fc9b148d1a044e3e261eae",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/Forests/AddForestWizard.tsx": {
+    "mtime": 1782980035.2294433,
+    "ast_hash": "ff9f52c6b3f05f28597d69810b9b4c42",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/Forests/ForestDetailView.tsx": {
+    "mtime": 1782980035.2315662,
+    "ast_hash": "2149392f8870370e089505a9a2d0ec09",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/Forests/TourEditor.tsx": {
+    "mtime": 1782980035.2349784,
+    "ast_hash": "0335e3cb42a728fdfa7d70ef3bbab163",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/Forests/geoApi.ts": {
+    "mtime": 1782980035.2377074,
+    "ast_hash": "7de034e4f3d26735f7bd8ab578f88c3f",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/Forests/BoundaryMap.tsx": {
+    "mtime": 1782980035.2296748,
+    "ast_hash": "c817edb4a45a31a0a0033d0583709e7a",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/Forests/treeId.ts": {
+    "mtime": 1782980035.246217,
+    "ast_hash": "16f7c8d373d5cc1c7ad9986e643f422f",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/Forests/TreeMap.tsx": {
+    "mtime": 1782980035.235544,
+    "ast_hash": "dd640556019da3bbef034025c1ac5725",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/Forests/Stepper.tsx": {
+    "mtime": 1782980035.2339995,
+    "ast_hash": "0e05f0a57dfddf7dbbb35c1fd207079c",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/Forests/fullTypes.ts": {
+    "mtime": 1782980035.2374575,
+    "ast_hash": "3d0fc15f493570b8728d9004666ae13a",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/Forests/detail/primitives.tsx": {
+    "mtime": 1782980035.2364774,
+    "ast_hash": "be7351bbf62b2f9e3c50e822ff18ad2f",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/Forests/detail/sections.tsx": {
+    "mtime": 1782980035.2367969,
+    "ast_hash": "328a63892a953b392196c061073b001c",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/Forests/reportForm/ReportDataEditor.tsx": {
+    "mtime": 1782980035.240301,
+    "ast_hash": "6598deff18d444fdf102c8002e8c2d6b",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/Forests/reportForm/registry.tsx": {
+    "mtime": 1782980035.2411585,
+    "ast_hash": "32653dc0dba31a45ecd3c08a68dcb5ef",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/Forests/reportForm/kit.tsx": {
+    "mtime": 1782980035.2408686,
+    "ast_hash": "746ee3ef1c01d98888bba537b717ba03",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/Forests/reportForm/sections/GrowthSection.tsx": {
+    "mtime": 1782980035.2430205,
+    "ast_hash": "8652e443e1c9924fdcbca6f9d838e876",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/Forests/reportForm/sections/MaintenanceSection.tsx": {
+    "mtime": 1782980035.24429,
+    "ast_hash": "65e72f9d7e31ad4964e65fa9cdd9ca79",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/Forests/reportForm/sections/AreaPopulationSection.tsx": {
+    "mtime": 1782980035.2422118,
+    "ast_hash": "58b916182f68375ce2f1bce3259cd51f",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/Forests/reportForm/sections/SiteConfigSection.tsx": {
+    "mtime": 1782980035.2454906,
+    "ast_hash": "a8b48f4f6d6d0883a846a8e16d4133a3",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/Forests/reportForm/sections/MediaSection.tsx": {
+    "mtime": 1782980035.244584,
+    "ast_hash": "e73f172fb32c7c91cc71776e2ea9d79f",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/Forests/reportForm/sections/SoilTempSection.tsx": {
+    "mtime": 1782980035.2459238,
+    "ast_hash": "c733bec5547ee49bada2719eb95a46e1",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/Forests/reportForm/sections/QuarterlyAutoSection.tsx": {
+    "mtime": 1782980035.244955,
+    "ast_hash": "6063d2885032689feed940b176e28467",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/Forests/reportForm/sections/BeneficiariesValueSection.tsx": {
+    "mtime": 1782980035.2424667,
+    "ast_hash": "2531f3af29e6a9bc7b4b625227925b45",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/Forests/reportForm/sections/LandAuthSection.tsx": {
+    "mtime": 1782980035.2440455,
+    "ast_hash": "9c25b374ad90a5a4aa8c1acd7c31418c",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/Users/index.tsx": {
+    "mtime": 1782980035.2629101,
+    "ast_hash": "6eba3f5b4ec015accdcda750efc849bc",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/Users/UserFormDialog.tsx": {
+    "mtime": 1782980035.2625208,
+    "ast_hash": "2c763cd22494917223f5bb656357b2f2",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/Users/useUsers.ts": {
+    "mtime": 1782980035.2632253,
+    "ast_hash": "b336e72eaa06557cbb1fa42adce077cc",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/report/reportPrimitives.tsx": {
+    "mtime": 1782980035.2664514,
+    "ast_hash": "e2e2770c6ed3731af8bd7c3eeb1b1079",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/report/cgiblr.sample.json": {
+    "mtime": 1782980035.265157,
+    "ast_hash": "20dc632627748251c2f9cc1e0f8ddf12",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/report/reportDownload.ts": {
+    "mtime": 1782980035.2658198,
+    "ast_hash": "e32d7b7f11c98b0db3efcd53cc22dcef",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/report/reportFixture.ts": {
+    "mtime": 1782980035.2661643,
+    "ast_hash": "cd285f905ea2899b3cbfc824d989fbd2",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/report/annasaheb.sample.json": {
+    "mtime": 1782980035.2648776,
+    "ast_hash": "3e0176d56125e616511a12867603d350",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/report/ReportForestQuarterly.tsx": {
+    "mtime": 1782980035.2644207,
+    "ast_hash": "c6fde7ba8367ceb8c6e1db48ff23819c",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/report/reportCompute.ts": {
+    "mtime": 1782980035.2655365,
+    "ast_hash": "bc6536b3f7ff24546dbf22bbf7b38ad3",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/report/reportTypes.ts": {
+    "mtime": 1782980035.2668068,
+    "ast_hash": "ca6d27a4590844cbdda51fd39c117ab8",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/report/speciesTraits.ts": {
+    "mtime": 1782980035.2689319,
+    "ast_hash": "4bb62543a0d5ebb3a54c70a4a1b64d22",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/report/vandalur.sample.json": {
+    "mtime": 1782980035.2693038,
+    "ast_hash": "e777189efefaedb8ed74b54545bd528b",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/report/slides/index.tsx": {
+    "mtime": 1782980035.2672262,
+    "ast_hash": "2aee174f6db628560f9729c7cb67aa21",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/report/slides/slides3.tsx": {
+    "mtime": 1782980035.2684777,
+    "ast_hash": "7342c10f7c60404c6f5125467f3a97b9",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/report/slides/slides2.tsx": {
+    "mtime": 1782980035.2681668,
+    "ast_hash": "32ecd231a61e325361f8ed67664202c3",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/report/slides/slides1.tsx": {
+    "mtime": 1782980035.2677453,
+    "ast_hash": "c42ba97d1b99c35d95e8aad80ad4cc34",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/Jobs/index.tsx": {
+    "mtime": 1782980035.2491193,
+    "ast_hash": "cfb737b85ee3be574d920d4a3d72c0b9",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/Jobs/JsonViewer.tsx": {
+    "mtime": 1782980035.248136,
+    "ast_hash": "03ef3802a172d0635751cc8bf1aab6d5",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/Jobs/StatusBadge.tsx": {
+    "mtime": 1782980035.2485676,
+    "ast_hash": "ff12c85c57cf06ca6aa8b4de3d1efd3c",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/Jobs/JobDetailDialog.tsx": {
+    "mtime": 1782980035.2478714,
+    "ast_hash": "2d9b6af9a7337ccb40aae11308f11ee2",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/Jobs/lib/format.ts": {
+    "mtime": 1782980035.2494752,
+    "ast_hash": "c2f4ccdba7bd09b95e06935d085c7a25",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/Reports/index.tsx": {
+    "mtime": 1782980035.2540796,
+    "ast_hash": "57a5027f78d5e80c5a707130fc14e587",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/Reports/reportApi.ts": {
+    "mtime": 1782980035.2543142,
+    "ast_hash": "9415f4454e2ee6ccc1fd8c182f0393ef",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/Reports/reportForms.ts": {
+    "mtime": 1782980035.2547188,
+    "ast_hash": "eaddb89b16bd01f24de3f3788c6f3193",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/Reports/useReports.ts": {
+    "mtime": 1782980035.2550101,
+    "ast_hash": "3c92f495f0b8a6aa37983856b9c9cb7a",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/Reports/ReportFormDialog.tsx": {
+    "mtime": 1782980035.253778,
+    "ast_hash": "a5939bc4b38b273064be8607437d1333",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/Reports/ReportFilterPopover.tsx": {
+    "mtime": 1782980035.2535446,
+    "ast_hash": "38ebc18e533fcb9b33bb18006cc024a5",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/Employees/validation.ts": {
+    "mtime": 1782980035.2272525,
+    "ast_hash": "595e3319558ec75eff6c75e790bf3b17",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/Employees/index.tsx": {
+    "mtime": 1782980035.226808,
+    "ast_hash": "61a59bd845fa2e007cb294e9cb657911",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/Employees/cells.tsx": {
+    "mtime": 1782980035.2265208,
+    "ast_hash": "354e750a766d1650e75019c4d0867da8",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/Employees/ToggleField.tsx": {
+    "mtime": 1782980035.226254,
+    "ast_hash": "f4ef1b77e2ca4c27bc16c0b037aa6be5",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/Employees/EmployeeFormDialog.tsx": {
+    "mtime": 1782980035.2257736,
+    "ast_hash": "17057c736792f1aa4779cc04b04077a8",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/Employees/useEmployees.ts": {
+    "mtime": 1782980035.2270546,
+    "ast_hash": "74e1e55ceba55552b7085d3b8d3260cd",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/spec/data_model_full.json": {
+    "mtime": 1782980035.712217,
+    "ast_hash": "5e94971d1cb454b27af76506d0951e0e",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/spec/species_catalog.json": {
+    "mtime": 1782980035.74534,
+    "ast_hash": "0506c1edefb44088b91bf6baaa33ac0d",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/spec/rest_list_shapes.json": {
+    "mtime": 1782980035.724363,
+    "ast_hash": "af6a75fee03dd81319c7f52d82f2393b",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/spec/communitree_admin_spec.json": {
+    "mtime": 1782980035.7116542,
+    "ast_hash": "649fbe29dfc4361dd71f9e19c958878e",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/spec/graphql_introspection.json": {
+    "mtime": 1782980035.7226713,
+    "ast_hash": "2bb7340072164a321e5d3719dff2068c",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/.claude/settings.json": {
+    "mtime": 1782980034.8029659,
+    "ast_hash": "87f0d903477984d0587a02f8fe185263",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/.claude/settings.local.json": {
+    "mtime": 1782980090.9332101,
+    "ast_hash": "0fcc8665e572ab7be3dc76db735a1775",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/.claude/launch.json": {
+    "mtime": 1782980034.8022783,
+    "ast_hash": "c9d8d10648a2c6336a5b91ebb6b2ab30",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/api/index.js": {
+    "mtime": 1782980034.9311929,
+    "ast_hash": "4debf0ba75ea1865af41564b85b613bb",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/email-preview.html": {
+    "mtime": 1782980035.3192823,
+    "ast_hash": "e1a1672a19f9810b4623ee11f2b98137",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/CLAUDE.md": {
+    "mtime": 1782980034.8111203,
+    "ast_hash": "84408e202485ee86833be5456ed6b068",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/STATUS.md": {
+    "mtime": 1782980034.9355276,
+    "ast_hash": "d4d930aceb54d1ac3d2c1fa6b48aee4c",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/SMOKE_RESULTS.md": {
+    "mtime": 1782980034.9343944,
+    "ast_hash": "81a6688144d7cfbbcf7bbb04f0011888",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/README.md": {
+    "mtime": 1782980034.9319692,
+    "ast_hash": "67d036cf79f86fb88209c3e688e48b13",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/server/README.md": {
+    "mtime": 1782980035.2837996,
+    "ast_hash": "e127e3d5a904d0cd344174e3b5c893f8",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/server/NOTES.md": {
+    "mtime": 1782980035.283398,
+    "ast_hash": "3c29382d0a85080ec15cce3e85f7bc20",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/server/CLAUDE.md": {
+    "mtime": 1782980035.283163,
+    "ast_hash": "58778a0abc8899794b821c7293e4a627",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/CONTRACTS.md": {
+    "mtime": 1782980034.9397528,
+    "ast_hash": "50fbff89fc6b0dfc101411baaf275c6c",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/index.html": {
+    "mtime": 1782980034.9405162,
+    "ast_hash": "6560daffe4abc7161e80f3d2415a3ff5",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/Forests/NOTES.md": {
+    "mtime": 1782980035.233771,
+    "ast_hash": "61579a40ccb99bee358cef7d8524e4fa",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/src/pages/Employees/NOTES.md": {
+    "mtime": 1782980035.226009,
+    "ast_hash": "e74649583be855c5db512e725064fe85",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/spec/write_contracts.md": {
+    "mtime": 1782980035.7461176,
+    "ast_hash": "a5e844a13acabf9dca738e905d7e27b2",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/spec/forest_and_bulk_contracts.md": {
+    "mtime": 1782980035.712785,
+    "ast_hash": "65647dd47dc2369c956a1a3ac5ad22d2",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/spec/keys_and_services.md": {
+    "mtime": 1782980035.7234864,
+    "ast_hash": "0ea244fc5a081364ba2b147724907605",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/spec/sponsor_portal.md": {
+    "mtime": 1782980035.745747,
+    "ast_hash": "1b49c2c5db793dcf62f5e383762910a8",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/spec/geo_and_species.md": {
+    "mtime": 1782980035.7140572,
+    "ast_hash": "20618766bc2c8dcf8cf9955dba0280d7",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/.claude/CLAUDE.md": {
+    "mtime": 1782980034.7984982,
+    "ast_hash": "db73b0edd7ffbc61ceac177130730865",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/.claude/commands/opsx/explore.md": {
+    "mtime": 1782980034.8003995,
+    "ast_hash": "bca6fe1d095ba5a832abed55072b9def",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/.claude/commands/opsx/archive.md": {
+    "mtime": 1782980034.7998335,
+    "ast_hash": "622fed432675ead218192e24f3343e19",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/.claude/commands/opsx/apply.md": {
+    "mtime": 1782980034.7993155,
+    "ast_hash": "1678894a7cfd1ea31917ed6ebeabc11b",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/.claude/commands/opsx/propose.md": {
+    "mtime": 1782980034.8011615,
+    "ast_hash": "0997adc1ed0af0a068544bc87a177770",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/.claude/skills/quarterly-session/SKILL.md": {
+    "mtime": 1782980034.8106582,
+    "ast_hash": "29926b829ff37df60258c329e756e9c1",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/.claude/skills/openspec-apply-change/SKILL.md": {
+    "mtime": 1782980034.8081415,
+    "ast_hash": "113ad4a13c30634311141d6dadcc0464",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/.claude/skills/openspec-explore/SKILL.md": {
+    "mtime": 1782980034.809289,
+    "ast_hash": "d160105373f4fe54bfbe1790b343c51b",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/.claude/skills/openspec-archive-change/SKILL.md": {
+    "mtime": 1782980034.808709,
+    "ast_hash": "f010cb3292d101742592bcad1abfe762",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/.claude/skills/openspec-propose/SKILL.md": {
+    "mtime": 1782980034.8098347,
+    "ast_hash": "0753f4a4ce92da2b27bef07c994bef17",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/.claude/skills/graphify/SKILL.md": {
+    "mtime": 1782980034.807355,
+    "ast_hash": "5ae00786ea53e4d944ab70abe11eedd1",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/docs/geo-dmrv-gap-analysis.md": {
+    "mtime": 1782980035.3133802,
+    "ast_hash": "1dc0146c883b51cafc7c24c3af4107b7",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/docs/OPERATIONS-COSTING.html": {
+    "mtime": 1782980035.305767,
+    "ast_hash": "5b22763565840fd295936d7ce891b60f",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/docs/PRICING-TIERS-3YR.html": {
+    "mtime": 1782980035.3103156,
+    "ast_hash": "22f7e792ec78dcb8e1243e1d33549217",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/docs/EXPERIENCE-DEMO.html": {
+    "mtime": 1782980035.3029912,
+    "ast_hash": "2b01b249725570e4b9a37a4bda954845",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/docs/communitree-vision.md": {
+    "mtime": 1782980035.3128,
+    "ast_hash": "41732962b4928195c9867a7aa1138e44",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/docs/SCHEMA.html": {
+    "mtime": 1782980035.31161,
+    "ast_hash": "f2cc54fb3eba3f598f28507fc01de8bb",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/docs/OPERATIONS-COSTING.md": {
+    "mtime": 1782980035.3062992,
+    "ast_hash": "4183f05067ff09f81f1ca3e83438dc8a",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/docs/FIXED-COSTING.html": {
+    "mtime": 1782980035.303249,
+    "ast_hash": "7b9dccfcd3a9daded4e866b10c84ab1b",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/docs/OUTREACH-NGOS.html": {
+    "mtime": 1782980035.3100505,
+    "ast_hash": "8d7525d67a97393b18d054235d5469cb",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/docs/screens.html": {
+    "mtime": 1782980035.3156028,
+    "ast_hash": "f8e310fb4107a9010f558b78abba293b",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/docs/TECH-COSTING.html": {
+    "mtime": 1782980035.3119557,
+    "ast_hash": "6865e8caa01370c85660b4a1e13b74e7",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/docs/MARKET-PRICING-RESEARCH.html": {
+    "mtime": 1782980035.3048723,
+    "ast_hash": "2d3c6734ca31585b590549703f3cde8d",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/docs/ENV.md": {
+    "mtime": 1782980035.3026447,
+    "ast_hash": "d369af65f8bab2fcbb82bb2bbb72a236",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/docs/BUSINESS-PLAN.html": {
+    "mtime": 1782980035.301773,
+    "ast_hash": "762e614dcb832ae848c0f52333df54d5",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/docs/AUTO-PIPELINE-BLUEPRINT.html": {
+    "mtime": 1782980035.3014798,
+    "ast_hash": "e90310ac6fcccbb2c95a6194aee88fec",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/docs/GRI-MAPPING.md": {
+    "mtime": 1782980035.3037057,
+    "ast_hash": "ca2ca1f4916b00bdeb5f50c50fd80f5a",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/docs/cgi-go-live-report.html": {
+    "mtime": 1782980035.3124795,
+    "ast_hash": "072bd779adb50f66873d108d117ce30d",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/docs/MASTER-DECK.html": {
+    "mtime": 1782980035.3053918,
+    "ast_hash": "ceb3508a45caaf1d8f7f8aec41818eb0",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/docs/carbon-credit-strategy.md": {
+    "mtime": 1782980035.3122265,
+    "ast_hash": "039ff1a695742aaf4d83757b39e10fbd",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/docs/COMPETITOR-INTEL.html": {
+    "mtime": 1782980035.3024275,
+    "ast_hash": "4e4cfe297401b6a4b76e073294e7c3a0",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/docs/OUTREACH-ENGINE.html": {
+    "mtime": 1782980035.3078816,
+    "ast_hash": "6b6553f7be566ee899b284dca4b0c98e",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/docs/incumbent-teardown.md": {
+    "mtime": 1782980035.3140397,
+    "ast_hash": "d82fb183b7d8dc93d41f6a96ce767073",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/docs/GO-LIVE-CGI-VERIFICATION.md": {
+    "mtime": 1782980035.3034847,
+    "ast_hash": "f22e6905ee10a768b0a8f6360ef249c3",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/docs/REPORTING-SPEC.md": {
+    "mtime": 1782980035.3108616,
+    "ast_hash": "408b6c69c5343b5d0152afdcba51409f",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/docs/GRI-REPORT.html": {
+    "mtime": 1782980035.3040097,
+    "ast_hash": "9520609f8ce598b13be7d29eafa49b20",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/docs/transcripts/loom/BTH-report-review.txt": {
+    "mtime": 1782980035.3174794,
+    "ast_hash": "79c6925a609544be6f0e395cfe8c3983",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/docs/transcripts/loom/BTH-quarter-logic.txt": {
+    "mtime": 1782980035.3170297,
+    "ast_hash": "3e27ff9a9af6abafe0f70f70606e865c",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/docs/transcripts/loom/Project-Update-Reporting-Strategies.txt": {
+    "mtime": 1782980035.3183477,
+    "ast_hash": "c08b339241fbfdbacb79d900b1ad9fc3",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/docs/transcripts/loom/BTH-Product-Demo.txt": {
+    "mtime": 1782980035.3163052,
+    "ast_hash": "fbda2e66ef56fbaa0e625d7f75fc3549",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/docs/transcripts/loom/Site-Location-Photo-Ideas.txt": {
+    "mtime": 1782980035.3187854,
+    "ast_hash": "dbfc767c398f26195a771058dba1dee5",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/docs/transcripts/loom/Bth-reports-Asim.txt": {
+    "mtime": 1782980035.3178406,
+    "ast_hash": "61c8add39890352a1682b14d73a03faa",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/docs/plans/360-photos.md": {
+    "mtime": 1782980035.3146274,
+    "ast_hash": "eb832de90e26d7cc34ce94ae32e6383a",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/docs/plans/interactive-360-hotspots.md": {
+    "mtime": 1782980035.3150992,
+    "ast_hash": "e0f280579383c3fff963610c30455aee",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/project.md": {
+    "mtime": 1782980035.70194,
+    "ast_hash": "fc851c98ce1a0840f062b934ab2026d8",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/specs/sponsor-portal/spec.md": {
+    "mtime": 1782980035.7068925,
+    "ast_hash": "78623c7ad8c0cb9e9d40c814e09cc681",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/specs/dom-crash-resilience/spec.md": {
+    "mtime": 1782980035.7042303,
+    "ast_hash": "98243ad9f6b4e33d3e9da96f732be426",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/specs/auth-and-roles/spec.md": {
+    "mtime": 1782980035.7025955,
+    "ast_hash": "b80584ccd8a70e668caa8916b49e2355",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/specs/proof-of-life/spec.md": {
+    "mtime": 1782980035.7062316,
+    "ast_hash": "3bcba9eb3e74bafa836935a607c017d9",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/specs/capture-integrity/spec.md": {
+    "mtime": 1782980035.7030454,
+    "ast_hash": "e81173f8caff497479fe9aad743cb859",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/specs/carbon-dmrv/spec.md": {
+    "mtime": 1782980035.7037852,
+    "ast_hash": "e9389862f4c39e200df4208edc3389ec",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/specs/forest-geotagging/spec.md": {
+    "mtime": 1782980035.7049446,
+    "ast_hash": "fe7317abe4690abe1c1dcfa6cff136ed",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/specs/forest-map-visibility/spec.md": {
+    "mtime": 1782980035.7055902,
+    "ast_hash": "0956f7a98e20127bab13a56a05db77ac",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/specs/transactional-email/spec.md": {
+    "mtime": 1782980035.7073252,
+    "ast_hash": "00c0b5ef7a80c49e67b8b16cd99385d5",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/forest-edit-delete-integrity/.openspec.yaml": {
+    "mtime": 1782980035.6538224,
+    "ast_hash": "bf78f855d6a0425db6bc305ffd968e0f",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/forest-edit-delete-integrity/tasks.md": {
+    "mtime": 1782980035.657279,
+    "ast_hash": "3ea6c17fe817ba4bd0001c020b72f043",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/forest-edit-delete-integrity/proposal.md": {
+    "mtime": 1782980035.6546497,
+    "ast_hash": "5386fbbc73dbd97fda459658b26f11f0",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/forest-edit-delete-integrity/specs/forest-editing/spec.md": {
+    "mtime": 1782980035.6560786,
+    "ast_hash": "044886548add2af716db6e0996d205a2",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/admin-dashboard-bento/.openspec.yaml": {
+    "mtime": 1782980035.6024966,
+    "ast_hash": "000cce4a3b54e701a8b5611230d0478b",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/admin-dashboard-bento/tasks.md": {
+    "mtime": 1782980035.604497,
+    "ast_hash": "f33c860dc9d9ca972446df667aa9f85d",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/admin-dashboard-bento/proposal.md": {
+    "mtime": 1782980035.6032567,
+    "ast_hash": "f7434960a5a7181519a19416dac07c5b",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/admin-dashboard-bento/specs/admin-shell/spec.md": {
+    "mtime": 1782980035.6040297,
+    "ast_hash": "3225388c61cd691be5cf4b67bee4ce18",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/auto-growth-default-curve/.openspec.yaml": {
+    "mtime": 1782980035.647949,
+    "ast_hash": "603c5ea41732be2351f30ab0ce563b10",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/auto-growth-default-curve/tasks.md": {
+    "mtime": 1782980035.64948,
+    "ast_hash": "e97d08cc5d168e5946c617bf913a6746",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/auto-growth-default-curve/proposal.md": {
+    "mtime": 1782980035.6482935,
+    "ast_hash": "3d1cbf5df4ecad85c6779778b824d9be",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/auto-growth-default-curve/specs/report-rendering/spec.md": {
+    "mtime": 1782980035.6491506,
+    "ast_hash": "f979dbd5e6f21d7ba20e0abcfddb23ac",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/report-capture-weather-media/.openspec.yaml": {
+    "mtime": 1782980035.6804395,
+    "ast_hash": "000cce4a3b54e701a8b5611230d0478b",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/report-capture-weather-media/tasks.md": {
+    "mtime": 1782980035.6860683,
+    "ast_hash": "cd7ac4da34a02e788e26b511c30629cd",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/report-capture-weather-media/proposal.md": {
+    "mtime": 1782980035.6822925,
+    "ast_hash": "f0527aeebcf7c9a9c0f1faa305e6b599",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/report-capture-weather-media/specs/report-photo-capture/spec.md": {
+    "mtime": 1782980035.6849227,
+    "ast_hash": "d79fed113f7d7676814b59c62b4b886c",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/report-capture-weather-media/specs/climate-autofill/spec.md": {
+    "mtime": 1782980035.6839185,
+    "ast_hash": "99741aa975ce819c78c2ffddf73be920",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/report-capture-weather-media/specs/report-rendering/spec.md": {
+    "mtime": 1782980035.685678,
+    "ast_hash": "41dd75bef78b22f673223a0e73835454",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/report-capture-weather-media/specs/report-media/spec.md": {
+    "mtime": 1782980035.684294,
+    "ast_hash": "a06bc29d4a1bde69bcd31cd0dcc2c085",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/report-render-and-capture-fixes/.openspec.yaml": {
+    "mtime": 1782980035.6918573,
+    "ast_hash": "aa6db2eaf8f605159d974c0bba1bf50a",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/report-render-and-capture-fixes/tasks.md": {
+    "mtime": 1782980035.695344,
+    "ast_hash": "5bc2626b8286c868572f28105880652f",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/report-render-and-capture-fixes/proposal.md": {
+    "mtime": 1782980035.6932042,
+    "ast_hash": "aad66c0371bdd141ae229eb3e79e29a4",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/report-render-and-capture-fixes/specs/report-rendering/spec.md": {
+    "mtime": 1782980035.694334,
+    "ast_hash": "141c43b5a339a03a2913d35095274198",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/report-render-and-capture-fixes/specs/capture-integrity/spec.md": {
+    "mtime": 1782980035.6938102,
+    "ast_hash": "e76ed0be38b1fee622e5195e8a82cce4",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/archive/2026-06-26-resend-email-overhaul/.openspec.yaml": {
+    "mtime": 1782980035.6429677,
+    "ast_hash": "000cce4a3b54e701a8b5611230d0478b",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/archive/2026-06-26-resend-email-overhaul/tasks.md": {
+    "mtime": 1782980035.64555,
+    "ast_hash": "3a411422eb7c0d3cd57a9f1e1dc0840d",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/archive/2026-06-26-resend-email-overhaul/design.md": {
+    "mtime": 1782980035.643337,
+    "ast_hash": "63e7f3e891d1760f2065afa383b81111",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/archive/2026-06-26-resend-email-overhaul/proposal.md": {
+    "mtime": 1782980035.6437268,
+    "ast_hash": "c00476e4a7f6077ab1b3bf67703064cb",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/archive/2026-06-26-resend-email-overhaul/specs/transactional-email/spec.md": {
+    "mtime": 1782980035.644616,
+    "ast_hash": "461b042f0fabe64ce3076c7f2f363429",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/archive/2026-06-26-harden-dom-crash-guard/.openspec.yaml": {
+    "mtime": 1782980035.6351688,
+    "ast_hash": "000cce4a3b54e701a8b5611230d0478b",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/archive/2026-06-26-harden-dom-crash-guard/tasks.md": {
+    "mtime": 1782980035.6371737,
+    "ast_hash": "0ffcc3ae231bf076e9231c77aca70237",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/archive/2026-06-26-harden-dom-crash-guard/design.md": {
+    "mtime": 1782980035.6357055,
+    "ast_hash": "c1b27832eeab24761902f270e7f25fd7",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/archive/2026-06-26-harden-dom-crash-guard/proposal.md": {
+    "mtime": 1782980035.6362627,
+    "ast_hash": "c4ce5a2681ba2ae043c5a4b47ef6049d",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/archive/2026-06-26-harden-dom-crash-guard/specs/dom-crash-resilience/spec.md": {
+    "mtime": 1782980035.6366854,
+    "ast_hash": "8fe131171f5ec393b15ef083dab6d3aa",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/archive/2026-06-26-map-forest-visibility/.openspec.yaml": {
+    "mtime": 1782980035.6373422,
+    "ast_hash": "000cce4a3b54e701a8b5611230d0478b",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/archive/2026-06-26-map-forest-visibility/tasks.md": {
+    "mtime": 1782980035.6424012,
+    "ast_hash": "293322255e424968b9e76283600242d7",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/archive/2026-06-26-map-forest-visibility/design.md": {
+    "mtime": 1782980035.6379945,
+    "ast_hash": "f786011da332b5637619858aa8f34099",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/archive/2026-06-26-map-forest-visibility/proposal.md": {
+    "mtime": 1782980035.6399107,
+    "ast_hash": "0bfac055ff8b3b7704bfff158c8c56f5",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/archive/2026-06-26-map-forest-visibility/specs/forest-geotagging/spec.md": {
+    "mtime": 1782980035.640558,
+    "ast_hash": "6d7344a48a7f1bf535c55ac8b61af9ff",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/archive/2026-06-26-map-forest-visibility/specs/forest-map-visibility/spec.md": {
+    "mtime": 1782980035.6410682,
+    "ast_hash": "bec2ce60ebe2f44a88577e1f5e4a8291",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/nondestructive-forest-edit/tasks.md": {
+    "mtime": 1782980035.6737485,
+    "ast_hash": "4ee0f6b6ac3896c0028e87a95faf6127",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/nondestructive-forest-edit/proposal.md": {
+    "mtime": 1782980035.672716,
+    "ast_hash": "d8d32c1b95d0540a66ca3f23c2f6c92b",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/nondestructive-forest-edit/specs/forest-edit/spec.md": {
+    "mtime": 1782980035.6731412,
+    "ast_hash": "cb51e23ad7b55ca52c4d1f5346accdb6",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/simplify-quarterly-reporting/.openspec.yaml": {
+    "mtime": 1782980035.6976123,
+    "ast_hash": "aa6db2eaf8f605159d974c0bba1bf50a",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/simplify-quarterly-reporting/tasks.md": {
+    "mtime": 1782980035.7014139,
+    "ast_hash": "9773944070afb74109a894446d8d9741",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/simplify-quarterly-reporting/proposal.md": {
+    "mtime": 1782980035.6980855,
+    "ast_hash": "6eb87534289bf1604da99d31861857cd",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/simplify-quarterly-reporting/specs/report-photo-capture/spec.md": {
+    "mtime": 1782980035.7002103,
+    "ast_hash": "441134f06b0e1232bb98cd5d137abeb4",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/simplify-quarterly-reporting/specs/report-derivations/spec.md": {
+    "mtime": 1782980035.6996593,
+    "ast_hash": "b15294e7a9d2af70c84aa064f1fc5619",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/simplify-quarterly-reporting/specs/climate-autofill/spec.md": {
+    "mtime": 1782980035.6988204,
+    "ast_hash": "a4f964548779ce270a5f28222a0b17af",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/simplify-quarterly-reporting/specs/area-stats-autofill/spec.md": {
+    "mtime": 1782980035.698311,
+    "ast_hash": "2b914c7f964bde1d8621d2e1e0169349",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/simplify-quarterly-reporting/specs/quarterly-session-skill/spec.md": {
+    "mtime": 1782980035.6990464,
+    "ast_hash": "fa7824be31b849f19beba8ed8478dafd",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/simplify-quarterly-reporting/specs/report-value-flow/spec.md": {
+    "mtime": 1782980035.7010977,
+    "ast_hash": "a170cd71ae2eea8989cc3929d4fbd63f",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/simplify-quarterly-reporting/specs/report-quarter-flow/spec.md": {
+    "mtime": 1782980035.7006583,
+    "ast_hash": "d4a01fec10fc8bee44c738317645d41c",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/report-crud-fix-and-pdf/tasks.md": {
+    "mtime": 1782980035.6915066,
+    "ast_hash": "7216009ec686ff75e8f2da80a93876b6",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/report-crud-fix-and-pdf/proposal.md": {
+    "mtime": 1782980035.6904733,
+    "ast_hash": "a0e9f8e8994c349db1850b0e4eeb0157",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/report-crud-fix-and-pdf/specs/quarterly-reporting/spec.md": {
+    "mtime": 1782980035.6911144,
+    "ast_hash": "2f582020b6183908a529982099dc2d7b",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/per-year-photo-gallery/.openspec.yaml": {
+    "mtime": 1782980035.6740847,
+    "ast_hash": "bf78f855d6a0425db6bc305ffd968e0f",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/per-year-photo-gallery/tasks.md": {
+    "mtime": 1782980035.6760168,
+    "ast_hash": "0a082e95ff678fddb8c7ebe479e740a9",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/per-year-photo-gallery/proposal.md": {
+    "mtime": 1782980035.6745658,
+    "ast_hash": "836b26575e719337d4ab041bc2fec366",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/per-year-photo-gallery/specs/report-gallery/spec.md": {
+    "mtime": 1782980035.6755645,
+    "ast_hash": "41fe3b04bbab2863f4d34d7699a7a14b",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/per-year-photo-gallery/specs/pfa-capture/spec.md": {
+    "mtime": 1782980035.6751888,
+    "ast_hash": "9a88068641c14d70dc7acadc173a0d73",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/forest-delete-cascade/.openspec.yaml": {
+    "mtime": 1782980035.6519399,
+    "ast_hash": "bf78f855d6a0425db6bc305ffd968e0f",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/forest-delete-cascade/tasks.md": {
+    "mtime": 1782980035.6536813,
+    "ast_hash": "c4f8d95c94c28d43996f3f52f72d83f5",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/forest-delete-cascade/proposal.md": {
+    "mtime": 1782980035.6526144,
+    "ast_hash": "657c81acff171cbc1372c94875f94a0f",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/forest-delete-cascade/specs/forest-lifecycle/spec.md": {
+    "mtime": 1782980035.653277,
+    "ast_hash": "9def6f3b5060aa74544d0f993f59b4ca",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/non-destructive-report-save/.openspec.yaml": {
+    "mtime": 1782980035.6697693,
+    "ast_hash": "bf78f855d6a0425db6bc305ffd968e0f",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/non-destructive-report-save/tasks.md": {
+    "mtime": 1782980035.6721172,
+    "ast_hash": "57cc1b9bbac595887b5b43400d7e63e9",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/non-destructive-report-save/proposal.md": {
+    "mtime": 1782980035.6705778,
+    "ast_hash": "3a4cfee5c05b6954523fea6be5ba41c1",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/non-destructive-report-save/specs/report-data-integrity/spec.md": {
+    "mtime": 1782980035.6710355,
+    "ast_hash": "e3da6146de9af6f060734ed007cea58c",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/forest-edit-species-visibility/tasks.md": {
+    "mtime": 1782980035.6597466,
+    "ast_hash": "f4d1dd2716c915e3d3a4f42c9782a094",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/forest-edit-species-visibility/proposal.md": {
+    "mtime": 1782980035.6588635,
+    "ast_hash": "bb1dc0c9a451c8843c9acc80500731b0",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/forest-edit-species-visibility/specs/forest-edit/spec.md": {
+    "mtime": 1782980035.6593587,
+    "ast_hash": "6d11b9aaf981dec04b0162c885309878",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/row-actions-left-everywhere/tasks.md": {
+    "mtime": 1782980035.6973124,
+    "ast_hash": "5dd4686e35174f6a47834af8e49d3403",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/row-actions-left-everywhere/proposal.md": {
+    "mtime": 1782980035.6961231,
+    "ast_hash": "f9c1b90bd99e782bc420ba0292fc089c",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/row-actions-left-everywhere/specs/admin-home/spec.md": {
+    "mtime": 1782980035.6968434,
+    "ast_hash": "75a3ca39396936f95b46020a9944cf67",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/audit-activity-log/.openspec.yaml": {
+    "mtime": 1782980035.6457257,
+    "ast_hash": "000cce4a3b54e701a8b5611230d0478b",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/audit-activity-log/tasks.md": {
+    "mtime": 1782980035.6476111,
+    "ast_hash": "524a65b5f8786a6606d02cba117a33d5",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/audit-activity-log/proposal.md": {
+    "mtime": 1782980035.646886,
+    "ast_hash": "59e290ffea6758f454201ea21ccda9e4",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/audit-activity-log/specs/audit-log/spec.md": {
+    "mtime": 1782980035.6473184,
+    "ast_hash": "53420d2be3459b843ecab30b19881d88",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/relax-mandatory-fields/.openspec.yaml": {
+    "mtime": 1782980035.6786518,
+    "ast_hash": "bf78f855d6a0425db6bc305ffd968e0f",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/relax-mandatory-fields/tasks.md": {
+    "mtime": 1782980035.6797287,
+    "ast_hash": "e51bab3562d687e2df4fbc760636ce7e",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/relax-mandatory-fields/proposal.md": {
+    "mtime": 1782980035.6788647,
+    "ast_hash": "6304805a9aaee03eaade692b2a27009c",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/relax-mandatory-fields/specs/forest-creation/spec.md": {
+    "mtime": 1782980035.6793299,
+    "ast_hash": "9413e455776955083c9ad4b846da29b3",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/harden-180-site-seed-migration/.openspec.yaml": {
+    "mtime": 1782980035.6680737,
+    "ast_hash": "aa6db2eaf8f605159d974c0bba1bf50a",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/harden-180-site-seed-migration/tasks.md": {
+    "mtime": 1782980035.6696105,
+    "ast_hash": "6db314b7cf1ff23db84c8caff6d70abc",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/harden-180-site-seed-migration/proposal.md": {
+    "mtime": 1782980035.6688442,
+    "ast_hash": "573a13c22f3d1b4da7761feade5760af",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/harden-180-site-seed-migration/specs/seed-data-import/spec.md": {
+    "mtime": 1782980035.6692073,
+    "ast_hash": "42515ce3da04e2180494f879e5cd97a3",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/quarterly-forest-report/.openspec.yaml": {
+    "mtime": 1782980035.6763186,
+    "ast_hash": "000cce4a3b54e701a8b5611230d0478b",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/quarterly-forest-report/tasks.md": {
+    "mtime": 1782980035.6782537,
+    "ast_hash": "a6181140c1684e760d886b11ac449925",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/quarterly-forest-report/proposal.md": {
+    "mtime": 1782980035.6767933,
+    "ast_hash": "7e57ae92f6d21a5dec8bce77035625e2",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/quarterly-forest-report/specs/report-generation/spec.md": {
+    "mtime": 1782980035.6775684,
+    "ast_hash": "3156eca593e7f1e60ee6365ed00067bc",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/forest-map-species-matrix/.openspec.yaml": {
+    "mtime": 1782980035.661608,
+    "ast_hash": "000cce4a3b54e701a8b5611230d0478b",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/forest-map-species-matrix/tasks.md": {
+    "mtime": 1782980035.6637073,
+    "ast_hash": "6d031d1087d346533e7159e1e6e5918b",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/forest-map-species-matrix/proposal.md": {
+    "mtime": 1782980035.6623566,
+    "ast_hash": "bb8daa46b635a947b3b374a7058e16f1",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/forest-map-species-matrix/specs/forest-map-visualization/spec.md": {
+    "mtime": 1782980035.6629713,
+    "ast_hash": "1901ef967a166a1b29561598b6fd29d2",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/boundary-editor-and-geocode/.openspec.yaml": {
+    "mtime": 1782980035.6496243,
+    "ast_hash": "000cce4a3b54e701a8b5611230d0478b",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/boundary-editor-and-geocode/tasks.md": {
+    "mtime": 1782980035.6511655,
+    "ast_hash": "5eda9f0d745683a1cbe3fbd1e35e84e0",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/boundary-editor-and-geocode/proposal.md": {
+    "mtime": 1782980035.6501575,
+    "ast_hash": "bdc851b0aa0b43e645ec9dd3e76bff20",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/boundary-editor-and-geocode/specs/forest-geotagging/spec.md": {
+    "mtime": 1782980035.6508498,
+    "ast_hash": "acf716057b4ae4a5ecc5ba2d1a7568c4",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/forest-tree-matrix-and-boundary/tasks.md": {
+    "mtime": 1782980035.6665702,
+    "ast_hash": "a792f6291429497c4906298935af1c1b",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/forest-tree-matrix-and-boundary/proposal.md": {
+    "mtime": 1782980035.6644933,
+    "ast_hash": "5caa2299c1c57359d44b274953902f17",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/forest-tree-matrix-and-boundary/specs/forest-tree-matrix/spec.md": {
+    "mtime": 1782980035.666028,
+    "ast_hash": "d298c6c1c178a83b453544bda92656d7",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/forest-tree-matrix-and-boundary/specs/forest-geotagging/spec.md": {
+    "mtime": 1782980035.6649034,
+    "ast_hash": "ac818f9a7cafc24e6b1465736c3a2b17",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/admin-shell-and-reliability/tasks.md": {
+    "mtime": 1782980035.634789,
+    "ast_hash": "e6666ae21c3bc58c65d35d13cacbaf0a",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/admin-shell-and-reliability/proposal.md": {
+    "mtime": 1782980035.6056452,
+    "ast_hash": "d1ff2f33a8280cd5160dadc0c9c3bc84",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/admin-shell-and-reliability/specs/admin-home/spec.md": {
+    "mtime": 1782980035.6290789,
+    "ast_hash": "edf7b7cf78ebd5e4e1d502cc2f98da1d",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/admin-shell-and-reliability/specs/auth-and-roles/spec.md": {
+    "mtime": 1782980035.6324868,
+    "ast_hash": "68144e5d7c4bd7b80f85fd6622978425",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/admin-shell-and-reliability/specs/background-jobs/spec.md": {
+    "mtime": 1782980035.6338105,
+    "ast_hash": "6bd02e3869826b5a37c315e1998b306e",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/report-cover-uploads-reliability/tasks.md": {
+    "mtime": 1782980035.6900578,
+    "ast_hash": "0fe2350900e0393cc5cd9a0a54d35766",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/report-cover-uploads-reliability/proposal.md": {
+    "mtime": 1782980035.6864612,
+    "ast_hash": "d5b26f8116120c10b43848c55371dee8",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/report-cover-uploads-reliability/specs/quarterly-reporting/spec.md": {
+    "mtime": 1782980035.6894565,
+    "ast_hash": "d480f74d49d42f021627359ddfc0eb6e",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/report-cover-uploads-reliability/specs/deploy-reliability/spec.md": {
+    "mtime": 1782980035.6872091,
+    "ast_hash": "f19852c752dd2c8a3caea345e24fdd88",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/report-cover-uploads-reliability/specs/proof-of-life/spec.md": {
+    "mtime": 1782980035.6886737,
+    "ast_hash": "d015469ef6aa3a632992885beba59beb",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/openspec/changes/report-cover-uploads-reliability/specs/forest-geotagging/spec.md": {
+    "mtime": 1782980035.688164,
+    "ast_hash": "29ce107bdc8521dba26ffb2ceea57530",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/email-samples/sample-b-bold.html": {
+    "mtime": 1782980035.3203268,
+    "ast_hash": "7acb6ea29b7db434556163e1e88936dd",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/email-samples/sample-c-warm.html": {
+    "mtime": 1782980035.3205912,
+    "ast_hash": "e535446a7cc3e12e811f1b3ff68fa977",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/email-samples/sample-a-minimal.html": {
+    "mtime": 1782980035.319902,
+    "ast_hash": "4d821b9fc40a783881bc29ed17fe4e4b",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/public/communitree-mark.svg": {
+    "mtime": 1782980034.9515924,
+    "ast_hash": "33345358fad1eda8750d7bedee8a6378",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/public/leaf.svg": {
+    "mtime": 1782980034.9518063,
+    "ast_hash": "33345358fad1eda8750d7bedee8a6378",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/public/pfa-icon.svg": {
+    "mtime": 1782980035.20684,
+    "ast_hash": "b5f4eccb936cab8a952cedd5781ac9f9",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/public/panoramas/empty-field-360.jpg": {
+    "mtime": 1782980035.001085,
+    "ast_hash": "d0c295a550432df11b01b57dfbe816bb",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/public/panoramas/barren-land-360.jpg": {
+    "mtime": 1782980034.990316,
+    "ast_hash": "557bc32e36cd41d948a648c1ca88fe7b",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/public/panoramas/phalzer-forest-360.jpg": {
+    "mtime": 1782980035.1703496,
+    "ast_hash": "8de0d270b6ae2f48e97f7718f6a24698",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/public/panoramas/mossy-forest-360.jpg": {
+    "mtime": 1782980035.1109614,
+    "ast_hash": "becdc30d0a2c6f87df7c7f53d8d7b3a9",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/public/panoramas/forest-slope-360.jpg": {
+    "mtime": 1782980035.0391417,
+    "ast_hash": "34bb2a94fc66b1d2b1c5faf859c995fa",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/public/panoramas/pnb-360-scene-b.jpg": {
+    "mtime": 1782980035.2059226,
+    "ast_hash": "9ee778b06657abef3f04b9639fb0a737",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/app/client/public/panoramas/pnb-360-scene-a.jpg": {
+    "mtime": 1782980035.197387,
+    "ast_hash": "4c52e4ef37da3a631ae17ff63d6cb9ea",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/spec/screens/sponsor-trees.png": {
+    "mtime": 1782980035.7444193,
+    "ast_hash": "6c2375d412fd7dda0f471ca82f9019d7",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/spec/screens/add-forest-step1.png": {
+    "mtime": 1782980035.727115,
+    "ast_hash": "800bc651de7088b19d3a111b8a0912c9",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/spec/screens/dashboard-users.png": {
+    "mtime": 1782980035.7334707,
+    "ast_hash": "4da3541546ede80496c36c4944c544ea",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/spec/screens/sponsor-dashboard.png": {
+    "mtime": 1782980035.7396183,
+    "ast_hash": "441c46c0f4197d1ca1f149073822d5e9",
+    "semantic_hash": ""
+  },
+  "/Users/mukesh/Claude/communitree-rebuild/.claude/worktrees/infallible-nobel-10e712/spec/screens/add-forest-step3-boxes.png": {
+    "mtime": 1782980035.731434,
+    "ast_hash": "47a6b9d9bb897726eb61e5b137da563f",
+    "semantic_hash": ""
   }
 }

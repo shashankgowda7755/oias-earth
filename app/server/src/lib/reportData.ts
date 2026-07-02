@@ -145,28 +145,117 @@ const DEFAULT_GROWTH_TARGETS: { year: number; min: number; max: number }[] = [
   { year: 3, min: 10, max: 14 },
 ];
 
-function growthMilestones(forest: Row) {
-  const pg = forest.plant_growth_data as { target_height_range?: { year: number; min?: number; max?: number }[] } | null;
-  const entered = (pg?.target_height_range ?? []).filter((t) => t.min != null && t.max != null).slice().sort((a, b) => a.year - b.year);
-  // Auto: no manual curve → standard 3-year default.
-  const targets = entered.length > 0 ? entered : DEFAULT_GROWTH_TARGETS;
-  const pd = forest.plantation_date ? new Date(String(forest.plantation_date)) : null;
-  // Heights are floored at 0 and shown as entered (no upper ceiling).
-  const ft = (v: number): number => Math.max(0, v);
-  return targets.map((t) => ({
-    label: t.year === 0 ? 'Year 0' : `End of Year ${t.year}`,
-    range: t.min != null && t.max != null ? `${ft(t.min)}–${ft(t.max)} Feet` : '—',
-    date: pd ? `${MONTHS[pd.getMonth()]}- ${pd.getFullYear() + t.year}` : '—',
-    current: t.year === 0,
-  }));
+interface GrowthMilestone { label: string; range: string; date: string; year: number; months: number; midFeet: number; current: boolean }
+interface GrowthChart { milestones: GrowthMilestone[]; existing: GrowthMilestone | null; elapsed_months: number; current_months: number; current_feet: number | null; max_months: number; max_feet: number; band_label: string }
+
+/** Plantation month + N months → "Jun 2025". */
+function growthDateLabel(plantD: Date | null, monthsFromPlant: number): string {
+  if (!plantD) return '—';
+  const d = new Date(plantD.getFullYear(), plantD.getMonth() + monthsFromPlant, 1);
+  return `${MONTHS[d.getMonth()]} ${d.getFullYear()}`;
 }
 
-function currentHeightLabel(forest: Row): string | null {
-  const pg = forest.plant_growth_data as { actual_height_range?: { year: number; quarter: number; min?: number; max?: number }[] } | null;
-  const a = (pg?.actual_height_range ?? []).slice().sort((x, y) => x.year - y.year || x.quarter - y.quarter);
-  const last = a[a.length - 1];
-  const ft = (v: number): number => Math.max(0, v);
-  return last && last.min != null && last.max != null ? `${ft(last.min)}–${ft(last.max)} Feet` : null;
+/** Linear-interpolate height (midFeet) across the milestone curve at `months`. */
+function interpGrowthFeet(ms: GrowthMilestone[], months: number): number | null {
+  if (ms.length === 0) return null;
+  const first = ms[0]!;
+  const last = ms[ms.length - 1]!;
+  if (months <= first.months) return first.midFeet;
+  if (months >= last.months) return last.midFeet;
+  for (let i = 0; i < ms.length - 1; i++) {
+    const a = ms[i]!;
+    const b = ms[i + 1]!;
+    if (months >= a.months && months <= b.months) {
+      const span = b.months - a.months;
+      const t = span > 0 ? (months - a.months) / span : 0;
+      return a.midFeet + t * (b.midFeet - a.midFeet);
+    }
+  }
+  return last.midFeet;
+}
+
+/**
+ * Slide-13 growth chart. Milestones anchored to the plantation month, carried
+ * for the whole project. The report period's end month is the "as of" date:
+ * months elapsed → arrow x-position; height is interpolated across the per-forest
+ * target curve. Auto-renders from the plantation date alone (default 3-year
+ * curve) when no targets are entered — never null. Server parity with the client
+ * buildGrowth() so the renderer draws identically.
+ */
+function buildGrowthChart(forest: Row, fy: number, q: number): GrowthChart {
+  const pg = forest.plant_growth_data as { target_height_range?: { year: number; min?: number; max?: number }[] } | null;
+  const entered = (pg?.target_height_range ?? [])
+    .filter((t) => t.min != null && t.max != null)
+    .slice()
+    .sort((a, b) => a.year - b.year);
+  const targets = entered.length > 0 ? entered : DEFAULT_GROWTH_TARGETS;
+
+  const ft = (v: number): number => Math.max(0, Math.min(50, v));
+  const plantD = forest.plantation_date ? new Date(String(forest.plantation_date)) : null;
+
+  const reportEndMonthIdx = (FQ_START_MONTH[q] ?? 0) + 2; // 0-indexed quarter end
+  const reportCalYear = fqCalYear(fy, q);
+
+  const maxYear = targets[targets.length - 1]!.year;
+  const maxMonths = Math.max(12, maxYear * 12);
+
+  let elapsed = 0;
+  if (plantD) {
+    elapsed = (reportCalYear - plantD.getFullYear()) * 12
+      + (reportEndMonthIdx - plantD.getMonth());
+  }
+  const currentMonths = Math.max(0, Math.min(maxMonths, elapsed));
+
+  const milestones: GrowthMilestone[] = targets.map((t) => {
+    const lo = ft(t.min!);
+    const hi = ft(t.max!);
+    return {
+      label: t.year === 0 ? 'Year 0' : `End of Year ${t.year}`,
+      range: `${lo}–${hi} Feet`,
+      date: growthDateLabel(plantD, t.year * 12),
+      year: t.year,
+      months: t.year * 12,
+      midFeet: (lo + hi) / 2,
+      current: false,
+    };
+  });
+
+  const currentFeet = interpGrowthFeet(milestones, currentMonths);
+  const maxHi = Math.max(...targets.map((t) => ft(t.max!)));
+  const maxFeet = Math.max(2, Math.ceil(maxHi / 2) * 2);
+
+  const existing: GrowthMilestone | null = plantD ? {
+    label: 'Existing Growth',
+    range: currentFeet != null ? `${Math.round(currentFeet * 10) / 10} Feet` : '—',
+    date: growthDateLabel(plantD, currentMonths),
+    year: -1,
+    months: currentMonths,
+    midFeet: currentFeet ?? 0,
+    current: true,
+  } : null;
+
+  let band = '';
+  if (elapsed <= 0) band = 'At plantation';
+  else if (elapsed >= maxMonths) band = `Project complete (Year ${maxYear}+)`;
+  else {
+    for (let i = 0; i < milestones.length - 1; i++) {
+      if (elapsed >= milestones[i]!.months && elapsed < milestones[i + 1]!.months) {
+        band = `Between Year ${milestones[i]!.year} and Year ${milestones[i + 1]!.year}`;
+        break;
+      }
+    }
+  }
+
+  return {
+    milestones,
+    existing,
+    elapsed_months: elapsed,
+    current_months: currentMonths,
+    current_feet: currentFeet,
+    max_months: maxMonths,
+    max_feet: maxFeet,
+    band_label: band,
+  };
 }
 
 function siteMasterPlan(forest: Row, plantedTotal: number) {
@@ -335,8 +424,7 @@ export async function buildForestReport(forestId: string, year: number, quarter:
     maintenance_tilldate: maintenanceRollup(maint, year, quarter, true),
     workforce_quarter: workforceRollup(maint, year, quarter, false),
     workforce_tilldate: workforceRollup(maint, year, quarter, true),
-    growth_milestones: growthMilestones(forest),
-    current_height_label: currentHeightLabel(forest),
+    growth: buildGrowthChart(forest, year, quarter),
     site_master_plan: siteMasterPlan(forest, total),
     site_plan_boxes,
   };
